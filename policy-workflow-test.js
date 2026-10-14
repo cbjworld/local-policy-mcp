@@ -42,3 +42,10 @@ assert.equal(w.plan({question:'서울 산후조리비 지원 사업 찾아줘'},
  assert.equal(r.financialDocuments.length,1);assert.equal(r.financialDocuments[0].documentRole,'allocation_or_deposit');
  assert.equal(r.projects.length,3);
 })().catch(e=>{console.error(e);process.exitCode=1});
+
+(async()=>{
+ let attempts=0;
+ const docs=Array.from({length:8},(_,i)=>({title:'산후조리비 지원사업 계획',institution:'기관'+i,url:'u'+i}));
+ const r=await w.research({question:'산후조리비 지원',queries:['산후조리비']},{search:async()=>({total:8,hasMore:false,items:docs,reviewItems:[],relatedDocuments:[]}),research:async()=>({status:++attempts<=3?'unreadable':'read'})});
+ assert.equal(attempts,5);assert.equal(r.investigations.filter(x=>x.result.status==='read').length,2);
+})().catch(e=>{console.error(e);process.exitCode=1});
