@@ -123,3 +123,12 @@ npm test
 오류나 개선 의견은 [Issues](https://github.com/cbjworld/local-policy-mcp/issues)에 남겨주세요. API 키, 개인정보, 비공개 원문은 올리지 마세요.
 
 코드는 MIT 라이선스입니다. 공공 문서는 배포하지 않으며 원문 이용조건은 제공기관의 조건을 따릅니다. HWP/HWPX 처리는 MIT 라이선스의 Kordoc, PDF 처리는 pypdf를 사용합니다. 의존성은 각자의 라이선스를 따릅니다.
+
+
+## 조사 범위와 응답 방식
+
+research_policy는 검색어별 최대 4페이지를 직접 조회합니다. 첫 조사는 원문 최대 4건이며, 남은 페이지는 coverage.nextSearches로 이어서 확인합니다. 전국 전수조사가 아닙니다.
+기본 응답은 compact이며 중복된 원문 데이터를 생략합니다. 전체 조사 데이터는 detail: full로 요청하거나 개별 문서를 research_open_document로 조회합니다.
+financialDocuments는 예산·교부·예탁·집행 문서를 따로 보여줍니다. 교부나 예탁을 실제 집행·현재 시행으로 단정하지 않습니다.
+possibleProjectLinks는 일부 명시적인 지역 사업명과 연도가 같은 기관 간 문서의 연관 후보입니다. 자동으로 사업을 합치거나 중복 사업 수를 확정하지 않습니다.
+원격 서버는 세션별 순차 처리하며 최대 4개 요청을 15초까지 대기시킵니다. 한도 초과 시 재시도가 필요합니다.
