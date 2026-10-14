@@ -1,4 +1,4 @@
-# 원격 정책 MCP 배포
+# 원격 지자체 정책검색 MCP 배포
 
 상태: 2026년 10월 14일 Railway에 공개 베타 배포. 주소는 `https://policy-mcp-production.up.railway.app/mcp`이며 로그인 없이 연결합니다. 체험 서버로 운영 중이며 상시 운영을 보장하지 않습니다.
 
