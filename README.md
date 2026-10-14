@@ -1,4 +1,8 @@
-# 정책 MCP
+# local-policy-mcp
+
+지자체 정책검색 MCP
+
+**다른 지자체의 사업·계획·예산을 찾는 MCP**
 
 ## 다른 지자체는 어떻게 했을까?
 
@@ -42,8 +46,8 @@ Streamable HTTP 지원 앱에서 서버 주소로 등록하세요. 인증은 로
 Node.js 22.19 이상, Python 3.10 이상, Git이 필요합니다. stdio MCP를 지원하는 AI 앱에서 실행합니다. 서버 자체는 AI 답변을 생성하지 않으며 연결한 AI가 근거를 해석합니다.
 
 ```sh
-git clone https://github.com/cbjworld/policy-mcp.git
-cd policy-mcp
+git clone https://github.com/cbjworld/local-policy-mcp.git
+cd local-policy-mcp
 npm ci --ignore-scripts --omit=optional
 python -m venv .venv
 ```
@@ -65,11 +69,11 @@ AI 앱의 MCP 설정에 아래 항목을 추가합니다. 두 경로는 실제 �
 ```json
 {
   "mcpServers": {
-    "policy-mcp": {
+    "local-policy-mcp": {
       "command": "node",
-      "args": ["--use-system-ca", "C:/설치폴더/policy-mcp/mcp.js"],
+      "args": ["--use-system-ca", "C:/설치폴더/local-policy-mcp/mcp.js"],
       "env": {
-        "POLICY_PYTHON": "C:/설치폴더/policy-mcp/.venv/Scripts/python.exe"
+        "POLICY_PYTHON": "C:/설치폴더/local-policy-mcp/.venv/Scripts/python.exe"
       }
     }
   }
@@ -116,6 +120,6 @@ npm test
 
 ## 기여와 라이선스
 
-오류나 개선 의견은 [Issues](https://github.com/cbjworld/policy-mcp/issues)에 남겨주세요. API 키, 개인정보, 비공개 원문은 올리지 마세요.
+오류나 개선 의견은 [Issues](https://github.com/cbjworld/local-policy-mcp/issues)에 남겨주세요. API 키, 개인정보, 비공개 원문은 올리지 마세요.
 
 코드는 MIT 라이선스입니다. 공공 문서는 배포하지 않으며 원문 이용조건은 제공기관의 조건을 따릅니다. HWP/HWPX 처리는 MIT 라이선스의 Kordoc, PDF 처리는 pypdf를 사용합니다. 의존성은 각자의 라이선스를 따릅니다.
