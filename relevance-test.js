@@ -32,3 +32,8 @@ for(const title of ['2027년 청년 AI 구독료 지원사업 추진 계획','�
  assert.equal(p.existence.status,'title_inferred');assert.equal(p.fields.budget.status,'unconfirmed');
 }
 console.log('PASS: survey and internal notices remain supporting documents; unreadable plans still imply existence');
+
+assert.equal(require('./relevance').documentRole('사업비 예탁 건의'),'allocation_or_deposit');
+assert.equal(require('./relevance').documentRole('보조금 교부결정'),'allocation_or_deposit');
+assert.equal(require('./relevance').documentRole('사업 집행실적 및 정산'),'execution_or_settlement');
+assert.equal(require('./relevance').documentRole('추경 예산 편성'),'budget');
