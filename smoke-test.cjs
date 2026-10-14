@@ -40,3 +40,9 @@ assert.equal(byInstitution.institutions[0].documents[1].readingStatus,'no_availa
 assert.equal(byInstitution.institutions[1].institution,null);
 assert.equal(present('research_policy',{}).summary.producingInstitutions,0);
 console.log('PASS: institution grouping preserves distinct projects, deduplicates documents and separates unattempted reading');
+
+const large={candidates:[doc],projects:[],investigations:[{candidate:doc,result:{status:'read',attempts:[{fileName:'test.pdf',status:'read',source:{url:doc.url,format:'pdf',pages:[{page:1,text:'x'.repeat(10000)}]}}]}}]};
+const compact=present('research_policy',large),full=present('research_policy',large,'full');
+assert.ok(JSON.stringify(compact).length<JSON.stringify(full).length/2);
+assert.equal(compact.presentation.documents[0].originals[0].url,doc.url);
+assert.equal(full.investigations.length,1);
