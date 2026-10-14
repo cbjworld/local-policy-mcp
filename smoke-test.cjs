@@ -29,7 +29,7 @@ assert.equal(summary.candidateDocuments,2);assert.equal(summary.projectGroups,1)
 assert.equal(present('research_policy',{}).summary.projectGroups,0);
 console.log('PASS: document counts, grouped candidates, unknown and redacted fields remain distinct');
 const other={...notice,title:'다른 사업',url:'other'},unknown={title:'기관 미상 문서',url:'unknown'};
-const byInstitution=present('research_policy',{candidates:[plan,plan,notice,other,unknown],projects:bundle([plan,other]),investigations:[{candidate:plan,result:{status:'read'}},{candidate:notice,result:{status:'no_available_attachment'}}]});
+const byInstitution=present('research_policy',{candidates:[plan,plan,notice,other,unknown],projects:bundle([plan,other]),investigations:[{candidate:plan,result:{status:'read'}},{candidate:notice,result:{status:'no_available_attachment'}}]},'full');
 assert.equal(byInstitution.summary.producingInstitutions,1);
 assert.equal(byInstitution.summary.unknownInstitutionDocuments,1);
 assert.equal(byInstitution.summary.projectGroups,2);
@@ -44,5 +44,9 @@ console.log('PASS: institution grouping preserves distinct projects, deduplicate
 const large={candidates:[doc],projects:[],investigations:[{candidate:doc,result:{status:'read',attempts:[{fileName:'test.pdf',status:'read',source:{url:doc.url,format:'pdf',pages:[{page:1,text:'x'.repeat(10000)}]}}]}}]};
 const compact=present('research_policy',large),full=present('research_policy',large,'full');
 assert.ok(JSON.stringify(compact).length<JSON.stringify(full).length/2);
-assert.equal(compact.presentation.documents[0].originals[0].url,doc.url);
+assert.equal(compact.documents[0].reading.originals[0].url,doc.url);
 assert.equal(full.investigations.length,1);
+
+const many={candidates:Array.from({length:200},(_,i)=>({...doc,url:doc.url+i,title:'긴 제목'.repeat(100)}))};
+const bounded=present('research_policy',many);
+assert.ok(JSON.stringify(bounded).length<=24000);assert.ok(bounded.responseSize.omittedDocuments>0);
