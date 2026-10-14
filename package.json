@@ -1,0 +1,17 @@
+{
+  "name": "korea-local-policy-mcp",
+  "version": "0.5.3",
+  "private": true,
+  "description": "Korean municipal policy document research through the information disclosure portal",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "start": "node --use-system-ca mcp.js",
+    "test": "node evidence-test.js && node relevance-test.js && node open-portal-test.js && node policy-workflow-test.js && node smoke-test.cjs"
+  },
+  "dependencies": {
+    "kordoc": "4.21.30"
+  }
+}

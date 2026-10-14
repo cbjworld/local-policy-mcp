@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict'),{evidence}=require('./evidence'),{research}=require('./open-portal');
+const make=text=>[{status:'read',source:{sourceId:'s',url:'https://example.go.kr/a',pages:[{page:1,text}]}}];
+const a=make('사업기간: 2027. 3.~11.\n지원대상: 미취업 청년\n지원내용: 구독료 지원\n소요예산: 30,000천원(구비)');
+const e=evidence(a);assert.equal(e.fields.budget.status,'needs_review');assert.equal(e.fields.target.status,'needs_review');
+for(const f of Object.values(e.fields))for(const x of f.excerpts)assert(a[0].source.pages[0].text.includes(x.quote));
+assert.equal(evidence(make('소요예산: *****\n사업기간: 2027년')).fields.budget.status,'redacted');
+assert.equal(evidence(make('소요예산: 미정\n참여인원: 300명')).fields.budget.status,'unconfirmed');
+assert.equal(evidence(make('사 업 비 : 155백만원 지원대상: 240명')).fields.budget.status,'needs_review');
+assert.equal(evidence([{...a[0],assessment:'form_or_cover'}]).fields.budget.status,'unconfirmed');
+research({url:'test',requestedQuery:'어르신 일자리'},async()=>({title:'어르신 일자리사업 참여자 인권교육 추진계획',attachments:[]})).then(r=>{assert.equal(r.relevanceStatus,'supporting_document');console.log('PASS: exact excerpts, masked/absent budget, spaced PDF label, forms excluded, query carried to research');}).catch(e=>{console.error(e);process.exitCode=1});
+
+assert.equal(evidence(make('예 산 액: 금7,505,000천원(도비 2,607,000, 시비 4,898,000)')).fields.budget.status,'needs_review');

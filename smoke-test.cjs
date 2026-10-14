@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict'),{spawnSync}=require('node:child_process');
+const messages=[{jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-11-25',clientInfo:{name:'smoke',version:'1'},capabilities:{}}},{jsonrpc:'2.0',method:'notifications/initialized'},{jsonrpc:'2.0',id:2,method:'tools/list'}];
+const r=spawnSync(process.execPath,['mcp.js'],{cwd:__dirname,input:messages.map(JSON.stringify).join('\n')+'\n',encoding:'utf8',timeout:10000});
+assert.equal(r.status,0,r.stderr);
+const replies=r.stdout.trim().split('\n').map(JSON.parse);
+assert.equal(replies[0].result.serverInfo.version,'0.5.3');
+assert.equal(replies[1].result.tools.length,7);
+assert.ok(replies[0].result.instructions.includes('title_inferred'));
+const {bundle}=require('./project-bundles');
+const doc={title:'2026년 산후조리비 지원사업 추진계획',institution:'테스트군',url:'https://example.go.kr/test'};
+const p=bundle([doc],[{candidate:doc,result:{status:'unreadable'}}])[0];
+assert.equal(p.existence.status,'title_inferred');assert.equal(p.fields.budget.status,'unconfirmed');
+assert.equal(bundle([{...doc,relevance:{kind:'unclassified'}}])[0].existence.status,'undetermined');
+console.log('PASS: stdio, public tool set, version, title inference without fabricated budget');
