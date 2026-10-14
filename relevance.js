@@ -1,3 +1,11 @@
+function documentRole(title=''){
+ const t=title.replace(/\s+/g,'');
+ if(/정산|집행실적|지급내역|집행잔액/.test(t))return 'execution_or_settlement';
+ if(/교부|예탁|예치금/.test(t))return 'allocation_or_deposit';
+ if(/예산|추경/.test(t))return 'budget';
+ if(/계획|방침/.test(t))return 'plan';
+ return 'other';
+}
 // shortcut: title rules infer existence only; body attribution still needs semantic review.
 function classify(title,q=''){
  const t=String(title||'').replace(/\s+/g,'');
@@ -18,7 +26,7 @@ function screen(result,purpose='projects'){
   const matches=anchors.every(w=>title.includes(w.toLowerCase()));
   if(anchors.length&&relevance.kind==='project_candidate'&&!matches)relevance={kind:'unclassified',reason:'원래 검색 주제의 일부 핵심어가 제목에서 확인되지 않음: 본문 관련성 추가 확인 필요',score:0};
   if(anchors.length&&matches&&relevance.kind==='unclassified'&&/사업/.test(title))relevance={kind:'project_candidate',reason:'원래 검색 주제와 사업명이 일치하는 후보: 계획서 여부는 본문 확인 필요',score:2};
-  return {...x,relevance};
+  return {...x,relevance,documentRole:documentRole(x.title),stageNote:'제목에서 추정한 문서 역할이며 교부·예탁은 실제 집행이나 현재 시행 확정이 아닙니다.'};
  });
  const candidates=all.filter(x=>x.relevance.kind==='project_candidate').sort((a,b)=>b.relevance.score-a.relevance.score);
  return {...result,purpose,totalMeaning:'포털 원시 문서 건수이며 관련 사업 수가 아님',items:purpose==='documents'?all:candidates,
@@ -26,4 +34,4 @@ function screen(result,purpose='projects'){
  relatedDocuments:purpose==='documents'?[]:all.filter(x=>['legal','ceremony','administration'].includes(x.relevance.kind)),
  guidance:'사업 검색에서는 items도 미검증 후보입니다. reviewItems는 판단 유보, relatedDocuments는 보조자료입니다. 넓은 주제는 후보 제목을 바탕으로 사업 종류를 먼저 제시하세요. 후보가 부족하면 다음 페이지를 최대 3페이지까지 확인하고, 원문에서 요청 사업과의 관련성·지원 대상·실행 내용·예산·기간을 검토하세요. 예산이 없으면 미확인으로 표시하고 읽기 성공을 정책 검색 성공으로 세지 마세요.'};
 }
-module.exports={classify,screen};
+module.exports={classify,screen,documentRole};
