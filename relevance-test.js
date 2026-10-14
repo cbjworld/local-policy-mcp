@@ -12,3 +12,23 @@ const focused=screen({q:'청년 AI 구독료 지원',items:[{title:'청년 AI �
 assert.equal(focused.items.length,2);assert.equal(focused.reviewItems.length,1);
 
 assert.equal(classify('2025년 아동급식 지원사업 시비보조금 집행잔액 및 발생이자 반납').kind,'administration');
+const auxiliary=[
+ '2027년 청년 AI구독료 지원사업 현황조사 결과 제출',
+ '2027년 청년 AI 구독료 지원사업 현황 제출',
+ '국민신문고 국민제안에 대한 검토 보고(부산 재직 청년 생성형 AI 구독료 지원)',
+ '청년정책 업무 추진을 위한 AI 구독료 지급 건의',
+ '청년 생성형 AI 구독료 지원사업 모집에 따른 통합접수시스템 이용 협조 요청',
+ '2026년 청년 생성형 AI 구독료 지원사업 홍보 협조 요청',
+ '청년 생성형 AI 구독료 지원사업 홍보물 제작',
+ '청년 생성형 AI 구독료 지원사업 보도자료 송부'
+];
+const filtered=screen({q:'청년 AI 구독료',items:auxiliary.map(title=>({title}))});
+assert.equal(filtered.items.length,0);assert.equal(filtered.relatedDocuments.length,auxiliary.length);
+assert.equal(screen({q:'청년 AI 구독료',items:auxiliary.map(title=>({title}))},'documents').items.length,auxiliary.length);
+const {bundle}=require('./project-bundles');
+for(const title of ['2027년 청년 AI 구독료 지원사업 추진 계획','청년 생성형 AI 구독료 지원사업 공고']){
+ const doc={title,institution:'테스트시',url:'https://example.go.kr/plan'};
+ const p=bundle(screen({q:'청년 AI 구독료',items:[doc]}).items,[{candidate:doc,result:{status:'no_available_attachment'}}])[0];
+ assert.equal(p.existence.status,'title_inferred');assert.equal(p.fields.budget.status,'unconfirmed');
+}
+console.log('PASS: survey and internal notices remain supporting documents; unreadable plans still imply existence');
