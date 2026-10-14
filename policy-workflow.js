@@ -1,7 +1,7 @@
 const portal=require('./open-portal');
 function plan({question,queries,startDate,endDate}={},now=new Date()){
  if(typeof question!=='string'||!question.trim()||question.length>300)throw Error('질문은 1~300자여야 합니다.');
- const topic=question.trim().replace(/[?？!.。]+$/,'').replace(/\s*(?:찾아\s*주세요|찾아\s*줘|알려\s*주세요|알려\s*줘|검색해\s*줘|검색해줘)\s*$/,'').replace(/\s*(?:정책|사례)(?:를|을)?\s*$/,'').trim();
+ const topic=question.trim().replace(/^(?:다른\s*(?:지자체|지역|지방자치단체)|전국(?:의)?\s*(?:지자체|지방자치단체))(?:에서|의)?\s+/, '').replace(/[?？!.。]+$/,'').replace(/\s*(?:찾아\s*주세요|찾아\s*줘|알려\s*주세요|알려\s*줘|검색해\s*줘|검색해줘)\s*$/,'').replace(/\s*(?:정책|사례)(?:를|을)?\s*$/,'').trim();
  if(!topic)throw Error('찾을 주제가 필요합니다.');
  const words=topic.split(/\s+/);
  // shortcut: mechanical fallback only; the host AI supplies semantic query variants without asking the user.
