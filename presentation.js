@@ -29,8 +29,7 @@ function present(name,value,detail='compact'){
  if(name==='research_open_document')return {...value,presentation:documentView(value)};
  if(name==='research_policy'){const output={...value,presentation:{projects:(value.projects||[]).map(p=>({institution:p.institution,name:p.name,year:p.titleYear,existence:p.existence,reviewFlags:p.reviewFlags,missingFields:p.missingFields,documents:p.documents.map(d=>({title:d.title,url:d.url,role:d.role,readingStatus:(value.investigations||[]).find(x=>x.candidate.url===d.url)?.result.status||'not_attempted'}))})),documents:(value.investigations||[]).map(x=>documentView({...x.result,metadata:{...x.candidate,...x.result.metadata}})),note:'제목만으로 존재가 추정되는 사업도 포함하되 제목 근거와 본문 근거를 구분하세요. 미확인 세부정보는 추정하지 마세요. 문서별 근거를 짧게 비교하되 사업 귀속·연도·단위를 확인한 뒤 요약하세요. 본문 확보만으로 검증된 사례라고 표시하지 마세요. 원문을 확인할 수 있도록 링크와 인용 위치를 유지하세요.'}};
  if(detail==='full')return output;
- const {investigations,projects,candidates,...compact}=output;
- return {...compact,responseMode:'compact',detailHint:'전체 조사 데이터는 research_policy detail=full, 개별 원문은 research_open_document로 조회하세요.',candidates:(candidates||[]).map(({title,url,institution,date,documentRole,relevance})=>({title,url,institution,date,documentRole,relevance})),readingFailures:(investigations||[]).filter(x=>x.result.status!=='read').map(x=>({url:x.candidate.url,status:x.result.status,attempts:(x.result.attempts||[]).map(({fileName,status,message})=>({fileName,status,message}))}))};
+ return require('./compact-research')(output);
  }
  return value;
 }
