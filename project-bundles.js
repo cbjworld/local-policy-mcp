@@ -8,7 +8,7 @@ function bundle(documents,investigations=[]){
  const groups=new Map();
  const titleCounts=new Map();
  for(const doc of [...new Map(documents.map(d=>[d.url,d])).values()]){const k=identity(doc).key+'|'+String(doc.title).replace(/\s+/g,'');titleCounts.set(k,(titleCounts.get(k)||0)+1);}
- for(const doc of documents){const id=identity(doc);const ambiguous=titleCounts.get(id.key+'|'+String(doc.title).replace(/\s+/g,''))>1;const key=ambiguous?doc.url:id.key;if(!groups.has(key))groups.set(key,{institution:doc.institution,name:id.name,titleYear:id.year,grouping:ambiguous?'identical-title-different-documents-kept-separate':'same-institution-department-explicit-title-year-normalized-name-only',documents:[]});const g=groups.get(key);if(!g.documents.some(x=>x.url===doc.url))g.documents.push({...doc,role:/변경|수정/.test(doc.title)?'revision':/예산/.test(doc.title)?'budget':/공고/.test(doc.title)?'notice':'plan_or_other'});}
+ for(const doc of documents){const id=identity(doc);const ambiguous=titleCounts.get(id.key+'|'+String(doc.title).replace(/\s+/g,''))>1;const key=ambiguous?doc.url:id.key;if(!groups.has(key))groups.set(key,{institution:doc.institution,name:id.name,titleYear:id.year,grouping:ambiguous?'identical-title-different-documents-kept-separate':'same-institution-department-explicit-title-year-normalized-name-only',documents:[]});const g=groups.get(key);if(!g.documents.some(x=>x.url===doc.url))g.documents.push({...doc,role:require('./relevance').documentRole(doc.title)});}
  return [...groups.values()].map(g=>{
   g.documents.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
   const read=g.documents.map(d=>investigations.find(x=>x.candidate.url===d.url)).filter(Boolean);
