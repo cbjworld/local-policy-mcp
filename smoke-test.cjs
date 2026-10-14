@@ -23,3 +23,8 @@ for(const different of [{...notice,title:notice.title.replace('2026','2027')},{.
 assert.equal(bundle([plan,{...plan,url:'duplicate-title'}]).length,2);
 assert.equal(bundle([plan,plan]).length,1);
 console.log('PASS: plan/notice grouping, source preservation, differing conditions, ambiguous titles kept separate');
+const {present}=require('./presentation');
+const summary=present('research_policy',{candidates:[plan,plan,notice],projects:[{documents:[plan,notice],fields:{budget:{status:'redacted'},target:{status:'unconfirmed'}}}],investigations:[{candidate:plan,result:{status:'unreadable'}},{candidate:notice,result:{status:'read'}}],searchOutcome:{status:'candidates_found'}}).summary;
+assert.equal(summary.candidateDocuments,2);assert.equal(summary.projectGroups,1);assert.equal(summary.textReadDocuments,1);assert.equal(summary.unreadableDocuments,1);assert.equal(summary.projectsWithUnknownFields,1);assert.equal(summary.projectsWithRedactedFields,1);
+assert.equal(present('research_policy',{}).summary.projectGroups,0);
+console.log('PASS: document counts, grouped candidates, unknown and redacted fields remain distinct');
