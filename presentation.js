@@ -21,13 +21,17 @@ function documentView(result){
  const fields=Object.entries(names).map(([key,label])=>{const f=e.fields?.[key];return {key,label,state:f?.status==='redacted'?'가림 처리':f?.excerpts?.length?'원문 근거 후보 · 문맥 확인 필요':'미확인',evidence:(f?.excerpts||[]).slice(0,2).map(x=>({quote:x.quote,sourceId:x.sourceId,page:x.page,location:x.page==null?'문서 내 인용문 · 쪽 번호 없음':x.page+'쪽',url:x.url}))};});
  return {reviewGuidance,readingCoverage:(result.attempts||[]).filter(a=>a.source).map(a=>({fileName:a.fileName,format:a.source.format,returnedPages:a.source.pages.map(p=>p.page),totalPages:a.source.totalPages??null,scanComplete:a.source.scanComplete??null,textTruncated:a.source.pages.some(p=>p.truncated),status:a.status})),title:m.title||'문서',producingInstitution:m.institution||'미확인',fields,originals:originals.filter(x=>x.url),remainingAttachments:(result.remaining||[]).map(x=>({name:x.name,fileId:x.fileId})),note:'핵심 근거를 먼저 보여주고 각 항목의 정확한 인용문과 원문 링크를 함께 제시하세요. 가린 금액은 추정하지 마세요. 원문 링크는 양식 미리보기나 직접 다운로드를 보장하지 않습니다. PDF 쪽은 파일 기준이며 HWP 쪽 번호는 제공하지 않습니다.'};
 }
-function present(name,value){
+function present(name,value,detail='compact'){
  if(name==='research_policy'){
   const institutions=institutionGroups(value);
   value={...value,institutions,summary:{...researchSummary(value),producingInstitutions:institutions.filter(g=>g.institution).length,unknownInstitutionDocuments:institutions.find(g=>!g.institution)?.documentCount||0,institutionNote:'기관별 문서 묶음이며 사업 수나 시행 지자체 수가 아닙니다. 동일 기관의 서로 다른 사업을 합치지 마세요.'}};
  }
  if(name==='research_open_document')return {...value,presentation:documentView(value)};
- if(name==='research_policy')return {...value,presentation:{projects:(value.projects||[]).map(p=>({institution:p.institution,name:p.name,year:p.titleYear,existence:p.existence,reviewFlags:p.reviewFlags,documents:p.documents.map(d=>({title:d.title,url:d.url,role:d.role,readingStatus:(value.investigations||[]).find(x=>x.candidate.url===d.url)?.result.status||'not_attempted'}))})),documents:(value.investigations||[]).map(x=>documentView({...x.result,metadata:{...x.candidate,...x.result.metadata}})),note:'제목만으로 존재가 추정되는 사업도 포함하되 제목 근거와 본문 근거를 구분하세요. 미확인 세부정보는 추정하지 마세요. 문서별 근거를 짧게 비교하되 사업 귀속·연도·단위를 확인한 뒤 요약하세요. 본문 확보만으로 검증된 사례라고 표시하지 마세요. 원문을 확인할 수 있도록 링크와 인용 위치를 유지하세요.'}};
+ if(name==='research_policy'){const output={...value,presentation:{projects:(value.projects||[]).map(p=>({institution:p.institution,name:p.name,year:p.titleYear,existence:p.existence,reviewFlags:p.reviewFlags,missingFields:p.missingFields,documents:p.documents.map(d=>({title:d.title,url:d.url,role:d.role,readingStatus:(value.investigations||[]).find(x=>x.candidate.url===d.url)?.result.status||'not_attempted'}))})),documents:(value.investigations||[]).map(x=>documentView({...x.result,metadata:{...x.candidate,...x.result.metadata}})),note:'제목만으로 존재가 추정되는 사업도 포함하되 제목 근거와 본문 근거를 구분하세요. 미확인 세부정보는 추정하지 마세요. 문서별 근거를 짧게 비교하되 사업 귀속·연도·단위를 확인한 뒤 요약하세요. 본문 확보만으로 검증된 사례라고 표시하지 마세요. 원문을 확인할 수 있도록 링크와 인용 위치를 유지하세요.'}};
+ if(detail==='full')return output;
+ const {investigations,projects,candidates,...compact}=output;
+ return {...compact,responseMode:'compact',detailHint:'전체 조사 데이터는 research_policy detail=full, 개별 원문은 research_open_document로 조회하세요.',candidates:(candidates||[]).map(({title,url,institution,date,documentRole,relevance})=>({title,url,institution,date,documentRole,relevance})),readingFailures:(investigations||[]).filter(x=>x.result.status!=='read').map(x=>({url:x.candidate.url,status:x.result.status,attempts:(x.result.attempts||[]).map(({fileName,status,message})=>({fileName,status,message}))}))};
+ }
  return value;
 }
 module.exports={documentView,present};
