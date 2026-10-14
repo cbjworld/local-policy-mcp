@@ -1,3 +1,4 @@
+const reviewGuidance='예산 합계와 재원별 금액을 같은 단위로 재계산하세요. 불일치는 원문 표를 다시 읽고, 확인 전 숫자를 수정하거나 확정값으로 제시하지 마세요. 서로 다른 금액은 회계연도·작성일·본예산/추경·분담금/총사업비를 대조한 뒤 비교하세요. 과거 문서는 문서 작성 당시 상태로 표현하고 현재 시행은 별도 확인하세요.';
 const names={target:'대상',activity:'사업 내용',budget:'예산 근거',period:'기간'};
 function institutionGroups(value){
  const groups=new Map(),seen=new Set(),states=new Map((value.investigations||[]).map(x=>[x.candidate.url,x.result.status]));
@@ -18,7 +19,7 @@ function documentView(result){
  const m=result.metadata||{},e=result.evidence||{},originals=[{label:'공식 문서 · 첨부파일 확인',url:m.url}];
  for(const a of result.attempts||[])if(a.source?.url&&!originals.some(x=>x.url===a.source.url))originals.push({label:a.fileName||'읽은 원문',url:a.source.url,format:a.source.format});
  const fields=Object.entries(names).map(([key,label])=>{const f=e.fields?.[key];return {key,label,state:f?.status==='redacted'?'가림 처리':f?.excerpts?.length?'원문 근거 후보 · 문맥 확인 필요':'미확인',evidence:(f?.excerpts||[]).slice(0,2).map(x=>({quote:x.quote,sourceId:x.sourceId,page:x.page,location:x.page==null?'문서 내 인용문 · 쪽 번호 없음':x.page+'쪽',url:x.url}))};});
- return {readingCoverage:(result.attempts||[]).filter(a=>a.source).map(a=>({fileName:a.fileName,format:a.source.format,returnedPages:a.source.pages.map(p=>p.page),totalPages:a.source.totalPages??null,scanComplete:a.source.scanComplete??null,textTruncated:a.source.pages.some(p=>p.truncated),status:a.status})),title:m.title||'문서',producingInstitution:m.institution||'미확인',fields,originals:originals.filter(x=>x.url),remainingAttachments:(result.remaining||[]).map(x=>({name:x.name,fileId:x.fileId})),note:'핵심 근거를 먼저 보여주고 각 항목의 정확한 인용문과 원문 링크를 함께 제시하세요. 가린 금액은 추정하지 마세요. 원문 링크는 양식 미리보기나 직접 다운로드를 보장하지 않습니다. PDF 쪽은 파일 기준이며 HWP 쪽 번호는 제공하지 않습니다.'};
+ return {reviewGuidance,readingCoverage:(result.attempts||[]).filter(a=>a.source).map(a=>({fileName:a.fileName,format:a.source.format,returnedPages:a.source.pages.map(p=>p.page),totalPages:a.source.totalPages??null,scanComplete:a.source.scanComplete??null,textTruncated:a.source.pages.some(p=>p.truncated),status:a.status})),title:m.title||'문서',producingInstitution:m.institution||'미확인',fields,originals:originals.filter(x=>x.url),remainingAttachments:(result.remaining||[]).map(x=>({name:x.name,fileId:x.fileId})),note:'핵심 근거를 먼저 보여주고 각 항목의 정확한 인용문과 원문 링크를 함께 제시하세요. 가린 금액은 추정하지 마세요. 원문 링크는 양식 미리보기나 직접 다운로드를 보장하지 않습니다. PDF 쪽은 파일 기준이며 HWP 쪽 번호는 제공하지 않습니다.'};
 }
 function present(name,value){
  if(name==='research_policy'){
