@@ -26,11 +26,19 @@ assert.equal(w.plan({question:'서울 산후조리비 지원 사업 찾아줘'},
 (async()=>{
  const empty={total:100,hasMore:true,items:[],reviewItems:[],relatedDocuments:[]};
  const r=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>empty});
- assert.deepEqual(r.coverage.nextSearches.map(x=>[x.arguments.scope,x.arguments.page]),[['original',3],['all',2]]);
- assert.equal(r.coverage.queriedPages,3);assert.equal(r.coverage.hasMore,true);
+ assert.deepEqual(r.coverage.nextSearches.map(x=>[x.arguments.scope,x.arguments.page]),[['original',5],['all',2]]);
+ assert.equal(r.coverage.queriedPages,5);assert.equal(r.coverage.hasMore,true);
  const f=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>{throw Error('offline')}});
  assert.equal(f.coverage.nextSearches[0].arguments.page,1);assert.equal(f.coverage.nextSearches[0].reason,'실패한 페이지 재시도');
  const done=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>({...empty,hasMore:false})});
  assert.equal(done.coverage.hasMore,false);
  console.log('PASS: continuation pages, exhausted results and retry after search failure');
+})().catch(e=>{console.error(e);process.exitCode=1});
+
+(async()=>{
+ const docs=[{title:'2026년 경기도 산후조리비 지원사업 계획',institution:'경기도',url:'a'},{title:'2026년 경기도 산후조리비 지원사업 예탁 건의',institution:'군포시',url:'b'},{title:'2025년 경기도 산후조리비 지원사업 계획',institution:'다른시',url:'c'}];
+ const r=await w.research({question:'산후조리비'},{search:async()=>({total:3,hasMore:false,items:docs,reviewItems:[],relatedDocuments:[]})});
+ assert.equal(r.possibleProjectLinks.length,1);assert.equal(r.possibleProjectLinks[0].documents.length,2);
+ assert.equal(r.financialDocuments.length,1);assert.equal(r.financialDocuments[0].documentRole,'allocation_or_deposit');
+ assert.equal(r.projects.length,3);
 })().catch(e=>{console.error(e);process.exitCode=1});
