@@ -19,6 +19,7 @@ const {createServer}=require('./http-server');
    assert.equal((await c.listTools()).tools.length,7);
    assert.ok(c.getInstructions().includes('title_inferred'));
   }
+  const concurrent=await Promise.all(Array.from({length:4},()=>clients[0].listTools()));assert.ok(concurrent.every(r=>r.tools.length===7));
   assert.notEqual(transports[0].sessionId,transports[1].sessionId);
   const init={jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-11-25',capabilities:{},clientInfo:{name:'test',version:'1'}}};
   assert.equal((await fetch(url,{method:'POST',body:JSON.stringify(init),headers})).status,503);
