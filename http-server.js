@@ -11,7 +11,7 @@ function createServer({publicUrl,token,allowPublic=false,maxSessions=8}={}){
  if(!Number.isInteger(maxSessions)||maxSessions<1||maxSessions>32)throw new Error('Invalid session limit');
  const sessions=new Map();let starting=0;
  const fail=(res,status,message)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:message}));};
- async function dispose(s){if(s.closed)return;s.closed=true;sessions.delete(s.transport.sessionId);await Promise.allSettled([s.server.close(),s.client.close()]);}
+ async function dispose(s){if(s.closed)return;s.closed=true;for(const wake of s.waiters.splice(0))wake();sessions.delete(s.transport.sessionId);await Promise.allSettled([s.server.close(),s.client.close()]);}
  const timer=setInterval(()=>{for(const s of sessions.values())if(!s.active&&Date.now()-s.last>15*60*1000)void dispose(s);},30000);timer.unref();
  const server=http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');
@@ -46,7 +46,7 @@ function createServer({publicUrl,token,allowPublic=false,maxSessions=8}={}){
      await client.connect(new StdioClientTransport({command:process.execPath,args:['--use-system-ca','--max-old-space-size=256',path.join(__dirname,'mcp.js')],env,stderr:'ignore'}));
      const rpc=new Server(client.getServerVersion(),{capabilities:{tools:{}},instructions:client.getInstructions()});
      const transport=new StreamableHTTPServerTransport({sessionIdGenerator:randomUUID,enableJsonResponse:true});
-     s={server:rpc,client,transport,last:Date.now(),active:0,calls:0,window:Date.now(),closed:false};
+     s={server:rpc,client,transport,last:Date.now(),active:0,waiters:[],calls:0,window:Date.now(),closed:false};
      rpc.setRequestHandler(ListToolsRequestSchema,()=>client.listTools());
      rpc.setRequestHandler(CallToolRequestSchema,request=>client.callTool(request.params,undefined,{timeout:180000}));
      await rpc.connect(transport);
@@ -55,7 +55,16 @@ function createServer({publicUrl,token,allowPublic=false,maxSessions=8}={}){
      created=true;
     }catch(e){await client.close();throw e;}finally{starting--;}
    }
-   if(s.active)return fail(res,429,'Wait for the current request');
+   while(s.active){
+    if(s.waiters.length>=4){res.setHeader('Retry-After','5');return fail(res,429,'Session queue full; retry sequentially');}
+    const ready=await new Promise(resolve=>{
+     const wake=()=>{clearTimeout(timeout);resolve(true);};
+     const timeout=setTimeout(()=>{s.waiters=s.waiters.filter(x=>x!==wake);resolve(false);},15000);
+     s.waiters.push(wake);
+    });
+    if(!ready){res.setHeader('Retry-After','5');return fail(res,429,'Queue wait expired; retry sequentially');}
+   }
+   if(s.closed)return fail(res,404,'Session expired; initialize again');
    if(Date.now()-s.window>60000){s.window=Date.now();s.calls=0;}
    if(++s.calls>60){res.setHeader('Retry-After','60');return fail(res,429,'Session rate limit');}
    s.active++;s.last=Date.now();
@@ -63,7 +72,7 @@ function createServer({publicUrl,token,allowPublic=false,maxSessions=8}={}){
     if(req.method==='GET'){res.setHeader('Allow','POST, DELETE');fail(res,405,'Standalone event stream is not offered');}
     else await s.transport.handleRequest(req,res,body);
     if(created){if(s.transport.sessionId)sessions.set(s.transport.sessionId,s);else await dispose(s);}
-   }finally{s.active--;s.last=Date.now();}
+   }finally{s.active--;s.last=Date.now();s.waiters.shift()?.();}
   }catch{
    if(s)await dispose(s);
    if(!res.headersSent)fail(res,500,'MCP request failed');else res.end();
