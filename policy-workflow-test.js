@@ -19,3 +19,6 @@ async function fallbackTest(){
 }
 fallbackTest().catch(e=>{console.error(e);process.exitCode=1});
 (async()=>{const r=await w.research({question:'청년 AI 구독료 지원 사례 찾아줘'},io);assert.equal(r.candidates.length,2);assert.equal(r.investigations.length,2);assert.equal(calls[0].requestedQuery,'청년 AI 구독료 지원 사례 찾아줘');calls.length=0;assert.equal((await w.research({question:'반려동물 정책 찾아줘'},io)).status,'topic_overview');assert.equal(calls.length,0);const f=await w.research({question:'청년 지원'},{search:async()=>{throw Error('offline')}});assert.equal(f.status,'search_failed');assert.equal(f.investigations.length,0);console.log('PASS: short questions, broad overview, defaults, dedupe, limits, intent propagation, search failure');})().catch(e=>{console.error(e);process.exitCode=1});
+
+for(const prefix of ['다른 지자체','다른 지역','전국 지자체'])assert.deepEqual(w.plan({question:prefix+' 산후조리비 지원 사업 찾아줘'},now).queries,['산후조리비 지원 사업','산후조리비']);
+assert.equal(w.plan({question:'서울 산후조리비 지원 사업 찾아줘'},now).topic,'서울 산후조리비 지원 사업');
