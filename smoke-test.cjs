@@ -28,3 +28,15 @@ const summary=present('research_policy',{candidates:[plan,plan,notice],projects:
 assert.equal(summary.candidateDocuments,2);assert.equal(summary.projectGroups,1);assert.equal(summary.textReadDocuments,1);assert.equal(summary.unreadableDocuments,1);assert.equal(summary.projectsWithUnknownFields,1);assert.equal(summary.projectsWithRedactedFields,1);
 assert.equal(present('research_policy',{}).summary.projectGroups,0);
 console.log('PASS: document counts, grouped candidates, unknown and redacted fields remain distinct');
+const other={...notice,title:'다른 사업',url:'other'},unknown={title:'기관 미상 문서',url:'unknown'};
+const byInstitution=present('research_policy',{candidates:[plan,plan,notice,other,unknown],projects:bundle([plan,other]),investigations:[{candidate:plan,result:{status:'read'}},{candidate:notice,result:{status:'no_available_attachment'}}]});
+assert.equal(byInstitution.summary.producingInstitutions,1);
+assert.equal(byInstitution.summary.unknownInstitutionDocuments,1);
+assert.equal(byInstitution.summary.projectGroups,2);
+assert.equal(byInstitution.institutions[0].documentCount,3);
+assert.equal(byInstitution.institutions[0].textReadDocuments,1);
+assert.equal(byInstitution.institutions[0].notAttemptedDocuments,1);
+assert.equal(byInstitution.institutions[0].documents[1].readingStatus,'no_available_attachment');
+assert.equal(byInstitution.institutions[1].institution,null);
+assert.equal(present('research_policy',{}).summary.producingInstitutions,0);
+console.log('PASS: institution grouping preserves distinct projects, deduplicates documents and separates unattempted reading');
