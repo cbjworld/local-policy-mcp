@@ -22,13 +22,25 @@ async function research(args={},io=portal){
  for(const q of request.queries){
   for(let page=1;page<=2;page++){
    try{const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page});
-    searches.push({q,page,total:r.total,url:r.url,hasMore:r.hasMore});
+    searches.push({q,page,scope:'original',total:r.total,url:r.url,hasMore:r.hasMore});
     for(const item of [...r.items,...r.reviewItems,...r.relatedDocuments])if(!byUrl.has(item.url))byUrl.set(item.url,item);
     if(!r.hasMore)break;
-   }catch(e){failures.push({q,page,message:e.message});break;}
+   }catch(e){failures.push({q,page,scope:'original',message:e.message});break;}
   }
  }
- const screened=require('./relevance').screen({q:request.topic,items:[...byUrl.values()]});
+ let screened=require('./relevance').screen({q:request.topic,items:[...byUrl.values()]});
+ // shortcut: one metadata page per expression only when the original search has no candidates.
+ const metadataFallback=searches.length>0&&screened.items.length===0;
+ if(metadataFallback){
+  for(const q of request.queries){
+   try{
+    const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page:1,scope:'all'});
+    searches.push({q,page:1,scope:'all',total:r.total,url:r.url,hasMore:r.hasMore});
+    for(const item of [...r.items,...r.reviewItems,...r.relatedDocuments])if(!byUrl.has(item.url))byUrl.set(item.url,item);
+   }catch(e){failures.push({q,page:1,scope:'all',message:e.message});}
+  }
+  screened=require('./relevance').screen({q:request.topic,items:[...byUrl.values()]});
+ }
  const candidates=screened.items;
  const investigations=[];
  // Broad topics present real candidate titles first; choosing a single sub-topic would invent user intent.
@@ -49,7 +61,8 @@ async function research(args={},io=portal){
   if(project){const item=project.nextDocuments[0];try{investigations.push({candidate:item,purpose:'fill_missing_evidence',missingFields:project.missingFields,result:await io.research({url:item.url,requestedQuery:request.question})});}catch(e){investigations.push({candidate:item,purpose:'fill_missing_evidence',result:{status:'failed',message:e.message}});}projects=require('./project-bundles').bundle(candidates,investigations);}
  }
  return {request,projects,status:searches.length?(request.broad?'topic_overview':'research_draft'):'search_failed',searches,failures,candidates,reviewItems:screened.reviewItems,relatedDocuments:screened.relatedDocuments,investigations,
- limits:{maxQueries:3,maxPagesPerQuery:2,maxDocuments:4,maxSupplementalDocuments:1,targetReadableInstitutions:2,examinedDocuments:byUrl.size,complete:false},
+ searchOutcome:{metadataFallback,status:candidates.length?'candidates_found':failures.length?'incomplete':'not_found_in_searched_scope',note:'후보가 없어도 사업 부존재를 뜻하지 않습니다. 검색 기간·조회 페이지·실패 내역을 함께 확인하세요.'},
+ limits:{maxQueries:3,maxPagesPerQuery:2,maxMetadataFallbackPagesPerQuery:1,maxSearchRequests:9,maxDocuments:4,maxSupplementalDocuments:1,targetReadableInstitutions:2,examinedDocuments:byUrl.size,complete:false},
  instruction:request.broad?'후보 제목에 실제로 나타난 사업 종류를 출처와 함께 먼저 제시하세요. 임의로 한 사업을 선택하지 마세요. 필요할 때만 관심 사업을 물으세요.':'제목이 요청 사업의 존재를 뒷받침하면 비공개·읽기 실패여도 사업 존재 추정 사례로 포함하고 제목과 출처를 제시하세요. 존재 추정과 본문 근거 확인을 별도로 구분하세요. 계획안은 현재 시행이나 예산 확정을 뜻하지 않습니다. 요청과 실제 본문이 같은 사업인지 먼저 판단하세요. 적합한 문서의 대상·내용·예산·기간을 근거와 함께 정리하고 미확인 항목은 명시하세요. 실패하거나 다른 사업이면 반환된 다음 후보를 research_open_document로 조사하세요. 부족한 사례를 만들어 채우지 마세요. 단계별 성공과 최종 관련성은 다릅니다.'};
 }
 module.exports={plan,research};
