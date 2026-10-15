@@ -16,18 +16,21 @@ const {createServer}=require('./http-server');
   for(let i=0;i<2;i++){
    const c=new Client({name:'remote-test',version:'1'}),t=new StreamableHTTPClientTransport(url,{requestInit:{headers:{Authorization:'Bearer test-only'}}});
    clients.push(c);transports.push(t);await c.connect(t);
-   assert.equal((await c.listTools()).tools.length,7);
+   assert.equal((await c.listTools()).tools.length,9);
    assert.ok(c.getInstructions().includes('title_inferred'));
   }
-  const concurrent=await Promise.all(Array.from({length:4},()=>clients[0].listTools()));assert.ok(concurrent.every(r=>r.tools.length===7));
+  const concurrent=await Promise.all(Array.from({length:4},()=>clients[0].listTools()));assert.ok(concurrent.every(r=>r.tools.length===9));
   assert.notEqual(transports[0].sessionId,transports[1].sessionId);
+  const budget=await clients[0].callTool({name:'search_budget_projects',arguments:{q:'산후',limit:2}});
+  assert.equal(budget.isError,false);const budgetData=JSON.parse(budget.content[0].text);
+  assert.equal(budgetData.totalCandidateRows,require('./budget-search').search({q:'산후'}).totalCandidateRows);assert.equal(budgetData.items.length,2);assert.equal(budgetData.scope.nationwideComplete,false);
   const init={jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-11-25',capabilities:{},clientInfo:{name:'test',version:'1'}}};
   assert.equal((await fetch(url,{method:'POST',body:JSON.stringify(init),headers})).status,503);
   const bad=await clients[0].callTool({name:'read_official_source',arguments:{url:'http://127.0.0.1/private'}});
   assert.equal(bad.isError,true);
   const oldId=transports[0].sessionId;await transports[0].terminateSession();
   assert.equal((await fetch(url,{method:'POST',body:JSON.stringify({jsonrpc:'2.0',id:2,method:'ping'}),headers:{...headers,'Mcp-Session-Id':oldId}})).status,404);
-  assert.equal((await clients[1].listTools()).tools.length,7);
+  assert.equal((await clients[1].listTools()).tools.length,9);
   console.log('PASS: HTTP SDK handshake, tools, isolated sessions, auth, origin, request limit, capacity, invalid URL, deletion');
  }finally{await Promise.allSettled(clients.map(c=>c.close()));await server.shutdown();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

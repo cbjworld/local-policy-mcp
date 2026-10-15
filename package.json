@@ -1,6 +1,6 @@
 {
   "name": "local-policy-mcp",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "private": true,
   "description": "Korean municipal policy document research through the information disclosure portal",
   "license": "MIT",
@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node --use-system-ca mcp.js",
     "start:http": "node --use-system-ca http-server.js",
-    "test": "node evidence-test.js && node relevance-test.js && node open-portal-test.js && node policy-workflow-test.js && node smoke-test.cjs && node http-test.cjs"
+    "test": "node budget-search-test.cjs && node evidence-test.js && node relevance-test.js && node open-portal-test.js && node policy-workflow-test.js && node smoke-test.cjs && node http-test.cjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
