@@ -1,4 +1,4 @@
-const data=require('./budget-data.json');
+const data=JSON.parse(require('node:zlib').gunzipSync(require('node:fs').readFileSync(require('node:path').join(__dirname,'budget-data.json.gz'))).toString('utf8'));
 const normalize=s=>s.normalize('NFKC').replace(/\s+/g,'').toLowerCase();
 function search({q,institution,offset=0,limit=10}={}){
  if(typeof q!=='string'||!q.trim()||q.length>100)throw Error('q must contain 1–100 characters');

@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package*.json requirements.txt ./
 RUN npm ci --ignore-scripts --omit=optional --omit=dev && python3 -m venv /opt/venv && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
 COPY *.js *.cjs *.py ./
-COPY budget-data.json verified-budget-data.json ./
+COPY budget-data.json.gz verified-budget-data.json ./
 ENV POLICY_PYTHON=/opt/venv/bin/python HOST=0.0.0.0 PORT=3000
 USER node
 EXPOSE 3000
