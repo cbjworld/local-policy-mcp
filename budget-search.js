@@ -1,4 +1,9 @@
-const data=JSON.parse(require('node:zlib').gunzipSync(require('node:fs').readFileSync(require('node:path').join(__dirname,'budget-data.json.gz'))).toString('utf8'));
+const data=(()=>{
+ const packed=JSON.parse(require('node:zlib').gunzipSync(require('node:fs').readFileSync(require('node:path').join(__dirname,'budget-data.json.gz'))).toString('utf8'));
+ if(packed.formatVersion===undefined)return packed;
+ if(packed.formatVersion!==1)throw Error('Unsupported budget data format');
+ return {scope:packed.scope,rows:packed.rows.map(([index,row])=>({...packed.contexts[index],...row}))};
+})();
 const normalize=s=>s.normalize('NFKC').replace(/\s+/g,'').toLowerCase();
 function search({q,institution,offset=0,limit=10}={}){
  if(typeof q!=='string'||!q.trim()||q.length>100)throw Error('q must contain 1–100 characters');

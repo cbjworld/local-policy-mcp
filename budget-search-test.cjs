@@ -13,3 +13,5 @@ assert.equal(r.status,0,r.stderr);const reply=JSON.parse(r.stdout.trim().split('
 console.log('budget search + MCP invocation passed');
 
 const andong=search({q:'빈집 철거',institution:'안동'}).items;assert.equal(andong.length,1);assert.equal(andong[0].budget,240000);assert.equal(andong[0].page,null);assert.ok(andong[0].table>0&&andong[0].tableRow>0);assert.ok(andong[0].source.startsWith('https://'));
+const asan=search({q:'의정활동 지원',institution:'아산'}).items[0];assert.equal(asan.budget,1626509);assert.equal(asan.page,1);assert.equal(asan.institutionAggregateVerified,true);
+const jeonnam=search({q:'소통도정 운영',institution:'전라남도'}).items[0];assert.equal(jeonnam.budget,77532);assert.equal(jeonnam.page,1);assert.ok(jeonnam.source.startsWith('https://www.jeonnam.go.kr/'));
