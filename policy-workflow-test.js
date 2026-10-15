@@ -1,5 +1,22 @@
 const assert=require('node:assert/strict'),w=require('./policy-workflow');
 const now=new Date('2026-10-13T00:00:00Z');
+async function semanticVariantsTest(){
+ const docs=[{title:'2026년 산후조리비 지원사업 추진계획',institution:'A',url:'variant-plan'},{title:'2026년 산후조리비 지원사업 교부결정',institution:'A',url:'variant-grant'},{title:'2026년 반려동물 지원사업 추진계획',institution:'A',url:'unrelated-variant'}];
+ const result=await w.research({question:'산후조리비 지원 사업의 계획 예산 교부 집행 자료 찾아줘',queries:['산후조리비 지원','산후조리비 교부']},{search:async()=>({total:3,hasMore:false,items:docs,reviewItems:[],relatedDocuments:[]}),research:async()=>({status:'read'})});
+ assert(result.candidates.some(d=>d.url==='variant-plan'));
+ assert(!result.candidates.some(d=>d.url==='unrelated-variant'));
+ assert(result.evidenceMap.some(g=>g.stages.some(s=>s.role==='allocation_or_deposit')));
+ console.log('PASS: question instructions do not become mandatory title keywords; semantic variants retain subject filtering');
+}
+semanticVariantsTest().catch(e=>{console.error(e);process.exitCode=1});
+async function financeFollowupTest(){
+ const docs=[{title:'2026년 산후조리비 지원계획',institution:'울산광역시 중구',url:'district-plan'},{title:'2026년 산후조리비 지원계획',institution:'부산광역시',url:'city-plan'},{title:'2026년 산후조리비 보조금 교부',institution:'울산광역시',url:'city-grant'}];
+ const r=await w.research({question:'산후조리비 지원',queries:['산후조리비']},{search:async()=>({total:3,hasMore:false,items:docs,reviewItems:[],relatedDocuments:[]}),research:async()=>({status:'read'})});
+ assert.equal(r.investigations.length,3);assert.equal(r.investigations[2].purpose,'link_financial_evidence');assert.equal(r.investigations[2].candidate.url,'city-grant');
+ assert.equal(r.projects.length,2,'provincial grant is not merged with district project');
+ console.log('PASS: financial follow-up after readable plans, province/district remain separate, bounded supplemental slot');
+}
+financeFollowupTest().catch(e=>{console.error(e);process.exitCode=1});
 assert.equal(w.plan({question:'반려동물 정책 찾아줘'},now).broad,true);
 assert.deepEqual(w.plan({question:'청년 AI 구독료 지원 사례 찾아줘'},now).queries,['청년 AI 구독료 지원','청년 AI 구독료']);
 assert.equal(w.plan({question:'병원 동행'},now).startDate,'20241013');

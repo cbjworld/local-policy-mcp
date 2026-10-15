@@ -1,5 +1,14 @@
 const assert=require('node:assert/strict');
 const {evidenceMap}=require('./project-bundles');
+const {documentKey}=require('./project-bundles');
+const original='https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT123&prdnDt=20260101&nstSeCd=W';
+const metadata=original.replace('infoListDetl.do','infoListDetl2.do')+'&kwd=anything';
+assert.equal(documentKey(original),documentKey(metadata));
+assert.notEqual(documentKey(original),documentKey(metadata.replace('20260101','20260102')));
+assert.notEqual(documentKey(original),documentKey(metadata.replace('www.open.go.kr','example.go.kr')));
+const dual=evidenceMap([{title:'2026년 산후조리비 지원계획',institution:'A',url:original},{title:'2026년 산후조리비 지원계획',institution:'A',url:metadata}],[{candidate:{url:metadata},result:{status:'read'}}]);
+assert.equal(dual[0].stages[0].documents.length,1);
+assert.equal(dual[0].stages[0].documents[0].readingStatus,'read');
 const docs=[
  {title:'2026년 산후조리비 지원사업 추진계획',institution:'A',url:'plan'},
  {title:'2026년 산후조리비 지원사업 보조금 교부',institution:'A',url:'grant'},

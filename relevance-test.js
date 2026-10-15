@@ -1,6 +1,8 @@
 const assert=require('node:assert/strict'),{classify,screen}=require('./relevance');
 for(const [title,expected] of [['반려동물복지센터 개소식 계획(안)','ceremony'],['반려동물 보호 및 학대방지 조례 일부개정 계획','legal'],['취약계층 반려동물 의료비 지원사업 추진계획','project_candidate'],['반려동물 문화축제 운영계획','project_candidate'],['청년 월세 지원금 지급','administration'],['반려동물 현황','unclassified']])assert.equal(classify(title).kind,expected);
 const r={items:['반려동물복지센터 개소식 계획','반려동물 지원사업 계획','반려동물 현황'].map(title=>({title})),total:30};
+assert.equal(screen({q:'울산 산후조리비',items:[{title:'2026년 산후조리비 지원계획',institution:'울산광역시 중구'}]}).items.length,1);
+assert.equal(screen({q:'울산 산후조리비',items:[{title:'2026년 산후조리비 지원계획',institution:'부산광역시'}]}).items.length,0);
 assert.equal(classify('어르신 일자리사업 참여자 인권교육 추진계획','어르신 일자리').kind,'administration');
 assert.equal(classify('어르신 일자리사업 참여자 인권교육 추진계획','어르신 인권교육').kind,'project_candidate');
 for(const title of ['반려동물 놀이터 운영 기간제 채용계획','반려동물 축제 시간외근무 확대 계획','설계용역 착수보고회 개최계획'])assert.equal(classify(title).kind,'administration');

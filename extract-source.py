@@ -78,5 +78,7 @@ def main():
     sys.stdout.write(json.dumps(result,ensure_ascii=True))
 
 try: main()
+except ModuleNotFoundError as error:
+    sys.stderr.write('MISSING_PYPDF' if error.name == 'pypdf' else 'Document extraction dependency missing.');sys.exit(1)
 except Exception:
     sys.stderr.write('Document extraction failed: unsupported, corrupt, encrypted or out-of-range document.');sys.exit(1)

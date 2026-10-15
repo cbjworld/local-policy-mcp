@@ -1,3 +1,7 @@
+function documentKey(value){
+ try{const u=new URL(value);if(u.hostname==='www.open.go.kr'&&/^\/othicInfo\/infoList\/infoListDetl2?\.do$/.test(u.pathname)&&u.searchParams.get('prdnNstRgstNo'))return JSON.stringify([u.hostname,u.searchParams.get('prdnNstRgstNo'),u.searchParams.get('prdnDt'),u.searchParams.get('nstSeCd')]);}catch{}
+ return value;
+}
 function identity(doc){
  const years=[...new Set(String(doc.title||'').match(/20\d{2}/g)||[])];
  const year=years.length===1?years[0]:null;
@@ -33,21 +37,21 @@ function bundle(documents,investigations=[]){
 }
 // Group for investigation only: institution/year does not establish a shared project identity.
 function evidenceMap(documents,investigations=[]){
- const reads=new Map(investigations.map(x=>[x.candidate.url,x.result.status]));
+ const reads=new Map(investigations.map(x=>[documentKey(x.candidate.url),x.result.status]));
  const groups=new Map(),seen=new Set();
  const labels={plan:'계획·방침',budget:'예산 편성·변경',allocation_or_deposit:'교부·예탁',execution_or_settlement:'집행·정산'};
  for(const d of documents){
   const role=require('./relevance').documentRole(d.title);
-  if(!labels[role]||!d.url||seen.has(d.url))continue;
-  seen.add(d.url);
+  if(!labels[role]||!d.url||seen.has(documentKey(d.url)))continue;
+  seen.add(documentKey(d.url));
   const year=identity(d).year,institution=d.institution||null;
   const key=institution&&year?JSON.stringify([institution,year]):d.url;
   if(!groups.has(key))groups.set(key,{institution,titleYear:year,relationship:'same_institution_year_candidates_not_confirmed_same_project',stages:[]});
   const group=groups.get(key);
   let stage=group.stages.find(x=>x.role===role);
   if(!stage){stage={role,label:labels[role],documents:[]};group.stages.push(stage);}
-  stage.documents.push({title:d.title,url:d.url,department:d.department||null,readingStatus:reads.get(d.url)||'not_attempted'});
+  stage.documents.push({title:d.title,url:d.url,department:d.department||null,readingStatus:reads.get(documentKey(d.url))||'not_attempted'});
  }
  return [...groups.values()].map(g=>({...g,missingStages:Object.keys(labels).filter(k=>!g.stages.some(s=>s.role===k)),note:'문서 제목에 따른 조사 경로입니다. 단계별 자료가 같은 사업인지 본문 대조가 필요하며, 미발견은 자료 부존재가 아닙니다. 교부·예탁과 실제 집행을 구분하세요.'}));
 }
-module.exports={identity,bundle,evidenceMap};
+module.exports={identity,bundle,evidenceMap,documentKey};

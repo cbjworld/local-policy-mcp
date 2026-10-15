@@ -9,12 +9,12 @@ function pythonPath(){
 function extract(bytes,options){return new Promise((resolve,reject)=>{
  const hangul=bytes.subarray(0,8).equals(Buffer.from('d0cf11e0a1b11ae1','hex'))||bytes.subarray(0,2).toString()==='PK'||bytes.subarray(0,17).toString()==='HWP Document File';
  const child=spawn(hangul?process.execPath:pythonPath(),hangul?['--max-old-space-size=256',path.join(__dirname,'extract-hangul.js'),JSON.stringify(options)]:[path.join(__dirname,'extract-source.py'),JSON.stringify(options)],{stdio:['pipe','pipe','pipe'],windowsHide:true});
- let out='',failed=false;
+ let out='',stderr='',failed=false;
  const timer=setTimeout(()=>{failed=true;child.kill();reject(new Error('문서 추출 30초 제한 초과'));},30000);
- child.stdin.on('error',()=>{});child.stderr.resume();
+ child.stdin.on('error',()=>{});child.stderr.on('data',b=>{stderr=(stderr+b.toString()).slice(0,256);});
  child.stdout.on('data',b=>{out+=b;if(out.length>1500000){failed=true;child.kill();reject(new Error('문서 추출 출력 제한 초과'));}});
  child.on('error',()=>{clearTimeout(timer);reject(new Error('문서 추출기 실행 불가. Node·Kordoc 또는 Python·pypdf 설치를 확인하세요.'));});
- child.on('close',code=>{clearTimeout(timer);if(failed)return;if(code!==0)return reject(new Error('문서 추출 실패: 형식·암호화·페이지 범위·추출기 설치를 확인하세요. HWP/HWPX의 시작 페이지는 1로 입력하세요.'));try{resolve(JSON.parse(out));}catch{reject(new Error('문서 추출 결과 해석 실패'));}});
+ child.on('close',code=>{clearTimeout(timer);if(failed)return;if(code!==0)return reject(new Error(!hangul&&stderr.trim()==='MISSING_PYPDF'?'PDF 추출기에 pypdf가 설치되지 않았습니다. 설치·도구 안내의 Python 환경을 준비하고 POLICY_PYTHON 경로를 지정하세요.':'문서 추출 실패: 형식·암호화·페이지 범위·추출기 설치를 확인하세요. HWP/HWPX의 시작 페이지는 1로 입력하세요.'));try{resolve(JSON.parse(out));}catch{reject(new Error('문서 추출 결과 해석 실패'));}});
  child.stdin.end(bytes);
 });}
 async function read({url,q='',page=1}={}){

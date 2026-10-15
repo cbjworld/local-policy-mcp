@@ -1,0 +1,30 @@
+const normalize=s=>String(s||'').normalize('NFKC').replace(/\s+/g,'');
+function links(investigations,search){
+ const found=[];
+ for(const {candidate,result} of investigations){
+  if(result.status!=='read')continue;
+  for(const attempt of result.attempts||[])for(const p of attempt.source?.pages||[]){
+   if(attempt.status!=='read'||attempt.assessment==='form_or_cover')continue;
+   const name=p.text.match(/보조사업명\s*[:：]\s*([^\n|]{2,80})/);
+   const period=p.text.match(/사업기간\s*[:：]\s*(20\d{2})\./);
+   if(!name||!period||period[1]!=='2026')continue;
+   const program=name[1].replace(/\*\*/g,'').trim(),key=normalize(program).replace(/사업$/,'');
+   if(key.length<4)continue;
+   const rows=search({q:key,institution:candidate.institution,limit:20}).items;
+   const tables=require('./funding-evidence').tables([attempt]);
+   // shortcut: link only nearby tables on the same extracted page; broader sections need semantic review.
+   for(const t of tables.filter(t=>t.unit==='천원'&&t.roles.includes('appropriation')&&t.page===p.page&&t.start>period.index&&t.start-period.index<2500&&t.start>name.index&&t.start-name.index<3000)){
+    const total=t.rows.find(r=>/^(합계|계|총계)$/.test(normalize(r.label)));
+    if(!total)continue;
+    const amount=total.values[t.roles.indexOf('appropriation')];
+    if(!Number.isSafeInteger(amount))continue;
+    for(const row of rows){
+     if(normalize(row.institution)!==normalize(candidate.institution)||row.year!==2026||row.unit!=='천원'||row.budget!==amount||!normalize(row.name).includes(key))continue;
+     found.push({status:'matched_name_year_institution_amount',program,institution:candidate.institution,year:2026,amount,unit:'천원',budgetRow:row,document:{title:candidate.title,url:candidate.url,sourceId:attempt.source.sourceId,page:p.page,nameQuote:name[0],periodQuote:period[0],tableQuote:t.quote,unitQuote:t.unitQuote},note:'본문의 사업명·사업기간과 동일 기관 본예산 행의 명칭·금액을 대조했습니다. 교부액이나 기초지자체 총사업비와 합산하지 마세요. 동일 사업의 법적 귀속과 현재 시행 여부는 별도 문맥 확인 사항입니다.'});
+    }
+   }
+  }
+ }
+ return [...new Map(found.map(x=>[JSON.stringify([x.document.url,x.budgetRow.source,x.budgetRow.page,x.amount]),x])).values()];
+}
+module.exports={links};

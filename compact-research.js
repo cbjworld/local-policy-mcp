@@ -9,12 +9,15 @@ module.exports=function compactResearch(value){
  const ids=new Map(documents.map(d=>[d.url,d.id]));
  const output={responseMode:'compact',request:value.request,status:value.status,summary:value.summary,coverage:value.coverage,limits:value.limits,searchFailures:value.failures||[],documents,possibleProjectLinks:(value.possibleProjectLinks||[]).map(x=>({name:x.name,status:x.status,documentIds:x.documents.map(d=>ids.get(d.url)).filter(Boolean)})),responseSize:{maxCharacters:24000,omittedDocuments:0,omittedReadingDetails:0,omittedLinks:0},detailHint:'생략 자료는 동일 인수의 detail=full 또는 문서 URL의 research_open_document로 재조회하세요. 재조회 결과는 달라질 수 있습니다.',note:'교부·예탁은 집행 확정이 아니며 연관 후보를 같은 사업으로 합치지 마세요. 제목 근거와 본문 근거를 구분하세요.'};
  output.evidenceMap=(value.evidenceMap||[]).map(g=>({...g,stages:g.stages.map(s=>({role:s.role,label:s.label,documentIds:s.documents.map(d=>ids.get(d.url)).filter(Boolean)}))}));
+ output.budgetEvidenceLinks=value.budgetEvidenceLinks||[];
+ output.responseSize.omittedBudgetLinks=0;
  output.responseSize.omittedEvidenceGroups=0;
  const oversized=()=>JSON.stringify(output).length>24000;
  // Preserve whole quotations rather than cutting evidence mid-sentence.
  for(let i=documents.length-1;i>=0&&oversized();i--)if(documents[i].reading){delete documents[i].reading;documents[i].readingDetailsOmitted=true;output.responseSize.omittedReadingDetails++;}
  while(oversized()&&output.possibleProjectLinks.length){output.possibleProjectLinks.pop();output.responseSize.omittedLinks++;}
  while(oversized()&&output.evidenceMap.length){output.evidenceMap.pop();output.responseSize.omittedEvidenceGroups++;}
+ while(oversized()&&output.budgetEvidenceLinks.length){output.budgetEvidenceLinks.pop();output.responseSize.omittedBudgetLinks++;}
  while(oversized()&&documents.length){documents.pop();output.responseSize.omittedDocuments++;}
  const kept=new Set(documents.map(d=>d.id));
  output.possibleProjectLinks=output.possibleProjectLinks.filter(x=>x.documentIds.every(id=>kept.has(id)));

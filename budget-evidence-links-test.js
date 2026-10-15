@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict'),{links}=require('./budget-evidence-links');
+const text='보조사업명 : 산후조리비 지원 사업\n사업기간 : 2026. 1. ~ 12.\n(단위 : 천원)\n| 구군명 | 예산액(시) | 기교부액 | 금회교부액 | 교부잔액 |\n| --- | --- | --- | --- | --- |\n| 합 계 | 2,337,500 | 1,275,000 | 940,500 | 122,000 |';
+const make=t=>[{candidate:{institution:'울산광역시',url:'https://www.open.go.kr/a',title:'2026년 교부'},result:{status:'read',attempts:[{status:'read',source:{sourceId:'s',url:'https://www.open.go.kr/a',pages:[{page:null,text:t}]}}]}}];
+const row={institution:'울산광역시',name:'산후조리비 지원',year:2026,budget:2337500,unit:'천원',source:'https://www.ulsan.go.kr/b',page:12};
+const search=()=>({items:[row]});
+assert.equal(links(make(text),search).length,1);
+for(const changes of [{year:2025},{unit:'원'},{budget:940500},{institution:'울산광역시 중구'},{name:'공공산후조리원 운영'}])assert.equal(links(make(text),()=>({items:[{...row,...changes}]})).length,0);
+for(const changed of [text.replace('2026.','2025.'),text.replace('천원','명'),text.replace('보조사업명','일반제목')])assert.equal(links(make(changed),search).length,0);
+assert.equal(links(make(text),search)[0].document.tableQuote,text.slice(text.indexOf('|')));
+assert.equal(links(make(text),search)[0].amount,2337500);
+console.log('PASS: body identifier and period, exact budget name/institution/year/unit/amount, grant and unrelated-project exclusion');

@@ -45,6 +45,7 @@ function evidence(attempts){
   fields[key]={status:excerpts.some(x=>x.status==='evidence_candidate')?'needs_review':excerpts.some(x=>x.status==='redacted')?'redacted':'unconfirmed',excerpts};
  }
  const organizations=[],budgetNotes=[];
+ fields.budget.tables=require('./funding-evidence').tables(attempts);
  for(const a of attempts.filter(a=>a.status==='read'&&a.assessment!=='form_or_cover'))for(const p of a.source?.pages||[]){
   for(const m of p.text.matchAll(/(?:지자체\(교육청\)명|도서관명|수행기관|운영기관|주최\/주관)\s*[:：]\s*([^\n○❍<|]{1,100})/g))organizations.push({label:m[0].split(/[:：]/)[0].trim(),value:m[1].trim(),quote:m[0],sourceId:a.source.sourceId,url:a.source.url,page:p.page});
   for(const m of p.text.matchAll(/■\s*비예산|(?:20\d{2})년\s*기준|총\s*예산액\s*변동\s*없음/g))budgetNotes.push({quote:m[0],sourceId:a.source.sourceId,url:a.source.url,page:p.page});

@@ -1,0 +1,15 @@
+const assert=require('node:assert/strict'),{tables}=require('./funding-evidence');
+const make=text=>[{status:'read',source:{sourceId:'s',url:'https://example.go.kr',pages:[{page:null,text}]}}];
+const text='(단위 : 천원)\n| 구군명 | 예산액(시) | 기교부액 | 금회교부액 | 교부잔액 |\n| --- | --- | --- | --- | --- |\n| 합 계 | 100 | 20 | 50 | 30 |\n| 중 구 | 40 | 10 | 20 | 10 |\n| 남 구 | 60 | 10 | 30 | 20 |';
+const t=tables(make(text))[0];assert.equal(t.unit,'천원');assert.equal(t.checks.length,7);assert(t.checks.every(x=>x.status==='matched'));assert.equal(t.quote,text.slice(text.indexOf('|')));
+assert(tables(make(text.replace('| 60 |','| 61 |')))[0].checks.some(x=>x.status==='mismatch'));
+const masked=tables(make(text.replace('| 60 |','| *** |')))[0];assert.equal(masked.rows[2].values[1],null);assert(!masked.checks.some(x=>x.row==='남 구'));
+assert.equal(tables(make(text.replace('(단위 : 천원)','')))[0].unit,null);
+assert.equal(tables(make(text.replace('(단위 : 천원)','(단위 : 천원)\n(단위 : 명)')))[0].unit,null);
+assert.equal(tables(make(text.replace('| 60 |','| 1,,2 |')))[0].rows[2].values[1],null);
+assert.equal(tables([{...make(text)[0],assessment:'form_or_cover'}]).length,0);
+assert.equal(tables(make(text.replace('예산액(시)','__proto__')))[0].roles[1],null);
+assert.equal(tables(make(text.replace('기교부액','금회교부액'))).length,0);
+const shares='| 구군명 | 총사업비 | 시 비 | 구·군비 |\n| --- | --- | --- | --- |\n| 합 계 | 100 | 85 | 15 |';
+assert.equal(tables(make(shares))[0].checks[0].status,'matched');
+console.log('PASS: funding shares, allocation balances and column sums, missing unit, masked/malformed amounts, exact source quotation');

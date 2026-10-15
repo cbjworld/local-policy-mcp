@@ -23,7 +23,8 @@ function screen(result,purpose='projects'){
  const all=result.items.map(x=>{
   let relevance=classify(x.title,result.q);
   const title=String(x.title||'').replace(/\s+/g,'').toLowerCase();
-  const matches=anchors.every(w=>title.includes(w.toLowerCase()));
+  const context=title+String(x.institution||'').replace(/\s+/g,'').toLowerCase();
+  const matches=anchors.every(w=>context.includes(w.toLowerCase()));
   if(anchors.length&&relevance.kind==='project_candidate'&&!matches)relevance={kind:'unclassified',reason:'원래 검색 주제의 일부 핵심어가 제목에서 확인되지 않음: 본문 관련성 추가 확인 필요',score:0};
   if(anchors.length&&matches&&relevance.kind==='unclassified'&&/사업/.test(title))relevance={kind:'project_candidate',reason:'원래 검색 주제와 사업명이 일치하는 후보: 계획서 여부는 본문 확인 필요',score:2};
   return {...x,relevance,documentRole:documentRole(x.title),stageNote:'제목에서 추정한 문서 역할이며 교부·예탁은 실제 집행이나 현재 시행 확정이 아닙니다.'};
