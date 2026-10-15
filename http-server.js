@@ -43,7 +43,7 @@ function createServer({publicUrl,token,allowPublic=false,maxSessions=8}={}){
     try{
      // Only pass runtime settings, never hosting credentials, to document workers.
      const env=Object.fromEntries(['PATH','Path','SystemRoot','WINDIR','TEMP','TMP','HOME','POLICY_PYTHON','NODE_EXTRA_CA_CERTS'].filter(k=>process.env[k]).map(k=>[k,process.env[k]]));
-     await client.connect(new StdioClientTransport({command:process.execPath,args:['--use-system-ca','--max-old-space-size=384',path.join(__dirname,'mcp.js')],env,stderr:'ignore'}));
+     await client.connect(new StdioClientTransport({command:process.execPath,args:['--use-system-ca','--max-old-space-size=512',path.join(__dirname,'mcp.js')],env,stderr:'inherit'}));
      const rpc=new Server(client.getServerVersion(),{capabilities:{tools:{}},instructions:client.getInstructions()});
      const transport=new StreamableHTTPServerTransport({sessionIdGenerator:randomUUID,enableJsonResponse:true});
      s={server:rpc,client,transport,last:Date.now(),active:0,waiters:[],calls:0,window:Date.now(),closed:false};
