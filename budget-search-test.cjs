@@ -4,7 +4,7 @@ const all=search({q:'청년',limit:2});assert.equal(all.items.length,2);assert.e
 const next=search({q:'청년',limit:2,offset:2});assert.notDeepEqual(all.items,next.items);
 assert.equal(search({q:'120미추홀콜센터'}).items[0].budget,229409);
 assert.equal(search({q:'합천호 노후관광지',institution:'합천'}).items[0].budget,1500000);
-assert.equal(search({q:'산후',institution:'양평'}).totalCandidateRows,0);
+assert.equal(search({q:'산후',institution:'존재하지않는기관'}).totalCandidateRows,0);
 for(const args of [{q:''},{q:'청년',limit:21},{q:'청년',offset:-1},{q:3},{q:'청년',institution:[]}])assert.throws(()=>search(args));
 const {spawnSync}=require('node:child_process');
 const messages=[{jsonrpc:'2.0',id:0,method:'initialize',params:{protocolVersion:'2025-11-25',clientInfo:{name:'budget-test',version:'1'},capabilities:{}}},{jsonrpc:'2.0',method:'notifications/initialized'},{jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'search_budget_projects',arguments:{q:'산후'}}}];
