@@ -2,6 +2,9 @@ const assert=require('node:assert/strict'),{evidence}=require('./evidence'),{res
 const make=text=>[{status:'read',source:{sourceId:'s',url:'https://example.go.kr/a',pages:[{page:1,text}]}}];
 const a=make('사업기간: 2027. 3.~11.\n지원대상: 미취업 청년\n지원내용: 구독료 지원\n소요예산: 30,000천원(구비)');
 const e=evidence(a);assert.equal(e.fields.budget.status,'needs_review');assert.equal(e.fields.target.status,'needs_review');
+const grant=evidence(make('금회 교부결정내역 : 940,500,000**원(금구억사천오십만원)**'));
+assert.equal(grant.fields.budget.status,'needs_review');
+assert.match(grant.fields.budget.excerpts[0].quote,/금회 교부결정내역/);
 for(const f of Object.values(e.fields))for(const x of f.excerpts)assert(a[0].source.pages[0].text.includes(x.quote));
 assert.equal(evidence(make('소요예산: *****\n사업기간: 2027년')).fields.budget.status,'redacted');
 assert.equal(evidence(make('소요예산: 미정\n참여인원: 300명')).fields.budget.status,'unconfirmed');

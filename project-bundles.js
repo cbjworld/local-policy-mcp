@@ -31,4 +31,23 @@ function bundle(documents,investigations=[]){
   return {...g,fields,referenceExcerpts:read.flatMap(x=>x.result.evidence?.referenceExcerpts||[]),organizations,budgetNotes,reviewFlags,missingFields:missing,nextDocuments:missing.length?unread:[],warning:'제목의 연도로 묶은 후보입니다. 같은 사업인지 본문 확인이 필요합니다. 생산일자가 최신이라고 변경계획의 확정·시행을 뜻하지 않습니다. 예산과 사업기간의 기준연도를 별도로 확인하세요.'};
  });
 }
-module.exports={identity,bundle};
+// Group for investigation only: institution/year does not establish a shared project identity.
+function evidenceMap(documents,investigations=[]){
+ const reads=new Map(investigations.map(x=>[x.candidate.url,x.result.status]));
+ const groups=new Map(),seen=new Set();
+ const labels={plan:'계획·방침',budget:'예산 편성·변경',allocation_or_deposit:'교부·예탁',execution_or_settlement:'집행·정산'};
+ for(const d of documents){
+  const role=require('./relevance').documentRole(d.title);
+  if(!labels[role]||!d.url||seen.has(d.url))continue;
+  seen.add(d.url);
+  const year=identity(d).year,institution=d.institution||null;
+  const key=institution&&year?JSON.stringify([institution,year]):d.url;
+  if(!groups.has(key))groups.set(key,{institution,titleYear:year,relationship:'same_institution_year_candidates_not_confirmed_same_project',stages:[]});
+  const group=groups.get(key);
+  let stage=group.stages.find(x=>x.role===role);
+  if(!stage){stage={role,label:labels[role],documents:[]};group.stages.push(stage);}
+  stage.documents.push({title:d.title,url:d.url,department:d.department||null,readingStatus:reads.get(d.url)||'not_attempted'});
+ }
+ return [...groups.values()].map(g=>({...g,missingStages:Object.keys(labels).filter(k=>!g.stages.some(s=>s.role===k)),note:'문서 제목에 따른 조사 경로입니다. 단계별 자료가 같은 사업인지 본문 대조가 필요하며, 미발견은 자료 부존재가 아닙니다. 교부·예탁과 실제 집행을 구분하세요.'}));
+}
+module.exports={identity,bundle,evidenceMap};

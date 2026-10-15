@@ -1,4 +1,4 @@
-const labels={target:'지원대상|사업대상|참여대상|교육대상|가입자격',activity:'지원내용|사업내용|주요내용|운영내용|지원내역',budget:'소요예산|사업예산|총사업비|사업비|예산액|총예산',period:'사업기간|운영기간|추진기간|지원기간'};
+const labels={target:'지원대상|사업대상|참여대상|교육대상|가입자격',activity:'지원내용|사업내용|주요내용|운영내용|지원내역',budget:'소요예산|사업예산|총사업비|사업비|예산액|총예산|금회교부결정내역',period:'사업기간|운영기간|추진기간|지원기간'};
 const spaced=s=>s.split('|').map(w=>[...w].join('\\s*')).join('|');
 const nextLabel=new RegExp('(?:'+spaced(Object.values(labels).join('|'))+')\\s*[:：]');
 function evidence(attempts){
@@ -23,7 +23,7 @@ function evidence(attempts){
     }
     else {const next=value.search(/\n(?:\|\s*(?:\d+|[ⅠⅡⅢⅣⅤⅥⅦ]+)\s*\||[ \t]*[ⅠⅡⅢⅣⅤⅥⅦ]+[ \t]*[가-힣])/);if(next>=0)value=value.slice(0,next);}
     const masked=/\*{3,}|(?:\\\*){3,}|비공개|가림/.test(value);
-    const amount=/\d[\d,.]*\s*(?:백만|천만|백|천|억|만)?\s*원/.test(value);
+    const amount=/\d[\d,.]*\s*(?:\*\*)?\s*(?:백만|천만|백|천|억|만)?\s*원/.test(value);
     const heading=[...p.text.slice(0,m.index).matchAll(/^\|\s*[ⅠⅡⅢⅣⅤⅥⅦ\d]+\s*\|[^\n]+/gm)].at(-1);
     const sectionTitle=heading?.[0]||null;
     // shortcut: section headings flag reference context; ownership still requires semantic review.
