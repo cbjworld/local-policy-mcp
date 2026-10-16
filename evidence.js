@@ -46,6 +46,10 @@ function evidence(attempts){
  }
  const organizations=[],budgetNotes=[];
  fields.budget.tables=require('./funding-evidence').tables(attempts);
+ for(const table of fields.budget.tables)if(table.unit&&table.rows.some(r=>r.values.some(Number.isSafeInteger))&&fields.budget.excerpts.length<3){
+  fields.budget.excerpts.push({sourceId:table.sourceId,url:table.url,page:table.page,quote:table.quote,status:'evidence_candidate',sectionTitle:'재원·교부 표',attribution:'requires_review',unit:table.unit,unitQuote:table.unitQuote});
+ }
+ if(fields.budget.excerpts.some(e=>e.status==='evidence_candidate'))fields.budget.status='needs_review';
  for(const a of attempts.filter(a=>a.status==='read'&&a.assessment!=='form_or_cover'))for(const p of a.source?.pages||[]){
   for(const m of p.text.matchAll(/(?:지자체\(교육청\)명|도서관명|수행기관|운영기관|주최\/주관)\s*[:：]\s*([^\n○❍<|]{1,100})/g))organizations.push({label:m[0].split(/[:：]/)[0].trim(),value:m[1].trim(),quote:m[0],sourceId:a.source.sourceId,url:a.source.url,page:p.page});
   for(const m of p.text.matchAll(/■\s*비예산|(?:20\d{2})년\s*기준|총\s*예산액\s*변동\s*없음/g))budgetNotes.push({quote:m[0],sourceId:a.source.sourceId,url:a.source.url,page:p.page});

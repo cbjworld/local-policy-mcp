@@ -17,6 +17,16 @@ async function financeFollowupTest(){
  console.log('PASS: financial follow-up after readable plans, province/district remain separate, bounded supplemental slot');
 }
 financeFollowupTest().catch(e=>{console.error(e);process.exitCode=1});
+async function budgetFallbackTest(){
+ const r=await w.research({question:'빈집',queries:['빈집']},{search:async()=>{throw Error('portal offline')}});
+ assert.equal(r.status,'search_failed');assert.equal(r.candidates.length,0);
+ assert(r.budgetCandidates.length>0&&r.budgetCandidates.length<=5);
+ assert(r.budgetCandidates.every(x=>x.unit==='천원'&&x.year===2026&&x.source.startsWith('https://')));
+ assert.equal(r.budgetEvidenceLinks.length,0,'index hits are not body-confirmed project links');
+ assert(r.budgetSearches[0].nextOffset>0);
+ console.log('PASS: indexed budget candidates survive portal failure, keep provenance and stay distinct from body matches');
+}
+budgetFallbackTest().catch(e=>{console.error(e);process.exitCode=1});
 assert.equal(w.plan({question:'반려동물 정책 찾아줘'},now).broad,true);
 assert.deepEqual(w.plan({question:'청년 AI 구독료 지원 사례 찾아줘'},now).queries,['청년 AI 구독료 지원','청년 AI 구독료']);
 assert.equal(w.plan({question:'병원 동행'},now).startDate,'20241013');

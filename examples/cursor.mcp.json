@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "local-policy-mcp": {
+      "url": "https://policy-mcp-production.up.railway.app/mcp"
+    }
+  }
+}

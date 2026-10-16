@@ -33,6 +33,11 @@ const small=require('./presentation').present('research_policy',{candidates:many
 assert(JSON.stringify(small).length<=24000);
 const ids=new Set(small.documents.map(d=>d.id));
 for(const g of small.evidenceMap)for(const s of g.stages)for(const id of s.documentIds)assert(ids.has(id));
+const readDoc={title:'2026년 산후조리비 지원 계획',url:'read-first',institution:'A'};
+const crowded=require('./presentation').present('research_policy',{candidates:[readDoc,...many],investigations:[{candidate:readDoc,result:{status:'read',evidence:{fields:{budget:{status:'needs_review',excerpts:[{quote:'소요예산: 100천원',url:'read-first',page:2}]}}}}}]});
+assert(crowded.documents.find(d=>d.url==='read-first').reading.fields.find(f=>f.key==='budget').evidence.some(e=>e.quote==='소요예산: 100천원'));
+assert(crowded.responseSize.omittedDocuments>0);
+assert.equal(crowded.responseSize.omittedReadingDetails,0);
 (async()=>{
  const result=await require('./policy-workflow').research({question:'산후조리비',queries:['산후조리비']},{search:async()=>({total:3,hasMore:false,items:[...docs,{title:'2026년 반려동물 의료비 지원사업 집행잔액 반납',url:'unrelated',institution:'A'}],reviewItems:[],relatedDocuments:[]})});
  assert(result.evidenceMap.some(g=>g.stages.some(s=>s.role==='allocation_or_deposit')));

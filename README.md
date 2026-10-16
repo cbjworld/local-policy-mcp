@@ -29,6 +29,8 @@ https://policy-mcp-production.up.railway.app/mcp
 
 서버 이름: `local-policy-mcp` · 연결 방식: `Streamable HTTP`
 
+Claude Code·Cursor 연결 방법은 [앱별 연결 안내](USAGE.md#claude-code)를 참고하세요.
+
 ## 이렇게 질문하세요
 
 > 다른 지자체 산후조리비 지원 사업의 계획과 예산을 비교해줘.

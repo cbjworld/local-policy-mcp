@@ -5,6 +5,9 @@ const e=evidence(a);assert.equal(e.fields.budget.status,'needs_review');assert.e
 const grant=evidence(make('금회 교부결정내역 : 940,500,000**원(금구억사천오십만원)**'));
 assert.equal(grant.fields.budget.status,'needs_review');
 assert.match(grant.fields.budget.excerpts[0].quote,/금회 교부결정내역/);
+const tableOnly=evidence(make('(단위 : 천원)\n| 구군명 | 예산액 | 기교부액 | 금회교부액 | 교부잔액 |\n| --- | --- | --- | --- | --- |\n| 합 계 | 100 | 20 | 50 | 30 |'));
+assert.equal(tableOnly.fields.budget.status,'needs_review');
+assert(tableOnly.fields.budget.excerpts.some(e=>e.sectionTitle==='재원·교부 표'&&e.unit==='천원'));
 for(const f of Object.values(e.fields))for(const x of f.excerpts)assert(a[0].source.pages[0].text.includes(x.quote));
 assert.equal(evidence(make('소요예산: *****\n사업기간: 2027년')).fields.budget.status,'redacted');
 assert.equal(evidence(make('소요예산: 미정\n참여인원: 300명')).fields.budget.status,'unconfirmed');

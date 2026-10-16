@@ -8,4 +8,16 @@ for(const changes of [{year:2025},{unit:'원'},{budget:940500},{institution:'울
 for(const changed of [text.replace('2026.','2025.'),text.replace('천원','명'),text.replace('보조사업명','일반제목')])assert.equal(links(make(changed),search).length,0);
 assert.equal(links(make(text),search)[0].document.tableQuote,text.slice(text.indexOf('|')));
 assert.equal(links(make(text),search)[0].amount,2337500);
+const planText='사업명 : 산후조리비 지원사업\n사업기간 : 2026년 1월부터\n소요예산: 2,337.5백만원';
+const plan=make(planText);plan[0].candidate.title='2026년 산후조리비 지원계획';
+plan[0].result.evidence={fields:{budget:{excerpts:[{sourceId:'s',page:null,status:'evidence_candidate',quote:'소요예산: 2,337.5백만원'}]}}};
+assert.equal(links(plan,search).length,0,'unsupported decimals do not become wrong integer amounts');
+plan[0].result.attempts[0].source.pages[0].text=planText.replace('2,337.5백만원','2,337,500천원');
+plan[0].result.evidence.fields.budget.excerpts[0].quote='소요예산: 2,337,500천원';
+assert.equal(links(plan,search).length,1);
+const district=structuredClone(plan);district[0].candidate.institution='울산광역시 중구';
+assert.equal(links(district,()=>({items:[{...row,institution:'중구',parent:'울산광역시'}]})).length,1);
+assert.equal(links(district,()=>({items:[{...row,institution:'중구',parent:'대구광역시'}]})).length,0);
+plan[0].result.evidence.fields.budget.excerpts[0].attribution='reference_context';
+assert.equal(links(plan,search).length,0);
 console.log('PASS: body identifier and period, exact budget name/institution/year/unit/amount, grant and unrelated-project exclusion');
