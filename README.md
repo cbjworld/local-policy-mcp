@@ -14,6 +14,8 @@
 
 <!-- budget-stats:start -->
 **2026년 본예산 일반회계 세출 사업행 265,416건 수록**
+
+검증된 지자체 일반회계 세출 총액 **193곳**
 <!-- budget-stats:end -->
 
 예산 검색 결과에는 편성액(천원)과 원문 위치가 함께 제공됩니다.
@@ -42,3 +44,4 @@ Claude Code·Cursor 연결 방법은 [앱별 연결 안내](USAGE.md#claude-code
 ## 더 알아보기
 
 [설치·도구 안내](USAGE.md) · [의견 남기기](https://github.com/cbjworld/local-policy-mcp/issues) · [MIT 라이선스](LICENSE)
+
