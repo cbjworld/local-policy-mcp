@@ -1,5 +1,5 @@
 {
-  "regions": 195,
+  "regions": 196,
   "nationwideComplete": false,
   "items": [
     {
@@ -3575,6 +3575,25 @@
       ],
       "verification": "�μ��� �ݾ� �հ�� ���� �Ϲ�ȸ�� �Ѿ� ��ġ",
       "limitation": "2026 ������ �Ϲ�ȸ�� ��ü�� ǥ�õ� 31�� ��û �μ��� 6�� ���������������� ù ������ ���� �Ѿ��� �ؽ�Ʈ������ Ȯ���ϰ�, 37�� �հ谡 ���� �Ϲ�ȸ�� �Ѿװ� ��ġ. ���� ����ࡤ����ġ�������� ���� ����. OCR �̻��."
+    },
+    {
+      "institutionId": "gov-da67967bd7",
+      "institution": "õ�Ƚ�",
+      "parent": "��û����",
+      "year": 2026,
+      "account": "�Ϲ�ȸ��",
+      "budgetType": "������",
+      "level": "municipality_total",
+      "amount": 2147000000,
+      "unit": "õ��",
+      "matchedDepartments": 112,
+      "sources": [
+        "https://www.cheonan.go.kr/cmm/fms/FileDown.do?atchFileId=FILE_000000000876605&fileSn=0",
+        "https://www.cheonan.go.kr/cmm/fms/FileDown.do?atchFileId=FILE_000000000876587&fileSn=0",
+        "https://www.cheonan.go.kr/prog/caBgtplnRls/kor/sub03_06_01/list.do?searchCondition=2026&searchCycl=0"
+      ],
+      "verification": "�μ��� �ݾ� �հ�� ���� �Ϲ�ȸ�� �Ѿ� ��ġ",
+      "limitation": "2026 ������ �Ϲ�ȸ�� ������������ 111�� �μ� �ݾװ� ������ �����Ѱ�ǥ�� ȸ��� �ݾ��� Ȯ���ߴ�. �Ϲ�ȸ�� �Ѿ� 2,147,000,000õ���� 112�� �μ� �հ谡 ��ġ�Ѵ�. Ư��ȸ�衤��ݡ����� ����. ���� ������ ������� ���� ����. OCR �̻��."
     }
   ],
   "skipped": [
