@@ -20,3 +20,15 @@ const jeonnam=search({q:'소통도정 운영',institution:'전라남도'}).items
 const yeosu=require("./verified-budget-search").search({institution:"여수시"}).items[0];
 assert.equal(yeosu.amount,1354528942);assert.equal(yeosu.matchedDepartments,0);
 assert.ok(yeosu.sources.every(url=>!url.includes("yeosu.go.kr/contents/12808/2026.pdf")));
+
+// Recovered sources, shifted table labels, and general-account transfers stay searchable.
+for(const [institution,q,department,budget,page] of [
+  ['구미시','적극적시책홍보','양포동',71358,1],
+  ['용산구','노후위험시설물스마트안전관리시스템운영및유지관리','안전재난과',259595,682],
+  ['남원시','하수도특별회계 자본전출','상하수도사업소',14975724,3],
+  ['김포시','도심항공교통(UAM) 체계 구축','미래전략과',35000,284]
+]) {
+  let result=search({q,institution,limit:20}),item=result.items.find(row=>row.department===department);
+  while(!item&&result.nextOffset!==null){result=search({q,institution,limit:20,offset:result.nextOffset});item=result.items.find(row=>row.department===department);}
+  assert.ok(item,`${institution} ${department}`);assert.equal(item.budget,budget);assert.equal(item.page,page);
+}
