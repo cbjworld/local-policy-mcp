@@ -16,3 +16,8 @@ assert.equal(evidence([{...a[0],assessment:'form_or_cover'}]).fields.budget.stat
 research({url:'test',requestedQuery:'어르신 일자리'},async()=>({title:'어르신 일자리사업 참여자 인권교육 추진계획',attachments:[]})).then(r=>{assert.equal(r.relevanceStatus,'supporting_document');console.log('PASS: exact excerpts, masked/absent budget, spaced PDF label, forms excluded, query carried to research');}).catch(e=>{console.error(e);process.exitCode=1});
 
 assert.equal(evidence(make('예 산 액: 금7,505,000천원(도비 2,607,000, 시비 4,898,000)')).fields.budget.status,'needs_review');
+
+assert.equal(evidence(make('사 업 예 산 : 840백 만 원 (도 비 100%)')).fields.budget.excerpts[0].status,'evidence_candidate');
+assert.equal(evidence(make('소요예산 '+String.raw`\*\*\*\*`)).fields.budget.status,'redacted');
+assert.equal(evidence(make('소요예산 *****')).fields.budget.status,'redacted');
+assert.equal(evidence(make('소요예산을 검토할 예정')).fields.budget.status,'unconfirmed');

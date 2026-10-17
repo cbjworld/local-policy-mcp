@@ -25,7 +25,7 @@ async function research(args={},io=portal){
  for(const q of request.queries){
   try{const b=require('./budget-search').search({q,limit:5});
    budgetScope={year:b.scope.year,account:b.scope.account,collectedDate:b.scope.collectedDate,nationwideComplete:b.scope.nationwideComplete,excluded:b.scope.excluded};
-   budgetSearches.push({q,year:2026,account:'일반회계',unit:'천원',totalCandidateRows:b.totalCandidateRows,nextOffset:b.nextOffset});
+   budgetSearches.push({q,year:b.scope.year,account:'일반회계',unit:'천원',totalCandidateRows:b.totalCandidateRows,nextOffset:b.nextOffset});
    for(const row of b.items){const key=JSON.stringify([row.institutionId,row.source,row.page,row.table,row.tableRow,row.name]);if(!budgetRows.has(key))budgetRows.set(key,row);}
   }catch(e){budgetSearches.push({q,status:'failed',message:e.message});}
  }

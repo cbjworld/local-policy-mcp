@@ -6,7 +6,7 @@ function evidence(attempts){
  for(const [key,label] of Object.entries(labels)){
   const excerpts=[];
   for(const a of attempts.filter(a=>a.status==='read'&&a.assessment!=='form_or_cover'))for(const p of a.source?.pages||[]){
-   const pattern=new RegExp('(?:'+spaced(label)+')\\s*(?:\\*\\*)?\\s*'+(key==='budget'?'(?:[:：)]|\\|[ \\t]*\\r?\\n)':'(?:[:：)]|</td>\\s*<td>)'),'g');let m;
+   const pattern=new RegExp('(?:'+spaced(label)+')\\s*(?:\\*\\*)?\\s*'+(key==='budget'?'(?:[:：)]|(?=(?:\\\\?\\*){3,})|\\|[ \\t]*\\r?\\n)':'(?:[:：)]|</td>\\s*<td>)'),'g');let m;
    while((m=pattern.exec(p.text))&&excerpts.length<3){
     const section=key==='budget'&&m[0].includes('|');
     const tail=p.text.slice(pattern.lastIndex,pattern.lastIndex+(section||m[0].includes('</t')?700:280));
@@ -23,7 +23,7 @@ function evidence(attempts){
     }
     else {const next=value.search(/\n(?:\|\s*(?:\d+|[ⅠⅡⅢⅣⅤⅥⅦ]+)\s*\||[ \t]*[ⅠⅡⅢⅣⅤⅥⅦ]+[ \t]*[가-힣])/);if(next>=0)value=value.slice(0,next);}
     const masked=/\*{3,}|(?:\\\*){3,}|비공개|가림/.test(value);
-    const amount=/\d[\d,.]*\s*(?:\*\*)?\s*(?:백만|천만|백|천|억|만)?\s*원/.test(value);
+    const amount=/\d[\d,.]*\s*(?:\*\*)?\s*(?:백\s*만|천\s*만|백|천|억|만)?\s*원/.test(value);
     const heading=[...p.text.slice(0,m.index).matchAll(/^\|\s*[ⅠⅡⅢⅣⅤⅥⅦ\d]+\s*\|[^\n]+/gm)].at(-1);
     const sectionTitle=heading?.[0]||null;
     // shortcut: section headings flag reference context; ownership still requires semantic review.

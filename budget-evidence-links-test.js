@@ -21,3 +21,5 @@ assert.equal(links(district,()=>({items:[{...row,institution:'중구',parent:'�
 plan[0].result.evidence.fields.budget.excerpts[0].attribution='reference_context';
 assert.equal(links(plan,search).length,0);
 console.log('PASS: body identifier and period, exact budget name/institution/year/unit/amount, grant and unrelated-project exclusion');
+
+assert.equal(links(make(text.replace("2026.","2027.")),()=>({items:[{...row,year:2027}]}))[0].year,2027);
