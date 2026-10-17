@@ -24,6 +24,8 @@ const {createServer}=require('./http-server');
   const budget=await clients[0].callTool({name:'search_budget_projects',arguments:{q:'산후',limit:2}});
   assert.equal(budget.isError,false);const budgetData=JSON.parse(budget.content[0].text);
   assert.equal(budgetData.totalCandidateRows,require('./budget-search').search({q:'산후'}).totalCandidateRows);assert.equal(budgetData.items.length,2);assert.equal(budgetData.scope.nationwideComplete,false);
+  const parallel=await Promise.all(clients.map((c,i)=>c.callTool({name:'search_budget_projects',arguments:{q:i?'빈집':'산후',limit:2}})));
+  for(let i=0;i<parallel.length;i++){assert.equal(parallel[i].isError,false);assert.equal(JSON.parse(parallel[i].content[0].text).totalCandidateRows,require('./budget-search').search({q:i?'빈집':'산후'}).totalCandidateRows);}
   const init={jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-11-25',capabilities:{},clientInfo:{name:'test',version:'1'}}};
   assert.equal((await fetch(url,{method:'POST',body:JSON.stringify(init),headers})).status,503);
   const bad=await clients[0].callTool({name:'read_official_source',arguments:{url:'http://127.0.0.1/private'}});

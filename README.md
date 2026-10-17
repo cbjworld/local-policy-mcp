@@ -42,3 +42,5 @@ Claude Code·Cursor 연결 방법은 [앱별 연결 안내](USAGE.md#claude-code
 ## 더 알아보기
 
 [설치·도구 안내](USAGE.md) · [의견 남기기](https://github.com/cbjworld/local-policy-mcp/issues) · [MIT 라이선스](LICENSE)
+
+짧게 **“산후조리비 지원 사업 비교해줘”**라고 질문하면 예산 사업명 조회와 정보공개포털 원문 조사를 이어갑니다. 지역·사업·예산·근거·출처를 먼저 정리하고, 본문 자료와 제목으로 찾은 자료를 구분합니다.

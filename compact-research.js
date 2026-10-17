@@ -10,10 +10,13 @@ module.exports=function compactResearch(value){
  });
  const ids=new Map(documents.map(d=>[d.url,d.id]));
  const output={responseMode:'compact',request:value.request,status:value.status,summary:value.summary,coverage:value.coverage,limits:value.limits,searchFailures:value.failures||[],documents,possibleProjectLinks:(value.possibleProjectLinks||[]).map(x=>({name:x.name,status:x.status,documentIds:x.documents.map(d=>ids.get(d.url)).filter(Boolean)})),responseSize:{maxCharacters:24000,omittedDocuments:0,omittedReadingDetails:0,omittedLinks:0},detailHint:'생략 자료는 동일 인수의 detail=full 또는 문서 URL의 research_open_document로 재조회하세요. 재조회 결과는 달라질 수 있습니다.',reviewGuidance:'예산 합계와 재원별 금액을 같은 단위로 재계산하세요. 불일치는 원문 표를 다시 읽고, 확인 전 숫자를 수정하거나 확정값으로 제시하지 마세요.',note:'교부·예탁은 집행 확정이 아니며 연관 후보를 같은 사업으로 합치지 마세요. 제목 근거와 본문 근거를 구분하세요.'};
+ output.comparison=[...(value.projects||[])].sort((a,b)=>Number(b.documents.some(d=>reads.get(d.url)?.status==='read'))-Number(a.documents.some(d=>reads.get(d.url)?.status==='read'))).slice(0,6).map(p=>({institution:p.institution,name:p.name,year:p.titleYear,existence:p.existence?.status,fields:Object.fromEntries(Object.entries(p.fields||{}).map(([k,v])=>[k,v.status])),documentIds:p.documents.map(d=>ids.get(d.url)).filter(Boolean),reviewFlags:p.reviewFlags||[]}));
+ output.answerGuide='먼저 지역·사업·편성예산·계획/집행 근거·출처를 짧은 표로 제시하세요. 본문을 읽은 자료와 제목으로 존재를 추정한 자료를 구분하고, 미확인 값은 채우지 마세요. 자세한 인용은 documents의 reading에서 확인하세요. 예산 후보는 같은 사업임을 대조한 뒤 연결하세요.';
  output.evidenceMap=(value.evidenceMap||[]).map(g=>({...g,stages:g.stages.map(s=>({role:s.role,label:s.label,documentIds:s.documents.map(d=>ids.get(d.url)).filter(Boolean)}))}));
  output.budgetEvidenceLinks=value.budgetEvidenceLinks||[];
  output.budgetCandidates=value.budgetCandidates||[];
  output.budgetSearches=value.budgetSearches||[];
+ output.budgetScope=value.budgetScope||null;
  output.budgetCandidateNote='2026년 본예산 일반회계 세출의 사업명 검색 초기 후보 최대 5행입니다. budgetSearches의 q·nextOffset으로 search_budget_projects를 이어 조회하세요. 문서의 사업과 같은지, 시비인지 총사업비인지 확인한 뒤 사용하세요. 교부·집행액과 합산하지 마세요.';
  output.responseSize.omittedBudgetCandidates=0;
  output.responseSize.omittedBudgetLinks=0;
@@ -21,6 +24,7 @@ module.exports=function compactResearch(value){
  const oversized=()=>JSON.stringify(output).length>24000;
  const pruneReferences=()=>{
   const kept=new Set(documents.map(d=>d.id));
+  output.comparison=output.comparison.filter(p=>p.documentIds.length&&p.documentIds.every(id=>kept.has(id)));
   const links=output.possibleProjectLinks.filter(x=>x.documentIds.every(id=>kept.has(id)));
   output.responseSize.omittedLinks+=output.possibleProjectLinks.length-links.length;output.possibleProjectLinks=links;
   const groups=output.evidenceMap.filter(g=>g.stages.every(s=>s.documentIds.every(id=>kept.has(id))));
