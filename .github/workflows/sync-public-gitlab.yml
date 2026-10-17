@@ -1,0 +1,48 @@
+name: Sync public GitLab
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: public-gitlab-main-sync
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Sync main to AI government GitLab
+        env:
+          GITLAB_SYNC_TOKEN: ${{ secrets.GITLAB_SYNC_TOKEN }}
+          GIT_TERMINAL_PROMPT: '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$GITLAB_SYNC_TOKEN" ]; then
+            echo '::error::Add the GITLAB_SYNC_TOKEN repository secret with write_repository access to the destination GitLab project.'
+            exit 1
+          fi
+          repo_dir="$RUNNER_TEMP/gitlab-sync"
+          askpass_file="$RUNNER_TEMP/gitlab-askpass.sh"
+          mkdir -p "$repo_dir"
+          cat > "$askpass_file" <<'ASKPASS'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' 'oauth2' ;;
+            *Password*) printf '%s\n' "$GITLAB_SYNC_TOKEN" ;;
+            *) exit 1 ;;
+          esac
+          ASKPASS
+          chmod 700 "$askpass_file"
+          trap 'rm -f "$askpass_file"' EXIT
+          git -C "$repo_dir" init --bare
+          git -C "$repo_dir" fetch --no-tags "https://github.com/${GITHUB_REPOSITORY}.git" refs/heads/main:refs/heads/main
+          export GIT_ASKPASS="$askpass_file"
+          destination='https://gitlab.aigov.go.kr/conicon/local-policy-mcp.git'
+          git -C "$repo_dir" push "$destination" refs/heads/main:refs/heads/main
+          expected=$(git -C "$repo_dir" rev-parse refs/heads/main)
+          actual=$(git ls-remote "$destination" refs/heads/main | cut -f1)
+          test "$expected" = "$actual"
+          echo "GitLab main synchronized: $actual"
