@@ -26,7 +26,10 @@ for(const [institution,q,department,budget,page] of [
   ['구미시','적극적시책홍보','양포동',71358,1],
   ['용산구','노후위험시설물스마트안전관리시스템운영및유지관리','안전재난과',259595,682],
   ['남원시','하수도특별회계 자본전출','상하수도사업소',14975724,3],
-  ['김포시','도심항공교통(UAM) 체계 구축','미래전략과',35000,284]
+  ['김포시','도심항공교통(UAM) 체계 구축','미래전략과',35000,284],
+  ['안성시','전화금융사기 예방','행정과',57833,4],
+  ['괴산군','예산편성 운영','기획홍보과',194328,6],
+  ['충주시','노동단체 화합행사','투자유치과',69500,251]
 ]) {
   let result=search({q,institution,limit:20}),item=result.items.find(row=>row.department===department);
   while(!item&&result.nextOffset!==null){result=search({q,institution,limit:20,offset:result.nextOffset});item=result.items.find(row=>row.department===department);}
