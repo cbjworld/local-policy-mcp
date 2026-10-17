@@ -29,7 +29,9 @@ for(const [institution,q,department,budget,page] of [
   ['김포시','도심항공교통(UAM) 체계 구축','미래전략과',35000,284],
   ['안성시','전화금융사기 예방','행정과',57833,4],
   ['괴산군','예산편성 운영','기획홍보과',194328,6],
-  ['충주시','노동단체 화합행사','투자유치과',69500,251]
+  ['충주시','노동단체 화합행사','투자유치과',69500,251],
+  ['영월군','지방세정운영','세무회계과',263918,1],
+  ['기장군','기금전출금(옥외광고발전기금)','도로관리과',40000,433]
 ]) {
   let result=search({q,institution,limit:20}),item=result.items.find(row=>row.department===department);
   while(!item&&result.nextOffset!==null){result=search({q,institution,limit:20,offset:result.nextOffset});item=result.items.find(row=>row.department===department);}
