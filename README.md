@@ -20,8 +20,8 @@
 
 ## 연결하기
 
-Streamable HTTP를 지원하는 AI 앱에 아래 주소를 등록하세요.
-로그인이나 별도 API 키 없이 연결할 수 있습니다.
+**공개 서버를 무료 호스팅으로 이전 준비 중입니다. 아래 기존 Railway 주소는 현재 중지돼 있습니다.**
+직접 배포하려면 [Render 무료 배포 안내](REMOTE.md#render-무료-배포)를 이용하세요.
 
 ```text
 https://policy-mcp-production.up.railway.app/mcp

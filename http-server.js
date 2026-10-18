@@ -5,7 +5,7 @@ const {StdioClientTransport}=require('@modelcontextprotocol/sdk/client/stdio.js'
 const {StreamableHTTPServerTransport}=require('@modelcontextprotocol/sdk/server/streamableHttp.js');
 const {ListToolsRequestSchema,CallToolRequestSchema,isInitializeRequest}=require('@modelcontextprotocol/sdk/types.js');
 
-function createServer({publicUrl,token,allowPublic=false,maxSessions=8}={}){
+function createServer({publicUrl,token,allowPublic=false,maxSessions=Number(process.env.MCP_MAX_SESSIONS||8)}={}){
  const origin=publicUrl?new URL(publicUrl):null;
  if(origin&&origin.protocol!=='https:')throw new Error('PUBLIC_URL must use HTTPS');
  if(!Number.isInteger(maxSessions)||maxSessions<1||maxSessions>32)throw new Error('Invalid session limit');
@@ -83,7 +83,7 @@ function createServer({publicUrl,token,allowPublic=false,maxSessions=8}={}){
  return server;
 }
 if(require.main===module){
- const host=process.env.HOST||'127.0.0.1',publicUrl=process.env.PUBLIC_URL,token=process.env.MCP_AUTH_TOKEN,allowPublic=process.env.MCP_ALLOW_PUBLIC==='1';
+ const host=process.env.HOST||'127.0.0.1',publicUrl=process.env.PUBLIC_URL||process.env.RENDER_EXTERNAL_URL,token=process.env.MCP_AUTH_TOKEN,allowPublic=process.env.MCP_ALLOW_PUBLIC==='1';
  if(host!=='127.0.0.1'&&(!publicUrl||(!token&&!allowPublic)))throw new Error('External binding requires PUBLIC_URL and authentication or explicit MCP_ALLOW_PUBLIC=1');
  const server=createServer({publicUrl,token,allowPublic});
  server.listen(Number(process.env.PORT||3000),host,()=>console.error('Policy MCP HTTP server ready'));

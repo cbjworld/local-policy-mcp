@@ -3,6 +3,10 @@ const {Client}=require('@modelcontextprotocol/sdk/client/index.js');
 const {StreamableHTTPClientTransport}=require('@modelcontextprotocol/sdk/client/streamableHttp.js');
 const {createServer}=require('./http-server');
 (async()=>{
+ const previous=process.env.MCP_MAX_SESSIONS;
+ process.env.MCP_MAX_SESSIONS='0';assert.throws(()=>createServer(),/Invalid session limit/);
+ process.env.MCP_MAX_SESSIONS='invalid';assert.throws(()=>createServer(),/Invalid session limit/);
+ if(previous===undefined)delete process.env.MCP_MAX_SESSIONS;else process.env.MCP_MAX_SESSIONS=previous;
  const server=createServer({token:'test-only',maxSessions:2});
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  const url=new URL('http://127.0.0.1:'+server.address().port+'/mcp'),clients=[],transports=[];

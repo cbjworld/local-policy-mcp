@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: local-policy-mcp
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /health
+    envVars:
+      - key: MCP_ALLOW_PUBLIC
+        value: "1"
+      - key: MCP_MAX_SESSIONS
+        value: "1"
