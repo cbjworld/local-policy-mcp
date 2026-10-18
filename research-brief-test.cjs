@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict');
+const brief=require('./research-brief');
+const doc={id:'d1',institution:'인제군',title:'산후조리비 계획',url:'https://www.open.go.kr/example',classification:'project_candidate',role:'plan',readingStatus:'read',reading:{fields:[{key:'budget',state:'원문 근거 후보 · 문맥 확인 필요',evidence:[{quote:'본예산 90백만원, 증액 계획 180백만원',page:6,url:'https://www.open.go.kr/source'}]}]}};
+let rows=brief([doc,{...doc,id:'d2',readingStatus:'unreadable',reading:undefined},{...doc,id:'d3',supportingOnly:true},{...doc,id:'d4',classification:'administration'}]);
+assert.equal(rows.length,3);
+assert.equal(rows[0].fields.budget.quote,'본예산 90백만원, 증액 계획 180백만원');
+assert.equal(rows[0].fields.budget.page,6);
+assert.equal(rows[1].fields.budget.state,'미확인');
+assert.equal(rows[2].fields.budget.state,'미확인');
+assert.equal(rows[2].basis,'제목으로 사업 존재 추정');
+assert.equal(brief([{...doc,reading:{fields:[{key:'budget',state:'가림 처리',evidence:[]}]}}])[0].fields.budget.state,'가림 처리');
+assert.equal(brief([{...doc,reading:{fields:[{key:'budget',state:'원문 근거 후보',evidence:[{quote:'x'.repeat(501)}]}]}}])[0].fields.budget.detailDocumentId,'d1');
+const compact=require('./compact-research')({candidates:Array.from({length:200},(_,i)=>({...doc,id:undefined,url:'url'+i,title:'산후조리비 계획'+ 'x'.repeat(200),relevance:{kind:'project_candidate'}}))});
+assert(JSON.stringify(compact).length<=24000);
+assert(compact.quickBrief.every(b=>compact.documents.some(d=>d.id===b.documentId)));
+console.log('PASS: concise sourced brief, unread/private and supporting evidence separation, redaction, bounded quotes and references');
