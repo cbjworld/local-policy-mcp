@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "local-policy-mcp": {
-      "url": "https://policy-mcp-production.up.railway.app/mcp"
+      "url": "https://local-policy-mcp.onrender.com/mcp"
     }
   }
 }

@@ -2,13 +2,13 @@
 
 ## 원격 연결
 
-기존 Railway 서버는 체험 종료로 중지돼 있습니다. 아래 주소는 이전 주소이며 새 무료 서버 배포 후 교체합니다.
+Render 무료 서버 주소입니다. 기존 Railway 주소로 등록했다면 아래 주소로 변경하세요.
 
 | 항목 | 값 |
 |---|---|
 | 서버 이름 | `local-policy-mcp` |
 | 연결 방식 | Streamable HTTP |
-| 주소 | `https://policy-mcp-production.up.railway.app/mcp` |
+| 주소 | `https://local-policy-mcp.onrender.com/mcp` |
 | 인증 | 없음 |
 
 연결한 AI 앱이 MCP의 검색·조회 결과를 바탕으로 답변을 작성합니다.
@@ -18,7 +18,7 @@
 터미널에서 한 번 등록하면 다른 프로젝트에서도 사용할 수 있습니다.
 
 ```sh
-claude mcp add --transport http local-policy-mcp --scope user https://policy-mcp-production.up.railway.app/mcp
+claude mcp add --transport http local-policy-mcp --scope user https://local-policy-mcp.onrender.com/mcp
 claude mcp get local-policy-mcp
 ```
 

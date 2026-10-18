@@ -20,11 +20,11 @@
 
 ## 연결하기
 
-**공개 서버를 무료 호스팅으로 이전 준비 중입니다. 아래 기존 Railway 주소는 현재 중지돼 있습니다.**
-직접 배포하려면 [Render 무료 배포 안내](REMOTE.md#render-무료-배포)를 이용하세요.
+Streamable HTTP를 지원하는 AI 앱에 아래 주소를 등록하세요.
+로그인이나 별도 API 키 없이 연결할 수 있습니다. 무료 서버는 미사용 후 첫 연결 때 기동 시간이 필요합니다.
 
 ```text
-https://policy-mcp-production.up.railway.app/mcp
+https://local-policy-mcp.onrender.com/mcp
 ```
 
 서버 이름: `local-policy-mcp` · 연결 방식: `Streamable HTTP`
