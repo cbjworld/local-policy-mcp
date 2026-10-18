@@ -1,17 +1,19 @@
-const http=require('node:http'),path=require('node:path'),{randomUUID}=require('node:crypto');
+const http=require('node:http'),{randomUUID}=require('node:crypto');
 const {Server}=require('@modelcontextprotocol/sdk/server/index.js');
-const {Client}=require('@modelcontextprotocol/sdk/client/index.js');
-const {StdioClientTransport}=require('@modelcontextprotocol/sdk/client/stdio.js');
+const {createHandler}=require('./mcp');
+const {createQueue}=require('./research-queue');
 const {StreamableHTTPServerTransport}=require('@modelcontextprotocol/sdk/server/streamableHttp.js');
 const {ListToolsRequestSchema,CallToolRequestSchema,isInitializeRequest}=require('@modelcontextprotocol/sdk/types.js');
 
-function createServer({publicUrl,token,allowPublic=false,maxSessions=Number(process.env.MCP_MAX_SESSIONS||8)}={}){
+function createServer({publicUrl,token,allowPublic=false,maxSessions=Number(process.env.MCP_MAX_SESSIONS||20)}={}){
  const origin=publicUrl?new URL(publicUrl):null;
  if(origin&&origin.protocol!=='https:')throw new Error('PUBLIC_URL must use HTTPS');
  if(!Number.isInteger(maxSessions)||maxSessions<1||maxSessions>32)throw new Error('Invalid session limit');
  const sessions=new Map();let starting=0;
+ const researchQueue=createQueue();
+ const fastTools=new Set(['search_budget_projects','search_verified_budget_totals','build_research_brief']);
  const fail=(res,status,message)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:message}));};
- async function dispose(s){if(s.closed)return;s.closed=true;for(const wake of s.waiters.splice(0))wake();sessions.delete(s.transport.sessionId);await Promise.allSettled([s.server.close(),s.client.close()]);}
+ async function dispose(s){if(s.closed)return;s.closed=true;for(const wake of s.waiters.splice(0))wake();sessions.delete(s.transport.sessionId);await s.server.close();}
  const timer=setInterval(()=>{for(const s of sessions.values())if(!s.active&&Date.now()-s.last>15*60*1000)void dispose(s);},30000);timer.unref();
  const server=http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');
@@ -23,8 +25,8 @@ function createServer({publicUrl,token,allowPublic=false,maxSessions=Number(proc
   if(token&&req.headers.authorization!=='Bearer '+token)return fail(res,401,'Authentication required');
   if(!token&&!allowPublic&&origin)return fail(res,403,'Public access is not enabled');
   if(!['POST','GET','DELETE'].includes(req.method)){res.setHeader('Allow','POST, GET, DELETE');return fail(res,405,'Method not allowed');}
-  // shortcut: one process per session; use a shared worker pool only after measured memory pressure.
-  let s,created=false;
+  // Session-local citation stores share one read-only budget index.
+  let s,created=false,reserved=false;
   try{
    let body;
    if(req.method==='POST'){
@@ -38,22 +40,31 @@ function createServer({publicUrl,token,allowPublic=false,maxSessions=Number(proc
    else{
     if(req.method!=='POST'||!isInitializeRequest(body))return fail(res,400,'Initialize first');
     if(sessions.size+starting>=maxSessions){res.setHeader('Retry-After','30');return fail(res,503,'Session capacity reached');}
-    starting++;
-    const client=new Client({name:'policy-http-bridge',version:'1.0.0'});
+    starting++;reserved=true;
+    let rpc;
     try{
-     // Only pass runtime settings, never hosting credentials, to document workers.
-     const env=Object.fromEntries(['PATH','Path','SystemRoot','WINDIR','TEMP','TMP','HOME','POLICY_PYTHON','NODE_EXTRA_CA_CERTS'].filter(k=>process.env[k]).map(k=>[k,process.env[k]]));
-     await client.connect(new StdioClientTransport({command:process.execPath,args:['--use-system-ca','--max-old-space-size=512',path.join(__dirname,'mcp.js')],env,stderr:'inherit'}));
-     const rpc=new Server(client.getServerVersion(),{capabilities:{tools:{}},instructions:client.getInstructions()});
+     const handle=createHandler();
+     const init=await handle({jsonrpc:'2.0',id:0,method:'initialize',params:body.params});
+     if(init.error)throw Error(init.error.message);
+     await handle({jsonrpc:'2.0',method:'notifications/initialized'});
+     rpc=new Server(init.result.serverInfo,{capabilities:{tools:{}},instructions:init.result.instructions});
      const transport=new StreamableHTTPServerTransport({sessionIdGenerator:randomUUID,enableJsonResponse:true});
-     s={server:rpc,client,transport,last:Date.now(),active:0,waiters:[],calls:0,window:Date.now(),closed:false};
-     rpc.setRequestHandler(ListToolsRequestSchema,()=>client.listTools());
-     rpc.setRequestHandler(CallToolRequestSchema,request=>client.callTool(request.params,undefined,{timeout:180000}));
+     s={server:rpc,transport,last:Date.now(),active:0,waiters:[],calls:0,window:Date.now(),closed:false};
+     rpc.setRequestHandler(ListToolsRequestSchema,async()=> (await handle({jsonrpc:'2.0',id:1,method:'tools/list'})).result);
+     rpc.setRequestHandler(CallToolRequestSchema,async request=>{
+      const run=async()=>{
+       if(s.closed)throw Error('세션이 종료됐습니다. 다시 연결하세요.');
+       const response=await handle({jsonrpc:'2.0',id:1,method:'tools/call',params:request.params});
+       if(response.error)throw Error(response.error.message);
+       return response.result;
+      };
+      try{return fastTools.has(request.params.name)?await run():await researchQueue(run);}
+      catch(e){return {isError:true,content:[{type:'text',text:e.message}]};}
+     });
      await rpc.connect(transport);
      transport.onclose=()=>{void dispose(s);};
-     client.onclose=()=>{void dispose(s);};
      created=true;
-    }catch(e){await client.close();throw e;}finally{starting--;}
+    }catch(e){await rpc?.close();throw e;}
    }
    while(s.active){
     if(s.waiters.length>=4){res.setHeader('Retry-After','5');return fail(res,429,'Session queue full; retry sequentially');}
@@ -76,7 +87,7 @@ function createServer({publicUrl,token,allowPublic=false,maxSessions=Number(proc
   }catch{
    if(s)await dispose(s);
    if(!res.headersSent)fail(res,500,'MCP request failed');else res.end();
-  }
+  }finally{if(reserved)starting--;}
  });
  server.requestTimeout=200000;server.headersTimeout=10000;
  server.shutdown=async()=>{clearInterval(timer);await Promise.allSettled([...sessions.values()].map(dispose));server.closeAllConnections();await new Promise(resolve=>server.close(resolve));};
