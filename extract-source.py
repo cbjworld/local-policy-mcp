@@ -36,10 +36,15 @@ def main():
     words=opts.get('q','').split(); start=opts.get('page',1); pages=[]; links=[]
     if data.startswith(b'%PDF-'):
         import os
+        result = None
+        fast_failed = False
         if os.environ.get('POLICY_PDF_ENGINE') == 'poppler' and not words:
-            from pdf_fast import extract
-            result = extract(data, start)
-        else:
+            try:
+                from pdf_fast import extract
+                result = extract(data, start)
+            except Exception:
+                fast_failed = True
+        if result is None:
             from pypdf import PdfReader
             reader=PdfReader(io.BytesIO(data),strict=False)
             if reader.is_encrypted and not reader.decrypt(''): raise ValueError('PDF requires a password')
@@ -54,6 +59,7 @@ def main():
                     if len(pages)==6: break
             scanned=i+1
             result={'format':'pdf','totalPages':total,'scannedThroughPage':scanned,'scanComplete':scanned==total,'pages':pages,'links':[], 'warning':'PDF 첫 장을 1쪽으로 센 번호입니다. 표의 단위·행·열은 원본에서 확인하세요. 이미지 PDF의 OCR은 미지원입니다.'}
+            if fast_failed: result['parserFallback'] = 'poppler_failed'
     else:
         content_type=opts.get('type','')
         if not ('text/' in content_type or data.lstrip().lower().startswith((b'<!doctype html',b'<html'))): raise ValueError('Only HTML, text and PDF supported')

@@ -28,4 +28,7 @@ for q in ['', 'Budget']:
     result=json.loads(response.stdout)
     assert result.get('parser')==('poppler' if not q else None)
     assert len(result['pages'])==6
-print('PASS: fast PDF page mapping, six-page bound, continuation, literal text, encrypted/corrupt rejection and query fallback; no OCR')
+response=subprocess.run([sys.executable,os.path.join(root,'extract-source.py'),json.dumps({'url':'https://example.go.kr/a.pdf','q':'','page':1})],input=data,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=dict(os.environ,POLICY_PDF_ENGINE='poppler',PATH=''),check=True)
+fallback=json.loads(response.stdout)
+assert fallback['parserFallback']=='poppler_failed' and len(fallback['pages'])==6
+print('PASS: fast PDF page mapping, six-page bound, continuation, text, encrypted/corrupt rejection, query and unavailable-engine fallback; no OCR')
