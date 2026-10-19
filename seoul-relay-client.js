@@ -1,6 +1,6 @@
 const https=require('node:https'),{createHash}=require('node:crypto');
 const MAX=15*1024*1024,CHUNK=3*1024*1024;
-function endpoint(value){const u=new URL(value);if(u.protocol!=='https:'||!u.hostname.endsWith('.vercel.app')||u.username||u.password||u.port||u.search||u.hash||u.pathname!=='/api/seoul')throw Error('Invalid Seoul reader endpoint');return u;}
+function endpoint(value){const u=new URL(value);if(u.protocol!=='https:'||!u.hostname.includes('.')||u.username||u.password||u.port||u.search||u.hash||!['/api/seoul','/policy-seoul.php'].includes(u.pathname))throw Error('Invalid Seoul reader endpoint');return u;}
 function part(url,offset,{deadline,signal,relayUrl,token}){return new Promise((resolve,reject)=>{
  const req=https.request(endpoint(relayUrl),{method:'POST',signal,lookup:require('./official-fetch').lookup,headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept-Encoding':'identity'}},res=>{
   if(res.statusCode!==200){res.resume();return reject(Object.assign(Error('서울 원문 조회 경로 HTTP '+res.statusCode),{code:'RELAY_HTTP_'+res.statusCode}));}
