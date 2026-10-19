@@ -12,6 +12,9 @@ const {createServer}=require('./http-server');
  const url=new URL('http://127.0.0.1:'+server.address().port+'/mcp'),clients=[],transports=[];
  const headers={'Content-Type':'application/json',Accept:'application/json, text/event-stream',Authorization:'Bearer test-only'};
  try{
+  const internalProbe=(path,method)=>new Promise((resolve,reject)=>{const req=require('node:http').request(new URL(path,url),{method,headers:{...headers,Host:'internal-probe:10000'}},res=>{res.resume();resolve(res.statusCode);});req.on('error',reject);req.end(method==='POST'?'{}':undefined);});
+  assert.equal(await internalProbe('/health','GET'),200);
+  assert.equal(await internalProbe('/mcp','POST'),403);
   assert.equal((await fetch(url,{method:'POST',body:'{}',headers:{'Content-Type':'application/json'}})).status,401);
   assert.equal((await fetch(url,{method:'POST',body:'{}',headers:{...headers,Origin:'https://evil.example'}})).status,403);
   assert.equal((await fetch(url,{method:'POST',body:'{',headers})).status,400);

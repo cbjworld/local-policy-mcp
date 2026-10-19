@@ -17,10 +17,11 @@ function createServer({publicUrl,token,allowPublic=false,maxSessions=Number(proc
  const timer=setInterval(()=>{for(const s of sessions.values())if(!s.active&&Date.now()-s.last>15*60*1000)void dispose(s);},30000);timer.unref();
  const server=http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');
+  // Hosting probes use an internal Host header; this endpoint exposes only process health.
+  if(req.url==='/health'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'application/json'});return res.end('{"status":"ok"}');}
   const localHosts=new Set(['127.0.0.1:'+server.address().port,'localhost:'+server.address().port]);
   if(!(origin?req.headers.host===origin.host:localHosts.has(req.headers.host)))return fail(res,403,'Invalid host');
   if(req.headers.origin&&req.headers.origin!==(origin?.origin||'http://'+req.headers.host))return fail(res,403,'Invalid origin');
-  if(req.url==='/health'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'application/json'});return res.end('{"status":"ok"}');}
   if(req.url!=='/mcp')return fail(res,404,'Not found');
   if(token&&req.headers.authorization!=='Bearer '+token)return fail(res,401,'Authentication required');
   if(!token&&!allowPublic&&origin)return fail(res,403,'Public access is not enabled');
