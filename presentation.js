@@ -24,6 +24,7 @@ function documentView(result){
 }
 function present(name,value,detail='compact'){
  if(name==='research_policy'){
+  value={...value,confirmedProgramLinks:require('./program-links').links(value.investigations)};
   const institutions=institutionGroups(value);
   value={...value,institutions,summary:{...researchSummary(value),producingInstitutions:institutions.filter(g=>g.institution).length,unknownInstitutionDocuments:institutions.find(g=>!g.institution)?.documentCount||0,institutionNote:'기관별 문서 묶음이며 사업 수나 시행 지자체 수가 아닙니다. 동일 기관의 서로 다른 사업을 합치지 마세요.'}};
  }

@@ -3,7 +3,7 @@ const messages=[{jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:
 const r=spawnSync(process.execPath,['mcp.js'],{cwd:__dirname,input:messages.map(JSON.stringify).join('\n')+'\n',encoding:'utf8',timeout:10000});
 assert.equal(r.status,0,r.stderr);
 const replies=r.stdout.trim().split('\n').map(JSON.parse);
-assert.equal(replies[0].result.serverInfo.version,'0.6.1');
+assert.equal(replies[0].result.serverInfo.version,'0.6.2');
 assert.equal(replies[1].result.tools.length,9);
 assert.ok(replies[0].result.instructions.includes('title_inferred'));
 const {bundle}=require('./project-bundles');

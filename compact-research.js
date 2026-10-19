@@ -9,23 +9,28 @@ module.exports=function compactResearch(value){
   return {id:'d'+(i+1),title:d.title,url:d.url,institution:d.institution,role:d.documentRole||'other',classification:d.relevance?.kind,readingStatus:r?.status||'not_attempted',supportingOnly:r?.relevanceStatus==='supporting_document',...(r?{reading,failures:(r.attempts||[]).filter(a=>a.status!=='read').map(a=>({fileName:a.fileName,status:a.status,message:a.message})),message:r.message}: {})};
  });
  const ids=new Map(documents.map(d=>[d.url,d.id]));
- const output={responseMode:'compact',request:value.request,status:value.status,summary:value.summary,coverage:value.coverage,limits:value.limits,searchFailures:value.failures||[],documents,possibleProjectLinks:(value.possibleProjectLinks||[]).map(x=>({name:x.name,status:x.status,documentIds:x.documents.map(d=>ids.get(d.url)).filter(Boolean)})),responseSize:{maxCharacters:24000,omittedDocuments:0,omittedReadingDetails:0,omittedLinks:0},detailHint:'생략 자료는 동일 인수의 detail=full 또는 문서 URL의 research_open_document로 재조회하세요. 재조회 결과는 달라질 수 있습니다.',reviewGuidance:'예산 합계와 재원별 금액을 같은 단위로 재계산하세요. 불일치는 원문 표를 다시 읽고, 확인 전 숫자를 수정하거나 확정값으로 제시하지 마세요.',note:'교부·예탁은 집행 확정이 아니며 연관 후보를 같은 사업으로 합치지 마세요. 제목 근거와 본문 근거를 구분하세요.'};
- output.comparison=[...(value.projects||[])].sort((a,b)=>Number(b.documents.some(d=>reads.get(d.url)?.status==='read'))-Number(a.documents.some(d=>reads.get(d.url)?.status==='read'))).slice(0,6).map(p=>({institution:p.institution,name:p.name,year:p.titleYear,existence:p.existence?.status,fields:Object.fromEntries(Object.entries(p.fields||{}).map(([k,v])=>[k,v.status])),documentIds:p.documents.map(d=>ids.get(d.url)).filter(Boolean),reviewFlags:p.reviewFlags||[]}));
- output.answerGuide='quickBrief를 바탕으로 지역·사업·예산 근거·문서 역할·출처를 짧은 표로 먼저 제시하세요. quote는 추출 인용문이며 편성액·지원액·교부액을 구분하고, 원문 검토 없이 확정 금액으로 바꾸지 마세요. 본문을 읽은 자료와 제목으로 존재를 추정한 자료를 구분하고, 미확인 값은 채우지 마세요. 자세한 인용은 documents의 reading에서 확인하세요. 예산 후보는 같은 사업임을 대조한 뒤 연결하세요.';
+ const briefInputs=documents.map(d=>({...d}));
+ const output={responseMode:'compact',request:value.request,status:value.status,summary:value.summary,coverage:value.coverage,limits:value.limits,searchFailures:value.failures||[],documents,possibleProjectLinks:(value.possibleProjectLinks||[]).map(x=>({name:x.name,status:x.status,documentIds:x.documents.map(d=>ids.get(d.url)).filter(Boolean)})),responseSize:{maxCharacters:24000,omittedDocuments:0,omittedReadingDetails:0,omittedLinks:0},detailHint:'생략 자료는 동일 인수의 detail=full 또는 문서 URL의 research_open_document로 재조회하세요. 재조회 결과는 달라질 수 있습니다.',reviewGuidance:'예산 합계와 재원별 금액을 같은 단위로 재계산하세요. 불일치는 원문 표를 다시 읽고, 확인 전 숫자를 수정하거나 확정값으로 제시하지 마세요.',note:'confirmedProgramLinks로 연결된 광역·기초 문서는 한 사업으로 비교하고 예산은 문서별로 유지하세요. 제목만 비슷한 후보는 합치지 마세요. 교부·예탁과 실제 집행을 구분하세요.'};
+ output.comparison=[...(value.projects||[])].sort((a,b)=>Number(b.documents.some(d=>reads.get(d.url)?.status==='read'))-Number(a.documents.some(d=>reads.get(d.url)?.status==='read'))).map(p=>({institution:p.institution,name:p.name,year:p.titleYear,existence:p.existence?.status,fields:Object.fromEntries(Object.entries(p.fields||{}).map(([k,v])=>[k,v.status])),documentIds:p.documents.map(d=>ids.get(d.url)).filter(Boolean),reviewFlags:p.reviewFlags||[]}));
+ output.answerGuide='quickBrief의 한 행을 한 사례로 비교하세요. countAsOneCase가 있는 사업은 linkedDocuments의 광역·기초 문서를 독립 사례로 다시 세지 말고 참여기관·역할·문서별 예산을 같은 행 안에 표시하세요. 광역 전체액·기초 사업비·교부액을 합산하지 마세요. 연결 후보만 있는 자료는 원문 확인 전 합치지 마세요. quote는 추출 인용문이며 편성액·지원액·교부액을 구분하고, 원문 검토 없이 확정 금액으로 바꾸지 마세요. 본문을 읽은 자료와 제목으로 존재를 추정한 자료를 구분하고, 미확인 값은 채우지 마세요. 자세한 인용은 documents의 reading에서 확인하세요. 예산 후보는 같은 사업임을 대조한 뒤 연결하세요.';
  output.evidenceMap=(value.evidenceMap||[]).map(g=>({...g,stages:g.stages.map(s=>({role:s.role,label:s.label,documentIds:s.documents.map(d=>ids.get(d.url)).filter(Boolean)}))}));
  output.budgetEvidenceLinks=value.budgetEvidenceLinks||[];
  output.budgetCandidates=value.budgetCandidates||[];
  output.budgetSearches=value.budgetSearches||[];
  output.budgetScope=value.budgetScope||null;
  output.budgetCandidateNote='2026년 본예산 일반회계 세출의 사업명 검색 초기 후보 최대 5행입니다. budgetSearches의 q·nextOffset으로 search_budget_projects를 이어 조회하세요. 문서의 사업과 같은지, 시비인지 총사업비인지 확인한 뒤 사용하세요. 교부·집행액과 합산하지 마세요.';
+ output.confirmedProgramLinks=(value.confirmedProgramLinks||[]).filter(l=>l.documents.every(d=>ids.has(d.url)));
+ for(const l of output.confirmedProgramLinks){const main=output.comparison.find(p=>p.documentIds.includes(ids.get(l.primaryUrl)));if(main){const memberIds=l.documents.map(d=>ids.get(d.url));output.comparison=output.comparison.filter(p=>p===main||!p.documentIds.some(id=>memberIds.includes(id)));main.documentIds=[...new Set([...main.documentIds,...memberIds])];main.participatingInstitutions=l.documents.map(d=>d.institution);main.countAsOneCase=true;main.name=l.name;}}
+ output.comparison=output.comparison.slice(0,6);
  output.responseSize.omittedBudgetCandidates=0;
  output.responseSize.omittedBudgetLinks=0;
  output.responseSize.omittedEvidenceGroups=0;
- output.quickBrief=require('./research-brief')(documents);
+ output.quickBrief=require('./research-brief')(briefInputs.filter(d=>documents.some(k=>k.id===d.id)),output.confirmedProgramLinks);
  const oversized=()=>JSON.stringify(output).length>24000;
  const pruneReferences=()=>{
   const kept=new Set(documents.map(d=>d.id));
-  output.quickBrief=require('./research-brief')(documents);
+  output.confirmedProgramLinks=output.confirmedProgramLinks.filter(l=>l.documents.every(d=>documents.some(k=>k.url===d.url)));
+  output.quickBrief=require('./research-brief')(briefInputs.filter(d=>documents.some(k=>k.id===d.id)),output.confirmedProgramLinks);
   output.comparison=output.comparison.filter(p=>p.documentIds.length&&p.documentIds.every(id=>kept.has(id)));
   const links=output.possibleProjectLinks.filter(x=>x.documentIds.every(id=>kept.has(id)));
   output.responseSize.omittedLinks+=output.possibleProjectLinks.length-links.length;output.possibleProjectLinks=links;
