@@ -13,6 +13,8 @@ for(const [text,key,expected] of [
  for(const x of entries){assert(text.includes(x.quote));if(key==='activity')assert(!x.quote.includes('소요예산:'));}
 }
 assert.equal(evidence(make('지원내용을 검토할 예정')).fields.activity.status,'unconfirmed');
+assert.equal(evidence(make('사업개요\n사업기간:2026년\n소요예산:500만원')).fields.activity.status,'unconfirmed');
+assert.equal(evidence(make('지원내용: ○')).fields.activity.status,'unconfirmed');
 assert.equal(evidence(make('소요예산\n*****')).fields.budget.status,'redacted');
 assert.equal(evidence(make('사업비\n: 1,200천원')).fields.budget.status,'needs_review');
 const infrastructure=evidence(make('사업개요 : LED 바닥신호등 3개소(11개) 설치 사업기간 : 2026. 7.~9. 설치대상 : 학교 앞 3개소'));
