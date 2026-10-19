@@ -45,3 +45,10 @@ assert.equal(require('./relevance').documentRole('사업비 예탁 건의'),'all
 assert.equal(require('./relevance').documentRole('보조금 교부결정'),'allocation_or_deposit');
 assert.equal(require('./relevance').documentRole('사업 집행실적 및 정산'),'execution_or_settlement');
 assert.equal(require('./relevance').documentRole('추경 예산 편성'),'budget');
+const {targetFit}=require('./relevance');
+assert.equal(targetFit('선천성 난청 검사 및 보청기 지원','어르신 보청기').status,'mismatch');
+assert.equal(targetFit('노인 주거 지원','청년 주거').status,'mismatch');
+assert.equal(targetFit('청각장애인 보청기 지원','어르신 보청기').status,'unspecified');
+assert.equal(targetFit('공항소음지역 난청자 지원','어르신 보청기').status,'unspecified');
+assert.equal(targetFit('어르신과 아동 공동 지원','어르신 지원').status,'match');
+assert.equal(targetFit('보청기 지원','보청기').status,'unspecified');

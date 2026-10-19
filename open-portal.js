@@ -86,7 +86,13 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
  const metadata=await reader({url});
  metadata.relevance=require('./relevance').classify(metadata.title,requestedQuery);
  metadata.requestedQuery=requestedQuery;
- const candidates=metadata.attachments.filter(f=>f.available).sort((a,b)=>attachmentScore(b)-attachmentScore(a));
+ const available=metadata.attachments.filter(f=>f.available),selectionNotes=[];
+ const candidates=available.filter(f=>{
+  const fit=require('./relevance').targetFit(f.name,requestedQuery);
+  const reason=fit.status==='mismatch'?fit.reason:/\.(?:xlsx?|docx?|pptx?|jpe?g|png|gif|zip)$/i.test(f.name)?'자동 읽기가 지원하지 않는 첨부 형식':null;
+  if(reason)selectionNotes.push({...f,reason,status:fit.status==='mismatch'?'target_mismatch':'unsupported_format'});
+  return !reason;
+ }).sort((a,b)=>attachmentScore(b)-attachmentScore(a));
  const attempts=[];
  // shortcut: follow only an explicit Seoul disclosure link, one level; no general website search.
  for(const link of (metadata.externalLinks||[]).slice(0,1)){
@@ -112,8 +118,14 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
   const text=(result.source?.pages||[]).map(p=>p.text).join('\n').replace(/<[^>]+>/g,' ');
   const form=isForm(file.name);
   const plan=!['legal','ceremony','administration'].includes(metadata.relevance.kind)&&/사업기간|사업개요|사업 개요|소요예산|추진계획|추진 계획|사업비/.test(text);
+  const fit=require('./relevance').targetFit(require('./evidence').evidence([{...result}]).fields.target.excerpts.map(e=>e.quote).join(' '),requestedQuery);
+  if(!form&&fit.status==='mismatch'){
+   attempts.push({...result,fileId:file.fileId,fileName:file.name,assessment:'target_mismatch'});
+   selectionNotes.push({fileId:file.fileId,name:file.name,status:'target_mismatch',reason:'첨부 본문에 명시된 지원 대상이 질문과 다름'});
+   continue;
+  }
   attempts.push({...result,fileId:file.fileId,fileName:file.name,assessment:form?'form_or_cover':plan?'plan_candidate':'text_needs_review'});
-  const missing=()=>Object.values(require('./evidence').evidence(attempts).fields).some(f=>f.status==='unconfirmed');
+  const missing=()=>Object.values(require('./evidence').evidence(attempts.filter(a=>a.assessment!=='target_mismatch')).fields).some(f=>f.status==='unconfirmed');
   // shortcut: at most two more six-page ranges per PDF; expose remaining pages rather than claiming full reading.
   if(!form&&result.source?.format==='pdf'){
    for(let extra=0;extra<2&&missing()&&result.source?.scanComplete===false;extra++){
@@ -127,7 +139,8 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
   }
   if(result.status==='read'&&!form&&plan&&!missing())break;
  }
- return {metadata,attempts,evidence:require('./evidence').evidence(attempts),relevanceStatus:['legal','ceremony','administration'].includes(metadata.relevance.kind)?'supporting_document':'requires_semantic_review',remaining:candidates.filter(f=>!attempts.some(a=>a.fileId===f.fileId)),status:attempts.some(a=>a.status==='read')?'read':candidates.length||attempts.length?'unreadable':'no_available_attachment',warning:'첨부명과 본문 단서로 최대 3개를 확인했습니다. 명시된 서울시 공개문서 링크는 한 단계 따라갑니다. plan_candidate는 의미 검증 완료가 아닙니다. 양식·표지 및 예산 단위·연도를 확인하세요. 이미지 PDF는 OCR 미지원입니다.'};
+ const extracted=require('./evidence').evidence(attempts.filter(a=>a.assessment!=='target_mismatch')),targetFit=require('./relevance').targetFit(extracted.fields.target.excerpts.map(e=>e.quote).join(' '),requestedQuery);
+ return {metadata,attempts,selectionNotes,targetFit,evidence:extracted,relevanceStatus:attempts.some(a=>a.assessment==='target_mismatch')&&!attempts.some(a=>a.status==='read'&&a.assessment!=='target_mismatch')?'supporting_document':['legal','ceremony','administration'].includes(metadata.relevance.kind)?'supporting_document':'requires_semantic_review',remaining:available.filter(f=>!attempts.some(a=>a.fileId===f.fileId)),status:attempts.some(a=>a.status==='read')?'read':candidates.length||attempts.length?'unreadable':'no_available_attachment',warning:'첨부명과 본문 단서로 최대 3개를 확인했습니다. 명시된 서울시 공개문서 링크는 한 단계 따라갑니다. plan_candidate는 의미 검증 완료가 아닙니다. 양식·표지 및 예산 단위·연도를 확인하세요. 이미지 PDF는 OCR 미지원입니다.'};
 }
 async function search(args={},get=download){
  const {purpose='projects',...query}=args;

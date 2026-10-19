@@ -64,3 +64,5 @@ Claude Code·Cursor 연결 방법은 [앱별 연결 안내](USAGE.md#claude-code
 Docker 이미지는 배포할 때 예산 검색 색인을 생성하고 Poppler로 PDF 텍스트를 추출합니다. OCR은 사용하지 않습니다.
 로컬 실행은 `npm run prepare:index`로 색인을 생성할 수 있습니다. 예산 자료를 교체하면 색인을 다시 생성하세요.
 Poppler의 `pdfinfo`·`pdftotext`가 설치된 환경에서는 `POLICY_PDF_ENGINE=poppler`로 빠른 PDF 읽기를 활성화할 수 있습니다. 검색어를 지정한 PDF 조회는 기존 pypdf 경로를 사용합니다.
+
+HWP/HWPX는 OCR 없이 Kordoc 변환기를 짧게 재사용합니다. 변환기는 30초 유휴 또는 8건 처리 후 종료하며, 파일당 30초·15MB·힙 256MB 제한을 유지합니다. 명시적으로 다른 연령 대상과 지원하지 않는 첨부는 자동 읽기에서 제외하고 사유를 남깁니다. 대상이 불명확한 자료는 관련성 확인 대상으로 유지합니다.

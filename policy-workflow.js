@@ -35,7 +35,7 @@ async function research(args={},io=portal){
   const best=new Map();
   const rank={project_candidate:3,legal:2,ceremony:2,administration:2,unclassified:1};
   for(const b of batches)for(const d of [...b.items,...b.reviewItems,...b.relatedDocuments])if(!best.has(d.url)||rank[d.relevance.kind]>rank[best.get(d.url).relevance.kind])best.set(d.url,d);
-  const docs=[...best.values()];
+  const docs=[...best.values()].map(d=>{const targetFit=require('./relevance').targetFit(d.title,request.question);return {...d,targetFit,...(targetFit.status==='mismatch'?{relevance:{kind:'administration',score:-10,reason:targetFit.reason}}:{})};});
   return {items:docs.filter(d=>d.relevance.kind==='project_candidate'),reviewItems:docs.filter(d=>d.relevance.kind==='unclassified'),relatedDocuments:docs.filter(d=>['legal','ceremony','administration'].includes(d.relevance.kind))};
  };
  timings.budgetMs=Date.now()-started;const searchStart=Date.now();
@@ -84,12 +84,12 @@ async function research(args={},io=portal){
  const possibleProjectLinks=[...named].filter(([,docs])=>new Set(docs.map(d=>d.institution).filter(Boolean)).size>1).map(([name,documents])=>({name,status:'possible_same_program_not_merged',documents,note:'제목의 지역 사업명과 연도가 같은 문서입니다. 광역·기초 역할과 동일 사업 여부는 본문 확인이 필요합니다.'}));
  const candidates=screened.items;
  const anchorSets=request.queries.map(q=>q.split(/\s+/).filter(w=>!['지원','사업','정책','사례'].includes(w)));
- const stageDocuments=allDocuments.filter(d=>anchorSets.some(anchors=>anchors.length&&anchors.every(w=>String((d.title||'')+(d.institution||'')).replace(/\s+/g,'').toLowerCase().includes(w.toLowerCase())))&&(d.relevance.kind==='project_candidate'||['allocation_or_deposit','execution_or_settlement','budget'].includes(d.documentRole)));
+ const stageDocuments=allDocuments.filter(d=>d.targetFit?.status!=='mismatch'&&anchorSets.some(anchors=>anchors.length&&anchors.every(w=>String((d.title||'')+(d.institution||'')).replace(/\s+/g,'').toLowerCase().includes(w.toLowerCase())))&&(d.relevance.kind==='project_candidate'||['allocation_or_deposit','execution_or_settlement','budget'].includes(d.documentRole)));
  const investigations=[];
  // Broad topics present real candidate titles first; choosing a single sub-topic would invent user intent.
  if(!request.broad){
   const institutions=new Set();
-  const ordered=[...candidates].sort((a,b)=>b.relevance.score-a.relevance.score);
+  const ordered=[...candidates].sort((a,b)=>Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||b.relevance.score-a.relevance.score);
   for(const item of ordered){
    if(investigations.length>=6||institutions.size>=2)break;
    if(institutions.has(item.institution))continue;

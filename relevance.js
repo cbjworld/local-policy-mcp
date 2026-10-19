@@ -6,6 +6,15 @@ function documentRole(title=''){
  if(/계획|방침/.test(t))return 'plan';
  return 'other';
 }
+function targetFit(text='',question=''){
+ const groups={older:/어르신|노인|고령자|(?:65|70|75)\s*세\s*이상/,youth:/청년/,child:/영유아|신생아|영아|아동|어린이|선천성\s*난청\s*검사/};
+ const requested=Object.keys(groups).filter(k=>groups[k].test(question)),mentioned=Object.keys(groups).filter(k=>groups[k].test(text));
+ if(!requested.length||!mentioned.length)return {status:'unspecified',requested,mentioned};
+ if(requested.some(k=>mentioned.includes(k)))return {status:'match',requested,mentioned};
+ // Only disjoint age groups are rejected. Missing age, disability or geography alone is not a conflict.
+ if(requested.includes('older')||mentioned.includes('older'))return {status:'mismatch',requested,mentioned,reason:'질문과 문서에 명시된 연령 대상이 다름'};
+ return {status:'unspecified',requested,mentioned};
+}
 // shortcut: title rules infer existence only; body attribution still needs semantic review.
 function classify(title,q=''){
  const t=String(title||'').replace(/\s+/g,'');
@@ -36,4 +45,4 @@ function screen(result,purpose='projects'){
  relatedDocuments:purpose==='documents'?[]:all.filter(x=>['legal','ceremony','administration'].includes(x.relevance.kind)),
  guidance:'사업 검색에서는 items도 미검증 후보입니다. reviewItems는 판단 유보, relatedDocuments는 보조자료입니다. 넓은 주제는 후보 제목을 바탕으로 사업 종류를 먼저 제시하세요. 후보가 부족하면 다음 페이지를 최대 3페이지까지 확인하고, 원문에서 요청 사업과의 관련성·지원 대상·실행 내용·예산·기간을 검토하세요. 예산이 없으면 미확인으로 표시하고 읽기 성공을 정책 검색 성공으로 세지 마세요.'};
 }
-module.exports={classify,screen,documentRole};
+module.exports={classify,screen,documentRole,targetFit};

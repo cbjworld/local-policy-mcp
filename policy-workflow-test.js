@@ -1,6 +1,12 @@
 const assert=require('node:assert/strict'),w=require('./policy-workflow');
 const now=new Date('2026-10-13T00:00:00Z');
 (async()=>{
+ const selected=[],docs=[{title:'어르신 보청기 지원 계획',institution:'테스트시',url:'elder'},{title:'선천성 난청 검사 및 보청기 지원 보조금 교부결정',institution:'테스트시',url:'infant'}];
+ const result=await w.research({question:'어르신 보청기',queries:['보청기']},{search:async()=>({total:2,hasMore:false,items:docs,reviewItems:[],relatedDocuments:[]}),research:async a=>{selected.push(a.url);return {status:'read',evidence:{fields:{target:{excerpts:[],status:'unconfirmed'}}}};}});
+ assert.deepEqual(selected,['elder']);assert.equal(result.coverage.uniqueDocuments,2);assert.equal(result.relatedDocuments.find(d=>d.url==='infant').targetFit.status,'mismatch');
+ console.log('PASS: incompatible age-target finance document retained but not downloaded or used as follow-up');
+})().catch(e=>{console.error(e);process.exitCode=1;});
+(async()=>{
  let active=0,peak=0;const calls=[];
  const result=await w.research({question:'청년',queries:['청년 지원','청년 사업']},{search:async a=>{
   calls.push(a.q+':'+a.page);active++;peak=Math.max(peak,active);await new Promise(r=>setTimeout(r,a.q==='청년 지원'?15:5));active--;

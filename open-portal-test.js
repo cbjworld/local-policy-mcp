@@ -56,6 +56,14 @@ async function main(){
  for(const fileId of ['f','g','f'])assert.equal((await bounded({url,fileId})).status,'read');
  assert.equal(posts,9); // Only the latest validated file is retained.
  const external={...io,get:async()=>html({openCateSearchVO:{...v,oppUrl:'https://opengov.seoul.go.kr/section/test'}})};
+ const selected=[];
+ const attachments=[{fileId:'child',name:'아동 보청기 계획.hwp',available:true},{fileId:'sheet',name:'예산.xlsx',available:true},{fileId:'adult',name:'어르신 보청기 계획.hwp',available:true}];
+ const picked=await p.research({url,requestedQuery:'어르신 보청기 지원'},async a=>{
+  if(!a.fileId)return {title:'보청기 지원계획',attachments};selected.push(a.fileId);return {status:'read',source:{sourceId:'adult',pages:[{page:null,text:'지원대상: 65세 이상 어르신\n사업내용: 구입비 지원\n사업비: 1,000천원\n사업기간: 2026년'}]}};
+ });
+ assert.deepEqual(selected,['adult']);assert.equal(picked.selectionNotes.length,2);assert.equal(picked.remaining.length,2);assert.equal(picked.evidence.fields.budget.status,'needs_review');
+ const mismatch=await p.research({url,requestedQuery:'어르신 보청기'},async a=>a.fileId?{status:'read',source:{sourceId:'child',pages:[{page:null,text:'지원대상: 영유아\n사업비: 999천원'}]}}:{title:'보청기 지원 계획',attachments:[{fileId:'generic',name:'사업계획.hwp',available:true}]});
+ assert.equal(mismatch.evidence.fields.budget.status,'unconfirmed');assert.equal(mismatch.relevanceStatus,'supporting_document');assert.equal(mismatch.attempts[0].assessment,'target_mismatch');
  assert.deepEqual((await p.read({url},external)).externalLinks,['https://opengov.seoul.go.kr/section/test']);
  for(const bad of ['https://evil.com/a','https://user@www.open.go.kr/othicInfo/infoList/infoListDetl.do','http://www.open.go.kr/othicInfo/infoList/infoListDetl.do'])await assert.rejects(p.read({url:bad},io));
  console.log('PASS: dates, search failures, pagination, private files, request/filter/download order, provider failure, empty text, URL boundaries');
