@@ -31,7 +31,7 @@ function createHandler({key=process.env.POLICY_SEOUL_RELAY_TOKEN,fetch=fetchSour
  // Cache at most two public originals for chunk consistency; never store user credentials or query text.
  const cache=new Map();
  return async(req,res)=>{
-  res.setHeader('Cache-Control','no-store');
+  res.setHeader('Cache-Control','no-store');res.setHeader('X-Policy-Region',process.env.VERCEL_REGION||'local');
   if(req.method!=='POST'){res.statusCode=405;return res.end();}
   if(typeof key!=='string'||key.length<32){res.statusCode=503;return res.end('Reader not configured');}
   const supplied=String(req.headers.authorization||''),expected='Bearer '+key;
@@ -52,7 +52,7 @@ function createHandler({key=process.env.POLICY_SEOUL_RELAY_TOKEN,fetch=fetchSour
    res.setHeader('Content-Type',entry.type);res.setHeader('X-Policy-Source-Url',encodeURIComponent(entry.url));
    res.setHeader('X-Policy-Total-Bytes',String(entry.bytes.length));res.setHeader('X-Policy-Sha256',entry.hash);res.setHeader('X-Policy-Offset',String(offset));res.setHeader('X-Policy-Region',process.env.VERCEL_REGION||'local');
    res.statusCode=200;res.end(entry.bytes.subarray(offset,offset+CHUNK));
-  }catch(error){if(!res.headersSent){res.statusCode=/Invalid|Body too/.test(error.message)?400:502;res.end('Official source unavailable');}else res.destroy();}
+  }catch(error){console.error('SEOUL_SOURCE_FAILURE '+JSON.stringify({code:error.code||error.name,message:/^(?:Source |Invalid|File too)/.test(error.message)?error.message:'Source connection failed'}));if(!res.headersSent){res.setHeader('X-Policy-Error',String(error.code||error.name).replace(/[^A-Za-z0-9_]/g,'').slice(0,60));res.statusCode=/Invalid|Body too/.test(error.message)?400:502;res.end('Official source unavailable');}else res.destroy();}
  };
 }
 module.exports=createHandler();module.exports.createHandler=createHandler;module.exports.target=target;module.exports.fetchSource=fetchSource;
