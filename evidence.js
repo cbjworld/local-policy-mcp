@@ -6,7 +6,7 @@ function evidence(attempts){
  for(const [key,label] of Object.entries(labels)){
   const excerpts=[];
   for(const a of attempts.filter(a=>a.status==='read'&&a.assessment!=='form_or_cover'))for(const p of a.source?.pages||[]){
-   const pattern=new RegExp('(?:'+spaced(label)+')[ \\t]*(?:\\*\\*)?[ \\t]*'+(key==='budget'?'(?:[:：)]|(?=(?:\\\\?\\*){3,})|\\|[ \\t]*\\r?\\n)':'(?:[:：)]|</td>\\s*<td>|\\r?\\n|(?=[․·]))'),'g');let m;
+   const pattern=new RegExp('(?:'+spaced(label)+')\\s*(?:\\*\\*)?\\s*'+(key==='budget'?'(?:[:：)]|(?=(?:\\\\?\\*){3,})|\\|[ \\t]*\\r?\\n)':'(?:[:：)]|</td>\\s*<td>|\\r?\\n|(?=[․·]))'),'g');let m;
    while((m=pattern.exec(p.text))&&excerpts.length<3){
     const section=key==='budget'&&m[0].includes('|');
     const tail=p.text.slice(pattern.lastIndex,pattern.lastIndex+(section||m[0].includes('</t')?700:280));
