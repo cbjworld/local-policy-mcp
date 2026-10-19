@@ -85,7 +85,7 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
  if(reader===read)reader=createReader();
  const metadata=await reader({url});
  metadata.relevance=require('./relevance').classify(metadata.title,requestedQuery);
- metadata.requestedQuery=requestedQuery;
+ metadata.requestedQuery=requestedQuery;metadata.targetFit=require('./relevance').targetFit(metadata.title,requestedQuery);
  const available=metadata.attachments.filter(f=>f.available),selectionNotes=[];
  const candidates=available.filter(f=>{
   const fit=require('./relevance').targetFit(f.name,requestedQuery);
@@ -140,7 +140,7 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
   if(result.status==='read'&&!form&&plan&&!missing())break;
  }
  const extracted=require('./evidence').evidence(attempts.filter(a=>a.assessment!=='target_mismatch')),targetFit=require('./relevance').targetFit(extracted.fields.target.excerpts.map(e=>e.quote).join(' '),requestedQuery);
- return {metadata,attempts,selectionNotes,targetFit,evidence:extracted,relevanceStatus:attempts.some(a=>a.assessment==='target_mismatch')&&!attempts.some(a=>a.status==='read'&&a.assessment!=='target_mismatch')?'supporting_document':['legal','ceremony','administration'].includes(metadata.relevance.kind)?'supporting_document':'requires_semantic_review',remaining:available.filter(f=>!attempts.some(a=>a.fileId===f.fileId)),status:attempts.some(a=>a.status==='read')?'read':candidates.length||attempts.length?'unreadable':'no_available_attachment',warning:'첨부명과 본문 단서로 최대 3개를 확인했습니다. 명시된 서울시 공개문서 링크는 한 단계 따라갑니다. plan_candidate는 의미 검증 완료가 아닙니다. 양식·표지 및 예산 단위·연도를 확인하세요. 이미지 PDF는 OCR 미지원입니다.'};
+ return {metadata,attempts,selectionNotes,targetFit:metadata.targetFit.status==='mismatch'?metadata.targetFit:targetFit,evidence:extracted,relevanceStatus:metadata.targetFit.status==='mismatch'?'supporting_document':attempts.some(a=>a.assessment==='target_mismatch')&&!attempts.some(a=>a.status==='read'&&a.assessment!=='target_mismatch')?'supporting_document':['legal','ceremony','administration'].includes(metadata.relevance.kind)?'supporting_document':'requires_semantic_review',remaining:available.filter(f=>!attempts.some(a=>a.fileId===f.fileId)),status:attempts.some(a=>a.status==='read')?'read':candidates.length||attempts.length?'unreadable':available.length?'no_selected_attachment':'no_available_attachment',warning:'첨부명과 본문 단서로 최대 3개를 확인했습니다. 명시된 서울시 공개문서 링크는 한 단계 따라갑니다. plan_candidate는 의미 검증 완료가 아닙니다. 양식·표지 및 예산 단위·연도를 확인하세요. 이미지 PDF는 OCR 미지원입니다.'};
 }
 async function search(args={},get=download){
  const {purpose='projects',...query}=args;
