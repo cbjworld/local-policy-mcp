@@ -1,1 +1,1 @@
-{"regions":["hnd1"],"outputDirectory":"public","functions":{"api/seoul.js":{"maxDuration":30}}}
+{"regions":["iad1"],"outputDirectory":"public","functions":{"api/seoul.js":{"maxDuration":30}}}
