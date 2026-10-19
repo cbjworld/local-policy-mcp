@@ -30,7 +30,12 @@ async function download(value,hops=0,deadline=Date.now()+25000,body,signal){
    res.on('error',()=>reject(new Error('원문 읽기 실패')));
    res.on('end',()=>resolve({url:u.href,type:res.headers['content-type']||'',bytes:Buffer.concat(chunks)}));
   });
-  req.on('socket',socket=>{socket.once('lookup',()=>{phase='connect';});socket.once('connect',()=>{phase='tls';});socket.once('secureConnect',()=>{phase='headers';});});
+  req.on('socket',socket=>{
+   if(!socket.connecting){phase=socket.secureConnecting?'tls':'headers';return;}
+   const onLookup=()=>{phase='connect';},onConnect=()=>{phase='tls';},onSecure=()=>{phase='headers';};
+   socket.once('lookup',onLookup);socket.once('connect',onConnect);socket.once('secureConnect',onSecure);
+   req.once('close',()=>{socket.removeListener('lookup',onLookup);socket.removeListener('connect',onConnect);socket.removeListener('secureConnect',onSecure);});
+  });
   const timer=setTimeout(()=>req.destroy(new Error('timeout')),Math.max(1,deadline-Date.now()));
   req.on('close',()=>clearTimeout(timer));
   req.on('error',e=>reject(Object.assign(new Error(e.message==='size'?'원문 15MB 제한 초과':e.message==='timeout'?'원문 연결 25초 제한 초과':'원문 연결 실패. 인증서 검증은 유지됩니다.'),{phase,code:e.message==='size'?'FILE_TOO_LARGE':e.message==='timeout'?'ETIMEDOUT':String(e.code||'NETWORK_ERROR').slice(0,60),retryable:['ECONNRESET','EPIPE','EAI_AGAIN','ECONNREFUSED'].includes(e.code)})));
