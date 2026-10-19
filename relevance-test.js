@@ -1,4 +1,10 @@
 const assert=require('node:assert/strict'),{classify,screen}=require('./relevance');
+for(const title of ['2026년 직원 대상포진·독감 예방접종 지원 계획','공무원 건강검진 지원 계획','교직원 후생복지 지원계획']){
+ assert.equal(screen({q:'대상포진 예방접종',items:[{title}]}).items.length,0);
+ assert.equal(screen({q:'대상포진 예방접종',items:[{title}]},'documents').items.length,1);
+}
+assert.equal(classify('2026년 직원 대상포진·독감 예방접종 지원 계획','직원 대상포진').kind,'project_candidate');
+assert.equal(classify('65세 이상 주민 대상포진 예방접종 지원계획','대상포진').kind,'project_candidate');
 for(const [title,expected] of [['반려동물복지센터 개소식 계획(안)','ceremony'],['반려동물 보호 및 학대방지 조례 일부개정 계획','legal'],['취약계층 반려동물 의료비 지원사업 추진계획','project_candidate'],['반려동물 문화축제 운영계획','project_candidate'],['청년 월세 지원금 지급','administration'],['반려동물 현황','unclassified']])assert.equal(classify(title).kind,expected);
 const r={items:['반려동물복지센터 개소식 계획','반려동물 지원사업 계획','반려동물 현황'].map(title=>({title})),total:30};
 assert.equal(screen({q:'울산 산후조리비',items:[{title:'2026년 산후조리비 지원계획',institution:'울산광역시 중구'}]}).items.length,1);

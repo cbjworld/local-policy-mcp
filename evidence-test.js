@@ -1,5 +1,17 @@
 const assert=require('node:assert/strict'),{evidence}=require('./evidence'),{research}=require('./open-portal');
 const make=text=>[{status:'read',source:{sourceId:'s',url:'https://example.go.kr/a',pages:[{page:1,text}]}}];
+for(const [text,key,expected] of [
+ ['지원내용\n․ 생백신 1회 (3.5만원 지원 / 본인부담금 5만원)\n․ 사백신 2회 (10만원 지원 / 본인부담금 26만원)\n❍ 소요예산: 102,350천원','activity','사백신 2회'],
+ ['접종대상 및 비용: 완도군에 주민등록을 두고 1년 이상 거주 65세 이상 군민\n구 분 약독화 생백신 재조합 백신\n비 용 무료 본인부담금 280천원\n소요예산: 47,000천원','target','65세 이상'],
+ ['접종대상 및 비용: 완도군에 주민등록을 두고 1년 이상 거주 65세 이상 군민\n구 분 약독화 생백신 재조합 백신\n비 용 무료 본인부담금 280천원\n소요예산: 47,000천원','activity','280천원'],
+ ['지원방법 : 신청인이 기 납부한 보증료의 전부 또는 일부(최대 40만원)를\n신청인 본인 계좌로 이체\n신청기간 : 연중(사업비 소진 시까지)','activity','본인 계좌로 이체'],
+ ['신청기간 : 연중(사업비 소진 시까지)','period','연중']
+]){
+ const entries=evidence(make(text)).fields[key].excerpts;
+ assert(entries.some(x=>x.quote.includes(expected)),key+': '+expected);
+ for(const x of entries){assert(text.includes(x.quote));if(key==='activity')assert(!x.quote.includes('소요예산:'));}
+}
+assert.equal(evidence(make('지원내용을 검토할 예정')).fields.activity.status,'unconfirmed');
 const a=make('사업기간: 2027. 3.~11.\n지원대상: 미취업 청년\n지원내용: 구독료 지원\n소요예산: 30,000천원(구비)');
 const e=evidence(a);assert.equal(e.fields.budget.status,'needs_review');assert.equal(e.fields.target.status,'needs_review');
 const grant=evidence(make('금회 교부결정내역 : 940,500,000**원(금구억사천오십만원)**'));
