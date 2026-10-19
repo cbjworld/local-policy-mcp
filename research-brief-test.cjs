@@ -1,6 +1,10 @@
 const assert=require('node:assert/strict');
 const brief=require('./research-brief');
 const doc={id:'d1',institution:'인제군',title:'산후조리비 계획',url:'https://www.open.go.kr/example',classification:'project_candidate',role:'plan',readingStatus:'read',reading:{fields:[{key:'budget',state:'원문 근거 후보 · 문맥 확인 필요',evidence:[{quote:'본예산 90백만원, 증액 계획 180백만원',page:6,url:'https://www.open.go.kr/source'}]}]}};
+assert.equal(brief([{...doc,reading:{fields:[{key:'target',state:'원문 근거 후보',evidence:[{quote:'지원대상: 인증받은 제품'},{quote:'신청자격: 관내 주소를 둔 세대'}]}]}}])[0].fields.target.quote,'신청자격: 관내 주소를 둔 세대');
+const emptyRead={...doc,id:'empty',reading:{fields:[]}};
+assert.equal(brief([emptyRead,doc])[0].documentId,'d1');
+assert.equal(brief([emptyRead])[0].basis,'본문 열람 · 핵심 근거 미확인');
 let rows=brief([doc,{...doc,id:'d2',readingStatus:'unreadable',reading:undefined},{...doc,id:'d3',supportingOnly:true},{...doc,id:'d4',classification:'administration'}]);
 assert.equal(rows.length,3);
 assert.equal(rows[0].fields.budget.quote,'본예산 90백만원, 증액 계획 180백만원');

@@ -15,6 +15,11 @@ for(const [text,key,expected] of [
 assert.equal(evidence(make('지원내용을 검토할 예정')).fields.activity.status,'unconfirmed');
 assert.equal(evidence(make('소요예산\n*****')).fields.budget.status,'redacted');
 assert.equal(evidence(make('사업비\n: 1,200천원')).fields.budget.status,'needs_review');
+const infrastructure=evidence(make('사업개요 : LED 바닥신호등 3개소(11개) 설치 사업기간 : 2026. 7.~9. 설치대상 : 학교 앞 3개소'));
+assert(infrastructure.fields.activity.excerpts.some(x=>x.quote.includes('11개')));
+assert(infrastructure.fields.target.excerpts.some(x=>x.quote.includes('학교 앞')));
+const rate=evidence(make('지원금액:구입금액의50% 지원한도:최대50만원 사업기간:2026년'));
+assert(rate.fields.activity.excerpts.some(x=>x.quote.includes('50%')&&x.quote.includes('50만원')));
 const a=make('사업기간: 2027. 3.~11.\n지원대상: 미취업 청년\n지원내용: 구독료 지원\n소요예산: 30,000천원(구비)');
 const e=evidence(a);assert.equal(e.fields.budget.status,'needs_review');assert.equal(e.fields.target.status,'needs_review');
 const grant=evidence(make('금회 교부결정내역 : 940,500,000**원(금구억사천오십만원)**'));

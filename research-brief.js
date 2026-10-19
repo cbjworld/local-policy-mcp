@@ -1,12 +1,14 @@
 // A document-level digest: never merge amounts across documents or institutions.
 module.exports=function researchBrief(documents,links=[]){
- const rows=documents.filter(d=>d.classification==='project_candidate').sort((a,b)=>Number(b.readingStatus==='read'&&!b.supportingOnly)-Number(a.readingStatus==='read'&&!a.supportingOnly)).map(d=>({
+ const evidenceCount=d=>d.supportingOnly?0:(d.reading?.fields||[]).filter(f=>f.evidence?.some(e=>e.quote)).length;
+ const rows=documents.filter(d=>d.classification==='project_candidate').sort((a,b)=>evidenceCount(b)-evidenceCount(a)||Number(b.readingStatus==='read'&&!b.supportingOnly)-Number(a.readingStatus==='read'&&!a.supportingOnly)).map(d=>({
   documentId:d.id,institution:d.institution,title:d.title,url:d.url,
-  basis:d.readingStatus==='read'&&!d.supportingOnly?'본문 근거 후보':'제목으로 사업 존재 추정',
+  basis:d.readingStatus==='read'&&!d.supportingOnly?(evidenceCount(d)?'본문 근거 후보':'본문 열람 · 핵심 근거 미확인'):'제목으로 사업 존재 추정',
   role:d.role,
   fields:Object.fromEntries(['target','activity','budget','period'].map(key=>{
    const f=!d.supportingOnly&&d.reading?.fields.find(f=>f.key===key);
-   const quote=f?.evidence?.find(e=>e.quote&&e.quote.length<=500);
+   const excerpts=f?.evidence?.filter(e=>e.quote&&e.quote.length<=500)||[];
+   const quote=(key==='target'&&excerpts.find(e=>/^신\s*청\s*자\s*격/.test(e.quote)))||excerpts[0];
    return [key,{state:f?.state||'미확인',...(quote?{quote:quote.quote,url:quote.url||d.url,page:quote.page,sourceId:quote.sourceId}:{}),...(f?.evidence?.length&&!quote?{detailDocumentId:d.id}:{})}];
   }))
  }));

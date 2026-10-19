@@ -19,6 +19,26 @@ async function main(){
  assert.equal((await p.read({url,fileId:'f'},filterFailure)).status,'download_failed');assert.equal(count,2);
  assert.equal((await p.read({url,fileId:'f'},{...io,extract:async()=>({pages:[{text:''}]})})).status,'no_text');
  assert.equal((await p.read({url,fileId:'f'},{...io,extract:async()=>{throw Error('conversion failed');}})).status,'extraction_failed');
+ // One investigation reuses transport bytes, not extracted pages or another user's disclosure snapshot.
+ let gets=0,posts=0,extracts=0;
+ const cachedIO={...io,get:async()=>{gets++;return io.get();},post:async step=>{posts++;return io.post(step);},extract:async(response,args)=>{extracts++;return {sourceId:'page-'+args.page,pages:[{page:args.page,text:args.q||'original'}]};}};
+ const reader=p.createReader(cachedIO);
+ await reader({url});
+ assert.equal((await reader({url,fileId:'f',page:1,q:'first'})).source.pages[0].text,'first');
+ assert.equal((await reader({url,fileId:'f',page:7,q:'second'})).source.pages[0].page,7);
+ assert.equal(gets,1);assert.equal(posts,3);assert.equal(extracts,2);
+ const independent=p.createReader(cachedIO);await independent({url,fileId:'f'});
+ assert.equal(gets,2);assert.equal(posts,6);
+ let retries=0;
+ const retryReader=p.createReader({...cachedIO,post:async step=>{if(retries++===0)return json({error_code:'99',error_msg:'provider timeout'});return io.post(step);}});
+ assert.equal((await retryReader({url,fileId:'f'})).status,'download_failed');
+ assert.equal((await retryReader({url,fileId:'f'})).status,'read');assert.equal(retries,4);
+ const invalidReader=p.createReader({...cachedIO,post:async step=>step.endsWith('.down')?{bytes:Buffer.from('<html>error</html>')}:io.post(step)});
+ assert.equal((await invalidReader({url,fileId:'f'})).status,'download_failed');
+ const twoFiles={...v,fileList:[...v.fileList,{fileId:'g',fileNm:'second.hwpx'}]};
+ posts=0;const bounded=p.createReader({...cachedIO,get:async()=>html({openCateSearchVO:twoFiles})});
+ for(const fileId of ['f','g','f'])assert.equal((await bounded({url,fileId})).status,'read');
+ assert.equal(posts,9); // Only the latest validated file is retained.
  const external={...io,get:async()=>html({openCateSearchVO:{...v,oppUrl:'https://opengov.seoul.go.kr/section/test'}})};
  assert.deepEqual((await p.read({url},external)).externalLinks,['https://opengov.seoul.go.kr/section/test']);
  for(const bad of ['https://evil.com/a','https://user@www.open.go.kr/othicInfo/infoList/infoListDetl.do','http://www.open.go.kr/othicInfo/infoList/infoListDetl.do'])await assert.rejects(p.read({url:bad},io));

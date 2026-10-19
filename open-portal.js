@@ -23,6 +23,13 @@ function unwrap(response){const raw=JSON.parse(response.bytes.toString('utf8'));
 function check(r){
  if(String(r.rtnCode)==='1'||![0,'0','00'].includes(r.error_code))throw Error(String(r.error_msg||r.rtnMessage||'포털 파일 제공 실패').slice(0,1000));
 }
+function createReader(io={get:download,post,extract:readResponse}){
+ const details=new Map(),files=new Map();
+ return args=>read(args,{...io,files,get:async url=>{
+  if(details.has(url))return details.get(url);
+  const response=await io.get(url);details.set(url,response);return response;
+ }});
+}
 async function read({url,fileId,q='',page=1}={},io={get:download,post,extract:readResponse}){
  const u=new URL(url);
  if(u.origin!==base||!['/othicInfo/infoList/infoListDetl.do','/othicInfo/infoList/infoListDetl2.do'].includes(u.pathname)||u.username||u.password||u.href.length>3000)throw Error('정보공개포털의 공식 문서 상세 주소가 필요합니다.');
@@ -39,6 +46,9 @@ async function read({url,fileId,q='',page=1}={},io={get:download,post,extract:re
  if(!f||!a.available)return {...out,status:'unavailable',message:'공개 다운로드 대상 첨부가 아닙니다. 포털에서 공개 범위를 확인하세요.'};
  let stage='download';
  try{
+  const cacheKey=u.href+'\n'+f.fileId;
+  let response=io.files?.get(cacheKey);
+  if(!response){
   let result=unwrap(await io.post('wonmunFileRequest.ajax',{fileId:f.fileId,esbFileName:f.fileNm,docId:v.docNo,ctDate:v.prdnDt,orgCd:v.nstCd,prdnNstRgstNo:v.prdnNstRgstNo,oppSeCd:v.oppSeCd,isPdf:'N',chrgDeptNm:v.chrgDeptNm}));check(result);
   const p={};
   for(const k of ['prdnNstRgstNo','prdnDt','nstCd','infoSj','chgrNmpn','chrgDeptCd','chrgDeptNm','nstClNm','prsrvPdCd','ndnfFiltrRndabtYn','rceptInsttCd','rceptInsttCdNm'])p[k]=v[k];
@@ -47,9 +57,12 @@ async function read({url,fileId,q='',page=1}={},io={get:download,post,extract:re
   result=unwrap(await io.post('wonmunFileFilter.ajax',p));check(result);
   const params={};for(const k of ['esbFilePath','esbFileName','fileName','isPdf']){if(typeof result[k]!=='string'||!result[k])throw Error('포털 파일 응답 필드 누락');params[k]=result[k];}
   Object.assign(params,{prdnNstRgstNo:v.prdnNstRgstNo,prdnDt:v.prdnDt,fileId:f.fileId,gubun:'esbFilePath'});
-  const response=await io.post('wonmunFileDownload.down',params);
+  response=await io.post('wonmunFileDownload.down',params);
   const b=response.bytes;
   if(!(b.subarray(0,5).toString()==='%PDF-'||b.subarray(0,2).toString()==='PK'||b.subarray(0,8).equals(Buffer.from('d0cf11e0a1b11ae1','hex'))||b.subarray(0,17).toString()==='HWP Document File'))throw Error('지원하는 PDF/HWP/HWPX 파일이 아닙니다. 오류 페이지를 본문으로 처리하지 않았습니다.');
+  // Retain only one validated file, within this document investigation, never across users or requests.
+  if(io.files){io.files.clear();io.files.set(cacheKey,response);}
+  }
   const citation=new URL(u);citation.hash=new URLSearchParams({fileId:f.fileId}).toString();
   stage='extract';
   const source=await io.extract({...response,url:citation.href},{q,page});
@@ -63,6 +76,7 @@ function attachmentScore(f){
 }
 async function research({url,requestedQuery=''}={},reader=read,externalReader=researchNotice){
  if(typeof requestedQuery!=='string'||requestedQuery.length>300)throw Error('검색 목적은 300자 이하 문자열이어야 합니다.');
+ if(reader===read)reader=createReader();
  const metadata=await reader({url});
  metadata.relevance=require('./relevance').classify(metadata.title,requestedQuery);
  metadata.requestedQuery=requestedQuery;
@@ -114,4 +128,4 @@ async function search(args={},get=download){
  if(!['projects','documents'].includes(purpose))throw Error('purpose projects/documents를 확인하세요.');
  return require('./relevance').screen(await rawSearch(query,get),purpose);
 }
-module.exports={search,read,research,attachmentScore,isForm};
+module.exports={search,read,research,attachmentScore,isForm,createReader};
