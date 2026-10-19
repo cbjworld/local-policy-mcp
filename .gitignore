@@ -4,3 +4,7 @@ __pycache__/
 .env*
 *.log
 /budget-data.json
+
+budget-search.sqlite
+budget-search.sqlite.*.tmp
+budget-search-keys.json.gz

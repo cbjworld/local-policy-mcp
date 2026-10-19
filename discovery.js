@@ -10,7 +10,7 @@ function pythonPath(){
 }
 function extract(bytes,options){return new Promise((resolve,reject)=>{
  const hangul=bytes.subarray(0,8).equals(Buffer.from('d0cf11e0a1b11ae1','hex'))||bytes.subarray(0,2).toString()==='PK'||bytes.subarray(0,17).toString()==='HWP Document File';
- const env=Object.fromEntries(['PATH','Path','SystemRoot','WINDIR','TEMP','TMP','HOME','POLICY_PYTHON','NODE_EXTRA_CA_CERTS'].filter(k=>process.env[k]).map(k=>[k,process.env[k]]));
+ const env=Object.fromEntries(['PATH','Path','SystemRoot','WINDIR','TEMP','TMP','HOME','POLICY_PYTHON','POLICY_PDF_ENGINE','NODE_EXTRA_CA_CERTS'].filter(k=>process.env[k]).map(k=>[k,process.env[k]]));
  const child=spawn(hangul?process.execPath:pythonPath(),hangul?['--max-old-space-size=256',path.join(__dirname,'extract-hangul.js'),JSON.stringify(options)]:[path.join(__dirname,'extract-source.py'),JSON.stringify(options)],{stdio:['pipe','pipe','pipe'],windowsHide:true,env});
  let out='',stderr='',failed=false;
  const timer=setTimeout(()=>{failed=true;child.kill();reject(new Error('문서 추출 30초 제한 초과'));},30000);

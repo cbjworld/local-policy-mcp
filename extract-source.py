@@ -35,20 +35,25 @@ def main():
     if len(data)>15*1024*1024: raise ValueError('Document too large')
     words=opts.get('q','').split(); start=opts.get('page',1); pages=[]; links=[]
     if data.startswith(b'%PDF-'):
-        from pypdf import PdfReader
-        reader=PdfReader(io.BytesIO(data),strict=False)
-        if reader.is_encrypted and not reader.decrypt(''): raise ValueError('PDF requires a password')
-        total=len(reader.pages)
-        if start>total: raise ValueError('Page outside document')
-        # Bound work; query scans up to 300 PDF pages, returns at most six matching pages.
-        stop=min(total, start+299 if words else start+5)
-        for i in range(start-1,stop):
-            text=clean(reader.pages[i].extract_text() or '')
-            if not words or all(w.casefold() in text.casefold() for w in words):
-                pages.append({'page':i+1,'text':text[:14000],'truncated':len(text)>14000})
-                if len(pages)==6: break
-        scanned=i+1
-        result={'format':'pdf','totalPages':total,'scannedThroughPage':scanned,'scanComplete':scanned==total,'pages':pages,'links':[], 'warning':'PDF 첫 장을 1쪽으로 센 번호입니다. 표의 단위·행·열은 원본에서 확인하세요. 이미지 PDF의 OCR은 미지원입니다.'}
+        import os
+        if os.environ.get('POLICY_PDF_ENGINE') == 'poppler' and not words:
+            from pdf_fast import extract
+            result = extract(data, start)
+        else:
+            from pypdf import PdfReader
+            reader=PdfReader(io.BytesIO(data),strict=False)
+            if reader.is_encrypted and not reader.decrypt(''): raise ValueError('PDF requires a password')
+            total=len(reader.pages)
+            if start>total: raise ValueError('Page outside document')
+            # Bound work; query scans up to 300 PDF pages, returns at most six matching pages.
+            stop=min(total, start+299 if words else start+5)
+            for i in range(start-1,stop):
+                text=clean(reader.pages[i].extract_text() or '')
+                if not words or all(w.casefold() in text.casefold() for w in words):
+                    pages.append({'page':i+1,'text':text[:14000],'truncated':len(text)>14000})
+                    if len(pages)==6: break
+            scanned=i+1
+            result={'format':'pdf','totalPages':total,'scannedThroughPage':scanned,'scanComplete':scanned==total,'pages':pages,'links':[], 'warning':'PDF 첫 장을 1쪽으로 센 번호입니다. 표의 단위·행·열은 원본에서 확인하세요. 이미지 PDF의 OCR은 미지원입니다.'}
     else:
         content_type=opts.get('type','')
         if not ('text/' in content_type or data.lstrip().lower().startswith((b'<!doctype html',b'<html'))): raise ValueError('Only HTML, text and PDF supported')
