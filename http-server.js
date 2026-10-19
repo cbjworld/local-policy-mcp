@@ -98,7 +98,7 @@ if(require.main===module){
  const host=process.env.HOST||'127.0.0.1',publicUrl=process.env.PUBLIC_URL||process.env.RENDER_EXTERNAL_URL,token=process.env.MCP_AUTH_TOKEN,allowPublic=process.env.MCP_ALLOW_PUBLIC==='1';
  if(host!=='127.0.0.1'&&(!publicUrl||(!token&&!allowPublic)))throw new Error('External binding requires PUBLIC_URL and authentication or explicit MCP_ALLOW_PUBLIC=1');
  const server=createServer({publicUrl,token,allowPublic});
- server.listen(Number(process.env.PORT||3000),host,()=>console.error('Policy MCP HTTP server ready'));
+ server.listen(Number(process.env.PORT||3000),host,()=>{console.error('Policy MCP HTTP server ready');require('./network-diagnostic.cjs').run().catch(e=>console.error('NETWORK_DIAG '+e.name));});
  for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>{void server.shutdown();});
 }
 module.exports={createServer};
