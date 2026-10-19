@@ -18,6 +18,9 @@ assert.equal(evidence(make('사업비\n: 1,200천원')).fields.budget.status,'ne
 const infrastructure=evidence(make('사업개요 : LED 바닥신호등 3개소(11개) 설치 사업기간 : 2026. 7.~9. 설치대상 : 학교 앞 3개소'));
 assert(infrastructure.fields.activity.excerpts.some(x=>x.quote.includes('11개')));
 assert(infrastructure.fields.target.excerpts.some(x=>x.quote.includes('학교 앞')));
+const its=evidence(make('추진대상: 2개소(삼척초등학교, 진주초등학교) 추진내용: 어린이보호구역 스마트횡단보도 구축 소요예산: 130,000,000원'));
+assert(its.fields.target.excerpts.some(x=>x.quote.includes('진주초등학교')));
+assert(its.fields.activity.excerpts.some(x=>x.quote.includes('스마트횡단보도')));
 const rate=evidence(make('지원금액:구입금액의50% 지원한도:최대50만원 사업기간:2026년'));
 assert(rate.fields.activity.excerpts.some(x=>x.quote.includes('50%')&&x.quote.includes('50만원')));
 const a=make('사업기간: 2027. 3.~11.\n지원대상: 미취업 청년\n지원내용: 구독료 지원\n소요예산: 30,000천원(구비)');
