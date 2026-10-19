@@ -29,6 +29,17 @@ async function main(){
  const stale=[];
  await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search([primary,{...grant,title:grant.title.replace('2026','2025')}]),research:async({url})=>{stale.push(url);return {status:'unreadable'};}});
  assert.deepEqual(stale,['primary'],'do not substitute an explicitly different fiscal year');
+ // A run of failed documents from one city must not consume every automatic reading slot.
+ const crowded=[primary,alternate,...Array.from({length:4},(_,i)=>({...alternate,url:'blocked'+i})),other,{...other,institution:'세번째시',url:'third'}];
+ const fairCalls=[];
+ const fair=await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search(crowded),research:async({url})=>{fairCalls.push(url);return ['other','third'].includes(url)?full():{status:'unreadable'};}});
+ assert.deepEqual(fairCalls,['primary','alternate','other','third']);
+ assert.equal(fair.candidates.length,crowded.length,'deferred titles and sources stay available');
+ assert.equal(fair.investigations.filter(x=>x.result.status==='unreadable').length,2);
+ // A focused search for one institution can still proceed to its third document.
+ const singleCalls=[];
+ await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search(crowded.slice(0,3)),research:async({url})=>{singleCalls.push(url);return url==='blocked0'?full():{status:'unreadable'};}});
+ assert.deepEqual(singleCalls,['primary','alternate','blocked0']);
  const notice='https://opengov.seoul.go.kr/sanction/123',valid='https://opengov.seoul.go.kr/og/com/download.php?nid=123&rid=F001&dtype=basic',calls=[];
  const result=await researchNotice({url:notice},async({url})=>{calls.push(url);return url===notice?{url,pages:[],links:[{url:'https://opengov.seoul.go.kr/og/com/download.php',title:'PDF 다운로드'},{url:valid,title:'원문 다운로드'},{url:'https://example.go.kr/download?id=123',title:'첨부 다운로드'}]}:{url,pages:[{text:'공개 본문'}],format:'hwpx'};});
  assert.equal(result.attachments.length,2);assert.deepEqual(calls,[notice,valid,'https://example.go.kr/download?id=123']);

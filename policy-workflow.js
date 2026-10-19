@@ -94,8 +94,14 @@ async function runResearch(args={},io=portal){
   io.preload?.(ordered.slice(0,6));
   const tried=new Set();
   for(let index=0;index<ordered.length;index++){
-   const item=ordered[index];
    if(investigations.length>=6||institutions.size>=2)break;
+   // Give another institution a turn after two reads; keep every deferred candidate available.
+   const attempts=d=>investigations.filter(x=>d.institution&&x.candidate.institution===d.institution).length;
+   if(attempts(ordered[index])>=2){
+    const nextIndex=ordered.findIndex((d,i)=>i>index&&!institutions.has(d.institution)&&!tried.has(documentKey(d.url))&&attempts(d)<2);
+    if(nextIndex>index){const [next]=ordered.splice(nextIndex,1);ordered.splice(index,0,next);}
+   }
+   const item=ordered[index];
    if(institutions.has(item.institution)||tried.has(documentKey(item.url)))continue;
    tried.add(documentKey(item.url));
    try{const result=await io.research({url:item.url,requestedQuery:request.question});investigations.push({candidate:item,result});if(!missingFields(result).length)institutions.add(item.institution);}
