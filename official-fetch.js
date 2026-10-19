@@ -18,6 +18,7 @@ function lookup(host,options,cb){dns.lookup(host,options,(err,address,family)=>{
 });}
 async function download(value,hops=0,deadline=Date.now()+25000,body,signal){
  const u=validateUrl(value);if(hops>3||Date.now()>=deadline)throw new Error('공식 원문 연결 시간 또는 이동 횟수 제한에 도달했습니다.');
+ if(hops===0&&body===undefined&&u.hostname==='opengov.seoul.go.kr'&&process.env.POLICY_SEOUL_RELAY_URL)return require('./seoul-relay-client').read(u.href,{deadline,signal});
  let phase='dns';
  const response=await new Promise((resolve,reject)=>{
   const req=https.request(u,{signal,lookup,method:body===undefined?'GET':'POST',headers:{Accept:'text/html,text/plain,application/pdf,application/octet-stream','Accept-Encoding':'identity','User-Agent':'PolicyResearchPrototype/0.2',...(body===undefined?{}:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'})}},res=>{
@@ -48,4 +49,4 @@ async function download(value,hops=0,deadline=Date.now()+25000,body,signal){
  }
  return response;
 }
-module.exports={validateUrl,publicIP,download};
+module.exports={validateUrl,publicIP,download,lookup};
