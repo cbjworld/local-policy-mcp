@@ -61,12 +61,17 @@ function brief({title='지자체 정책 사례 검토',cases}={}){
  lines.push('## 원문');for(const s of used.values())lines.push('['+(refs.indexOf(s.sourceId)+1)+'] '+s.url+' · 조회 '+s.checkedAt.slice(0,10));
  return {title,cases:normalized,text:lines.join('\n'),verification:'quote-match-only',sources:[...used.values()].map(s=>({sourceId:s.sourceId,url:s.url,checkedAt:s.checkedAt}))};
 }
-async function researchNotice({url}={},reader=read){
+async function researchNotice({url,expectedTitle}={},reader=read){
  validateUrl(url);
  const notice=await reader({url});
+ if(expectedTitle!==undefined&&(typeof expectedTitle!=='string'||!expectedTitle.trim()||!(notice.pages||[]).map(p=>p.text).join('').replace(/\s+/g,'').includes(expectedTitle.replace(/\s+/g,''))))throw Error('외부 원문 제목 일치 확인 실패');
  const seen=new Set([notice.url]);
  const candidates=notice.links.filter(l=>{
-  try{const u=validateUrl(l.url).href;if(seen.has(u)||!/\.pdf|\.hwpx?|download|다운로드|첨부/i.test(l.url+' '+l.title))return false;seen.add(u);return true;}catch{return false;}
+  try{const u=validateUrl(l.url);
+   // Seoul's parameterless PDF button needs browser POST data; use its explicit public original link instead.
+   if(u.hostname==='opengov.seoul.go.kr'&&u.pathname==='/og/com/download.php'&&!['rid','fid','uri'].some(k=>u.searchParams.get(k)))return false;
+   if(seen.has(u.href)||!/\.pdf|\.hwpx?|download|다운로드|첨부/i.test(l.url+' '+l.title))return false;seen.add(u.href);return true;
+  }catch{return false;}
  });
  // shortcut: one level and three attachments; use read_official_source for remaining or script-only links.
  const attachments=[];for(const l of candidates.slice(0,3)){

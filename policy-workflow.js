@@ -1,5 +1,6 @@
 const portal=require('./open-portal');
 const {documentKey}=require('./project-bundles');
+const {missingFields,sameProject}=require('./policy-followup');
 function plan({question,queries,startDate,endDate}={},now=new Date()){
  if(typeof question!=='string'||!question.trim()||question.length>300)throw Error('질문은 1~300자여야 합니다.');
  const topic=question.trim().replace(/^우리\s*(?:지자체|지역|시|군|구)(?:도|에서|에)?\s*/, '').replace(/^(?:다른\s*(?:지자체|지역|지방자치단체)|전국(?:의)?\s*(?:지자체|지방자치단체))(?:에서|의)?\s+/, '').replace(/[?？!.。]+$/,'').replace(/\s*(?:을|를)?\s*(?:새로\s*)?(?:도입\s*검토해\s*줘|도입하고\s*싶어|도입하려는데|추진하려는데|시작하려는데|하려는데)\s*$/,'').replace(/\s*(?:찾아\s*주세요|찾아\s*줘|알려\s*주세요|알려\s*줘|검색해\s*줘|검색해줘|비교해\s*줘|비교해\s*주세요)\s*$/,'').replace(/\s+(?:계획과\s*예산|예산과\s*계획|예산|계획)(?:을|를)?\s*$/,'').replace(/\s*(?:정책|사례)(?:를|을)?\s*$/,'').trim().replace(/\s지원사업$/,' 지원 사업');
@@ -91,19 +92,34 @@ async function runResearch(args={},io=portal){
   const institutions=new Set();
   const ordered=[...candidates].sort((a,b)=>Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||b.relevance.score-a.relevance.score);
   io.preload?.(ordered.slice(0,6));
-  for(const item of ordered){
+  const tried=new Set();
+  for(let index=0;index<ordered.length;index++){
+   const item=ordered[index];
    if(investigations.length>=6||institutions.size>=2)break;
-   if(institutions.has(item.institution))continue;
-   try{const result=await io.research({url:item.url,requestedQuery:request.question});investigations.push({candidate:item,result});if(result.status==='read'&&result.relevanceStatus!=='supporting_document')institutions.add(item.institution);}
+   if(institutions.has(item.institution)||tried.has(documentKey(item.url)))continue;
+   tried.add(documentKey(item.url));
+   try{const result=await io.research({url:item.url,requestedQuery:request.question});investigations.push({candidate:item,result});if(!missingFields(result).length)institutions.add(item.institution);}
    catch(e){investigations.push({candidate:item,result:{status:'failed',message:e.message}});}
+   const missing=missingFields(investigations.at(-1).result);
+   if(missing.length){
+    const nextIndex=ordered.findIndex((d,i)=>i>index&&!tried.has(documentKey(d.url))&&sameProject(item,d));
+    if(nextIndex>index){
+     const [next]=ordered.splice(nextIndex,1);ordered.splice(index+1,0,next);
+     next.followup={fromUrl:item.url,missingFields:missing,reason:'same_project_candidate_after_missing_evidence'};
+    }
+   }
   }
  }
  let projects=require('./project-bundles').bundle(candidates,investigations);
  // shortcut: one supplemental document per request; retain other gaps for host-directed follow-up.
  if(!request.broad){
-  const project=projects.find(p=>p.missingFields.length&&p.nextDocuments.length&&investigations.some(x=>x.result.status==='read'&&p.documents.some(d=>d.url===x.candidate.url)));
+  const project=projects.find(p=>p.missingFields.length&&p.nextDocuments.length&&investigations.some(x=>p.documents.some(d=>documentKey(d.url)===documentKey(x.candidate.url))));
   const readable=investigations.filter(x=>x.result.status==='read');
-  const finance=financialDocuments.find(d=>stageDocuments.some(s=>s.url===d.url)&&!investigations.some(x=>x.candidate.url===d.url)&&readable.some(x=>d.institution&&x.candidate.institution&&(d.institution===x.candidate.institution||x.candidate.institution.startsWith(d.institution+' ')||d.institution.startsWith(x.candidate.institution+' '))));
+  const finance=financialDocuments.find(d=>stageDocuments.some(s=>s.url===d.url)&&!investigations.some(x=>documentKey(x.candidate.url)===documentKey(d.url))&&investigations.some(x=>{
+   const a=x.candidate,identity=require('./project-bundles').identity,year=identity(d).year,otherYear=identity(a).year;
+   if(!d.institution||!a.institution||year&&otherYear&&year!==otherYear||d.department&&a.department&&d.department!==a.department)return false;
+   return d.institution===a.institution||readable.includes(x)&&(a.institution.startsWith(d.institution+' ')||d.institution.startsWith(a.institution+' '));
+  }));
   const item=project?.nextDocuments[0]||finance;
   if(item){const purpose=project?'fill_missing_evidence':'link_financial_evidence';try{investigations.push({candidate:item,purpose,...(project?{missingFields:project.missingFields}:{}),result:await io.research({url:item.url,requestedQuery:request.question})});}catch(e){investigations.push({candidate:item,purpose,result:{status:'failed',message:e.message}});}projects=require('./project-bundles').bundle(candidates,investigations);}
  }
@@ -117,7 +133,7 @@ async function runResearch(args={},io=portal){
  timings.readingMs=Date.now()-readStart;timings.totalMs=Date.now()-started;
  return {timings,budgetScope,budgetCandidates,budgetSearches,budgetEvidenceLinks,evidenceMap,financialDocuments,possibleProjectLinks,coverage,request,projects,status:searches.length?(request.broad?'topic_overview':'research_draft'):'search_failed',searches,failures,candidates,reviewItems:screened.reviewItems,relatedDocuments:screened.relatedDocuments,investigations,
  searchOutcome:{metadataFallback,status:candidates.length?'candidates_found':failures.length?'incomplete':'not_found_in_searched_scope',note:'후보가 없어도 사업 부존재를 뜻하지 않습니다. 검색 기간·조회 페이지·실패 내역을 함께 확인하세요.'},
- limits:{maxQueries:3,maxPagesPerQuery:4,maxMetadataFallbackPagesPerQuery:1,maxSearchRequests:15,maxDocuments:7,maxSupplementalDocuments:1,targetReadableInstitutions:2,examinedDocuments:byUrl.size,complete:false},
+ limits:{maxQueries:3,maxPagesPerQuery:4,maxMetadataFallbackPagesPerQuery:1,maxSearchRequests:15,maxDocuments:7,maxSupplementalDocuments:1,targetReadableInstitutions:2,readableCriterion:'core_field_quotes_required_not_text_only',examinedDocuments:byUrl.size,complete:false},
  instruction:request.broad?'후보 제목에 실제로 나타난 사업 종류를 출처와 함께 먼저 제시하세요. 임의로 한 사업을 선택하지 마세요. 필요할 때만 관심 사업을 물으세요.':'제목이 요청 사업의 존재를 뒷받침하면 비공개·읽기 실패여도 사업 존재 추정 사례로 포함하고 제목과 출처를 제시하세요. 존재 추정과 본문 근거 확인을 별도로 구분하세요. 계획안은 현재 시행이나 예산 확정을 뜻하지 않습니다. 요청과 실제 본문이 같은 사업인지 먼저 판단하세요. 적합한 문서의 대상·내용·예산·기간을 근거와 함께 정리하고 미확인 항목은 명시하세요. 실패하거나 다른 사업이면 반환된 다음 후보를 research_open_document로 조사하세요. 부족한 사례를 만들어 채우지 마세요. 단계별 성공과 최종 관련성은 다릅니다.'};
 }
 async function research(args={},io=portal){

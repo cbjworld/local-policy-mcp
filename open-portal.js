@@ -98,7 +98,7 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
  // shortcut: follow only an explicit Seoul disclosure link, one level; no general website search.
  for(const link of (metadata.externalLinks||[]).slice(0,1)){
   try{
-   const external=await externalReader({url:link});
+   const external=await externalReader({url:link,expectedTitle:metadata.title});
    const noticeText=(external.notice?.pages||[]).map(p=>p.text).join('').replace(/\s+/g,'');
    if(!metadata.title||!noticeText.includes(metadata.title.replace(/\s+/g,'')))throw Error('외부 원문 제목 일치 확인 실패');
    for(const a of external.attachments||[]){
