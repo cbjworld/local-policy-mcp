@@ -11,7 +11,7 @@ const {createServer}=require('./http-server');
   for(const count of [5,10,20]){
    const connections=Array.from({length:count},()=>({client:new Client({name:'public-load-check',version:'1'}),transport:new StreamableHTTPClientTransport(url)}));
    try{
-    await Promise.all(connections.map(async c=>{await c.client.connect(c.transport);assert.equal((await c.client.listTools()).tools.length,9);}));
+    await Promise.all(connections.map(async c=>{await c.client.connect(c.transport);assert.equal((await c.client.listTools()).tools.length,11);}));
     const started=performance.now();
     const timings=await Promise.all(connections.map(async(c,i)=>{
      const start=performance.now(),q=i%2?'빈집':'산후';

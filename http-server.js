@@ -11,7 +11,7 @@ function createServer({publicUrl,token,allowPublic=false,maxSessions=Number(proc
  if(!Number.isInteger(maxSessions)||maxSessions<1||maxSessions>32)throw new Error('Invalid session limit');
  const sessions=new Map();let starting=0;
  const researchQueue=createQueue();
- const fastTools=new Set(['search_budget_projects','search_verified_budget_totals','build_research_brief']);
+ const fastTools=new Set(['search_budget_projects','search_verified_budget_totals','build_research_brief','calculate_policy_budget']);
  const fail=(res,status,message)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:message}));};
  async function dispose(s){if(s.closed)return;s.closed=true;for(const wake of s.waiters.splice(0))wake();sessions.delete(s.transport.sessionId);await s.server.close();}
  const timer=setInterval(()=>{for(const s of sessions.values())if(!s.active&&Date.now()-s.last>15*60*1000)void dispose(s);},30000);timer.unref();

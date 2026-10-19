@@ -2,7 +2,7 @@ const portal=require('./open-portal');
 const {documentKey}=require('./project-bundles');
 function plan({question,queries,startDate,endDate}={},now=new Date()){
  if(typeof question!=='string'||!question.trim()||question.length>300)throw Error('질문은 1~300자여야 합니다.');
- const topic=question.trim().replace(/^(?:다른\s*(?:지자체|지역|지방자치단체)|전국(?:의)?\s*(?:지자체|지방자치단체))(?:에서|의)?\s+/, '').replace(/[?？!.。]+$/,'').replace(/\s*(?:찾아\s*주세요|찾아\s*줘|알려\s*주세요|알려\s*줘|검색해\s*줘|검색해줘|비교해\s*줘|비교해\s*주세요)\s*$/,'').replace(/\s+(?:계획과\s*예산|예산과\s*계획|예산|계획)(?:을|를)?\s*$/,'').replace(/\s*(?:정책|사례)(?:를|을)?\s*$/,'').trim();
+ const topic=question.trim().replace(/^우리\s*(?:지자체|지역|시|군|구)(?:도|에서|에)?\s*/, '').replace(/^(?:다른\s*(?:지자체|지역|지방자치단체)|전국(?:의)?\s*(?:지자체|지방자치단체))(?:에서|의)?\s+/, '').replace(/[?？!.。]+$/,'').replace(/\s*(?:을|를)?\s*(?:새로\s*)?(?:도입\s*검토해\s*줘|도입하고\s*싶어|도입하려는데|추진하려는데|시작하려는데|하려는데)\s*$/,'').replace(/\s*(?:찾아\s*주세요|찾아\s*줘|알려\s*주세요|알려\s*줘|검색해\s*줘|검색해줘|비교해\s*줘|비교해\s*주세요)\s*$/,'').replace(/\s+(?:계획과\s*예산|예산과\s*계획|예산|계획)(?:을|를)?\s*$/,'').replace(/\s*(?:정책|사례)(?:를|을)?\s*$/,'').trim().replace(/\s지원사업$/,' 지원 사업');
  if(!topic)throw Error('찾을 주제가 필요합니다.');
  const words=topic.split(/\s+/);
  // shortcut: mechanical fallback only; the host AI supplies semantic query variants without asking the user.

@@ -38,6 +38,8 @@ claude mcp get local-policy-mcp
 
 | 도구 | 기능 |
 |---|---|
+| `review_policy_adoption` | 도입할 사업의 사례·원문 근거·우리 지역 결정 사항 검토 |
+| `calculate_policy_budget` | 명시한 가정에 따른 연간 비용·재원 시나리오 계산 |
 | `research_policy` | 짧은 질문으로 정책 문서 검색·선별·원문 조회 |
 | `search_open_documents` | 기간·페이지·공개 범위를 지정한 문서 검색 |
 | `research_open_document` | 첨부파일 선택과 계획·예산 근거 추출 |
