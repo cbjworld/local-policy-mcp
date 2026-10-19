@@ -16,10 +16,12 @@ function lookup(host,options,cb){dns.lookup(host,options,(err,address,family)=>{
  if(!ips.length||!ips.every(publicIP))return cb(new Error('Non-public address blocked'));
  cb(null,address,family);
 });}
-async function download(value,hops=0,deadline=Date.now()+25000,body){
+async function download(value,hops=0,deadline=Date.now()+25000,body,signal){
  const u=validateUrl(value);if(hops>3||Date.now()>=deadline)throw new Error('공식 원문 연결 시간 또는 이동 횟수 제한에 도달했습니다.');
+ let phase='dns';
  const response=await new Promise((resolve,reject)=>{
-  const req=https.request(u,{lookup,method:body===undefined?'GET':'POST',headers:{Accept:'text/html,text/plain,application/pdf,application/octet-stream','Accept-Encoding':'identity','User-Agent':'PolicyResearchPrototype/0.2',...(body===undefined?{}:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'})}},res=>{
+  const req=https.request(u,{signal,lookup,method:body===undefined?'GET':'POST',headers:{Accept:'text/html,text/plain,application/pdf,application/octet-stream','Accept-Encoding':'identity','User-Agent':'PolicyResearchPrototype/0.2',...(body===undefined?{}:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'})}},res=>{
+   phase='body';
    if([301,302,303,307,308].includes(res.statusCode)){res.resume();return resolve({redirect:res.headers.location});}
    if(res.statusCode!==200){res.resume();return reject(Object.assign(new Error('원문 HTTP '+res.statusCode),{code:'HTTP_'+res.statusCode,retryable:[502,503,504].includes(res.statusCode)}));}
    const chunks=[];let size=0;
@@ -28,15 +30,16 @@ async function download(value,hops=0,deadline=Date.now()+25000,body){
    res.on('error',()=>reject(new Error('원문 읽기 실패')));
    res.on('end',()=>resolve({url:u.href,type:res.headers['content-type']||'',bytes:Buffer.concat(chunks)}));
   });
+  req.on('socket',socket=>{socket.once('lookup',()=>{phase='connect';});socket.once('connect',()=>{phase='tls';});socket.once('secureConnect',()=>{phase='headers';});});
   const timer=setTimeout(()=>req.destroy(new Error('timeout')),Math.max(1,deadline-Date.now()));
   req.on('close',()=>clearTimeout(timer));
-  req.on('error',e=>reject(Object.assign(new Error(e.message==='size'?'원문 15MB 제한 초과':e.message==='timeout'?'원문 연결 25초 제한 초과':'원문 연결 실패. 인증서 검증은 유지됩니다.'),{code:e.message==='size'?'FILE_TOO_LARGE':e.message==='timeout'?'ETIMEDOUT':String(e.code||'NETWORK_ERROR').slice(0,60),retryable:['ECONNRESET','EPIPE','EAI_AGAIN','ECONNREFUSED'].includes(e.code)})));
+  req.on('error',e=>reject(Object.assign(new Error(e.message==='size'?'원문 15MB 제한 초과':e.message==='timeout'?'원문 연결 25초 제한 초과':'원문 연결 실패. 인증서 검증은 유지됩니다.'),{phase,code:e.message==='size'?'FILE_TOO_LARGE':e.message==='timeout'?'ETIMEDOUT':String(e.code||'NETWORK_ERROR').slice(0,60),retryable:['ECONNRESET','EPIPE','EAI_AGAIN','ECONNREFUSED'].includes(e.code)})));
   req.end(body);
  });
  if(Object.hasOwn(response,'redirect')){
   if(body!==undefined)throw new Error('POST 이동 응답: 포털에서 직접 확인하세요.');
   if(!response.redirect)throw new Error('원문 이동 주소가 없습니다.');
-  return download(new URL(response.redirect,u).href,hops+1,deadline);
+  return download(new URL(response.redirect,u).href,hops+1,deadline,undefined,signal);
  }
  return response;
 }

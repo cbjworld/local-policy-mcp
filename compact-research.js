@@ -6,7 +6,7 @@ module.exports=function compactResearch(value){
   const r=reads.get(d.url);
   const reading=r&&require('./presentation').documentView({...r,metadata:{...d,...r.metadata}});
   if(reading){delete reading.reviewGuidance;delete reading.note;}
-  return {id:'d'+(i+1),title:d.title,url:d.url,institution:d.institution,role:d.documentRole||'other',classification:d.relevance?.kind,targetFit:r?.targetFit||d.targetFit,readingStatus:r?.status||'not_attempted',supportingOnly:r?.relevanceStatus==='supporting_document',...(r?{reading,selectionNotes:r.selectionNotes?.slice(0,8),failures:(r.attempts||[]).filter(a=>a.status!=='read').map(a=>({fileName:a.fileName,status:a.status,message:a.message,phase:a.phase,errorCode:a.errorCode,retryCount:a.retryCount})),message:r.message}: {})};
+  return {id:'d'+(i+1),title:d.title,url:d.url,institution:d.institution,role:d.documentRole||'other',classification:d.relevance?.kind,targetFit:r?.targetFit||d.targetFit,readingStatus:r?.status||'not_attempted',supportingOnly:r?.relevanceStatus==='supporting_document',...(r?{reading,selectionNotes:r.selectionNotes?.slice(0,8),failures:(r.attempts||[]).filter(a=>a.status!=='read').map(a=>({fileName:a.fileName,status:a.status,message:a.message,phase:a.phase,errorCode:a.errorCode,retryCount:a.retryCount,networkMs:a.networkMs})),message:r.message}: {})};
  });
  const ids=new Map(documents.map(d=>[d.url,d.id]));
  const briefInputs=documents.map(d=>({...d}));

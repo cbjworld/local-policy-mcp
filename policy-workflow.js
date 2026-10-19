@@ -18,7 +18,7 @@ function plan({question,queries,startDate,endDate}={},now=new Date()){
  const from=new Date(now);from.setUTCFullYear(from.getUTCFullYear()-2);
  return {question,topic,queries:[...new Set(terms.map(x=>x.trim()))],startDate:startDate||from.toISOString().slice(0,10).replaceAll('-',''),endDate:endDate||date,periodDefaulted:startDate===undefined,broad:['청년','노인','아동','복지','문화','환경','교육','반려동물','교통','주거'].includes(topic)};
 }
-async function research(args={},io=portal){
+async function runResearch(args={},io=portal){
  const started=Date.now(),timings={},request=plan(args),searches=[],failures=[],byUrl=new Map();
  const budgetSearches=[],budgetRows=new Map();
  let budgetScope=null;
@@ -90,6 +90,7 @@ async function research(args={},io=portal){
  if(!request.broad){
   const institutions=new Set();
   const ordered=[...candidates].sort((a,b)=>Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||b.relevance.score-a.relevance.score);
+  io.preload?.(ordered.slice(0,6));
   for(const item of ordered){
    if(investigations.length>=6||institutions.size>=2)break;
    if(institutions.has(item.institution))continue;
@@ -118,5 +119,11 @@ async function research(args={},io=portal){
  searchOutcome:{metadataFallback,status:candidates.length?'candidates_found':failures.length?'incomplete':'not_found_in_searched_scope',note:'후보가 없어도 사업 부존재를 뜻하지 않습니다. 검색 기간·조회 페이지·실패 내역을 함께 확인하세요.'},
  limits:{maxQueries:3,maxPagesPerQuery:4,maxMetadataFallbackPagesPerQuery:1,maxSearchRequests:15,maxDocuments:7,maxSupplementalDocuments:1,targetReadableInstitutions:2,examinedDocuments:byUrl.size,complete:false},
  instruction:request.broad?'후보 제목에 실제로 나타난 사업 종류를 출처와 함께 먼저 제시하세요. 임의로 한 사업을 선택하지 마세요. 필요할 때만 관심 사업을 물으세요.':'제목이 요청 사업의 존재를 뒷받침하면 비공개·읽기 실패여도 사업 존재 추정 사례로 포함하고 제목과 출처를 제시하세요. 존재 추정과 본문 근거 확인을 별도로 구분하세요. 계획안은 현재 시행이나 예산 확정을 뜻하지 않습니다. 요청과 실제 본문이 같은 사업인지 먼저 판단하세요. 적합한 문서의 대상·내용·예산·기간을 근거와 함께 정리하고 미확인 항목은 명시하세요. 실패하거나 다른 사업이면 반환된 다음 후보를 research_open_document로 조사하세요. 부족한 사례를 만들어 채우지 마세요. 단계별 성공과 최종 관련성은 다릅니다.'};
+}
+async function research(args={},io=portal){
+ if(io!==portal)return runResearch(args,io);
+ const session=require('./external-prefetch').createSession(portal);
+ try{return await runResearch(args,{...portal,research:session.research,preload:session.preload});}
+ finally{session.close();}
 }
 module.exports={plan,research};

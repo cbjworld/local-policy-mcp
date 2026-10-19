@@ -23,7 +23,8 @@ function unwrap(response){const raw=JSON.parse(response.bytes.toString('utf8'));
 function check(r){
  if(String(r.rtnCode)==='1'||![0,'0','00'].includes(r.error_code))throw Error(String(r.error_msg||r.rtnMessage||'포털 파일 제공 실패').slice(0,1000));
 }
-function createReader(io={get:download,post,extract:readResponse}){
+function createReader(io={}){
+ io={get:download,post,extract:readResponse,...io};
  const details=new Map(),files=new Map();
  return args=>read(args,{...io,files,get:async url=>{
   if(details.has(url))return details.get(url);
@@ -105,7 +106,7 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
     attempts.push({url:a.url,fileName:a.title,status:hasText?'read':a.status==='read'?'no_text':a.status,source:a.source,message:a.error,assessment:'external_attachment_needs_review'});
    }
    metadata.externalNotice=external.notice;
-  }catch(e){attempts.push({url:link,status:'external_failed',message:e.message});}
+  }catch(e){attempts.push({url:link,status:'external_failed',message:e.message,phase:e.phase||'external_notice',errorCode:e.code||'EXTERNAL_ERROR',networkMs:e.networkMs});}
  }
  // shortcut: at most three files per document; expose the rest for explicit follow-up.
  for(const file of candidates.slice(0,3)){
