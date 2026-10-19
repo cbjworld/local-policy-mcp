@@ -16,8 +16,8 @@ async function rawSearch({q,startDate,endDate,page=1,scope='original'}={},get=do
  if(r.parameterVO?.kwd!==q||r.parameterVO?.startDate!==startDate||r.parameterVO?.endDate!==endDate)throw Error('포털이 요청한 검색 조건을 반영하지 않았습니다.');
  return {status:'ok',mode:'live-open-portal',url,checkedAt:new Date().toISOString(),q,startDate,endDate,scope,page,total:Number(r.rtnTotal),hasMore:page*10<Number(r.rtnTotal),items:r.rtnList.map(x=>({title:x.INFO_SJ,institution:x.ALL_PROC_INSTT_NM||x.PROC_INSTT_NM,department:x.CHRG_DEPT_NM,date:x.PRDCTN_DT,documentNumber:x.DOC_NO,disclosure:({'1':'공개','2':'부분공개','3':'비공개','5':'열람제한'})[x.OTHBC_SE_CD]||'미확인',url:detailUrl(x.PRDCTN_INSTT_REGIST_NO,x.PRDCTN_DT,x.INSTT_SE_CD,scope)})),warning:'문서 건수이며 사업 건수가 아닙니다. 제목은 본문 근거가 아닙니다. 검색 기간과 공개 범위 밖 문서는 포함되지 않습니다.'};
 }
-async function post(step,params){
- return download(base+'/util/wonmunUtils/'+step,0,Date.now()+25000,new URLSearchParams(Object.entries(params).filter(([,v])=>v!==undefined&&v!==null)).toString());
+async function post(step,params,deadline=Date.now()+25000){
+ return download(base+'/util/wonmunUtils/'+step,0,deadline,new URLSearchParams(Object.entries(params).filter(([,v])=>v!==undefined&&v!==null)).toString());
 }
 function unwrap(response){const raw=JSON.parse(response.bytes.toString('utf8'));return raw.modelAndView?.model?.result||raw.result||raw;}
 function check(r){
@@ -44,20 +44,26 @@ async function read({url,fileId,q='',page=1}={},io={get:download,post,extract:re
  if(fileId===undefined)return out;
  const f=files.find(x=>x.fileId===fileId),a=attachments.find(x=>x.fileId===fileId);
  if(!f||!a.available)return {...out,status:'unavailable',message:'공개 다운로드 대상 첨부가 아닙니다. 포털에서 공개 범위를 확인하세요.'};
- let stage='download';
+ let stage='download',phase='request',retryCount=0;
+ const timings=[];
+ const transfer=async(step,params)=>{
+  phase=step;const deadline=Date.now()+25000;
+  for(;;){const start=Date.now();try{const response=await io.post(step,params,deadline);timings.push({phase:step,ms:Date.now()-start});return response;}
+   catch(e){timings.push({phase:step,ms:Date.now()-start,status:'failed',code:e.code||'PORTAL_ERROR'});if(!e.retryable||retryCount||Date.now()>=deadline)throw e;retryCount++;}}
+ };
  try{
   const cacheKey=u.href+'\n'+f.fileId;
   let response=io.files?.get(cacheKey);
   if(!response){
-  let result=unwrap(await io.post('wonmunFileRequest.ajax',{fileId:f.fileId,esbFileName:f.fileNm,docId:v.docNo,ctDate:v.prdnDt,orgCd:v.nstCd,prdnNstRgstNo:v.prdnNstRgstNo,oppSeCd:v.oppSeCd,isPdf:'N',chrgDeptNm:v.chrgDeptNm}));check(result);
+  let result=unwrap(await transfer('wonmunFileRequest.ajax',{fileId:f.fileId,esbFileName:f.fileNm,docId:v.docNo,ctDate:v.prdnDt,orgCd:v.nstCd,prdnNstRgstNo:v.prdnNstRgstNo,oppSeCd:v.oppSeCd,isPdf:'N',chrgDeptNm:v.chrgDeptNm}));check(result);
   const p={};
   for(const k of ['prdnNstRgstNo','prdnDt','nstCd','infoSj','chgrNmpn','chrgDeptCd','chrgDeptNm','nstClNm','prsrvPdCd','ndnfFiltrRndabtYn','rceptInsttCd','rceptInsttCdNm'])p[k]=v[k];
   for(const k of ['esbFilePath','esbFileName','fileName','orglPrdnNstCd','isPdf','closegvrnYn','mngrTelno'])p[k]=result[k];
   Object.assign(p,{fileId:f.fileId,orgCd:v.nstCd,orgSeCd:v.nstSeCd,orgNm:v.prcsNstNm,docId:v.docNo,step:'step2'});
-  result=unwrap(await io.post('wonmunFileFilter.ajax',p));check(result);
+  result=unwrap(await transfer('wonmunFileFilter.ajax',p));check(result);
   const params={};for(const k of ['esbFilePath','esbFileName','fileName','isPdf']){if(typeof result[k]!=='string'||!result[k])throw Error('포털 파일 응답 필드 누락');params[k]=result[k];}
   Object.assign(params,{prdnNstRgstNo:v.prdnNstRgstNo,prdnDt:v.prdnDt,fileId:f.fileId,gubun:'esbFilePath'});
-  response=await io.post('wonmunFileDownload.down',params);
+  response=await transfer('wonmunFileDownload.down',params);
   const b=response.bytes;
   if(!(b.subarray(0,5).toString()==='%PDF-'||b.subarray(0,2).toString()==='PK'||b.subarray(0,8).equals(Buffer.from('d0cf11e0a1b11ae1','hex'))||b.subarray(0,17).toString()==='HWP Document File'))throw Error('지원하는 PDF/HWP/HWPX 파일이 아닙니다. 오류 페이지를 본문으로 처리하지 않았습니다.');
   // Retain only one validated file, within this document investigation, never across users or requests.
@@ -65,14 +71,14 @@ async function read({url,fileId,q='',page=1}={},io={get:download,post,extract:re
   }
   const citation=new URL(u);citation.hash=new URLSearchParams({fileId:f.fileId}).toString();
   stage='extract';
-  const source=await io.extract({...response,url:citation.href},{q,page});
+  const extractStart=Date.now(),source=await io.extract({...response,url:citation.href},{q,page});timings.push({phase:'extract',ms:Date.now()-extractStart});
   const hasText=source.pages.some(p=>p.text.trim());
-  return {...out,status:hasText?'read':'no_text',fileId:f.fileId,fileName:f.fileNm,source,...(hasText?{}:{message:'파일은 내려받았지만 이 범위에서 텍스트를 추출하지 못했습니다. 이미지 문서는 OCR이 필요하며 검색어 미일치일 수도 있습니다.'})};
- }catch(e){return {...out,status:stage==='extract'?'extraction_failed':'download_failed',fileId:f.fileId,message:e.message};}
+  return {...out,status:hasText?'read':'no_text',fileId:f.fileId,fileName:f.fileNm,source,retryCount,timings,...(hasText?{}:{message:'파일은 내려받았지만 이 범위에서 텍스트를 추출하지 못했습니다. 이미지 문서는 OCR이 필요하며 검색어 미일치일 수도 있습니다.'})};
+ }catch(e){return {...out,status:stage==='extract'?'extraction_failed':'download_failed',fileId:f.fileId,message:e.message,phase:stage==='extract'?'extract':phase,errorCode:e.code||'PORTAL_ERROR',retryable:!!e.retryable,retryCount,timings};}
 }
 function isForm(name){return /표지/.test(name)||(/서식|신청서|동의서|양식/.test(name)&&!/지침/.test(name));}
 function attachmentScore(f){
- return (/추진계획|시행계획|사업계획|예산|방침/.test(f.name)?10:0)+(/\.hwpx?$/i.test(f.name)?2:0)-(isForm(f.name)?20:0);
+ return (/추진계획|시행계획|사업계획|예산|방침/.test(f.name.replace(/\s+/g,''))?10:0)+(/\.hwpx?$/i.test(f.name)?2:0)-(isForm(f.name)?20:0);
 }
 async function research({url,requestedQuery=''}={},reader=read,externalReader=researchNotice){
  if(typeof requestedQuery!=='string'||requestedQuery.length>300)throw Error('검색 목적은 300자 이하 문자열이어야 합니다.');
@@ -99,7 +105,7 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
  for(const file of candidates.slice(0,3)){
   if(isForm(file.name)&&attempts.some(a=>a.status==='read'&&a.assessment==='plan_candidate'))continue;
   let result;try{result=await reader({url,fileId:file.fileId});}catch(e){result={status:'download_failed',message:e.message};}
-  if(result.status==='download_failed'&&/시간 초과|timeout|timed out|ECONNRESET|ETIMEDOUT/i.test(result.message||'')){
+  if(result.status==='download_failed'&&!result.errorCode&&/시간 초과|timeout|timed out|ECONNRESET|ETIMEDOUT/i.test(result.message||'')){
    const initialFailure=result.message;
    try{result={...await reader({url,fileId:file.fileId}),retryCount:1,initialFailure};}catch(e){result={status:'download_failed',message:e.message,retryCount:1,initialFailure};}
   }

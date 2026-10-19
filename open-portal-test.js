@@ -11,6 +11,22 @@ async function main(){
  const v={infoSj:'추진계획',oppSeCd:'1',fileYn:'Y',nstSeCd:'B',urtxtYn:'Y',fileList:[{fileId:'f',fileNm:'plan.hwpx',fileSeDc:'첨부'}]};
  const calls=[];const io={get:async()=>html({openCateSearchVO:v}),post:async(step)=>{calls.push(step);if(step.endsWith('.down'))return {bytes:Buffer.from('PK-test')};return json({error_code:'00',esbFilePath:'server-value',esbFileName:'plan.hwpx',fileName:'generated',isPdf:'N'});},extract:async()=>({sourceId:'test',pages:[{page:null,text:'소요예산 30,000천원'}]})};
  const result=await p.read({url,fileId:'f'},io);assert.equal(result.status,'read');assert.deepEqual(calls,['wonmunFileRequest.ajax','wonmunFileFilter.ajax','wonmunFileDownload.down']);
+ assert(p.attachmentScore({name:'추진 계획.pdf'})>p.attachmentScore({name:'공고.hwpx'}));
+ for(const failedStage of ['wonmunFileRequest.ajax','wonmunFileFilter.ajax','wonmunFileDownload.down']){
+  const stages=[];let failed=false;
+  const recovered=await p.read({url,fileId:'f'},{...io,post:async(stage)=>{stages.push(stage);if(stage===failedStage&&!failed){failed=true;throw Object.assign(Error('connection reset'),{code:'ECONNRESET',retryable:true});}return io.post(stage);}});
+  assert.equal(recovered.status,'read');assert.equal(recovered.retryCount,1);assert.equal(stages.length,4);assert.equal(stages.filter(s=>s===failedStage).length,2);
+  assert.equal(recovered.timings.filter(t=>t.status==='failed').length,1);
+ }
+ let permanentCalls=0;
+ for(const code of ['HTTP_403','ETIMEDOUT','FILE_TOO_LARGE','CERT_HAS_EXPIRED']){
+  const permanent=await p.read({url,fileId:'f'},{...io,post:async()=>{permanentCalls++;throw Object.assign(Error('blocked'),{code,retryable:false});}});
+  assert.equal(permanent.errorCode,code);assert.equal(permanent.retryCount,0);
+ }
+ assert.equal(permanentCalls,4);
+ let exhaustedCalls=0;
+ const exhausted=await p.read({url,fileId:'f'},{...io,post:async()=>{exhaustedCalls++;throw Object.assign(Error('reset'),{code:'ECONNRESET',retryable:true});}});
+ assert.equal(exhausted.status,'download_failed');assert.equal(exhausted.retryCount,1);assert.equal(exhaustedCalls,2);
  calls.length=0;v.oppSeCd='3';assert.equal((await p.read({url,fileId:'f'},io)).status,'unavailable');assert.equal(calls.length,0);
  v.oppSeCd='2';v.fileList[0].fileOppYn='N';assert.equal((await p.read({url,fileId:'f'},io)).status,'unavailable');assert.equal(calls.length,0);
  v.oppSeCd='1';let count=0;const blocked={...io,post:async()=>{count++;return json({error_code:'99',error_msg:'provider timeout'});}};

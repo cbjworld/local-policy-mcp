@@ -1,5 +1,15 @@
 const assert=require('node:assert/strict'),w=require('./policy-workflow');
 const now=new Date('2026-10-13T00:00:00Z');
+(async()=>{
+ let active=0,peak=0;const calls=[];
+ const result=await w.research({question:'청년',queries:['청년 지원','청년 사업']},{search:async a=>{
+  calls.push(a.q+':'+a.page);active++;peak=Math.max(peak,active);await new Promise(r=>setTimeout(r,a.q==='청년 지원'?15:5));active--;
+  return {total:0,hasMore:a.page===1,items:[],reviewItems:[],relatedDocuments:[],url:a.q+':'+a.page};
+ }});
+ assert.equal(peak,2);assert.deepEqual(result.searches.filter(s=>s.scope==='original').map(s=>s.url),['청년 지원:1','청년 지원:2','청년 사업:1','청년 사업:2']);
+ assert.equal(result.coverage.queriedPages,6);assert.equal(result.failures.length,0);assert(result.timings.searchMs>=0);
+ console.log('PASS: independent queries overlap, page and merge order remain stable, metadata fallback preserved');
+})().catch(e=>{console.error(e);process.exitCode=1;});
 async function semanticVariantsTest(){
  const docs=[{title:'2026년 산후조리비 지원사업 추진계획',institution:'A',url:'variant-plan'},{title:'2026년 산후조리비 지원사업 교부결정',institution:'A',url:'variant-grant'},{title:'2026년 반려동물 지원사업 추진계획',institution:'A',url:'unrelated-variant'}];
  const result=await w.research({question:'산후조리비 지원 사업의 계획 예산 교부 집행 자료 찾아줘',queries:['산후조리비 지원','산후조리비 교부']},{search:async()=>({total:3,hasMore:false,items:docs,reviewItems:[],relatedDocuments:[]}),research:async()=>({status:'read'})});

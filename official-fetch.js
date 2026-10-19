@@ -21,16 +21,16 @@ async function download(value,hops=0,deadline=Date.now()+25000,body){
  const response=await new Promise((resolve,reject)=>{
   const req=https.request(u,{lookup,method:body===undefined?'GET':'POST',headers:{Accept:'text/html,text/plain,application/pdf,application/octet-stream','Accept-Encoding':'identity','User-Agent':'PolicyResearchPrototype/0.2',...(body===undefined?{}:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'})}},res=>{
    if([301,302,303,307,308].includes(res.statusCode)){res.resume();return resolve({redirect:res.headers.location});}
-   if(res.statusCode!==200){res.resume();return reject(new Error('원문 HTTP '+res.statusCode));}
+   if(res.statusCode!==200){res.resume();return reject(Object.assign(new Error('원문 HTTP '+res.statusCode),{code:'HTTP_'+res.statusCode,retryable:[502,503,504].includes(res.statusCode)}));}
    const chunks=[];let size=0;
    res.on('data',b=>{size+=b.length;if(size>15*1024*1024)req.destroy(new Error('size'));else chunks.push(b);});
-   res.on('aborted',()=>reject(new Error('원문 전송 중단')));
+   res.on('aborted',()=>reject(Object.assign(new Error('원문 전송 중단'),{code:'ECONNRESET',retryable:true})));
    res.on('error',()=>reject(new Error('원문 읽기 실패')));
    res.on('end',()=>resolve({url:u.href,type:res.headers['content-type']||'',bytes:Buffer.concat(chunks)}));
   });
   const timer=setTimeout(()=>req.destroy(new Error('timeout')),Math.max(1,deadline-Date.now()));
   req.on('close',()=>clearTimeout(timer));
-  req.on('error',()=>reject(new Error('원문 연결 실패 또는 15MB·25초 제한 초과. 인증서 검증은 유지됩니다.')));
+  req.on('error',e=>reject(Object.assign(new Error(e.message==='size'?'원문 15MB 제한 초과':e.message==='timeout'?'원문 연결 25초 제한 초과':'원문 연결 실패. 인증서 검증은 유지됩니다.'),{code:e.message==='size'?'FILE_TOO_LARGE':e.message==='timeout'?'ETIMEDOUT':String(e.code||'NETWORK_ERROR').slice(0,60),retryable:['ECONNRESET','EPIPE','EAI_AGAIN','ECONNREFUSED'].includes(e.code)})));
   req.end(body);
  });
  if(Object.hasOwn(response,'redirect')){
