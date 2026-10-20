@@ -1,5 +1,25 @@
 const assert=require('node:assert/strict'),{evidence}=require('./evidence'),{research}=require('./open-portal');
 const make=text=>[{status:'read',source:{sourceId:'s',url:'https://example.go.kr/a',pages:[{page:1,text}]}}];
+const deliveryText='지원대상: 저소득 주민 200명\n신청자격: 검진장비와 전문인력을 갖춘 의료기관\n사업내용: 건강검진 제공';
+const delivery=evidence(make(deliveryText));
+assert.equal(delivery.fields.target.excerpts.length,1);
+assert(delivery.fields.target.excerpts[0].quote.includes('저소득 주민'));
+assert.equal(delivery.deliveryQualifications.length,1);
+assert(deliveryText.includes(delivery.deliveryQualifications[0].quote));
+const procurement='신청자격) 공공기관, 지방공사·공단, 주무관청의 허가 등을 받아 설립된 법인 등 「지방계약법 시행령」제6조에서 정하는 전문기관';
+const providerOnly=evidence(make(procurement));
+assert.equal(providerOnly.fields.target.status,'unconfirmed');
+assert.equal(providerOnly.deliveryQualifications[0].quote,procurement);
+for(const text of ['신청자격: 관내 주소를 둔 세대','신청자격: 지역 중소기업 및 소상공인','지원대상: 지역 의료기관 시설개선 지원']){
+ const result=evidence(make(text));assert.equal(result.deliveryQualifications.length,0);assert.equal(result.fields.target.status,'needs_review');
+}
+const view=require('./presentation').documentView({status:'read',evidence:providerOnly,attempts:make(procurement)});
+assert.equal(view.fields.find(f=>f.key==='target').state,'미확인');
+assert.equal(view.fields.find(f=>f.key==='target').deliveryQualifications[0].quote,procurement);
+const digest=require('./research-brief')([{id:'d1',classification:'project_candidate',readingStatus:'read',reading:view}]);
+assert.equal(digest[0].fields.target.quote,undefined);
+assert.equal(digest[0].fields.target.deliveryQualifications[0].quote,procurement);
+assert(require('./policy-followup').missingFields({status:'read',evidence:providerOnly}).includes('target'));
 for(const [text,key,expected] of [
  ['지원내용\n․ 생백신 1회 (3.5만원 지원 / 본인부담금 5만원)\n․ 사백신 2회 (10만원 지원 / 본인부담금 26만원)\n❍ 소요예산: 102,350천원','activity','사백신 2회'],
  ['지원대상 : 65세 이상 시민 - 지원내용 ․ 생백신 1회 (3.5만원 지원) ․ 사백신 2회 (10만원 지원) ❍ 소요예산: 102,350천원','activity','사백신 2회'],
