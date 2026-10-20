@@ -8,7 +8,7 @@ function tables(attempts){
    const line=lines[i],start=offset;offset+=line.length+1;
    if(!/^\s*\|/.test(line)||!/^\s*\|[\s:|-]+\|\s*$/.test(lines[i+1]||''))continue;
    const split=s=>s.trim().slice(1,-1).split('|').map(x=>x.trim());
-   const headers=split(line),roles=headers.map(h=>Object.hasOwn(columns,normalized(h))?columns[normalized(h)]:null);
+   const headers=split(line),roles=headers.map(h=>Object.hasOwn(columns,normalized(h))?columns[normalized(h)]:/^예산액\((?:\d+차)?추경반영\)$/.test(h.replace(/<br\s*\/?>/gi,'').replace(/\s/g,''))?'appropriation':null);
    if(new Set(roles.filter(Boolean)).size!==roles.filter(Boolean).length)continue;
    if(!roles.some(Boolean))continue;
    let end=i+2;while(end<lines.length&&/^\s*\|/.test(lines[end]))end++;
@@ -41,4 +41,29 @@ function tables(attempts){
  }
  return found;
 }
-module.exports={tables};
+const amountLabels={총사업비:['project_total','총사업비'],소요예산:['budget_unspecified','소요예산 · 편성 여부 확인'],사업예산:['budget_unspecified','사업예산 · 편성 여부 확인'],사업비:['budget_unspecified','사업비 · 범위 확인'],예산액:['budget_unspecified','예산액 · 범위 확인'],지원금액:['support_amount','지원액'],지원한도:['support_limit','지원 한도'],지원액:['support_amount','지원액'],금회교부결정내역:['current_allocation','금회 교부결정액'],금회교부액:['current_allocation','금회 교부액'],기교부액:['previous_allocation','기교부액'],교부액:['allocation_unspecified','교부액 · 차수 확인']};
+function amounts(attempts){
+ const result=[];
+ const headings=Object.keys(amountLabels).map(s=>[...s].join('\\s*')).join('|');
+ const boundary=new RegExp('(?:'+headings+'|지원대상|사업기간|신청기간|사업내용)\\s*[:：)]');
+ for(const a of attempts.filter(a=>a.status==='read'&&a.assessment!=='form_or_cover'))for(const p of a.source?.pages||[]){
+  const pattern=new RegExp('('+headings+')\\s*(?:[:：)]|\\r?\\n)','g');let m;
+  while((m=pattern.exec(p.text))&&result.length<12){
+   // shortcut: classify explicit prose labels only; table roles are returned separately by tables().
+   if(p.text.slice(p.text.lastIndexOf('\n',m.index)+1,m.index).includes('|'))continue;
+   const tail=p.text.slice(pattern.lastIndex,pattern.lastIndex+300),end=tail.search(boundary);
+   const value=tail.slice(0,end<0?tail.length:end).match(/^[ \t]*(?:\r?\n[ \t]*)?[^\r\n]*/)?.[0]||'';
+   const quote=p.text.slice(m.index,pattern.lastIndex)+value;
+   const matches=[...value.matchAll(/\d[\d,.]*\s*(?:\*\*)?\s*(?:백\s*만|천\s*만|억|만|천|백)?\s*원/g)].map(x=>x[0]);
+   const redacted=/\*{3,}|(?:\\\*){3,}|비공개|가림/.test(value);
+   const rates=[...value.matchAll(/\d+(?:\.\d+)?\s*%/g)].map(x=>x[0]);
+   const key=m[1].replace(/\s+/g,''),[role,label]=amountLabels[key];
+   if(!matches.length&&!redacted&&!(role.startsWith('support_')&&rates.length))continue;
+   const per=role.startsWith('support_')?quote.match(/(?:1\s*인|인|1\s*가구|가구|세대|1\s*개소|개소|1\s*명|명)\s*당/):null;
+   const reference=/타\s*지자체|타\s*시[·ㆍ]?군|시군명.{0,80}사업비/.test(p.text.slice(0,350));
+   result.push({role,label,quote,amountTexts:redacted?[]:matches.slice(0,1),status:redacted?'redacted':'evidence_candidate',attribution:reference?'reference_context':'requires_review',...(role.startsWith('support_')?{recipientBasis:per?.[0]||null,rateTexts:rates,amountBasis:/최대|한도/.test(value)?'ceiling_not_fixed_payment':'source_label'}:{}),sourceId:a.source.sourceId,url:a.source.url,page:p.page,verification:'explicit_label_only',note:role.includes('allocation')?'교부 결정·이전 내역이며 주민 지급이나 집행 완료를 뜻하지 않습니다.':'첫 금액은 해당 표제의 근거 후보입니다. 인용문에 함께 있는 재원별 금액을 총액으로 합산하지 마세요. 연도·대상·편성 여부는 문맥을 확인하세요.'});
+  }
+ }
+ return result;
+}
+module.exports={tables,amounts};

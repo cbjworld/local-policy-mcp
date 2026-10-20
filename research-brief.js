@@ -9,7 +9,7 @@ module.exports=function researchBrief(documents,links=[]){
    const f=!d.supportingOnly&&d.reading?.fields.find(f=>f.key===key);
    const excerpts=f?.evidence?.filter(e=>e.quote&&e.quote.length<=500)||[];
    const quote=(key==='target'&&excerpts.find(e=>/^신\s*청\s*자\s*격/.test(e.quote)))||excerpts[0];
-   return [key,{state:f?.state||'미확인',...(key==='target'&&f?.deliveryQualifications?.length?{deliveryQualifications:f.deliveryQualifications}:{}),...(quote?{quote:quote.quote,url:quote.url||d.url,page:quote.page,sourceId:quote.sourceId}:{}),...(f?.evidence?.length&&!quote?{detailDocumentId:d.id}:{})}];
+   return [key,{state:f?.state||'미확인',...(key==='budget'&&f?.financialAmounts?.length?{financialAmounts:f.financialAmounts}:{}),...(key==='target'&&f?.deliveryQualifications?.length?{deliveryQualifications:f.deliveryQualifications}:{}),...(quote?{quote:quote.quote,url:quote.url||d.url,page:quote.page,sourceId:quote.sourceId}:{}),...(f?.evidence?.length&&!quote?{detailDocumentId:d.id}:{})}];
   }))
  }));
  const children=new Set();

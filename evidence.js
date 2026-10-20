@@ -57,6 +57,7 @@ function evidence(attempts){
  }
  const organizations=[],budgetNotes=[];
  fields.budget.tables=require('./funding-evidence').tables(attempts);
+ fields.budget.amounts=require('./funding-evidence').amounts(attempts);
  for(const table of fields.budget.tables)if(table.unit&&table.rows.some(r=>r.values.some(Number.isSafeInteger))&&fields.budget.excerpts.length<3){
   fields.budget.excerpts.push({sourceId:table.sourceId,url:table.url,page:table.page,quote:table.quote,status:'evidence_candidate',sectionTitle:'재원·교부 표',attribution:'requires_review',unit:table.unit,unitQuote:table.unitQuote});
  }
