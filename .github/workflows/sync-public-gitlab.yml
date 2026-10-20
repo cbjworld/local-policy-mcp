@@ -20,6 +20,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          if ! curl --silent --show-error --head --connect-timeout 10 --max-time 15 --retry 2 --retry-delay 5 --retry-max-time 55 https://gitlab.aigov.go.kr/ >/dev/null; then
+            echo '::error::Cannot reach public GitLab HTTPS from this runner. No GitLab credential has been sent. Retry from an allowed network; do not rotate the token for a connection timeout.'
+            exit 1
+          fi
           if [ -z "$GITLAB_SYNC_TOKEN" ]; then
             echo '::error::Add the GITLAB_SYNC_TOKEN repository secret with write_repository access to the destination GitLab project.'
             exit 1
