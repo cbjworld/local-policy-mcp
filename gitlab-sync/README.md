@@ -4,6 +4,8 @@ GitHub Actions calls `/api/sync` in Vercel's `icn1` region after a push to `main
 
 `GITLAB_SYNC_TOKEN` is the existing project-scoped `write_repository` token. It is held in GitHub Actions Secrets and an encrypted Vercel environment variable, and sent only over verified HTTPS. It is not stored in temporary Git files or returned in logs or responses. The endpoint checks this credential before accessing either repository.
 
+Both services must hold the same token. When renewing it, save the replacement in GitHub Actions Secrets and Vercel's sensitive production environment variable, redeploy the Vercel function, then re-run the failed workflow. Confirm its successful result and matching `main` commit before retiring the previous token. A `401 UNAUTHORIZED` response from this endpoint means its shared credential did not match; it is separate from GitLab network connectivity.
+
 Only fast-forward updates to `main` are allowed. Divergent history stops the job. Each invocation uses a temporary shallow clone of the last 64 commits, at most 128 MiB of received Git data, and a 240-second network deadline; temporary files are removed afterwards. Longer gaps require a direct resync. A newer GitHub head supersedes an older queued event without pushing it.
 
 Run `node test.cjs` for fixed-host, credential isolation, access checks, fast-forward, repeat-call, stale-event, verification and cleanup tests.
