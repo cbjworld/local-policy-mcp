@@ -15,6 +15,13 @@ for(const [text,key,expected] of [
 assert.equal(evidence(make('지원내용을 검토할 예정')).fields.activity.status,'unconfirmed');
 assert.equal(evidence(make('사업개요\n사업기간:2026년\n소요예산:500만원')).fields.activity.status,'unconfirmed');
 assert.equal(evidence(make('지원내용: ○')).fields.activity.status,'unconfirmed');
+const grantActivity='사업내용 : 농작물재해보험 가입 농가 보험료 일부 지원\n\n※ 전체 사업목적 및 사업별 핵심 내용을 기술\n\n2. 위의 교부결정에도 불구하고 교부결정을 취소할 수 있습니다.';
+const activityQuote=evidence(make(grantActivity)).fields.activity.excerpts[0].quote;
+assert.equal(activityQuote.trim(),'사업내용 : 농작물재해보험 가입 농가 보험료 일부 지원');
+assert(grantActivity.includes(activityQuote));
+const legalBoundary=evidence(make('사업내용: 보험료 지원\n2. 위의 교부결정에도 불구하고 보조금 교부를 취소할 수 있습니다.')).fields.activity.excerpts[0].quote;
+assert(!legalBoundary.includes('교부결정'));
+assert(evidence(make('지원내용: 보험료 지원\n※ 자부담 20%는 신청 농가 부담\n2. 추가 지원은 다음 달 신청')).fields.activity.excerpts[0].quote.includes('자부담 20%'));
 assert.equal(evidence(make('소요예산\n*****')).fields.budget.status,'redacted');
 assert.equal(evidence(make('사업비\n: 1,200천원')).fields.budget.status,'needs_review');
 const infrastructure=evidence(make('사업개요 : LED 바닥신호등 3개소(11개) 설치 사업기간 : 2026. 7.~9. 설치대상 : 학교 앞 3개소'));

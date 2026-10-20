@@ -13,7 +13,7 @@ function evidence(attempts){
     const tail=p.text.slice(pattern.lastIndex,pattern.lastIndex+(section||m[0].includes('</t')?700:280));
     const end=tail.search(boundaryLabel);let value=tail.slice(0,end<0?tail.length:end);
     if(!section&&key==='activity'){
-     const boundary=value.search(/\n[ \t]*(?:[□▢❍○]|[ⅠⅡⅢⅣⅤⅥⅦ])/);
+     const boundary=value.search(/\n[ \t]*(?:[□▢❍○]|[ⅠⅡⅢⅣⅤⅥⅦ]|※\s*전체\s*사업목적\s*및\s*사업별\s*핵심\s*내용을\s*기술|\d+[.)]\s*위의\s*교부결정에도\s*불구하고)/);
      if(boundary>=0)value=value.slice(0,boundary);
     }
     else if(!section){
