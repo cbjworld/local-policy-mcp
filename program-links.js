@@ -15,7 +15,7 @@ function links(investigations=[]){
   const name=upper.candidate.title.match(new RegExp('('+region+'(?:형|도)?\\s*[^\\n「」\\[\\]()]{1,70}?지원\\s*사업)'))?.[1];
   if(!name||/자체|추가\s*지원|별도\s*지원|확대\s*지원/.test(upper.candidate.title))continue;
   const up=pages(upper),year=period(up);
-  const distribution=up.map(p=>({p,m:p.text.match(/(?:구\s*[·ㆍ・‧]?\s*군|시\s*[·ㆍ・‧]?\s*군)[^\n]{0,80}?(?:보조금\s*교부|보조사업자|시행)/)})).find(x=>x.m);
+  const distribution=up.map(p=>({p,m:p.text.match(/(?:구\s*[·ㆍ・‧]?\s*군|시\s*[·ㆍ・‧]?\s*군)[^\n]{0,80}?(?:보조금\s*교부|보조사업자|시행)|보조\s*사업자\s*[:：]\s*\d+개\s*(?:구\s*[·ㆍ・‧]?\s*군|시\s*[·ㆍ・‧]?\s*군)/)})).find(x=>x.m);
   if(!year||!distribution||!up.some(p=>normalize(p.text).includes(normalize(name))))continue;
   const members=[];
   for(const lower of read){
@@ -28,7 +28,8 @@ function links(investigations=[]){
    if(!grant)continue;
    const programQuote=grant.text.split('\n').find(line=>normalize(line).includes(normalize(name))&&/교부결정|교부통지|교부\s*알림/.test(line));
    if(!programQuote||programQuote.length>500)continue;
-   members.push({url:lower.candidate.url,institution:lower.candidate.institution,evidence:[lowerYear.evidence,cite(grant,programQuote),cite(grant,institution+'장')]});
+   const issuerQuote=grant.text.split('\n').find(line=>normalize(line.replace(/<[^>]+>|[*_#]/g,''))===institution+'장');
+   members.push({url:lower.candidate.url,institution:lower.candidate.institution,evidence:[lowerYear.evidence,cite(grant,programQuote),cite(grant,issuerQuote)]});
   }
   if(members.length)groups.push({name:name.trim(),year:year.year,status:'same_program_body_supported',coordinatingInstitution:institution,primaryUrl:upper.candidate.url,documents:[{url:upper.candidate.url,institution},...members.map(({url,institution})=>({url,institution}))],evidence:[year.evidence,cite(distribution.p,distribution.m[0]),...members.flatMap(m=>m.evidence)],countAsOneCase:true,budgetRule:'사업은 한 사례로 비교합니다. 광역 전체액·기초 사업비·교부액은 문서별로 유지하고 합산하지 마세요. 문서 생산기관이 금액의 적용 범위를 뜻하지 않습니다.'});
  }
@@ -40,4 +41,17 @@ function links(investigations=[]){
  }
  return [...unique.values()];
 }
-module.exports={links};
+function caseCounts(projects=[],confirmed=[]){
+ const parents=projects.map((_,i)=>i),root=i=>parents[i]===i?i:(parents[i]=root(parents[i]));
+ for(const link of confirmed){
+  const urls=new Set(link.documents.map(d=>d.url));
+  const members=projects.flatMap((p,i)=>p.documents.some(d=>urls.has(d.url))?[i]:[]);
+  for(const i of members.slice(1))parents[root(i)]=root(members[0]);
+ }
+ return {candidateProjectGroups:projects.length,projectGroups:new Set(parents.map((_,i)=>root(i))).size,confirmedLinkedPrograms:confirmed.length};
+}
+function retainedLinks(confirmed,documents){
+ const urls=new Set(documents.map(d=>d.url));
+ return confirmed.map(link=>{const kept=link.documents.filter(d=>urls.has(d.url));return {...link,documents:kept,primaryUrl:urls.has(link.primaryUrl)?link.primaryUrl:kept[0]?.url,omittedDocumentCount:(link.omittedDocumentCount||0)+link.documents.length-kept.length};}).filter(link=>link.documents.length>=2);
+}
+module.exports={links,caseCounts,retainedLinks};

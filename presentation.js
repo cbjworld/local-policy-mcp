@@ -13,7 +13,7 @@ function institutionGroups(value){
 }
 function researchSummary(value){
  const projects=value.projects||[],investigations=[...new Map((value.investigations||[]).map(x=>[x.candidate.url,x])).values()];
- return {candidateDocuments:new Set((value.candidates||[]).map(d=>d.url)).size,projectGroups:projects.length,attemptedDocuments:investigations.length,textReadDocuments:investigations.filter(x=>x.result.status==='read').length,unreadableDocuments:investigations.filter(x=>x.result.status!=='read').length,projectsWithUnknownFields:projects.filter(p=>Object.values(p.fields||{}).some(f=>f.status==='unconfirmed')).length,projectsWithRedactedFields:projects.filter(p=>Object.values(p.fields||{}).some(f=>f.status==='redacted')).length,searchOutcome:value.searchOutcome||null,note:'사업 묶음은 제목 기준 후보이며 확정된 사업 수가 아닙니다. 읽은 문서 수는 텍스트 추출 성공 수로, 본문 전체 이해·관련성 확인·정확도를 뜻하지 않습니다. 가림 처리와 미확인은 별개입니다.'};
+ return {candidateDocuments:new Set((value.candidates||[]).map(d=>d.url)).size,...require('./program-links').caseCounts(projects,value.confirmedProgramLinks),attemptedDocuments:investigations.length,textReadDocuments:investigations.filter(x=>x.result.status==='read').length,unreadableDocuments:investigations.filter(x=>x.result.status!=='read').length,projectsWithUnknownFields:require('./program-links').caseCounts(projects.filter(p=>Object.values(p.fields||{}).some(f=>f.status==='unconfirmed')),value.confirmedProgramLinks).projectGroups,projectsWithRedactedFields:require('./program-links').caseCounts(projects.filter(p=>Object.values(p.fields||{}).some(f=>f.status==='redacted')),value.confirmedProgramLinks).projectGroups,searchOutcome:value.searchOutcome||null,note:'사업 묶음은 제목 기준 후보이며 확정된 사업 수가 아닙니다. 읽은 문서 수는 텍스트 추출 성공 수로, 본문 전체 이해·관련성 확인·정확도를 뜻하지 않습니다. 가림 처리와 미확인은 별개입니다.'};
 }
 function documentView(result){
  const fundingTables=(result.evidence?.fields?.budget?.tables||[]).slice(0,2);
@@ -34,6 +34,15 @@ function present(name,value,detail='compact'){
  }
  if(name==='research_open_document')return {...value,budgetEvidenceLinks:require('./budget-evidence-links').links([{candidate:value.metadata||{},result:value}],args=>require('./budget-search').search(args)),presentation:documentView(value)};
  if(name==='research_policy'){const output={...value,presentation:{projects:(value.projects||[]).map(p=>({institution:p.institution,name:p.name,year:p.titleYear,existence:p.existence,reviewFlags:p.reviewFlags,missingFields:p.missingFields,documents:p.documents.map(d=>({title:d.title,url:d.url,role:d.role,readingStatus:(value.investigations||[]).find(x=>x.candidate.url===d.url)?.result.status||'not_attempted'}))})),documents:(value.investigations||[]).map(x=>documentView({...x.result,metadata:{...x.candidate,...x.result.metadata}})),note:'제목만으로 존재가 추정되는 사업도 포함하되 제목 근거와 본문 근거를 구분하세요. 미확인 세부정보는 추정하지 마세요. 문서별 근거를 짧게 비교하되 사업 귀속·연도·단위를 확인한 뒤 요약하세요. 본문 확보만으로 검증된 사례라고 표시하지 마세요. 원문을 확인할 수 있도록 링크와 인용 위치를 유지하세요.'}};
+ for(const link of output.confirmedProgramLinks){
+  const primary=output.presentation.projects.find(p=>p.documents.some(d=>d.url===link.primaryUrl));
+  if(!primary)continue;
+  const members=output.presentation.projects.filter(p=>p!==primary&&p.documents.some(d=>link.documents.some(m=>m.url===d.url)));
+  primary.linkedProjects=members;primary.countAsOneCase=true;primary.programName=link.name;
+  primary.participatingInstitutions=[...new Set(link.documents.map(d=>d.institution))];
+  primary.documents=[...new Map([primary,...members].flatMap(p=>p.documents).map(d=>[d.url,d])).values()];
+  output.presentation.projects=output.presentation.projects.filter(p=>!members.includes(p));
+ }
  if(detail==='full')return output;
  return require('./compact-research')(output);
  }

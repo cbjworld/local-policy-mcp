@@ -19,7 +19,7 @@ module.exports=function compactResearch(value){
  output.budgetSearches=value.budgetSearches||[];
  output.budgetScope=value.budgetScope||null;
  output.budgetCandidateNote='2026년 본예산 일반회계 세출의 사업명 검색 초기 후보 최대 5행입니다. budgetSearches의 q·nextOffset으로 search_budget_projects를 이어 조회하세요. 문서의 사업과 같은지, 시비인지 총사업비인지 확인한 뒤 사용하세요. 교부·집행액과 합산하지 마세요.';
- output.confirmedProgramLinks=(value.confirmedProgramLinks||[]).filter(l=>l.documents.every(d=>ids.has(d.url)));
+ output.confirmedProgramLinks=require('./program-links').retainedLinks(value.confirmedProgramLinks||[],documents);
  for(const l of output.confirmedProgramLinks){const main=output.comparison.find(p=>p.documentIds.includes(ids.get(l.primaryUrl)));if(main){const memberIds=l.documents.map(d=>ids.get(d.url));output.comparison=output.comparison.filter(p=>p===main||!p.documentIds.some(id=>memberIds.includes(id)));main.documentIds=[...new Set([...main.documentIds,...memberIds])];main.participatingInstitutions=l.documents.map(d=>d.institution);main.countAsOneCase=true;main.name=l.name;}}
  output.comparison=output.comparison.slice(0,6);
  output.responseSize.omittedBudgetCandidates=0;
@@ -29,7 +29,7 @@ module.exports=function compactResearch(value){
  const oversized=()=>JSON.stringify(output).length>24000;
  const pruneReferences=()=>{
   const kept=new Set(documents.map(d=>d.id));
-  output.confirmedProgramLinks=output.confirmedProgramLinks.filter(l=>l.documents.every(d=>documents.some(k=>k.url===d.url)));
+  output.confirmedProgramLinks=require('./program-links').retainedLinks(output.confirmedProgramLinks,documents);
   output.quickBrief=require('./research-brief')(briefInputs.filter(d=>documents.some(k=>k.id===d.id)),output.confirmedProgramLinks);
   output.comparison=output.comparison.filter(p=>p.documentIds.length&&p.documentIds.every(id=>kept.has(id)));
   const links=output.possibleProjectLinks.filter(x=>x.documentIds.every(id=>kept.has(id)));
