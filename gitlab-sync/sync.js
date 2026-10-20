@@ -15,7 +15,8 @@ function httpClient(deadline,fetcher=fetch){
  return {async request({url,method='GET',headers={},body}){
   allowedRequest(url,method,headers);
   const left=deadline-Date.now();if(left<=0)throw Error('SYNC_DEADLINE');
-  const r=await fetcher(url,{method,headers,redirect:'manual',signal:AbortSignal.timeout(left),...(body?{body,duplex:'half'}:{})});
+  const requestBody=body?(async function*(){for await(const chunk of body)yield chunk;})():undefined;
+  const r=await fetcher(url,{method,headers,redirect:'manual',signal:AbortSignal.timeout(left),...(requestBody?{body:requestBody,duplex:'half'}:{})});
   if(r.status>=300&&r.status<400){await r.body?.cancel();throw Error('REDIRECT_BLOCKED');}
   return {url,method,statusCode:r.status,statusMessage:r.statusText,headers:Object.fromEntries(r.headers),body:(async function*(){if(r.body)for await(const chunk of r.body){received+=chunk.length;if(received>128*1024*1024)throw Error('SYNC_DOWNLOAD_LIMIT');yield chunk;}})()};
  }};
