@@ -1,0 +1,1 @@
+{"name":"local-policy-gitlab-sync","private":true,"version":"0.1.0","engines":{"node":"22.x"},"dependencies":{"isomorphic-git":"1.44.3"}}

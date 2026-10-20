@@ -1,0 +1,1 @@
+{"regions":["icn1"],"functions":{"api/check.js":{"maxDuration":30},"api/sync.js":{"maxDuration":300}}}

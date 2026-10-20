@@ -1,0 +1,22 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const core=require('./sync'),handler=require('./api/sync');
+const old='a'.repeat(40),current='b'.repeat(40),token='local-test-credential-not-real';
+(async()=>{
+ for(const url of ['https://evil.example/conicon/local-policy-mcp.git/info/refs?service=git-receive-pack','http://gitlab.aigov.go.kr/conicon/local-policy-mcp.git/info/refs?service=git-receive-pack','https://gitlab.aigov.go.kr/other/repo.git/info/refs?service=git-receive-pack'])assert.throws(()=>core.allowedRequest(url,'GET'));
+ assert.throws(()=>core.allowedRequest(core.SOURCE+'/info/refs?service=git-upload-pack','GET',{authorization:'secret'}));
+ assert(core.allowedRequest(core.DESTINATION+'/git-receive-pack','POST'));
+ const http=core.httpClient(Date.now()+1000,async()=>new Response('',{status:302,headers:{location:'https://evil.example'}}));await assert.rejects(http.request({url:core.DESTINATION+'/info/refs?service=git-receive-pack'}),/REDIRECT_BLOCKED/);
+ let cloneCount=0,pushCount=0,dir,head=old,descendent=true,source=current;
+ const driver={listServerRefs:async args=>{assert.equal(args.url,core.DESTINATION);assert.equal(args.onAuth(core.DESTINATION).password,token);assert.throws(()=>args.onAuth(core.SOURCE));return[{ref:'refs/heads/main',oid:head}];},clone:async args=>{cloneCount++;dir=args.dir;assert.equal(args.url,core.SOURCE);assert.equal(args.onAuth,undefined);assert.equal(args.depth,64);},resolveRef:async()=>source,isDescendent:async()=>descendent,push:async args=>{pushCount++;assert.equal(args.force,false);assert.equal(args.remoteRef,'main');assert.equal(args.url,core.DESTINATION);head=current;}};
+ assert.equal((await core.synchronize(current,token,{driver,http:{}})).status,'synchronized');assert.equal(pushCount,1);assert(!fs.existsSync(dir));
+ assert.equal((await core.synchronize(current,token,{driver,http:{}})).status,'already_current');assert.equal(cloneCount,1);
+ head=old;descendent=false;await assert.rejects(core.synchronize(current,token,{driver,http:{}}),/NON_FAST_FORWARD/);assert.equal(pushCount,1);assert(!fs.existsSync(dir));
+ source='c'.repeat(40);assert.equal((await core.synchronize(current,token,{driver,http:{}})).status,'superseded');assert.equal(pushCount,1);
+ const previous=process.env.GITLAB_SYNC_TOKEN;delete process.env.GITLAB_SYNC_TOKEN;
+ const call=async(req)=>{let status=200,output;const res={setHeader(){},set statusCode(n){status=n},end(text){output=JSON.parse(text)}};await handler(req,res);return{status,output};};
+ assert.equal((await call({method:'GET'})).status,405);assert.equal((await call({method:'POST'})).status,503);
+ process.env.GITLAB_SYNC_TOKEN=token;assert.equal((await call({method:'POST',headers:{},body:{commit:current}})).status,401);
+ assert.equal((await call({method:'POST',headers:{authorization:'Bearer '+token},body:{commit:current,url:'https://evil.example'}})).status,400);
+ if(previous===undefined)delete process.env.GITLAB_SYNC_TOKEN;else process.env.GITLAB_SYNC_TOKEN=previous;
+ console.log('PASS: fixed remotes, credential isolation, method/auth/body checks, no force pushes, stale-event handling, repeat safety, verification and temp cleanup');
+})().catch(error=>{console.error(error);process.exitCode=1});
