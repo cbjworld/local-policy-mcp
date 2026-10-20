@@ -9,6 +9,18 @@ try{
  const first=db.find(['청년','지원'],null,0,2);assert.equal(first.total,3);assert.deepEqual(first.items,[{...input.contexts[0],...input.rows[0][1]},{...input.contexts[1],...input.rows[1][1]}]);
  assert.deepEqual(db.find(['청년','지원'],null,2,2).items,[{...input.contexts[0],...input.rows[3][1]}]);
  assert.equal(db.find(['ai청년'],null,0,2).total,1);assert.equal(db.find(['청년'],'부산광역시수영구',0,2).total,2);
+ assert.equal(db.find(['청년'],['부산','수영구'],0,2).total,2);
+ assert.equal(db.find(['청년'],['서울','수영구'],0,2).total,0);
+ // The JSON fallback must apply the same multi-part region filter as the SQLite path.
+ fs.copyFileSync(path.join(__dirname,'budget-search.js'),path.join(dir,'budget-search.js'));
+ const expected=db.find(['청년'],['부산','수영구'],0,2);
+ db.close();db=null;
+ fs.renameSync(path.join(dir,'budget-search.sqlite'),path.join(dir,'index-disabled.sqlite'));
+ const fallbackSearch=require(path.join(dir,'budget-search.js')).search;
+ const fallback=fallbackSearch({q:'청년',institution:'부산 수영구',limit:2});
+ assert.equal(fallback.totalCandidateRows,expected.total);assert.deepEqual(fallback.items,expected.items);
+ assert.equal(fallbackSearch({q:'청년',institution:'서울 수영구'}).totalCandidateRows,0);
+ fs.renameSync(path.join(dir,'index-disabled.sqlite'),path.join(dir,'budget-search.sqlite'));db=open(dir);
  assert.equal(db.find(['%_'],null,0,2).total,1);assert.equal(db.find(["' OR 1=1 --"],null,0,2).total,0);
  assert.deepEqual(db.find(['청년'],null,4,2),{total:3,items:[]});
  db.close();db=null;

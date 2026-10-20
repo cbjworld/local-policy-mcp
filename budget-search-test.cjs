@@ -5,6 +5,14 @@ const next=search({q:'청년',limit:2,offset:2});assert.notDeepEqual(all.items,n
 assert.equal(search({q:'120미추홀콜센터'}).items[0].budget,229409);
 assert.equal(search({q:'합천호 노후관광지',institution:'합천'}).items[0].budget,1500000);
 assert.equal(search({q:'산후',institution:'존재하지않는기관'}).totalCandidateRows,0);
+for(const [institution,parent,local] of [['부산 중구','부산광역시','중구'],['서울 강남구','서울특별시','강남구']]){
+ const result=search({q:'청년',institution,limit:20});
+ assert(result.totalCandidateRows>0,institution);
+ assert(result.items.every(row=>row.parent===parent&&row.institution===local));
+ assert.deepEqual(result.items,search({q:'청년',institution:parent+' '+local,limit:20}).items);
+ assert.deepEqual(result.items,search({q:'청년',institution:local+' '+parent,limit:20}).items);
+}
+assert.equal(search({q:'청년',institution:'부산 강남구'}).totalCandidateRows,0);
 for(const args of [{q:''},{q:'청년',limit:21},{q:'청년',offset:-1},{q:3},{q:'청년',institution:[]}])assert.throws(()=>search(args));
 const {spawnSync}=require('node:child_process');
 const messages=[{jsonrpc:'2.0',id:0,method:'initialize',params:{protocolVersion:'2025-11-25',clientInfo:{name:'budget-test',version:'1'},capabilities:{}}},{jsonrpc:'2.0',method:'notifications/initialized'},{jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'search_budget_projects',arguments:{q:'산후'}}}];

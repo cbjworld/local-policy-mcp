@@ -9,8 +9,10 @@ function open(directory=__dirname){
   if(keys.sha256!==hash||keys.names.length!==meta.rows||keys.contextIds.length!==meta.rows)throw Error('Budget search keys are stale; rebuild them');
   const read=db.prepare('SELECT p.raw AS row,c.raw AS context FROM projects p JOIN contexts c ON p.context_id=c.id WHERE p.id=?');
   return {scope:meta.scope,length:meta.rows,find(terms,region,offset,limit){
+   const regionTerms=region?(Array.isArray(region)?region:[region]):null;
+   const regionMatches=regionTerms?keys.institutions.map(name=>regionTerms.every(term=>name.includes(term))):null;
    let total=0;const rows=[];
-   for(let i=0;i<keys.names.length;i++)if((!region||keys.institutions[keys.contextIds[i]].includes(region))&&terms.every(t=>keys.names[i].includes(t))){if(total>=offset&&rows.length<limit)rows.push(read.get(i));total++;}
+   for(let i=0;i<keys.names.length;i++)if((!regionMatches||regionMatches[keys.contextIds[i]])&&terms.every(t=>keys.names[i].includes(t))){if(total>=offset&&rows.length<limit)rows.push(read.get(i));total++;}
    return {total,items:rows.map(r=>({...JSON.parse(r.context),...JSON.parse(r.row)}))};
   },close(){db.close();}};
  }catch(e){db.close();throw e;}
