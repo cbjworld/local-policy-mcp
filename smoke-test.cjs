@@ -4,7 +4,7 @@ const r=spawnSync(process.execPath,['mcp.js'],{cwd:__dirname,input:messages.map(
 assert.equal(r.status,0,r.stderr);
 const replies=r.stdout.trim().split('\n').map(JSON.parse);
 assert.equal(replies[0].result.serverInfo.version,require('./package.json').version);
-assert.equal(replies[1].result.tools.length,11);
+assert.equal(replies[1].result.tools.length,12);
 assert.ok(replies[0].result.instructions.includes('title_inferred'));
 const {bundle}=require('./project-bundles');
 const doc={title:'2026년 산후조리비 지원사업 추진계획',institution:'테스트군',url:'https://example.go.kr/test'};

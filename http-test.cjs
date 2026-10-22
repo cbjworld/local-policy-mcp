@@ -23,10 +23,10 @@ const {createServer}=require('./http-server');
   for(let i=0;i<2;i++){
    const c=new Client({name:'remote-test',version:'1'}),t=new StreamableHTTPClientTransport(url,{requestInit:{headers:{Authorization:'Bearer test-only'}}});
    clients.push(c);transports.push(t);await c.connect(t);
-   assert.equal((await c.listTools()).tools.length,11);
+   assert.equal((await c.listTools()).tools.length,12);
    assert.ok(c.getInstructions().includes('title_inferred'));
   }
-  const concurrent=await Promise.all(Array.from({length:4},()=>clients[0].listTools()));assert.ok(concurrent.every(r=>r.tools.length===11));
+  const concurrent=await Promise.all(Array.from({length:4},()=>clients[0].listTools()));assert.ok(concurrent.every(r=>r.tools.length===12));
   assert.notEqual(transports[0].sessionId,transports[1].sessionId);
   const scenario=await clients[0].callTool({name:'calculate_policy_budget',arguments:{scenarios:[{participants:200,amountPerPaymentKRW:10000,paymentsPerYear:12}]}});
   assert.equal(scenario.isError,false);assert.equal(JSON.parse(scenario.content[0].text).results[0].modeledAnnualCostKRW,24000000);
@@ -41,7 +41,7 @@ const {createServer}=require('./http-server');
   assert.equal(bad.isError,true);
   const oldId=transports[0].sessionId;await transports[0].terminateSession();
   assert.equal((await fetch(url,{method:'POST',body:JSON.stringify({jsonrpc:'2.0',id:2,method:'ping'}),headers:{...headers,'Mcp-Session-Id':oldId}})).status,404);
-  assert.equal((await clients[1].listTools()).tools.length,11);
+  assert.equal((await clients[1].listTools()).tools.length,12);
   console.log('PASS: HTTP SDK handshake, tools, isolated sessions, auth, origin, request limit, capacity, invalid URL, deletion');
  }finally{await Promise.allSettled(clients.map(c=>c.close()));await server.shutdown();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
