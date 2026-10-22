@@ -21,3 +21,15 @@ assert.equal(budgetReferences(child,read('2026년 사업\n예산과목\n\n● �
 assert.equal(budgetReferences(child,read('2026년 사업\n타 지역 비교: 음식물쓰레기 감량 및 분리배출 정착'),[parent]).length,0);
 assert.equal(budgetReferences({...child,title:child.title.replace('2026','2027')},read('2026년 사업\n예산과목: 음식물쓰레기 감량 및 분리배출 정착'),[parent]).length,0);
 console.log('PASS: saved body anchors, funding-label normalization, exact quotes, no title-only promotion, future periods, different beneficiaries, additional programs and ambiguous identities');
+
+const {reviewedLinks}=require('./catalog-evidence');
+const rp={id:'review',name:'노인 보청기 지원',department:'가족행복과',year:2026,account:'일반회계'};
+const rc={title:'2026년 노인 보청기 구입비 지원',institution:'영암군',url:'https://www.open.go.kr/a?prdnNstRgstNo=DCTAB12'};
+const ra={...read('사업기간:2026 소요예산:13,100천원'),source:{url:rc.url+'#fileId=one',pages:[{page:2,text:'사업기간:2026 소요예산:13,100천원'}]}};
+const rr={projectId:'review',documentKey:documentKey(rc.url),institution:'영암군',sourceUrl:ra.source.url,expected:{name:rp.name,department:rp.department,year:2026,account:'일반회계'},relationship:'same_named_budget_program',evidence:[{page:2,quote:'소요예산:13,100천원'}]};
+assert.equal(reviewedLinks(rc,ra,[rp],[rr]).length,1);
+assert.equal(reviewedLinks(rc,ra,[{...rp,department:'다른과'}],[rr]).length,0);
+assert.equal(reviewedLinks(rc,{...ra,assessment:'form_or_cover'},[rp],[rr]).length,0);
+assert.equal(reviewedLinks({...rc,institution:'다른군'},ra,[rp],[rr]).length,0);
+assert.equal(reviewedLinks(rc,ra,[rp],[{...rr,evidence:[{page:2,quote:'없는 인용문'}]}]).length,0);
+assert.equal(reviewedLinks(rc,{...ra,source:{...ra.source,url:'wrong'}},[rp],[rr]).length,0);

@@ -25,6 +25,8 @@ function save(id,candidate,source,evidence,strength,relationship='same_named_bud
  for(const e of evidence)if(!item.evidence.some(x=>x.quote===e.quote&&x.page===e.page&&x.sourceUrl===(source.url||candidate.url)))item.evidence.push({...e,sourceId:source.sourceId,sourceUrl:source.url||candidate.url});
 }
 for(const entry of investigations){const {candidate,result}=entry;
+ for(const attempt of result.attempts||[])for(const match of require(path.join(root,'catalog-evidence')).reviewedLinks(candidate,attempt,institutionGroups(candidate),JSON.parse(fs.readFileSync(path.join(root,'reviewed-catalog-links.json'))).reviews)){save(match.projectId,candidate,attempt.source,match.evidence,'reviewed_name_department_year_budget',match.relationship);output.get(match.projectId+'\n'+documentKey(candidate.url)).note=match.note;}
+
  for(const attempt of result.attempts||[])for(const match of anchors(candidate,attempt,institutionGroups(candidate)))save(match.projectId,candidate,attempt.source,match.evidence,'name_year_institution');
  for(const attempt of result.attempts||[])for(const match of budgetReferences(candidate,attempt,institutionGroups(candidate)))save(match.projectId,candidate,attempt.source,match.evidence,'explicit_budget_line_name_year_institution','explicit_budget_line_reference');
  const strict=require(path.join(root,'budget-evidence-links')).links([entry],({q,institution})=>({items:institutionGroups({institution}).filter(g=>normalized(g.name).includes(normalized(q))).flatMap(g=>g.records)}));

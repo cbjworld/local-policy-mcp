@@ -43,3 +43,15 @@ function budgetReferences(candidate,attempt,projects){
  return found;
 }
 module.exports.budgetReferences=budgetReferences;
+
+// Reviewed aliases stay tied to one retained source and one budget identity; no global fuzzy matching.
+function reviewedLinks(candidate,attempt,projects,reviews){
+ if(attempt.status!=='read'||attempt.assessment==='form_or_cover')return [];
+ return reviews.filter(r=>r.documentKey===documentKey(candidate.url)&&institutionKey(r.institution)===institutionKey(candidate.institution)&&r.sourceUrl===attempt.source?.url).flatMap(r=>{
+  const project=projects.find(p=>p.id===r.projectId);
+  if(!project||Object.entries(r.expected).some(([key,value])=>project[key]!==value)||!['same_named_budget_program','explicit_budget_line_reference'].includes(r.relationship))return [];
+  if(!r.evidence.length||!r.evidence.every(e=>e.quote&&attempt.source.pages.some(p=>p.page===e.page&&p.text.includes(e.quote))))return [];
+  return [{projectId:r.projectId,evidence:r.evidence,relationship:r.relationship,note:r.note}];
+ });
+}
+module.exports.reviewedLinks=reviewedLinks;

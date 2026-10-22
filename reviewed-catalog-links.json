@@ -1,0 +1,210 @@
+{
+  "formatVersion": 1,
+  "checkedDate": "2026-10-22",
+  "reviews": [
+    {
+      "projectId": "bp-99e3a605f071cecffc8ba1e8",
+      "documentKey": "DCT3E43A667CAC21FD62765F0AFB2B9DE21:20260107140719:B",
+      "institution": "전라남도 영암군",
+      "year": 2026,
+      "relationship": "same_named_budget_program",
+      "sourceUrl": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT3E43A667CAC21FD62765F0AFB2B9DE21&prdnDt=20260107140719&nstSeCd=B#fileId=8983076f9eda913de9bd4cac9e0a0a54",
+      "evidence": [
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": 1,
+          "quote": "사업기간 : 2026. 1. ~ 12. 31."
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": 1,
+          "quote": "노인 보청기 구입비 지원 조례"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": 1,
+          "quote": "소요예산 : 13,100천원(군비)"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": 1,
+          "quote": "가족행복과-940"
+        }
+      ],
+      "note": "노인 보청기 지원과 구입비 지원의 표현 차이. 기관·담당부서·기간·총예산 13,100천원을 대조했습니다. 1인 지원 한도와 구분합니다.",
+      "expected": {
+        "name": "노인 보청기 지원",
+        "department": "가족행복과",
+        "year": 2026,
+        "account": "일반회계"
+      }
+    },
+    {
+      "projectId": "bp-5871463a7838140ed71ed4bd",
+      "documentKey": "DCT79FB46AD0328B97E2835CE7BCE4DD283:20260427180714:B",
+      "institution": "울산광역시 중구",
+      "year": 2026,
+      "relationship": "same_named_budget_program",
+      "sourceUrl": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT79FB46AD0328B97E2835CE7BCE4DD283&prdnDt=20260427180714&nstSeCd=B#fileId=98d69fb8df20ea7da26e95fd4f8dad36",
+      "evidence": [
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": 2,
+          "quote": "산후조리비 지원금액 증액50만원→100만원 계획"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": 2,
+          "quote": "2026년 당초 950 475,000 403,750 71,250"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": 1,
+          "quote": "건 강 관 리 과 -12204"
+        }
+      ],
+      "note": "당초예산 475,000천원과 증액안 950,000천원을 구분합니다. 증액안 연결은 추경 확정·협의 완료를 뜻하지 않습니다.",
+      "expected": {
+        "name": "출산산모 산후조리비 지원",
+        "department": "건강관리과",
+        "year": 2026,
+        "account": "일반회계"
+      }
+    },
+    {
+      "projectId": "bp-42831777d7c0c04884e7724a",
+      "documentKey": "DCT2C5EE308CC15B336D1F6FC398C42699D:20261012192446:B",
+      "institution": "경상남도 남해군",
+      "year": 2026,
+      "relationship": "explicit_budget_line_reference",
+      "sourceUrl": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT2C5EE308CC15B336D1F6FC398C42699D&prdnDt=20261012192446&nstSeCd=B#fileId=b645254af174ee76f9cb050141fdc3cd",
+      "evidence": [
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "해당 사업명 (예산서 세부사업명 기준)\n\n1) 2026년 : 남해군 가족센터 운영, 다문화가족 특성화사업, 여성결혼이민자 원어민강사 수당 지원, 여성결혼이민자 가족센터 인턴채용, 여성결혼이민자 지원"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "작성자 : 주민행복과장 김경주"
+        }
+      ],
+      "note": "조례 비용추계서가 2026년 예산서 세부사업명으로 명시한 연결입니다. 여러 사업을 한 사업으로 합치지 않으며 추계금액으로 본예산을 덮어쓰지 않습니다.",
+      "expected": {
+        "name": "남해군 가족센터 운영",
+        "department": "주민행복과",
+        "year": 2026,
+        "account": "일반회계"
+      }
+    },
+    {
+      "projectId": "bp-330099a2255fa5506756b18e",
+      "documentKey": "DCT2C5EE308CC15B336D1F6FC398C42699D:20261012192446:B",
+      "institution": "경상남도 남해군",
+      "year": 2026,
+      "relationship": "explicit_budget_line_reference",
+      "sourceUrl": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT2C5EE308CC15B336D1F6FC398C42699D&prdnDt=20261012192446&nstSeCd=B#fileId=b645254af174ee76f9cb050141fdc3cd",
+      "evidence": [
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "해당 사업명 (예산서 세부사업명 기준)\n\n1) 2026년 : 남해군 가족센터 운영, 다문화가족 특성화사업, 여성결혼이민자 원어민강사 수당 지원, 여성결혼이민자 가족센터 인턴채용, 여성결혼이민자 지원"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "작성자 : 주민행복과장 김경주"
+        }
+      ],
+      "note": "조례 비용추계서가 2026년 예산서 세부사업명으로 명시한 연결입니다. 여러 사업을 한 사업으로 합치지 않으며 추계금액으로 본예산을 덮어쓰지 않습니다.",
+      "expected": {
+        "name": "다문화가족 특성화사업",
+        "department": "주민행복과",
+        "year": 2026,
+        "account": "일반회계"
+      }
+    },
+    {
+      "projectId": "bp-a640dbf08deadc7f3b747291",
+      "documentKey": "DCT2C5EE308CC15B336D1F6FC398C42699D:20261012192446:B",
+      "institution": "경상남도 남해군",
+      "year": 2026,
+      "relationship": "explicit_budget_line_reference",
+      "sourceUrl": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT2C5EE308CC15B336D1F6FC398C42699D&prdnDt=20261012192446&nstSeCd=B#fileId=b645254af174ee76f9cb050141fdc3cd",
+      "evidence": [
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "해당 사업명 (예산서 세부사업명 기준)\n\n1) 2026년 : 남해군 가족센터 운영, 다문화가족 특성화사업, 여성결혼이민자 원어민강사 수당 지원, 여성결혼이민자 가족센터 인턴채용, 여성결혼이민자 지원"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "작성자 : 주민행복과장 김경주"
+        }
+      ],
+      "note": "조례 비용추계서가 2026년 예산서 세부사업명으로 명시한 연결입니다. 여러 사업을 한 사업으로 합치지 않으며 추계금액으로 본예산을 덮어쓰지 않습니다.",
+      "expected": {
+        "name": "여성결혼이민자 원어민강사 수당 지원",
+        "department": "주민행복과",
+        "year": 2026,
+        "account": "일반회계"
+      }
+    },
+    {
+      "projectId": "bp-9c198d754cf8af27a63b55bc",
+      "documentKey": "DCT2C5EE308CC15B336D1F6FC398C42699D:20261012192446:B",
+      "institution": "경상남도 남해군",
+      "year": 2026,
+      "relationship": "explicit_budget_line_reference",
+      "sourceUrl": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT2C5EE308CC15B336D1F6FC398C42699D&prdnDt=20261012192446&nstSeCd=B#fileId=b645254af174ee76f9cb050141fdc3cd",
+      "evidence": [
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "해당 사업명 (예산서 세부사업명 기준)\n\n1) 2026년 : 남해군 가족센터 운영, 다문화가족 특성화사업, 여성결혼이민자 원어민강사 수당 지원, 여성결혼이민자 가족센터 인턴채용, 여성결혼이민자 지원"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "작성자 : 주민행복과장 김경주"
+        }
+      ],
+      "note": "조례 비용추계서가 2026년 예산서 세부사업명으로 명시한 연결입니다. 여러 사업을 한 사업으로 합치지 않으며 추계금액으로 본예산을 덮어쓰지 않습니다.",
+      "expected": {
+        "name": "여성결혼이민자 가족센터 인턴채용",
+        "department": "주민행복과",
+        "year": 2026,
+        "account": "일반회계"
+      }
+    },
+    {
+      "projectId": "bp-03b668c99d9d18dd2e36ead5",
+      "documentKey": "DCT2C5EE308CC15B336D1F6FC398C42699D:20261012192446:B",
+      "institution": "경상남도 남해군",
+      "year": 2026,
+      "relationship": "explicit_budget_line_reference",
+      "sourceUrl": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT2C5EE308CC15B336D1F6FC398C42699D&prdnDt=20261012192446&nstSeCd=B#fileId=b645254af174ee76f9cb050141fdc3cd",
+      "evidence": [
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "해당 사업명 (예산서 세부사업명 기준)\n\n1) 2026년 : 남해군 가족센터 운영, 다문화가족 특성화사업, 여성결혼이민자 원어민강사 수당 지원, 여성결혼이민자 가족센터 인턴채용, 여성결혼이민자 지원"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "작성자 : 주민행복과장 김경주"
+        }
+      ],
+      "note": "조례 비용추계서가 2026년 예산서 세부사업명으로 명시한 연결입니다. 여러 사업을 한 사업으로 합치지 않으며 추계금액으로 본예산을 덮어쓰지 않습니다.",
+      "expected": {
+        "name": "여성결혼이민자 지원",
+        "department": "주민행복과",
+        "year": 2026,
+        "account": "일반회계"
+      }
+    }
+  ]
+}
