@@ -30,6 +30,6 @@ jobs:
             if(response.ok&&['synchronized','already_current'].includes(result.status)&&result.commit===commit){console.log(JSON.stringify(result));break;}
             if(response.ok&&result.status==='superseded'&&/^[a-f0-9]{40}$/.test(result.sourceCommit||'')){console.log(JSON.stringify(result));break;}
             if(attempt===0&&[409,429,502].includes(response.status)&&!['NON_FAST_FORWARD_OR_HISTORY_GAP','PUSH_VERIFICATION_FAILED'].includes(result.error)){await new Promise(r=>setTimeout(r,5000));continue;}
-            throw Error('GitLab sync failed: HTTP '+response.status+' '+String(result.error||'UNKNOWN').slice(0,80)+' '+String(result.code||'')+' '+String(result.httpStatus||''));
+            throw Error('GitLab sync failed: HTTP '+response.status+' '+String(result.error||'UNKNOWN').slice(0,700)+' '+String(result.code||'')+' '+String(result.httpStatus||''));
           }
           NODE
