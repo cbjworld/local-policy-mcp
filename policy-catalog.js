@@ -20,6 +20,7 @@ function buildTables(db,data,directory){
  const insert=db.prepare('INSERT OR IGNORE INTO catalog VALUES (?,?,?,?,?)'),row=db.prepare('INSERT INTO catalog_rows VALUES (?,?)');
  data.rows.forEach(([contextId,item],index)=>{const original=data.contexts[contextId],context=enrich(original,directory),id=projectId(original,item);insert.run(id,contextId,item.name,normalize(item.name),normalize((context.parent||'')+' '+context.institution));row.run(index,id);});
  const packed=documentsFile(directory),documents=JSON.parse(packed);
+ db.exec('CREATE INDEX catalog_context ON catalog(context_id);');
  if(documents.formatVersion!==1||!Array.isArray(documents.links))throw Error('Invalid project document links');
  const exists=db.prepare('SELECT id FROM catalog WHERE id=?');
  for(const link of documents.links){if(!exists.get(link.projectId))throw Error('Linked budget project is missing: '+link.projectId);if(!Array.isArray(link.evidence)||!link.evidence.length||!/^https:\/\/www\.open\.go\.kr\//.test(link.document?.url||''))throw Error('Invalid linked document evidence');}
@@ -33,6 +34,7 @@ function open(directory=__dirname){
   const meta=JSON.parse(db.prepare('SELECT value FROM metadata').get().value),packed=documentsFile(directory);
   if(!meta.catalog||meta.catalog.registrySha256!==registryHash(directory)||meta.sha256!==crypto.createHash('sha256').update(fs.readFileSync(path.join(directory,'budget-data.json.gz'))).digest('hex')||meta.catalog.linksSha256!==crypto.createHash('sha256').update(packed).digest('hex'))throw Error('Rebuild the policy catalog with npm run prepare:index');
   const links=JSON.parse(packed).links,byId=new Map();for(const link of links){if(!byId.has(link.projectId))byId.set(link.projectId,[]);byId.get(link.projectId).push(link);}
+  const regions=db.prepare('SELECT id,raw FROM contexts').all().map(row=>{const c=enrich(JSON.parse(row.raw),directory);return {id:row.id,key:normalize((c.parent||'')+' '+c.institution)};});
   const read=db.prepare('SELECT p.raw AS item,c.raw AS context FROM catalog_rows r JOIN projects p ON p.id=r.row_id JOIN contexts c ON c.id=p.context_id WHERE r.project_id=? ORDER BY r.row_id');
   function search({q,institution,projectId:id,offset=0,limit=10}={}){
    if(q!==undefined&&(typeof q!=='string'||!q.trim()||q.length>100))throw Error('Invalid q');
@@ -42,7 +44,11 @@ function open(directory=__dirname){
    const where=[],params=[];if(id){where.push('id=?');params.push(id);}
    for(const term of q?.trim().split(/\s+/)||[]){where.push('instr(name_key,?)>0');params.push(normalize(term));}
    const region=institution?.replace(/^전라남도(?=\s|.+[시군구]$)/,'전남광주통합특별시');
-   for(const term of region?.trim().split(/\s+/)||[]){where.push('instr(institution_key,?)>0');params.push(normalize(term));}
+   const regionTerms=region?.trim().split(/\s+/).map(normalize)||[];
+   if(regionTerms.length){const ids=regions.filter(r=>regionTerms.every(t=>r.key.includes(t))).map(r=>r.id);
+    if(ids.length<=500){where.push(ids.length?'context_id IN ('+ids.map(()=>'?').join(',')+')':'0');params.push(...ids);}
+    else for(const term of regionTerms){where.push('instr(institution_key,?)>0');params.push(term);}
+   }
    const filter=where.length?' WHERE '+where.join(' AND '):'',total=db.prepare('SELECT count(*) AS n FROM catalog'+filter).get(...params).n;
    const items=db.prepare('SELECT id,name FROM catalog'+filter+' ORDER BY id LIMIT ? OFFSET ?').all(...params,limit,offset).map(group=>{
     const records=read.all(group.id).map(r=>({...enrich(JSON.parse(r.context),directory),...JSON.parse(r.item)})),first=records[0];

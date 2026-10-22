@@ -21,6 +21,8 @@ function plan({question,queries,startDate,endDate}={},now=new Date()){
 }
 async function runResearch(args={},io=portal){
  const started=Date.now(),timings={},request=plan(args),searches=[],failures=[],byUrl=new Map();
+ const catalogEvidence=require('./catalog-context').lookup(request,io.searchCatalog);
+ timings.catalogMs=Date.now()-started;
  const budgetSearches=[],budgetRows=new Map();
  let budgetScope=null;
  for(const q of request.queries){
@@ -32,7 +34,9 @@ async function runResearch(args={},io=portal){
  }
  const budgetCandidates=[...budgetRows.values()].slice(0,5);
  const screen=()=>{
-  const batches=request.queries.map(q=>require('./relevance').screen({q,items:[...byUrl.values()]}));
+  const regionalTerms=catalogEvidence.institution?.split(/\s+/).map(t=>require('./catalog-evidence').institutionKey(t))||[];
+  const scoped=[...byUrl.values()].filter(d=>regionalTerms.every(t=>require('./catalog-evidence').institutionKey(d.institution).includes(t)));
+  const batches=request.queries.map(q=>require('./relevance').screen({q,items:scoped}));
   const best=new Map();
   const rank={project_candidate:3,legal:2,ceremony:2,administration:2,unclassified:1};
   for(const b of batches)for(const d of [...b.items,...b.reviewItems,...b.relatedDocuments])if(!best.has(d.url)||rank[d.relevance.kind]>rank[best.get(d.url).relevance.kind])best.set(d.url,d);
@@ -69,6 +73,9 @@ async function runResearch(args={},io=portal){
   }
   screened=screen();
  }
+ const liveSearchDocuments=byUrl.size;
+ for(const doc of catalogEvidence.seedDocuments){const key=documentKey(doc.url);if(!byUrl.has(key))byUrl.set(key,doc);}
+ if(catalogEvidence.seedDocuments.length)screened=screen();
  timings.searchMs=Date.now()-searchStart;const readStart=Date.now();
  const allDocuments=[...screened.items,...screened.reviewItems,...screened.relatedDocuments];
  const financialDocuments=allDocuments.filter(d=>['allocation_or_deposit','execution_or_settlement','budget'].includes(d.documentRole));
@@ -90,7 +97,8 @@ async function runResearch(args={},io=portal){
  // Broad topics present real candidate titles first; choosing a single sub-topic would invent user intent.
  if(!request.broad){
   const institutions=new Set();
-  const ordered=[...candidates].sort((a,b)=>Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||b.relevance.score-a.relevance.score);
+  const savedKeys=new Set(catalogEvidence.seedDocuments.map(d=>documentKey(d.url)));
+  const ordered=[...candidates].sort((a,b)=>Number(savedKeys.has(documentKey(b.url)))-Number(savedKeys.has(documentKey(a.url)))||Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||b.relevance.score-a.relevance.score);
   io.preload?.(ordered.slice(0,6));
   const tried=new Set();
   for(let index=0;index<ordered.length;index++){
@@ -136,14 +144,16 @@ async function runResearch(args={},io=portal){
  const nextSearches=[...lastSearches.values()].filter(s=>s.hasMore&&s.page<100&&!failures.some(f=>f.q===s.q&&f.scope===s.scope)).map(s=>({tool:'search_open_documents',arguments:{q:s.q,startDate:request.startDate,endDate:request.endDate,scope:s.scope,page:s.page+1},reason:'다음 페이지 미조회'}));
  for(const f of failures)nextSearches.push({tool:'search_open_documents',arguments:{q:f.q,startDate:request.startDate,endDate:request.endDate,scope:f.scope,page:f.page},reason:'실패한 페이지 재시도'});
  const coverage={queriedPages:searches.length,uniqueDocuments:byUrl.size,hasMore:nextSearches.length>0,pageLimitReached:[...lastSearches.values()].some(s=>s.hasMore&&s.page>=100),nextSearches,note:'전국 지자체를 검색 대상으로 하지만 일부 페이지의 결과입니다. 검색어별 총건수는 중복될 수 있어 합산하지 마세요. 후속 검색은 순서대로 실행하고 URL 중복을 제거하세요. 전국 전체 사업 수나 검색 완전성을 뜻하지 않습니다.'};
+ coverage.liveSearchDocuments=liveSearchDocuments;
+ coverage.savedSeedDocuments=byUrl.size-liveSearchDocuments;
  timings.readingMs=Date.now()-readStart;timings.totalMs=Date.now()-started;
- return {timings,budgetScope,budgetCandidates,budgetSearches,budgetEvidenceLinks,evidenceMap,financialDocuments,possibleProjectLinks,coverage,request,projects,status:searches.length?(request.broad?'topic_overview':'research_draft'):'search_failed',searches,failures,candidates,reviewItems:screened.reviewItems,relatedDocuments:screened.relatedDocuments,investigations,
+ return {catalogEvidence:{...catalogEvidence,liveSearchDocuments},timings,budgetScope,budgetCandidates,budgetSearches,budgetEvidenceLinks,evidenceMap,financialDocuments,possibleProjectLinks,coverage,request,projects,status:searches.length?(request.broad?'topic_overview':'research_draft'):'search_failed',searches,failures,candidates,reviewItems:screened.reviewItems,relatedDocuments:screened.relatedDocuments,investigations,
  searchOutcome:{metadataFallback,status:candidates.length?'candidates_found':failures.length?'incomplete':'not_found_in_searched_scope',note:'후보가 없어도 사업 부존재를 뜻하지 않습니다. 검색 기간·조회 페이지·실패 내역을 함께 확인하세요.'},
  limits:{maxQueries:3,maxPagesPerQuery:4,maxMetadataFallbackPagesPerQuery:1,maxSearchRequests:15,maxDocuments:7,maxSupplementalDocuments:1,targetReadableInstitutions:2,readableCriterion:'core_field_quotes_required_not_text_only',examinedDocuments:byUrl.size,complete:false},
  instruction:request.broad?'후보 제목에 실제로 나타난 사업 종류를 출처와 함께 먼저 제시하세요. 임의로 한 사업을 선택하지 마세요. 필요할 때만 관심 사업을 물으세요.':'제목이 요청 사업의 존재를 뒷받침하면 비공개·읽기 실패여도 사업 존재 추정 사례로 포함하고 제목과 출처를 제시하세요. 존재 추정과 본문 근거 확인을 별도로 구분하세요. 계획안은 현재 시행이나 예산 확정을 뜻하지 않습니다. 요청과 실제 본문이 같은 사업인지 먼저 판단하세요. 적합한 문서의 대상·내용·예산·기간을 근거와 함께 정리하고 미확인 항목은 명시하세요. 실패하거나 다른 사업이면 반환된 다음 후보를 research_open_document로 조사하세요. 부족한 사례를 만들어 채우지 마세요. 단계별 성공과 최종 관련성은 다릅니다.'};
 }
 async function research(args={},io=portal){
- if(io!==portal)return runResearch(args,io);
+ if(io!==portal)return runResearch(args,{searchCatalog:()=>({coverage:null,total:0,items:[],nextOffset:null}),...io});
  const session=require('./external-prefetch').createSession(portal);
  try{return await runResearch(args,{...portal,research:session.research,preload:session.preload});}
  finally{session.close();}

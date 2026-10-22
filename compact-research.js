@@ -18,6 +18,8 @@ module.exports=function compactResearch(value){
  output.budgetCandidates=value.budgetCandidates||[];
  output.budgetSearches=value.budgetSearches||[];
  output.budgetScope=value.budgetScope||null;
+ output.catalogEvidence=require('./catalog-context').compact(value.catalogEvidence);
+ output.responseSize.omittedCatalogItems=0;
  output.budgetCandidateNote='2026년 본예산 일반회계 세출의 사업명 검색 초기 후보 최대 5행입니다. budgetSearches의 q·nextOffset으로 search_budget_projects를 이어 조회하세요. 문서의 사업과 같은지, 시비인지 총사업비인지 확인한 뒤 사용하세요. 교부·집행액과 합산하지 마세요.';
  output.confirmedProgramLinks=require('./program-links').retainedLinks(value.confirmedProgramLinks||[],documents);
  for(const l of output.confirmedProgramLinks){const main=output.comparison.find(p=>p.documentIds.includes(ids.get(l.primaryUrl)));if(main){const memberIds=l.documents.map(d=>ids.get(d.url));output.comparison=output.comparison.filter(p=>p===main||!p.documentIds.some(id=>memberIds.includes(id)));main.documentIds=[...new Set([...main.documentIds,...memberIds])];main.participatingInstitutions=l.documents.map(d=>d.institution);main.countAsOneCase=true;main.name=l.name;}}
@@ -46,6 +48,7 @@ module.exports=function compactResearch(value){
  while(oversized()&&output.possibleProjectLinks.length){output.possibleProjectLinks.pop();output.responseSize.omittedLinks++;}
  while(oversized()&&output.evidenceMap.length){output.evidenceMap.pop();output.responseSize.omittedEvidenceGroups++;}
  while(oversized()&&output.budgetCandidates.length){output.budgetCandidates.pop();output.responseSize.omittedBudgetCandidates++;}
+ while(oversized()&&output.catalogEvidence?.items.length){output.catalogEvidence.items.pop();output.responseSize.omittedCatalogItems++;}
  // Preserve whole quotations rather than cutting evidence mid-sentence.
  for(let i=documents.length-1;i>=0&&oversized();i--)if(documents[i].reading){delete documents[i].reading;documents[i].readingDetailsOmitted=true;output.responseSize.omittedReadingDetails++;}
  while(oversized()&&output.possibleProjectLinks.length){output.possibleProjectLinks.pop();output.responseSize.omittedLinks++;}
