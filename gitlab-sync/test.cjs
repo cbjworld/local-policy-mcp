@@ -13,6 +13,8 @@ const old='a'.repeat(40),current='b'.repeat(40),token='local-test-credential-not
  assert.equal((await core.synchronize(current,token,{driver,http:{}})).status,'already_current');assert.equal(cloneCount,1);
  head=old;descendent=false;await assert.rejects(core.synchronize(current,token,{driver,http:{}}),/NON_FAST_FORWARD/);assert.equal(pushCount,1);assert(!fs.existsSync(dir));
  source='c'.repeat(40);assert.equal((await core.synchronize(current,token,{driver,http:{}})).status,'superseded');assert.equal(pushCount,1);
+ source=current;descendent=true;driver.push=async args=>{args.onMessage('GitLab: protected branch '+token);throw Object.assign(Error('rejected'),{code:'GitPushError',data:{result:{refs:{'refs/heads/main':{error:'pre-receive hook declined'}}}}});};
+ await assert.rejects(core.synchronize(current,token,{driver,http:{}}),error=>{assert.match(error.safePushReason,/protected branch/);assert(!error.safePushReason.includes(token));assert.match(error.safePushReason,/pre-receive hook declined/);return true;});assert(!fs.existsSync(dir));
  const previous=process.env.GITLAB_SYNC_TOKEN;delete process.env.GITLAB_SYNC_TOKEN;
  const call=async(req)=>{let status=200,output;const res={setHeader(){},set statusCode(n){status=n},end(text){output=JSON.parse(text)}};await handler(req,res);return{status,output};};
  assert.equal((await call({method:'GET'})).status,405);assert.equal((await call({method:'POST'})).status,503);

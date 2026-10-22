@@ -39,7 +39,9 @@ async function synchronize(expected,token,{driver=git,http=httpClient(Date.now()
   const current=await driver.resolveRef({fs,dir,ref:'refs/heads/main'});
   if(current!==expected)return {status:'superseded',requested:expected,sourceCommit:current};
   if(!await driver.isDescendent({fs,dir,oid:current,ancestor:previous,depth:-1}))throw Error('NON_FAST_FORWARD_OR_HISTORY_GAP');
-  await driver.push({fs,http,dir,url:DESTINATION,ref:'main',remoteRef:'main',force:false,onAuth});
+  const messages=[];
+  try{await driver.push({fs,http,dir,url:DESTINATION,ref:'main',remoteRef:'main',force:false,onAuth,onMessage:message=>{if(messages.join('').length<2000)messages.push(String(message));}});}
+  catch(error){if(error.code==='GitPushError'){const reason=[...messages,error.data?.result?.error,error.data?.result?.refs?.['refs/heads/main']?.error].filter(Boolean).join(' ');error.safePushReason=reason.split(token).join('[redacted]').split(Buffer.from('oauth2:'+token).toString('base64')).join('[redacted]').replace(/https?:\/\/\S+|glpat-[\w-]+/g,'[redacted]').replace(/[\r\n\x00-\x1f]/g,' ').slice(0,600);}throw error;}
   if(await remote()!==current)throw Error('PUSH_VERIFICATION_FAILED');
   return {status:'synchronized',previous,commit:current};
  }finally{if(path.dirname(path.resolve(dir))!==temporaryRoot||!path.basename(dir).startsWith('policy-gitlab-sync-'))throw Error('INVALID_TEMP_PATH');await fs.promises.rm(dir,{recursive:true,force:true});}
