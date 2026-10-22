@@ -8,3 +8,5 @@ __pycache__/
 budget-search.sqlite
 budget-search.sqlite.*.tmp
 budget-search-keys.json.gz
+
+/catalog-import-audit.json

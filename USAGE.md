@@ -149,3 +149,5 @@ npm test
 `search_policy_catalog`에 `q`(사업명), `institution`(지역)을 넣어 조회합니다. 둘 다 생략하면 전체 목록을 페이지별로 반환합니다. 응답의 `projectId`로 특정 항목을 다시 조회할 수 있습니다.
 
 `documents`는 본문 근거로 연결된 문서이고, `documentCandidates`는 제목·기관·연도만 일치한 추가 확인 후보입니다. 금액이 다른 원문 행은 `budgetVariants`와 `budgetRecords`에 각각 남기며 합산하지 않습니다. `coverage`는 전체 예산행 수·목록 수·본문 연결 범위를 함께 보여줍니다. 목록 수는 전국의 독립 정책 수가 아닙니다.
+
+저장된 조사 JSON을 추가하려면 `npm run import:catalog -- saved-result.json` 실행 후 `npm run prepare:index`로 색인을 갱신합니다. 기존 연결은 유지합니다. 본문 연결의 `relationship`이 `explicit_budget_line_reference`이면 문서에 명시된 상위·관련 예산과목 참조입니다. 해당 예산 전체를 문서 세부사업의 총사업비로 사용하지 마세요.

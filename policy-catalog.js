@@ -24,7 +24,8 @@ function buildTables(db,data,directory){
  const exists=db.prepare('SELECT id FROM catalog WHERE id=?');
  for(const link of documents.links){if(!exists.get(link.projectId))throw Error('Linked budget project is missing: '+link.projectId);if(!Array.isArray(link.evidence)||!link.evidence.length||!/^https:\/\/www\.open\.go\.kr\//.test(link.document?.url||''))throw Error('Invalid linked document evidence');}
  const confirmed=documents.links.filter(x=>x.status==='body_supported');
- return {projects:db.prepare('SELECT count(*) AS n FROM catalog').get().n,linkedProjects:new Set(confirmed.map(x=>x.projectId)).size,documentLinks:confirmed.length,titleCandidateLinks:documents.links.length-confirmed.length,linksSha256:crypto.createHash('sha256').update(packed).digest('hex'),registrySha256:registryHash(directory)};
+ const direct=confirmed.filter(x=>x.relationship!=='explicit_budget_line_reference'),references=confirmed.filter(x=>x.relationship==='explicit_budget_line_reference');
+ return {projects:db.prepare('SELECT count(*) AS n FROM catalog').get().n,linkedProjects:new Set(confirmed.map(x=>x.projectId)).size,documentLinks:confirmed.length,directLinkedProjects:new Set(direct.map(x=>x.projectId)).size,directDocumentLinks:direct.length,budgetReferenceProjects:new Set(references.map(x=>x.projectId)).size,budgetReferenceLinks:references.length,titleCandidateLinks:documents.links.length-confirmed.length,linksSha256:crypto.createHash('sha256').update(packed).digest('hex'),registrySha256:registryHash(directory)};
 }
 function open(directory=__dirname){
  const {DatabaseSync}=require('node:sqlite'),db=new DatabaseSync(path.join(directory,'budget-search.sqlite'),{readOnly:true});
@@ -40,7 +41,8 @@ function open(directory=__dirname){
    if(!Number.isInteger(offset)||offset<0||offset>meta.rows||!Number.isInteger(limit)||limit<1||limit>20)throw Error('Invalid pagination');
    const where=[],params=[];if(id){where.push('id=?');params.push(id);}
    for(const term of q?.trim().split(/\s+/)||[]){where.push('instr(name_key,?)>0');params.push(normalize(term));}
-   for(const term of institution?.trim().split(/\s+/)||[]){where.push('instr(institution_key,?)>0');params.push(normalize(term));}
+   const region=institution?.replace(/^전라남도(?=\s|.+[시군구]$)/,'전남광주통합특별시');
+   for(const term of region?.trim().split(/\s+/)||[]){where.push('instr(institution_key,?)>0');params.push(normalize(term));}
    const filter=where.length?' WHERE '+where.join(' AND '):'',total=db.prepare('SELECT count(*) AS n FROM catalog'+filter).get(...params).n;
    const items=db.prepare('SELECT id,name FROM catalog'+filter+' ORDER BY id LIMIT ? OFFSET ?').all(...params,limit,offset).map(group=>{
     const records=read.all(group.id).map(r=>({...enrich(JSON.parse(r.context),directory),...JSON.parse(r.item)})),first=records[0];
@@ -48,7 +50,7 @@ function open(directory=__dirname){
     const attached=byId.get(group.id)||[],documents=attached.filter(x=>x.status==='body_supported'),documentCandidates=attached.filter(x=>x.status==='title_candidate');
     return {projectId:group.id,name:group.name,institution:first.institution,parent:first.parent,department:first.department,year:first.year,account:first.account,budgetVariants,budgetStatus:budgetVariants.length===1?'single_recorded_amount':'multiple_recorded_amounts_do_not_sum',budgetRowCount:records.length,budgetRecords:records.slice(0,20),omittedBudgetRecords:Math.max(0,records.length-20),documents,documentCandidates,documentStatus:documents.length?'body_supported_links':documentCandidates.length?'title_candidates_only':'not_linked'};
    });
-   return {coverage:{year:meta.scope.year,account:meta.scope.account,collectedDate:meta.scope.collectedDate,budgetRows:meta.rows,catalogProjects:meta.catalog.projects,linkedProjects:meta.catalog.linkedProjects,documentLinks:meta.catalog.documentLinks,nationwideComplete:meta.scope.nationwideComplete},total,offset,items,nextOffset:offset+limit<total?offset+limit:null,note:'동일 기관·부서·연도·회계·사업명의 예산행 목록입니다. 서로 다른 기관의 사업은 이름만으로 합치지 않습니다. 금액 변형과 출처를 보존하며 합산하지 않습니다. 근거 미연결은 문서나 사업의 부재가 아닙니다. 사업명 의미·전국 고유 정책 수·현재 시행은 별도 확인합니다.'};
+   return {coverage:{year:meta.scope.year,account:meta.scope.account,collectedDate:meta.scope.collectedDate,budgetRows:meta.rows,catalogProjects:meta.catalog.projects,linkedProjects:meta.catalog.linkedProjects,documentLinks:meta.catalog.documentLinks,directLinkedProjects:meta.catalog.directLinkedProjects,directDocumentLinks:meta.catalog.directDocumentLinks,budgetReferenceProjects:meta.catalog.budgetReferenceProjects,budgetReferenceLinks:meta.catalog.budgetReferenceLinks,titleCandidateLinks:meta.catalog.titleCandidateLinks,nationwideComplete:meta.scope.nationwideComplete},total,offset,items,nextOffset:offset+limit<total?offset+limit:null,note:'동일 기관·부서·연도·회계·사업명의 예산행 목록입니다. 서로 다른 기관의 사업은 이름만으로 합치지 않습니다. 금액 변형과 출처를 보존하며 합산하지 않습니다. explicit_budget_line_reference는 문서에 명시된 상위·관련 예산과목 연결이며 예산 전체가 해당 세부사업 금액이라는 뜻이 아닙니다. 근거 미연결은 문서나 사업의 부재가 아닙니다. 사업명 의미·전국 고유 정책 수·현재 시행은 별도 확인합니다.'};
   }
   return {search,close:()=>db.close()};
  }catch(error){db.close();throw error;}
