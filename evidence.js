@@ -1,4 +1,4 @@
-const labels={target:'지원대상|사업대상|참여대상|교육대상|가입자격|신청대상|신청자격|접종대상및비용|접종대상|사업위치|설치대상|대상구간|추진대상',activity:'지원내용|사업내용|주요내용|운영내용|지원내역|지원방법|접종내용|접종대상및비용|지원금액|지원한도|지원기준|지원규모|사업개요|설치내용|구축내용|추진내용',budget:'소요예산|사업예산|총사업비|사업비|예산액|총예산|금회교부결정내역|교부금액',period:'사업기간|운영기간|추진기간|지원기간|신청기간'};
+const labels={target:'지원대상|사업대상|참여대상|교육대상|가입자격|신청대상|신청자격|접종대상및비용|접종대상|사업위치|설치대상|대상구간|추진대상',activity:'지원내용|사업내용|주요내용|운영내용|지원내역|지원방법|접종내용|접종대상및비용|지원금액|지원한도|지원기준|지원규모|사업개요|설치내용|구축내용|추진내용',budget:'소요예산|사업예산|총사업비|사업비|예산액|총예산|금회교부결정내역|교부금액',period:'사업기간|운영기간|추진기간|지원기간|신청기간|시행일시'};
 const spaced=s=>s.split('|').map(w=>[...w].join('\\s*')).join('|');
 const nextLabel=new RegExp('(?:'+spaced(Object.values(labels).join('|'))+')[ \\t]*(?:[:：]|\\r?\\n|(?=[․·]))');
 function extractEvidence(attempts){
@@ -73,7 +73,7 @@ function extractEvidence(attempts){
 function evidence(attempts){
  const primary=attempts.filter(a=>a.evidenceScope!=='attachment_reference');
  const result=extractEvidence(primary),references=extractEvidence(attempts.filter(a=>a.evidenceScope==='attachment_reference'));
- const decorate=e=>{const a=attempts.find(a=>a.source?.sourceId===e.sourceId&&a.source?.url===e.url);return {...e,...(a?.fileName?{attachmentTitle:a.fileName}:{}),sourceScope:a?.evidenceScope||'document_attachment'};};
+ const decorate=e=>{const a=attempts.find(a=>a.source?.sourceId===e.sourceId&&a.source?.url===e.url);return {...e,...(a?.source?.ocr?.status==='read'?{extraction:'ocr_transcription'}:{}),...(a?.fileName?{attachmentTitle:a.fileName}:{}),sourceScope:a?.evidenceScope||'document_attachment'};};
  for(const f of Object.values(result.fields)){
   f.excerpts=f.excerpts.map(decorate);
   if(f.amounts)f.amounts=f.amounts.map(decorate);

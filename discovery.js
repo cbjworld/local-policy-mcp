@@ -29,6 +29,7 @@ async function read({url,q='',page=1}={}){
 async function readResponse(response,{q='',page=1,scanEmptyPdf=false,ocr=false}={}){
  if(typeof ocr!=='boolean'||ocr&&q)throw Error('OCR은 검색어 없이 지정한 PDF 한 쪽을 읽습니다.');
  let result=await extract(response.bytes,{url:response.url,type:response.type,q,page,scanEmptyPdf});
+ if(ocr&&result.format==='pdf')result={...result,pages:result.pages.filter(p=>p.page===page),scannedThroughPage:page,scanComplete:page===1&&result.totalPages===1};
  if(ocr&&result.format==='pdf'&&!result.pages.some(p=>p.text.trim())){
   try{const r=await require('./ocr-reader').read(response.bytes,{page});result={...result,pages:[{page,text:r.text,truncated:r.truncated}],scannedThroughPage:page,scanComplete:page===1&&result.totalPages===1,parser:'tesseract',ocr:{status:r.text.trim()?'read':'no_text',...r.ocr},warning:'OCR로 지정한 한 쪽을 전사했습니다. 숫자·단위·감액·행열은 원본 이미지와 대조하세요.'};}
   catch(e){result={...result,ocr:{status:'failed',message:e.message},warning:'지정한 쪽 OCR 실행이 완료되지 않았습니다. 기존 텍스트 읽기 결과를 유지했습니다.'};}

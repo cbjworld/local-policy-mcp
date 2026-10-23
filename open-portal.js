@@ -87,8 +87,10 @@ function attachmentScore(f,title=''){
  const own=key(title),name=key(f.name);
  return (own.length>=8&&name.includes(own)?15:0)+(/추진계획|시행계획|사업계획|예산|방침/.test(f.name.replace(/\s+/g,''))?10:0)+(/\.hwpx?$/i.test(f.name)?2:0)-(isForm(f.name)?20:0);
 }
-async function research({url,requestedQuery=''}={},reader=read,externalReader=researchNotice){
+async function research({url,requestedQuery='',autoOcr=true}={},reader=read,externalReader=researchNotice,options={}){
  if(typeof requestedQuery!=='string'||requestedQuery.length>300)throw Error('검색 목적은 300자 이하 문자열이어야 합니다.');
+ if(typeof autoOcr!=='boolean')throw Error('autoOcr은 boolean이어야 합니다.');
+ const ocrBudget=options.ocrBudget||{remaining:2},automaticOcr=[];
  if(reader===read)reader=createReader();
  const metadata=await reader({url});
  metadata.relevance=require('./relevance').classify(metadata.title,requestedQuery);
@@ -146,10 +148,13 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
     if(!next.source)break;
    }
   }
-  if(result.status==='read'&&!form&&plan&&!missing())break;
+  if(autoOcr&&!form&&scope(file)==='document_attachment'&&metadata.targetFit.status!=='mismatch'&&!['legal','ceremony','administration'].includes(metadata.relevance.kind)){
+   automaticOcr.push(...await require('./automatic-ocr').readMissing({url,file,attempts,reader,question:requestedQuery,budget:ocrBudget}));
+  }
+  if(attempts.some(a=>a.status==='read'&&a.assessment==='plan_candidate')&&!form&&!missing())break;
  }
  const extracted=require('./evidence').evidence(attempts.filter(a=>a.assessment!=='target_mismatch')),targetFit=require('./relevance').targetFit(extracted.fields.target.excerpts.map(e=>e.quote).join(' '),requestedQuery);
- return {metadata,attempts,selectionNotes,targetFit:metadata.targetFit.status==='mismatch'?metadata.targetFit:targetFit,evidence:extracted,relevanceStatus:metadata.targetFit.status==='mismatch'?'supporting_document':attempts.some(a=>a.assessment==='target_mismatch')&&!attempts.some(a=>a.status==='read'&&a.assessment!=='target_mismatch')?'supporting_document':['legal','ceremony','administration'].includes(metadata.relevance.kind)?'supporting_document':'requires_semantic_review',remaining:available.filter(f=>!attempts.some(a=>a.fileId===f.fileId)),status:attempts.some(a=>a.status==='read')?'read':candidates.length||attempts.length?'unreadable':available.length?'no_selected_attachment':'no_available_attachment',warning:'첨부명과 본문 단서로 최대 3개를 확인했습니다. 명시된 서울시 공개문서 링크는 한 단계 따라갑니다. plan_candidate는 의미 검증 완료가 아닙니다. 양식·표지 및 예산 단위·연도를 확인하세요. 이미지 PDF는 OCR 미지원입니다.'};
+ return {metadata,attempts,selectionNotes,automaticOcr,targetFit:metadata.targetFit.status==='mismatch'?metadata.targetFit:targetFit,evidence:extracted,relevanceStatus:metadata.targetFit.status==='mismatch'?'supporting_document':attempts.some(a=>a.assessment==='target_mismatch')&&!attempts.some(a=>a.status==='read'&&a.assessment!=='target_mismatch')?'supporting_document':['legal','ceremony','administration'].includes(metadata.relevance.kind)?'supporting_document':'requires_semantic_review',remaining:available.filter(f=>!attempts.some(a=>a.fileId===f.fileId)),status:attempts.some(a=>a.status==='read')?'read':candidates.length||attempts.length?'unreadable':available.length?'no_selected_attachment':'no_available_attachment',warning:'첨부명과 본문 단서로 최대 3개를 확인했습니다. 부족한 항목이 있으면 공개 PDF의 빈 쪽을 문서당 최대 2쪽 OCR로 이어 읽습니다. 참고 지침·양식·대상 불일치 첨부는 제외합니다. OCR은 기계 전사이며 원본 쪽수와 판독값 표시를 유지하세요.'};
 }
 async function search(args={},get=download){
  const {purpose='projects',...query}=args;

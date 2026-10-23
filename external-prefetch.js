@@ -39,12 +39,12 @@ function createSession(portal,{get=download,extract=readResponse}={}){
    return extract(await fetch(sourceArgs.url),sourceArgs);
   });
  }
- async function research(args){
+ async function research(args,options){
   const entry=prepared.get(args.url);
   try{
    const result=entry?await entry:{};
    if(result.error&&result.error.code!=='PREFETCH_METADATA_LIMIT'&&!result.error.retryable)throw result.error;
-   const investigation=await portal.research(args,result.reader||portal.createReader({get}),externalReader);
+   const investigation=await portal.research(args,result.reader||portal.createReader({get}),externalReader,options);
    if(result.error)investigation.metadataPrefetchFailure={code:result.error.code,message:result.error.message};
    return investigation;
   }finally{prepared.delete(args.url);}

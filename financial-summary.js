@@ -30,6 +30,9 @@ function summarize(attempts,existingAmounts){
  const readable=attempts.filter(a=>a.status==='read'&&a.assessment!=='form_or_cover'&&a.assessment!=='target_mismatch'&&a.evidenceScope!=='attachment_reference');
  for(const a of readable)for(const p of a.source?.pages||[]){
   if(/타\s*지자체|타\s*시[·ㆍ]?군|시군명.{0,80}사업비/.test(p.text.slice(0,350)))continue;
+  // A single explicit per-recipient payment in a support-content line is not the project budget.
+  const payment=new RegExp('(?:지원\\s*내용|보조\\s*금액)\\s*[:：]\\s*([가-힣 \\t]{0,12}?(?:1\\s*인|1\\s*가구|1\\s*명|1?\\s*호)\\s*당[^\\n:：;|]{0,24}?('+amount+')[^\\n]{0,50})','g');
+  for(const m of p.text.matchAll(payment)){if(/기존|종전|변경|에서|→|%/.test(m[1])||[...m[1].matchAll(new RegExp(amount,'g'))].length!==1)continue;const valueKRW=money(m[2]);if(valueKRW!==null)add('benefit',{sourceId:a.source.sourceId,url:a.source.url,page:p.page,quote:m[0],basis:'stated',sourceLabel:'수혜 단위가 명시된 지급액',amountBasis:/최대|한도/.test(m[1])?'ceiling_not_fixed_payment':'source_label',amountText:m[2],valueKRW});}
   // Only an explicit support-budget label can anchor a multiplication, never a free-floating figure.
   const formula=new RegExp('(?:면\\s*접\\s*수\\s*당\\s*)?지\\s*원\\s*금\\s*[:：]\\s*('+amount+')\\s*[×xX*]\\s*(\\d{1,3}(?:,\\d{3})+|\\d+)\\s*(명|회|가구|개소|건)(?:\\s*[×xX*]\\s*(\\d+)\\s*(회|개월|월))?(?![\\d.]|\\s*[×xX*+÷/])','g');
   for(const m of p.text.matchAll(formula)){
@@ -54,6 +57,7 @@ function summarize(attempts,existingAmounts){
   r.status=values.length>1?'multiple_values':values.length?r.observations.some(e=>e.basis==='stated')?'stated':'calculated':r.observations.some(e=>e.basis==='redacted')?'redacted':'not_stated';
   r.display=r.status==='redacted'?'가림 처리':r.status==='not_stated'?(complete?'별도 표기 없음':'읽은 범위 별도 표기 없음'):values.map(v=>(v/10000).toLocaleString('ko-KR',{maximumFractionDigits:4})+'만원').join(' / ')+(r.status==='calculated'?' (산식 계산값)':'');
   if(values.length===1)r.valueKRW=values[0];
+  if(r.key==='benefit'&&r.observations.length&&r.observations.every(e=>e.amountBasis==='ceiling_not_fixed_payment'))r.display='최대 '+r.display;
  }
  const checks=[];
  if([rows.planBudget,rows.supportBudget,rows.promotionBudget].every(r=>['stated','calculated'].includes(r.status)&&Number.isSafeInteger(r.valueKRW))){
@@ -71,11 +75,12 @@ function summarize(attempts,existingAmounts){
 function requestedGaps(result,question=''){
  if(result?.status!=='read'||result.relevanceStatus==='supporting_document'||result.targetFit?.status==='mismatch')return [];
  const requested=[];
- if(/예산|사업비/.test(question))requested.push('planBudget');
+ if(/예산|사업비|지원|수당|조리비|교통비/.test(question))requested.push('planBudget');
+ if(/지원|수당|조리비|교통비/.test(question))requested.push('benefit');
  if(/지원금\s*(?:총액|예산)|사업비\s*구성|예산\s*구성|지원금[·ㆍ과\s]+홍보비/.test(question))requested.push('supportBudget');
  if(/홍보비/.test(question))requested.push('promotionBudget');
  const summary=summarize(result.attempts||[],result.evidence?.fields?.budget?.amounts);
- return requested.filter(key=>summary.rows.find(r=>r.key===key)?.status==='not_stated');
+ return requested.filter(key=>(summary.rows.find(r=>r.key===key)?.status||'not_stated')==='not_stated');
 }
 function compact(s){return {rows:s.rows,checks:s.checks,completeTextRead:s.completeTextRead,scope:s.scope};}
 module.exports={summarize,money,requestedGaps,compact};
