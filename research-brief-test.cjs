@@ -27,3 +27,7 @@ console.log('PASS: concise sourced brief, unread/private and supporting evidence
 const crowdedReads=Array.from({length:12},(_,i)=>({candidate:{title:'산후조리비 지원 계획',institution:'지역'+i,url:'read'+i,relevance:{kind:'project_candidate'}},result:{status:'read',attempts:[],evidence:{fields:{budget:{status:'needs_review',excerpts:[{quote:'사업예산 100만원',url:'read'+i,page:1}],amounts:Array.from({length:30},()=>({role:'budget_unspecified',quote:'예산'.repeat(400),amountTexts:['100만원'],url:'read'+i,page:1}))}}}}}));
 const crowdedResult=require('./presentation').present('research_policy',{candidates:crowdedReads.map(r=>r.candidate),investigations:crowdedReads,projects:[]});
 assert(JSON.stringify(crowdedResult).length<=24000);assert(crowdedResult.quickBrief.length>0);assert(crowdedResult.caseComparison.length>0);assert(crowdedResult.documents.length>0,'compaction must retain evidence rows rather than deleting every document');
+const failedFirst=[...Array.from({length:5},(_,i)=>({candidate:{title:'사업 지원 계획'+ '가'.repeat(3000),institution:'지역'+i,url:'failed'+i,relevance:{kind:'project_candidate'}},result:{status:'no_available_attachment'}})),...crowdedReads.slice(0,2)];
+const preserved=require('./presentation').present('research_policy',{candidates:failedFirst.map(x=>x.candidate),investigations:failedFirst,projects:[]});
+assert.equal(preserved.documents.filter(d=>d.readingStatus==='read').length,2,'successful sources must survive before large unreadable candidates');
+assert(JSON.stringify(preserved).length<=24000);

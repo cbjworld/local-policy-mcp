@@ -2,7 +2,8 @@ module.exports=function compactResearch(value){
  const reads=new Map((value.investigations||[]).map(x=>[x.candidate.url,{...x.result,followup:x.candidate.followup||(x.purpose?{purpose:x.purpose,missingFields:x.missingFields}:undefined)}]));
  const rows=new Map();
  for(const d of [...(value.candidates||[]),...(value.financialDocuments||[]),...(value.reviewItems||[]),...(value.relatedDocuments||[])])if(!rows.has(d.url))rows.set(d.url,d);
- const documents=[...rows.values()].sort((a,b)=>Number(reads.has(b.url))-Number(reads.has(a.url))).map((d,i)=>{
+ const priority=d=>{const r=reads.get(d.url);return r?.status==='read'?(r.relevanceStatus==='supporting_document'||r.targetFit?.status==='mismatch'?2:3):r?1:0;};
+ const documents=[...rows.values()].sort((a,b)=>priority(b)-priority(a)).map((d,i)=>{
   const r=reads.get(d.url);
   const reading=r&&require('./presentation').documentView({...r,metadata:{...d,...r.metadata}});
   if(reading){delete reading.reviewGuidance;delete reading.note;}
