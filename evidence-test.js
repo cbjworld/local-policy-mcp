@@ -1,5 +1,8 @@
 const assert=require('node:assert/strict'),{evidence}=require('./evidence'),{research}=require('./open-portal');
 const make=text=>[{status:'read',source:{sourceId:'s',url:'https://example.go.kr/a',pages:[{page:1,text}]}}];
+const headingOnly=evidence(make('Ⅰ 사업개요\n\n□ 사업목적\n\n○ 건강권 보장\n\n□ 사업개요\n\n○ 사업기간 : 2026. 1. ~ 12.\n\n○ 사업내용\n\n- (지원) 지역화폐로 인당 연 최대 142,000원 지급\n\n○ 사업예산 : 428,400천원'));
+assert(!headingOnly.fields.activity.excerpts.some(e=>/^사업개요/.test(e.quote)));
+assert(headingOnly.fields.activity.excerpts.some(e=>e.quote.includes('142,000원')));
 const deliveryText='지원대상: 저소득 주민 200명\n신청자격: 검진장비와 전문인력을 갖춘 의료기관\n사업내용: 건강검진 제공';
 const delivery=evidence(make(deliveryText));
 assert.equal(delivery.fields.target.excerpts.length,1);

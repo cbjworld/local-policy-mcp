@@ -28,6 +28,7 @@ function evidence(attempts){
     }
     else {const next=value.search(/\n(?:\|\s*(?:\d+|[ⅠⅡⅢⅣⅤⅥⅦ]+)\s*\||[ \t]*[ⅠⅡⅢⅣⅤⅥⅦ]+[ \t]*[가-힣])/);if(next>=0)value=value.slice(0,next);}
     const masked=/\*{3,}|(?:\\\*){3,}|비공개|가림/.test(value);
+    if(key==='activity'&&/^[\s□▢#]*(?:사업목적|관련근거)\s*$/.test(value))continue;
     if(key!=='budget'&&!masked&&!/[가-힣A-Za-z0-9]/.test(value.replace(/<[^>]*>/g,'')))continue;
     const amount=/\d[\d,.]*\s*(?:\*\*)?\s*(?:백\s*만|천\s*만|백|천|억|만)?\s*원/.test(value);
     const heading=[...p.text.slice(0,m.index).matchAll(/^\|\s*[ⅠⅡⅢⅣⅤⅥⅦ\d]+\s*\|[^\n]+/gm)].at(-1);
