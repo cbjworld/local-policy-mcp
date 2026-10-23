@@ -29,6 +29,10 @@ assert.equal(row(summarize(make('타 지자체 참고\n지원금:50천원×100�
 const partial=make('본문');partial[0].source.scanComplete=false;assert.equal(row(summarize(partial),'promotionBudget').display,'읽은 범위 별도 표기 없음');
 const direct=require('./presentation').present('read_open_document',{status:'read',title:'2026년 계획',institution:'테스트시',url:'https://a.go.kr/plan',source:make(gijang)[0].source});assert.equal(row(direct.presentation.financialSummary,'planBudget').valueKRW,10500000);assert(direct.source.pages.length);
 const r={status:'read',attempts:make(yeongdo)};assert.deepEqual(requestedGaps(r,'사업비 구성과 홍보비'),['promotionBudget']);
+const machine=make(gijang);machine[0].source.ocr={status:'read'};
+const machineSummary=summarize(machine);assert(row(machineSummary,'planBudget').ocrReviewRequired);assert(row(machineSummary,'planBudget').display.includes('OCR 판독값'));assert.equal(machineSummary.checks[0].verification,'ocr_arithmetic_only');
+const punctuation=make('사 업 비 ; 80백만원(국 40, 도 5, 시 35)');punctuation[0].source.ocr={status:'read'};
+assert.equal(row(summarize(punctuation),'planBudget').valueKRW,80000000);assert(row(summarize(punctuation),'planBudget').ocrReviewRequired);
 const covered=make('사업비: 10,500천원 등록번호 청년과-123 공개여부 비공개(5)');
 const coverEvidence=require('./evidence').evidence(covered);
 assert.equal(coverEvidence.fields.budget.status,'needs_review');

@@ -34,10 +34,10 @@ function createReader(io={}){
   const response=await io.get(url);details.set(url,response);return response;
  }});
 }
-async function read({url,fileId,q='',page=1,scanEmptyPdf=false}={},io={get:download,post,extract:readResponse}){
+async function read({url,fileId,q='',page=1,scanEmptyPdf=false,ocr=false}={},io={get:download,post,extract:readResponse}){
  const u=new URL(url);
  if(u.origin!==base||!['/othicInfo/infoList/infoListDetl.do','/othicInfo/infoList/infoListDetl2.do'].includes(u.pathname)||u.username||u.password||u.href.length>3000)throw Error('정보공개포털의 공식 문서 상세 주소가 필요합니다.');
- if(typeof q!=='string'||q.length>300||!Number.isInteger(page)||page<1||page>10000||typeof scanEmptyPdf!=='boolean'||fileId!==undefined&&(typeof fileId!=='string'||fileId.length>100))throw Error('첨부 ID·검색어·페이지를 확인하세요.');
+ if(typeof q!=='string'||q.length>300||!Number.isInteger(page)||page<1||page>10000||typeof scanEmptyPdf!=='boolean'||typeof ocr!=='boolean'||ocr&&q||fileId!==undefined&&(typeof fileId!=='string'||fileId.length>100))throw Error('첨부 ID·검색어·페이지를 확인하세요. OCR은 검색어 없이 지정한 한 쪽을 읽습니다.');
  const detail=await io.get(u.href),r=embedded(detail.bytes),v=r.openCateSearchVO;
  if(!v||typeof v.infoSj!=='string'||!v.infoSj)throw Error('문서 상세 정보를 찾지 못했습니다.');
  const files=Array.isArray(v.fileList)?v.fileList:[];
@@ -76,7 +76,7 @@ async function read({url,fileId,q='',page=1,scanEmptyPdf=false}={},io={get:downl
   }
   const citation=new URL(u);citation.hash=new URLSearchParams({fileId:f.fileId}).toString();
   stage='extract';
-  const extractStart=Date.now(),source=await io.extract({...response,url:citation.href},{q,page,scanEmptyPdf});timings.push({phase:'extract',ms:Date.now()-extractStart});
+  const extractStart=Date.now(),source=await io.extract({...response,url:citation.href},{q,page,scanEmptyPdf,ocr});timings.push({phase:'extract',ms:Date.now()-extractStart});
   const hasText=source.pages.some(p=>p.text.trim());
   return {...out,status:hasText?'read':'no_text',fileId:f.fileId,fileName:f.fileNm,source,retryCount,timings,...(hasText?{}:{message:'파일은 내려받았지만 이 범위에서 텍스트를 추출하지 못했습니다. 이미지 문서는 OCR이 필요하며 검색어 미일치일 수도 있습니다.'})};
  }catch(e){return {...out,status:stage==='extract'?'extraction_failed':'download_failed',fileId:f.fileId,message:e.message,phase:stage==='extract'?'extract':phase,errorCode:e.code||'PORTAL_ERROR',retryable:!!e.retryable,retryCount,timings};}

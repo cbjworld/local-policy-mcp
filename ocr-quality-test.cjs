@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict'),{assess}=require('./ocr-quality');
+const t=(text,score=96,x=10)=>`5\t1\t1\t1\t1\t1\t${x}\t20\t80\t30\t${score}\t${text}`;
+assert.equal(assess(t('500,000'),t('500,000')).agreementCount,1);
+assert(assess(t('19주',71),t('12주')).items[0].reasons.includes('two_pass_disagreement'));
+assert(assess(t('124,588'),t('△124,588')).items[0].reasons.includes('two_pass_disagreement'));
+assert(assess(t('316,386,8%'),t('316,386,896')).items[0].reasons.includes('malformed_grouping'));
+assert(assess(t('50만원',70),t('50만원')).reviewCount===1);
+assert(assess(t('50만원'),t('50만원',96,500)).items[0].reasons.includes('no_same_location_number'));
+assert.equal(assess('',t('12주')).numericTokens,0);
+assert.throws(()=>assess('x'.repeat(2000001),''));
+Promise.all([require('./ocr-reader').read(Buffer.from('not a pdf')).then(()=>assert.fail('invalid PDF accepted'),()=>{}),require('./ocr-reader').read(Buffer.from('%PDF-'),{page:0}).then(()=>assert.fail('invalid page accepted'),()=>{})]).catch(e=>{console.error(e);process.exitCode=1;});
+console.log('PASS: OCR numeric disagreement, missing minus, malformed grouping, low score and spatial separation; agreement is not verification');

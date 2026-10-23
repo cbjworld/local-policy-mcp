@@ -45,9 +45,9 @@ const amountLabels={총사업비:['project_total','총사업비'],소요예산:[
 function amounts(attempts){
  const result=[];
  const headings=Object.keys(amountLabels).map(s=>[...s].join('\\s*')).join('|');
- const boundary=new RegExp('(?:'+headings+'|지원대상|사업기간|신청기간|사업내용)\\s*[:：)]');
+ const boundary=new RegExp('(?:'+headings+'|지원대상|사업기간|신청기간|사업내용)\\s*[:：;)]');
  for(const a of attempts.filter(a=>a.status==='read'&&a.assessment!=='form_or_cover'))for(const p of a.source?.pages||[]){
-  const pattern=new RegExp('('+headings+')\\s*(?:[:：)]|\\r?\\n|차등적용\\s*▶)','g');let m;
+  const pattern=new RegExp('('+headings+')\\s*(?:[:：;)]|\\r?\\n|차등적용\\s*▶)','g');let m;
   while((m=pattern.exec(p.text))&&result.length<12){
    // shortcut: classify explicit prose labels only; table roles are returned separately by tables().
    if(p.text.slice(p.text.lastIndexOf('\n',m.index)+1,m.index).includes('|'))continue;

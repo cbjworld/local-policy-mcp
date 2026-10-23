@@ -10,3 +10,5 @@ budget-search.sqlite.*.tmp
 budget-search-keys.json.gz
 
 /catalog-import-audit.json
+
+ocr-models/*.traineddata

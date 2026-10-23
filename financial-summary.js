@@ -21,7 +21,7 @@ function summarize(attempts,existingAmounts){
   for(const text of a.amountTexts||[]){
    const valueKRW=money(text);if(valueKRW===null)continue;
    // No partial reading of compound amounts, negative revisions, historical prefixes or formulas.
-   const labelEnd=a.quote.search(/[:：)]/),prefix=a.quote.slice(labelEnd+1,a.quote.indexOf(text));
+   const labelEnd=a.quote.search(/[:：;)]/),prefix=a.quote.slice(labelEnd+1,a.quote.indexOf(text));
    if(key!=='benefit'&&(labelEnd<0||!/^\s*(?:금\s*)?$/.test(prefix)))continue;
    if(key!=='benefit'&&/^\s*[×xX*]\s*\d/.test(a.quote.slice(a.quote.indexOf(text)+text.length)))continue;
    add(key,{...source(a),basis:'stated',sourceLabel:a.quote.slice(0,labelEnd).replace(/\s+/g,''),amountText:text,valueKRW});
@@ -60,7 +60,13 @@ function summarize(attempts,existingAmounts){
   const total=BigInt(rows.supportBudget.valueKRW)+BigInt(rows.promotionBudget.valueKRW);
   if(total<=BigInt(Number.MAX_SAFE_INTEGER))checks.push({kind:'support_plus_promotion',status:Number(total)===rows.planBudget.valueKRW?'matched':'mismatch',statedTotalKRW:rows.planBudget.valueKRW,componentTotalKRW:Number(total)});
  }
- return {checks,rows:Object.values(rows).filter(r=>['planBudget','supportBudget','promotionBudget'].includes(r.key)||r.status!=='not_stated'),scope:'one_document_only',completeTextRead:complete,instruction:'계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요.'};
+ for(const r of Object.values(rows)){
+  const extracted=r.observations.filter(e=>attempts.some(a=>a.source?.sourceId===e.sourceId&&a.source?.ocr?.status==='read'));
+  if(extracted.length){r.ocrReviewRequired=true;r.display+=' (OCR 판독값)';for(const e of extracted)e.extraction='ocr_transcription';}
+  if(r.status==='not_stated'&&attempts.some(a=>a.source?.ocr?.status==='read'))r.display='OCR 읽은 범위에서 추출되지 않음';
+ }
+ if(Object.values(rows).some(r=>r.ocrReviewRequired))for(const c of checks){c.verification='ocr_arithmetic_only';c.ocrReviewRequired=true;}
+ return {checks,rows:Object.values(rows).filter(r=>['planBudget','supportBudget','promotionBudget'].includes(r.key)||r.status!=='not_stated'),scope:'one_document_only',completeTextRead:complete,instruction:'계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요.'};
 }
 function requestedGaps(result,question=''){
  if(result?.status!=='read'||result.relevanceStatus==='supporting_document'||result.targetFit?.status==='mismatch')return [];
