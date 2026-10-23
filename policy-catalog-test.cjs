@@ -10,6 +10,12 @@ try{
  fs.writeFileSync(path.join(dir,'budget-data.json.gz'),z.gzipSync(JSON.stringify(input)));fs.writeFileSync(path.join(dir,'project-document-links.json'),JSON.stringify(links));build(dir);store=catalog.open(dir);
  const result=store.search({q:'산후 조리비',institution:'부산 중구'});assert.equal(result.total,2);assert.equal(result.coverage.budgetRows,4);assert.equal(result.coverage.catalogProjects,3);assert.equal(result.coverage.linkedProjects,1);assert.equal(result.coverage.documentLinks,1);
  assert.equal(result.coverage.directLinkedProjects,1);assert.equal(result.coverage.budgetReferenceLinks,0);assert.equal(result.coverage.titleCandidateLinks,1);
+ const snapshot=structuredClone(result);result.items[0].name='mutated';result.coverage.budgetRows=999;
+ assert.deepEqual(store.search({q:'조리비 산후',institution:'부산 중구'}),snapshot,'cached public results must be isolated copies');
+ assert.equal(store.search({q:'산후 조리비',institution:'부산 중구',linkedOnly:true}).total,1);
+ assert.equal(store.search({q:'산후 조리비',institution:'부산 중구',limit:1}).items.length,1);
+ assert.equal(store.search({q:'산후 조리비',institution:'울산 중구'}).total,1);
+ const empty=store.search({q:'없음'});empty.total=99;assert.equal(store.search({q:'없음'}).total,0);
  const project=store.search({projectId:id}).items[0];assert.equal(project.budgetRowCount,2);assert.deepEqual(project.budgetVariants,[{amount:100,unit:'천원'},{amount:200,unit:'천원'}]);assert.match(project.budgetStatus,/do_not_sum/);assert.equal(project.documents.length,1);assert.equal(project.budgetRecords[1].page,2);
  const other=store.search({institution:'울산 중구'}).items[0];assert.equal(other.documentStatus,'title_candidates_only');assert.equal(other.documents.length,0);assert.equal(other.documentCandidates.length,1);
  assert.equal(store.search({q:'%_'}).total,0);assert.throws(()=>store.search({projectId:'invalid'}));assert.throws(()=>store.search({limit:100}));assert.equal(store.search({limit:1}).nextOffset,1);
