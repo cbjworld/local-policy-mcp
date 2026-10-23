@@ -58,7 +58,7 @@ async function fallbackTest(){
  assert.equal(result.searchOutcome.metadataFallback,true);
  const none=await w.research(args,{search:async()=>empty});assert.equal(none.searchOutcome.status,'not_found_in_searched_scope');
  const failed=await w.research(args,{search:async a=>{if(a.scope==='all')throw Error('offline');return empty}});assert.equal(failed.searchOutcome.status,'incomplete');
- const noFallback=await w.research(args,{...io,search:async a=>{assert.notEqual(a.scope,'all');return {...empty,items:[{title:'산후조리비 지원사업 계획',url:'a',institution:'A'}]}}});assert.equal(noFallback.searchOutcome.metadataFallback,false);
+ const enriched=await w.research(args,{...io,search:async a=>({...empty,items:[{title:'산후조리비 지원사업 계획',url:a.scope==='all'?'private-b':'a',institution:a.scope==='all'?'B':'A',...(a.scope==='all'?{disclosure:'비공개'}:{})}]} )});assert.equal(enriched.searchOutcome.metadataFallback,false);assert.equal(enriched.candidates.length,2);assert(enriched.searches.some(s=>s.scope==='all'));
  console.log('PASS: metadata fallback, dates, private title evidence, empty vs failure, no unnecessary retry');
 }
 fallbackTest().catch(e=>{console.error(e);process.exitCode=1});

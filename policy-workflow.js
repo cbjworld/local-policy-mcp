@@ -10,6 +10,9 @@ function plan({question,queries,startDate,endDate}={},now=new Date()){
  const words=searchTopic.split(/\s+/);
  // shortcut: mechanical fallback only; the host AI supplies semantic query variants without asking the user.
  const derived=[searchTopic];if(words.length>2)derived.push(words.filter(w=>!['지원','사업','정책'].includes(w)).join(' '));
+ if(/청년/.test(searchTopic)&&/면접\s*(?:수당|비|활동비)/.test(searchTopic)){
+  derived.splice(0,derived.length,'청년 면접수당','청년 면접비','청년 면접활동비');
+ }
  if(/음식물\s*처리기/.test(searchTopic)){
   const subject=words.filter(w=>!['지원','사업','정책'].includes(w)).join(' ');
   derived.splice(1,derived.length,subject.replace(/음식물\s*처리기/,'음식물쓰레기 처리기'),subject.replace(/음식물\s*처리기/,'음식물 감량기'));
@@ -67,9 +70,9 @@ async function runResearch(args={},io=portal){
   }
  }
  let screened=screen();
- // shortcut: one metadata page per expression only when the original search has no candidates.
+ // Include nonpublic title evidence even when some public plans were found.
  const metadataFallback=searches.length>0&&screened.items.length===0;
- if(metadataFallback){
+ if(searches.length>0){
   for(const q of request.queries){
    try{
     const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page:1,scope:'all'});
