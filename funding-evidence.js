@@ -52,7 +52,7 @@ function amounts(attempts){
    // shortcut: classify explicit prose labels only; table roles are returned separately by tables().
    if(p.text.slice(p.text.lastIndexOf('\n',m.index)+1,m.index).includes('|'))continue;
    const tail=p.text.slice(pattern.lastIndex,pattern.lastIndex+300),end=tail.search(boundary);
-   const value=tail.slice(0,end<0?tail.length:end).match(/^[ \t]*(?:\r?\n[ \t]*)?[^\r\n]*/)?.[0]||'';
+   const value=budgetValue(tail.slice(0,end<0?tail.length:end).match(/^[ \t]*(?:\r?\n[ \t]*)?[^\r\n]*/)?.[0]||'');
    const quote=p.text.slice(m.index,pattern.lastIndex)+value;
    const matches=[...value.matchAll(/\d[\d,.]*\s*(?:\*\*)?\s*(?:백\s*만|천\s*만|억|만|천|백)?\s*원/g)].map(x=>x[0]);
    const redacted=/\*{3,}|(?:\\\*){3,}|비공개|가림/.test(value);
@@ -69,4 +69,6 @@ function amounts(attempts){
  }
  return result;
 }
-module.exports={tables,amounts};
+// Flattened PDF pages can put administrative cover fields after a visible budget.
+function budgetValue(value){return value.split(/공개\s*(?:여부|구분)|등록\s*번호|결재\s*일자/)[0];}
+module.exports={tables,amounts,budgetValue};

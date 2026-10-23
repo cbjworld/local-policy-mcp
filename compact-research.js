@@ -72,5 +72,5 @@ module.exports=function compactResearch(value){
  pruneReferences();
  while(oversized()&&output.catalogEvidence?.items.length){output.catalogEvidence.items.pop();output.responseSize.omittedCatalogItems++;refreshComparison();}
  if(oversized())return {responseMode:'compact',responseSize:{maxCharacters:24000,metadataOmitted:true,omittedDocuments:rows.size},detailHint:output.detailHint,note:'메타데이터가 응답 한도를 초과했습니다. detail=full로 조회하세요.'};
- return output;
+ return {answerGuide:output.answerGuide,quickBrief:output.quickBrief,...output};
 };

@@ -27,6 +27,7 @@ function extractEvidence(attempts){
      value=lines.slice(0,keep).join('\n').split(/<\/t[dh]>/)[0];
     }
     else {const next=value.search(/\n(?:\|\s*(?:\d+|[ⅠⅡⅢⅣⅤⅥⅦ]+)\s*\||[ \t]*[ⅠⅡⅢⅣⅤⅥⅦ]+[ \t]*[가-힣])/);if(next>=0)value=value.slice(0,next);}
+    if(key==='budget')value=require('./funding-evidence').budgetValue(value);
     const masked=/\*{3,}|(?:\\\*){3,}|비공개|가림/.test(value);
     if(key==='activity'&&/^[\s□▢#]*(?:사업목적|관련근거)\s*$/.test(value))continue;
     if(key!=='budget'&&!masked&&!/[가-힣A-Za-z0-9]/.test(value.replace(/<[^>]*>/g,'')))continue;

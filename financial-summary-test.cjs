@@ -29,6 +29,24 @@ assert.equal(row(summarize(make('타 지자체 참고\n지원금:50천원×100�
 const partial=make('본문');partial[0].source.scanComplete=false;assert.equal(row(summarize(partial),'promotionBudget').display,'읽은 범위 별도 표기 없음');
 const direct=require('./presentation').present('read_open_document',{status:'read',title:'2026년 계획',institution:'테스트시',url:'https://a.go.kr/plan',source:make(gijang)[0].source});assert.equal(row(direct.presentation.financialSummary,'planBudget').valueKRW,10500000);assert(direct.source.pages.length);
 const r={status:'read',attempts:make(yeongdo)};assert.deepEqual(requestedGaps(r,'사업비 구성과 홍보비'),['promotionBudget']);
+const covered=make('사업비: 10,500천원 등록번호 청년과-123 공개여부 비공개(5)');
+const coverEvidence=require('./evidence').evidence(covered);
+assert.equal(coverEvidence.fields.budget.status,'needs_review');
+assert.equal(coverEvidence.fields.budget.amounts[0].status,'evidence_candidate');
+assert.equal(row(summarize(covered),'planBudget').valueKRW,10500000);
+for(const hidden of ['사업비: 비공개','사업비: ***** 공개여부 공개','소요예산: ***** 시비 30천원']){
+ assert.equal(require('./evidence').evidence(make(hidden)).fields.budget.status,'redacted');
+ assert.equal(row(summarize(make(hidden)),'planBudget').status,'redacted');
+}
+const different=[{status:'read',source:{sourceId:'age',url:'https://a.go.kr/age',scanComplete:true,pages:[{page:1,text:'지원대상: 19세 이상 39세 미만 청년'},{page:3,text:'신청자격: 아래 요건 연령 19세 이상~39세 이하'}]}}];
+const view=require('./presentation').documentView({attempts:different,evidence:require('./evidence').evidence(different)});
+assert.equal(view.documentDifferences[0].kind,'age_boundary_difference');
+assert.equal(view.fields.find(f=>f.key==='target').state,'원문 표기 차이');
+assert.equal(require('./presentation').documentView({attempts:[...different.map(a=>({...a,evidenceScope:'attachment_reference'}))]}).documentDifferences.length,0);
+const compactRow=require('./research-brief')([{classification:'project_candidate',readingStatus:'read',reading:view}])[0];
+assert.equal(compactRow.fields.target.documentDifferences[0].evidence.length,2);
+assert(direct.presentation.answerSummary.text.includes('계획서 사업비 | 1,050만원'));
+assert.equal(Object.keys(direct)[0],'presentation');
 const quote='사업비: 5,000천원',source={sourceId:'budget',url:'https://a.go.kr/plan',checkedAt:'2026-10-23',pages:[{page:1,text:quote}]};
 require('./discovery').withSources(new Map([['budget',source]]),()=>{
  const b=require('./discovery').brief({cases:['가시','나시'].map(region=>({region,name:'지원 계획',fields:{budget:{sourceId:'budget',quote,page:1}}}))});
