@@ -118,6 +118,7 @@ async function runResearch(args={},io=portal){
    const item=ordered[index];
    if(institutions.has(item.institution)||tried.has(documentKey(item.url)))continue;
    tried.add(documentKey(item.url));
+   io.preload?.(ordered.slice(index,index+3).filter(d=>!tried.has(documentKey(d.url))||d===item));
    try{const result=await io.research({url:item.url,requestedQuery:request.question});investigations.push({candidate:item,result});if(!missingFields(result).length)institutions.add(item.institution);}
    catch(e){investigations.push({candidate:item,result:{status:'failed',message:e.message}});}
    const missing=missingFields(investigations.at(-1).result);

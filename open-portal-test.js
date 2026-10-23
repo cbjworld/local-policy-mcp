@@ -11,7 +11,15 @@ async function main(){
  const v={infoSj:'추진계획',oppSeCd:'1',fileYn:'Y',nstSeCd:'B',urtxtYn:'Y',fileList:[{fileId:'f',fileNm:'plan.hwpx',fileSeDc:'첨부'}]};
  const calls=[];const io={get:async()=>html({openCateSearchVO:v}),post:async(step)=>{calls.push(step);if(step.endsWith('.down'))return {bytes:Buffer.from('PK-test')};return json({error_code:'00',esbFilePath:'server-value',esbFileName:'plan.hwpx',fileName:'generated',isPdf:'N'});},extract:async()=>({sourceId:'test',pages:[{page:null,text:'소요예산 30,000천원'}]})};
  const result=await p.read({url,fileId:'f'},io);assert.equal(result.status,'read');assert.deepEqual(calls,['wonmunFileRequest.ajax','wonmunFileFilter.ajax','wonmunFileDownload.down']);
+ assert.equal(result.attachmentAvailability.status,'public_attachments_available');
+ for(const [message,code] of [['파일 정보가 상이하여 열람이 불가합니다.','PROVIDER_FILE_MISMATCH'],['제공기관 시스템 점검으로 열람이 잠시 불가합니다.','PROVIDER_MAINTENANCE']]){
+  const failed=await p.read({url,fileId:'f'},{...io,post:async()=>json({error_code:'99',error_msg:message})});assert.equal(failed.errorCode,code);assert.equal(failed.retryable,false);
+ }
  assert(p.attachmentScore({name:'추진 계획.pdf'})>p.attachmentScore({name:'공고.hwpx'}));
+ const guriTitle='2026년 구리시 여성청소년 생리용품 보편지원사업 추진(변경)계획';
+ assert(p.attachmentScore({name:'★'+guriTitle+'-최종.hwp'},guriTitle)>p.attachmentScore({name:'★(260303)(생리용품 보편 지원) 2026년 운영 지침 변경안.hwpx'},guriTitle));
+ const pairedTitle='2026년 여성청소년 생리용품 지원 사업 추진계획(안)';
+ assert(p.attachmentScore({name:'2026년 여성청소년 생리용품 지원사업 계획(안).hwp'},pairedTitle)>p.attachmentScore({name:pairedTitle+'.pdf'},pairedTitle),'equivalent text originals stay ahead of the signed PDF');
  for(const failedStage of ['wonmunFileRequest.ajax','wonmunFileFilter.ajax','wonmunFileDownload.down']){
   const stages=[];let failed=false;
   const recovered=await p.read({url,fileId:'f'},{...io,post:async(stage)=>{stages.push(stage);if(stage===failedStage&&!failed){failed=true;throw Object.assign(Error('connection reset'),{code:'ECONNRESET',retryable:true});}return io.post(stage);}});
@@ -28,6 +36,7 @@ async function main(){
  const exhausted=await p.read({url,fileId:'f'},{...io,post:async()=>{exhaustedCalls++;throw Object.assign(Error('reset'),{code:'ECONNRESET',retryable:true});}});
  assert.equal(exhausted.status,'download_failed');assert.equal(exhausted.retryCount,1);assert.equal(exhaustedCalls,2);
  calls.length=0;v.oppSeCd='3';assert.equal((await p.read({url,fileId:'f'},io)).status,'unavailable');assert.equal(calls.length,0);
+ assert.equal((await p.read({url},io)).attachmentAvailability.status,'not_public');
  v.oppSeCd='2';v.fileList[0].fileOppYn='N';assert.equal((await p.read({url,fileId:'f'},io)).status,'unavailable');assert.equal(calls.length,0);
  v.oppSeCd='1';let count=0;const blocked={...io,post:async()=>{count++;return json({error_code:'99',error_msg:'provider timeout'});}};
  assert.equal((await p.read({url,fileId:'f'},blocked)).status,'download_failed');assert.equal(count,1);

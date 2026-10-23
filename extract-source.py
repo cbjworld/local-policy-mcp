@@ -41,7 +41,7 @@ def main():
         if os.environ.get('POLICY_PDF_ENGINE') == 'poppler' and not words:
             try:
                 from pdf_fast import extract
-                result = extract(data, start)
+                result = extract(data, start, scan_empty=opts.get('scanEmptyPdf') is True)
             except Exception:
                 fast_failed = True
         if result is None:

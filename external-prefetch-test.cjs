@@ -36,6 +36,17 @@ async function main(){
  // Prefetch is not permission to accept a different document's contents.
  const mismatch=createSession(portal,{get:async url=>url===doc(1)?html(1):{url,bytes:Buffer.from('3')},extract});
  mismatch.preload([items[0]]);await tick();const wrong=await mismatch.research({url:doc(1)});assert.match(wrong.attempts[0].message,/제목 일치 확인 실패/);assert.equal(wrong.metadata.externalNotice,undefined);mismatch.close();
- console.log('PASS: three overlapping full-deadline requests, isolated failure, serial parsing, cancellation, large metadata fallback, title verification');
+ const mainlandItems=items.map(x=>({...x,institution:'충청남도 시험시'})),metadataStarts=[],resolvers=new Map();
+ const mainland=createSession(portal,{get:async url=>{metadataStarts.push(url);return new Promise(resolve=>resolvers.set(url,()=>resolve({url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:{infoSj:'교통비 지원 계획',oppSeCd:'3',fileYn:'N',fileList:[]}})+';')})));}});
+ mainland.preload(mainlandItems);await tick();assert.equal(metadataStarts.length,3);
+ mainland.preload([mainlandItems[3]]);await tick();assert.equal(metadataStarts.length,3,'at most three metadata slots');
+ resolvers.get(doc(1))();resolvers.get(doc(2))();resolvers.get(doc(3))();
+ assert.equal((await mainland.research({url:doc(1)})).status,'no_available_attachment');
+ mainland.preload([mainlandItems[3]]);await tick();assert.equal(metadataStarts.length,4);resolvers.get(doc(4))();
+ await mainland.research({url:doc(4)});assert.equal(metadataStarts.filter(x=>x===doc(1)).length,1);mainland.close();
+ let resetCalls=0;
+ const reset=createSession(portal,{get:async url=>{if(++resetCalls===1)throw Object.assign(Error('reset'),{code:'ECONNRESET',retryable:true});return {url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:{infoSj:'교통비 지원 계획',oppSeCd:'3',fileYn:'N',fileList:[]}})+';')};}});
+ reset.preload([mainlandItems[0]]);await tick();const restored=await reset.research({url:doc(1)});assert.equal(restored.status,'no_available_attachment');assert.equal(restored.metadataPrefetchFailure.code,'ECONNRESET');assert.equal(resetCalls,2);reset.close();
+ console.log('PASS: three overlapping full-deadline requests, isolated failure, serial parsing, cancellation, large metadata fallback, title verification, bounded municipal metadata prefetch');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

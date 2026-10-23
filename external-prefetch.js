@@ -13,8 +13,9 @@ function createSession(portal,{get=download,extract=readResponse}={}){
   notices.set(url,promise);
  }
  function preload(items){
-  for(const item of items.filter(x=>/^서울/.test(x.institution||'')).slice(0,3)){
+  for(const item of items.slice(0,3)){
    if(closed||prepared.has(item.url))continue;
+   if(prepared.size>=3)break;
    const reader=portal.createReader({get:async url=>{
     const response=await fetch(url);
     if(response.bytes.length>1024*1024)throw Object.assign(Error('Prefetch metadata limit'),{code:'PREFETCH_METADATA_LIMIT'});
@@ -42,8 +43,10 @@ function createSession(portal,{get=download,extract=readResponse}={}){
   const entry=prepared.get(args.url);
   try{
    const result=entry?await entry:{};
-   if(result.error&&result.error.code!=='PREFETCH_METADATA_LIMIT')throw result.error;
-   return await portal.research(args,result.reader||portal.createReader({get}),externalReader);
+   if(result.error&&result.error.code!=='PREFETCH_METADATA_LIMIT'&&!result.error.retryable)throw result.error;
+   const investigation=await portal.research(args,result.reader||portal.createReader({get}),externalReader);
+   if(result.error)investigation.metadataPrefetchFailure={code:result.error.code,message:result.error.message};
+   return investigation;
   }finally{prepared.delete(args.url);}
  }
  return {preload,research,close(){closed=true;controller.abort();prepared.clear();notices.clear();}};

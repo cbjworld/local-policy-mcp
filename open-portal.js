@@ -21,7 +21,10 @@ async function post(step,params,deadline=Date.now()+25000){
 }
 function unwrap(response){const raw=JSON.parse(response.bytes.toString('utf8'));return raw.modelAndView?.model?.result||raw.result||raw;}
 function check(r){
- if(String(r.rtnCode)==='1'||![0,'0','00'].includes(r.error_code))throw Error(String(r.error_msg||r.rtnMessage||'포털 파일 제공 실패').slice(0,1000));
+ if(String(r.rtnCode)==='1'||![0,'0','00'].includes(r.error_code)){
+  const message=String(r.error_msg||r.rtnMessage||'포털 파일 제공 실패').slice(0,1000),key=message.replace(/\s+/g,'');
+  throw Object.assign(Error(message),{code:/파일정보가상이/.test(key)?'PROVIDER_FILE_MISMATCH':/시스템점검|서버패치|네트워크작업/.test(key)?'PROVIDER_MAINTENANCE':'PROVIDER_ERROR',retryable:false});
+ }
 }
 function createReader(io={}){
  io={get:download,post,extract:readResponse,...io};
@@ -31,16 +34,17 @@ function createReader(io={}){
   const response=await io.get(url);details.set(url,response);return response;
  }});
 }
-async function read({url,fileId,q='',page=1}={},io={get:download,post,extract:readResponse}){
+async function read({url,fileId,q='',page=1,scanEmptyPdf=false}={},io={get:download,post,extract:readResponse}){
  const u=new URL(url);
  if(u.origin!==base||!['/othicInfo/infoList/infoListDetl.do','/othicInfo/infoList/infoListDetl2.do'].includes(u.pathname)||u.username||u.password||u.href.length>3000)throw Error('정보공개포털의 공식 문서 상세 주소가 필요합니다.');
- if(typeof q!=='string'||q.length>300||!Number.isInteger(page)||page<1||page>10000||fileId!==undefined&&(typeof fileId!=='string'||fileId.length>100))throw Error('첨부 ID·검색어·페이지를 확인하세요.');
+ if(typeof q!=='string'||q.length>300||!Number.isInteger(page)||page<1||page>10000||typeof scanEmptyPdf!=='boolean'||fileId!==undefined&&(typeof fileId!=='string'||fileId.length>100))throw Error('첨부 ID·검색어·페이지를 확인하세요.');
  const detail=await io.get(u.href),r=embedded(detail.bytes),v=r.openCateSearchVO;
  if(!v||typeof v.infoSj!=='string'||!v.infoSj)throw Error('문서 상세 정보를 찾지 못했습니다.');
  const files=Array.isArray(v.fileList)?v.fileList:[];
  const eligible=['1','2'].includes(v.oppSeCd)&&v.urtxtYn!=='N'&&v.fileYn==='Y'&&r.downloadRestriction!=='X';
  const attachments=files.map(f=>({fileId:f.fileId,name:f.fileNm,bytes:Number(f.fileByteNum)||null,available:eligible&&(v.oppSeCd==='1'||f.fileOppYn==='Y')&&(v.nstSeCd!=='E'||f.fileSeDc==='본문')}));
  const out={url:u.href,checkedAt:new Date().toISOString(),title:v.infoSj,institution:v.prcsNstNm||v.nstCdNm,department:v.chrgDeptNm,date:v.prdnDt,documentNumber:v.docNo,disclosure:v.dlsrCdNm,attachments,status:'metadata',warning:'목록 확인은 원문 열람이 아닙니다. 예산·계획은 source의 실제 문장으로 확인하세요.'};
+ out.attachmentAvailability={status:attachments.some(f=>f.available)?'public_attachments_available':!['1','2'].includes(v.oppSeCd)?'not_public':v.urtxtYn==='N'?'original_not_published':r.downloadRestriction==='X'?'download_restricted':!files.length||v.fileYn!=='Y'?'no_file_list':'no_public_attachment',availableCount:attachments.filter(f=>f.available).length};
  out.externalLinks=typeof v.oppUrl==='string'&&/^https:\/\/opengov\.seoul\.go\.kr\//.test(v.oppUrl)?[v.oppUrl]:[];
  if(fileId===undefined)return out;
  const f=files.find(x=>x.fileId===fileId),a=attachments.find(x=>x.fileId===fileId);
@@ -72,14 +76,16 @@ async function read({url,fileId,q='',page=1}={},io={get:download,post,extract:re
   }
   const citation=new URL(u);citation.hash=new URLSearchParams({fileId:f.fileId}).toString();
   stage='extract';
-  const extractStart=Date.now(),source=await io.extract({...response,url:citation.href},{q,page});timings.push({phase:'extract',ms:Date.now()-extractStart});
+  const extractStart=Date.now(),source=await io.extract({...response,url:citation.href},{q,page,scanEmptyPdf});timings.push({phase:'extract',ms:Date.now()-extractStart});
   const hasText=source.pages.some(p=>p.text.trim());
   return {...out,status:hasText?'read':'no_text',fileId:f.fileId,fileName:f.fileNm,source,retryCount,timings,...(hasText?{}:{message:'파일은 내려받았지만 이 범위에서 텍스트를 추출하지 못했습니다. 이미지 문서는 OCR이 필요하며 검색어 미일치일 수도 있습니다.'})};
  }catch(e){return {...out,status:stage==='extract'?'extraction_failed':'download_failed',fileId:f.fileId,message:e.message,phase:stage==='extract'?'extract':phase,errorCode:e.code||'PORTAL_ERROR',retryable:!!e.retryable,retryCount,timings};}
 }
 function isForm(name){return /표지/.test(name)||(/서식|신청서|동의서|양식/.test(name)&&!/지침/.test(name));}
-function attachmentScore(f){
- return (/추진계획|시행계획|사업계획|예산|방침/.test(f.name.replace(/\s+/g,''))?10:0)+(/\.hwpx?$/i.test(f.name)?2:0)-(isForm(f.name)?20:0);
+function attachmentScore(f,title=''){
+ const key=s=>s.normalize('NFKC').replace(/\.(?:hwpx?|pdf)$/i,'').replace(/[-_\s]*최종$/,'').replace(/[^\p{L}\p{N}]/gu,'').replace(/(?:추진|시행|운영|기본|변경|수정|보완)*계획(?:안)?$/,'');
+ const own=key(title),name=key(f.name);
+ return (own.length>=8&&name.includes(own)?15:0)+(/추진계획|시행계획|사업계획|예산|방침/.test(f.name.replace(/\s+/g,''))?10:0)+(/\.hwpx?$/i.test(f.name)?2:0)-(isForm(f.name)?20:0);
 }
 async function research({url,requestedQuery=''}={},reader=read,externalReader=researchNotice){
  if(typeof requestedQuery!=='string'||requestedQuery.length>300)throw Error('검색 목적은 300자 이하 문자열이어야 합니다.');
@@ -93,7 +99,7 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
   const reason=fit.status==='mismatch'?fit.reason:/\.(?:xlsx?|docx?|pptx?|jpe?g|png|gif|zip)$/i.test(f.name)?'자동 읽기가 지원하지 않는 첨부 형식':null;
   if(reason)selectionNotes.push({...f,reason,status:fit.status==='mismatch'?'target_mismatch':'unsupported_format'});
   return !reason;
- }).sort((a,b)=>attachmentScore(b)-attachmentScore(a));
+ }).sort((a,b)=>attachmentScore(b,metadata.title)-attachmentScore(a,metadata.title));
  const attempts=[];
  // shortcut: follow only an explicit Seoul disclosure link, one level; no general website search.
  for(const link of (metadata.externalLinks||[]).slice(0,1)){
@@ -111,10 +117,10 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
  // shortcut: at most three files per document; expose the rest for explicit follow-up.
  for(const file of candidates.slice(0,3)){
   if(isForm(file.name)&&attempts.some(a=>a.status==='read'&&a.assessment==='plan_candidate'))continue;
-  let result;try{result=await reader({url,fileId:file.fileId});}catch(e){result={status:'download_failed',message:e.message};}
+  let result;try{result=await reader({url,fileId:file.fileId,scanEmptyPdf:true});}catch(e){result={status:'download_failed',message:e.message};}
   if(result.status==='download_failed'&&!result.errorCode&&/시간 초과|timeout|timed out|ECONNRESET|ETIMEDOUT/i.test(result.message||'')){
    const initialFailure=result.message;
-   try{result={...await reader({url,fileId:file.fileId}),retryCount:1,initialFailure};}catch(e){result={status:'download_failed',message:e.message,retryCount:1,initialFailure};}
+   try{result={...await reader({url,fileId:file.fileId,scanEmptyPdf:true}),retryCount:1,initialFailure};}catch(e){result={status:'download_failed',message:e.message,retryCount:1,initialFailure};}
   }
   const text=(result.source?.pages||[]).map(p=>p.text).join('\n').replace(/<[^>]+>/g,' ');
   const form=isForm(file.name);
@@ -129,7 +135,7 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
   const missing=()=>Object.values(require('./evidence').evidence(attempts.filter(a=>a.assessment!=='target_mismatch')).fields).some(f=>f.status==='unconfirmed');
   // shortcut: at most two more six-page ranges per PDF; expose remaining pages rather than claiming full reading.
   if(!form&&result.source?.format==='pdf'){
-   for(let extra=0;extra<2&&missing()&&result.source?.scanComplete===false;extra++){
+   for(let extra=0;extra<2&&missing()&&result.source?.scanComplete===false&&result.source.scannedThroughPage<18;extra++){
     const page=Number(result.source.scannedThroughPage)+1;
     if(!Number.isInteger(page)||page<2||page>result.source.totalPages)break;
     let next;try{next=await reader({url,fileId:file.fileId,page});}catch(e){next={status:'download_failed',message:e.message};}

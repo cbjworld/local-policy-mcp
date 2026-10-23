@@ -17,6 +17,16 @@ assert r['totalPages']==8 and r['scannedThroughPage']==6 and not r['scanComplete
 assert [p['page'] for p in r['pages']]==list(range(1,7))
 assert all('Budget 58800 page '+str(p['page']) in p['text'] for p in r['pages'])
 last=engine.extract(data,7);assert last['scanComplete'] and [p['page'] for p in last['pages']]==[7,8]
+mixed=PdfWriter()
+for i in range(24):
+    if i in (6,17,18): mixed.add_page(writer.pages[0])
+    else: mixed.add_blank_page(width=600,height=800)
+mixed_buffer=io.BytesIO();mixed.write(mixed_buffer);mixed_data=mixed_buffer.getvalue()
+ordinary=engine.extract(mixed_data,1);assert len(ordinary['pages'])==6 and not any(p['text'] for p in ordinary['pages'])
+recovered=engine.extract(mixed_data,1,scan_empty=True)
+assert len(recovered['pages'])==18 and recovered['scannedThroughPage']==18 and not recovered['scanComplete']
+assert recovered['pages'][6]['text'] and recovered['pages'][17]['text'],'later text must not be skipped just because the first six pages are empty'
+assert engine.extract(data,1,scan_empty=True)==r,'normal text documents keep the six-page first range'
 for payload,start in [(data,9),(b'not PDF',1)]:
     try: engine.extract(payload,start);raise AssertionError('accepted invalid PDF/range')
     except ValueError: pass
