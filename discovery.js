@@ -52,7 +52,9 @@ function brief({title='지자체 정책 사례 검토',cases}={}){
    fields[k]={quote:f.quote.trim(),sourceId:s.sourceId,url:s.url,page:p.page,checkedAt:s.checkedAt};used.set(s.sourceId,s);
   }
   if(!Object.values(fields).some(Boolean))throw new Error('사례마다 원문 근거가 하나 이상 필요합니다.');
-  return {region:c.region,name:c.name,fields};
+  const budget=fields.budget;
+  const financialSummary=budget?require('./financial-summary').summarize([{status:'read',source:{sourceId:budget.sourceId,url:budget.url,pages:[{page:budget.page,text:budget.quote}],scanComplete:false}}]):undefined;
+  return {region:c.region,name:c.name,fields,...(financialSummary?{financialSummary:{...financialSummary,scope:'selected_budget_quote_only'}}:{})};
  });
  if(new Set(normalized.map(c=>JSON.stringify([c.region,c.name]))).size!==normalized.length)throw new Error('서로 다른 사례를 선택하세요.');
  const refs=[...used.keys()];

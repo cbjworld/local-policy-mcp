@@ -41,7 +41,7 @@ function tables(attempts){
  }
  return found;
 }
-const amountLabels={총사업비:['project_total','총사업비'],소요예산:['budget_unspecified','소요예산 · 편성 여부 확인'],사업예산:['budget_unspecified','사업예산 · 편성 여부 확인'],사업비:['budget_unspecified','사업비 · 범위 확인'],예산액:['budget_unspecified','예산액 · 범위 확인'],지원금액:['support_amount','지원액'],지원한도:['support_limit','지원 한도'],지원액:['support_amount','지원액'],금회교부결정내역:['current_allocation','금회 교부결정액'],금회교부액:['current_allocation','금회 교부액'],기교부액:['previous_allocation','기교부액'],교부액:['allocation_unspecified','교부액 · 차수 확인'],교부금액:['allocation_unspecified','교부금액 · 차수 확인'],지원규모:['support_scope','지원 규모 · 성격 확인'],지원단가:['support_unit_rate','지원 단가']};
+const amountLabels={총사업비:['project_total','총사업비'],소요예산:['budget_unspecified','소요예산 · 편성 여부 확인'],사업예산:['budget_unspecified','사업예산 · 편성 여부 확인'],사업비:['budget_unspecified','사업비 · 범위 확인'],예산액:['budget_unspecified','예산액 · 범위 확인'],지원금액:['support_amount','지원액'],지원한도:['support_limit','지원 한도'],지원액:['support_amount','지원액'],금회교부결정내역:['current_allocation','금회 교부결정액'],금회교부액:['current_allocation','금회 교부액'],기교부액:['previous_allocation','기교부액'],교부액:['allocation_unspecified','교부액 · 차수 확인'],교부금액:['allocation_unspecified','교부금액 · 차수 확인'],지원금:['support_budget','지원금 예산'],홍보비:['promotion_budget','홍보비'],지원규모:['support_scope','지원 규모 · 성격 확인'],지원단가:['support_unit_rate','지원 단가']};
 function amounts(attempts){
  const result=[];
  const headings=Object.keys(amountLabels).map(s=>[...s].join('\\s*')).join('|');

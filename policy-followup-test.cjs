@@ -21,11 +21,11 @@ async function main(){
  // Mere text extraction must not end the investigation as two successful cases.
  const textCalls=[],textDocs=Array.from({length:8},(_,i)=>({...primary,institution:'기관'+i,url:'text'+i}));
  const textOnly=await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search(textDocs),research:async({url})=>{textCalls.push(url);return {status:'read'};}});
- assert.equal(textCalls.length,6);assert.equal(textOnly.limits.maxDocuments,7);
+ assert.equal(textCalls.length,6);assert.equal(textOnly.limits.maxDocuments,8);
  const grant={...primary,title:'2026년 산후조리비 지원 교부결정',url:'grant'};
  const financeCalls=[];
  const finance=await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search([primary,grant]),research:async({url})=>{financeCalls.push(url);return url==='grant'?full():{status:'unreadable'};}});
- assert.deepEqual(financeCalls,['primary','grant']);assert.equal(finance.investigations[1].purpose,'link_financial_evidence');
+ assert.deepEqual(financeCalls,['primary','grant']);assert.equal(finance.investigations[1].purpose,'fill_missing_evidence');
  const stale=[];
  await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search([primary,{...grant,title:grant.title.replace('2026','2025')}]),research:async({url})=>{stale.push(url);return {status:'unreadable'};}});
  assert.deepEqual(stale,['primary'],'do not substitute an explicitly different fiscal year');

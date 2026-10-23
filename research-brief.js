@@ -6,6 +6,8 @@ module.exports=function researchBrief(documents,links=[]){
   budgetEvidenceStatus:{status:d.supportingOnly?'supporting_document':d.readingStatus!=='read'?'not_read':d.reading?.fields.find(f=>f.key==='budget')?.state==='가림 처리'?'redacted':d.reading?.fields.find(f=>f.key==='budget')?.evidence?.length?'body_excerpt':'read_no_budget_excerpt',readingStatus:d.readingStatus},
   basis:d.targetFit?.requested?.length&&d.targetFit.status==='unspecified'&&d.readingStatus==='read'?'본문 열람 · 요청 대상 관련성 미확인':d.readingStatus==='read'&&!d.supportingOnly?(evidenceCount(d)?'본문 근거 후보':'본문 열람 · 핵심 근거 미확인'):'제목으로 사업 존재 추정',
   role:d.role,
+  financialSupplements:documents.filter(s=>d.url&&s.followup?.fromUrl===d.url&&s.reading?.financialSummary).map(s=>({documentId:s.id,title:s.title,url:s.url,role:s.role,relationship:s.followup.relationship,missingFields:s.followup.missingFields,financialSummary:require('./financial-summary').compact(s.reading.financialSummary)})),
+  ...(!d.supportingOnly&&d.reading?.financialSummary?{financialSummary:require('./financial-summary').compact(d.reading.financialSummary)}:{}),
   fields:Object.fromEntries(['target','activity','budget','period'].map(key=>{
    const f=!d.supportingOnly&&d.reading?.fields.find(f=>f.key===key);
    const excerpts=f?.evidence?.filter(e=>e.quote&&e.quote.length<=500)||[];
