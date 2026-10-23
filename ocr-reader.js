@@ -10,7 +10,7 @@ function read(bytes,{page=1}={}){
   catch{busy=false;cleanup();reject(Error('OCR 프로세스 실행 실패'));return;}
   let settled=false;
   const finish=(err,result)=>{if(settled)return;settled=true;clearTimeout(timer);busy=false;child.kill();err?reject(err):resolve(result);};
-  const timer=setTimeout(()=>finish(Error('OCR 한 쪽 처리 45초 제한 초과')),45000);
+  const timer=setTimeout(()=>finish(Error('OCR 한 쪽 처리 120초 제한 초과')),120000);
   child.on('error',()=>finish(Error('OCR 프로세스 실행 실패')));child.on('exit',()=>{cleanup();finish(Error('OCR 프로세스 종료'));});
   child.on('message',m=>{const r=m?.result;if(!r||typeof r.text!=='string'||r.text.length>14000||JSON.stringify(r).length>250000)return finish(Error(m?.error||'OCR 출력 형식 한도 초과'));finish(null,r);});
   child.send({bytes,page,dir},e=>{if(e)finish(Error('OCR 입력 전송 실패'));});
