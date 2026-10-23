@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict'),{configured,read}=require('./ocr-accelerator'),original=global.fetch;
+(async()=>{assert.equal(configured(),false);process.env.POLICY_OCR_RELAY_URL='https://example.vercel.app/api/ocr';process.env.POLICY_OCR_RELAY_TOKEN='test-only-key';assert(configured());let called=0;
+ const result={text:'80백만원',truncated:false,ocr:{engine:'Tesseract.js 7.0.0',passes:2,quality:{verification:'ocr_transcription_only',items:[]}}};
+ global.fetch=async(url,options)=>{called++;assert.equal(url.protocol,'https:');assert.equal(options.redirect,'error');assert.equal(options.headers.authorization,'Bearer test-only-key');assert.equal(options.headers['x-vercel-protection-bypass'].length,32);assert.equal(JSON.parse(options.body).rawImage,Buffer.from('raw').toString('base64'));return new Response(JSON.stringify(result));};
+ assert.deepEqual(await read(Buffer.from('raw'),Buffer.from('clean')),result);assert.equal(called,1);
+ process.env.POLICY_OCR_RELAY_URL='http://example.vercel.app/api/ocr';await assert.rejects(read(Buffer.from('raw'),Buffer.from('clean')),/INVALID/);assert.equal(called,1);
+ process.env.POLICY_OCR_RELAY_URL='https://127.0.0.1/api/ocr';await assert.rejects(read(Buffer.from('raw'),Buffer.from('clean')),/INVALID/);assert.equal(called,1);
+ process.env.POLICY_OCR_RELAY_URL='https://example.vercel.app/api/ocr';await assert.rejects(read(Buffer.alloc(3000000),Buffer.from('clean')),/PAYLOAD/);assert.equal(called,1);
+ global.fetch=async()=>new Response('unavailable',{status:503});await assert.rejects(read(Buffer.from('raw'),Buffer.from('clean')),/HTTP_503/);
+ global.fetch=async()=>new Response(JSON.stringify({...result,text:12}));await assert.rejects(read(Buffer.from('raw'),Buffer.from('clean')),/INVALID/);
+ global.fetch=async()=>new Response('x'.repeat(250001));await assert.rejects(read(Buffer.from('raw'),Buffer.from('clean')),/OUTPUT_LIMIT/);
+ console.log('PASS: OCR acceleration HTTPS/host restriction, server authentication, input/output bounds, two-pass metadata and failure handling');
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{global.fetch=original;delete process.env.POLICY_OCR_RELAY_URL;delete process.env.POLICY_OCR_RELAY_TOKEN;});

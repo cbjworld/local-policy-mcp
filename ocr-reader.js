@@ -9,7 +9,7 @@ function read(bytes,{page=1}={}){
  return new Promise((resolve,reject)=>{
   let dir,child;
   const cleanup=()=>{if(dir&&path.dirname(path.resolve(dir))===path.resolve(os.tmpdir())&&path.basename(dir).startsWith('policy-ocr-'))try{fs.rmSync(dir,{recursive:true,force:true,maxRetries:2});}catch{}};
-  try{dir=fs.mkdtempSync(path.join(os.tmpdir(),'policy-ocr-'));child=fork(path.join(__dirname,'ocr-worker.js'),[],{execArgv:['--max-old-space-size=256'],serialization:'advanced',stdio:['ignore','ignore','ignore','ipc'],windowsHide:true,env:Object.fromEntries(['PATH','Path','SystemRoot','WINDIR','TEMP','TMP','POLICY_PYTHON'].filter(k=>process.env[k]).map(k=>[k,process.env[k]]))});}
+  try{dir=fs.mkdtempSync(path.join(os.tmpdir(),'policy-ocr-'));child=fork(path.join(__dirname,'ocr-worker.js'),[],{execArgv:['--max-old-space-size=256','--use-system-ca'],serialization:'advanced',stdio:['ignore','ignore','ignore','ipc'],windowsHide:true,env:Object.fromEntries(['PATH','Path','SystemRoot','WINDIR','TEMP','TMP','POLICY_PYTHON','POLICY_OCR_RELAY_URL','POLICY_OCR_RELAY_TOKEN'].filter(k=>process.env[k]).map(k=>[k,process.env[k]]))});}
   catch{busy=false;cleanup();reject(Error('OCR 프로세스 실행 실패'));return;}
   let settled=false;
   const finish=(err,result)=>{if(settled)return;settled=true;clearTimeout(timer);busy=false;child.kill();err?reject(err):resolve(result);};
