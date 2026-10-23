@@ -62,4 +62,23 @@ function retainedLinks(confirmed,documents){
  const urls=new Set(documents.map(d=>d.url));
  return confirmed.map(link=>{const kept=link.documents.filter(d=>urls.has(d.url));return {...link,documents:kept,primaryUrl:urls.has(link.primaryUrl)?link.primaryUrl:kept[0]?.url,omittedDocumentCount:(link.omittedDocumentCount||0)+link.documents.length-kept.length};}).filter(link=>link.documents.length>=2);
 }
-module.exports={links,caseCounts,retainedLinks};
+function catalogLinks(context,candidates=[],investigations=[],existing=[]){
+ const {documentKey,institutionKey}=require('./catalog-evidence'),present=new Map(candidates.map(d=>[documentKey(d.url),d])),read=new Map(investigations.map(d=>[documentKey(d.candidate.url),d]));
+ const occupied=new Set(existing.flatMap(l=>l.documents.map(d=>documentKey(d.url))));
+ const result=[];
+ for(const item of context?.items||[]){
+  const matched=[];
+  for(const link of item.documents||[]){
+   if(link.status!=='body_supported'||link.relationship!=='same_named_budget_program'||!link.evidence?.some(e=>e.quote))continue;
+   const key=documentKey(link.document.url),candidate=present.get(key);if(!candidate||occupied.has(key)||institutionKey(candidate.institution)!==institutionKey(link.document.institution))continue;
+   const fresh=read.get(key),freshPages=fresh?.result.status==='read'?pages(fresh):[],freshPeriod=period(freshPages);
+   if(!freshPeriod&&freshPages.some(p=>/사\s*업\s*기\s*간\s*[:：)]\s*20\d{2}/.test(p.text)))continue;
+   if(freshPeriod&&Number(freshPeriod.year)!==item.year)continue;
+   if(!matched.some(m=>documentKey(m.document.url)===key))matched.push({document:{url:candidate.url,institution:candidate.institution},evidence:link.evidence});
+  }
+  if(matched.length<2)continue;
+  result.push({name:item.name,year:String(item.year),status:'same_budget_project_saved_body_supported',basis:'같은 기관·부서·연도·회계·사업 식별번호에 직접 연결된 저장 본문 근거',catalogProjectId:item.projectId,coordinatingInstitution:(item.parent||'')+' '+item.institution,primaryUrl:matched[0].document.url,documents:matched.map(m=>m.document),evidence:matched.flatMap(m=>m.evidence.map(e=>({...e,url:e.sourceUrl}))),countAsOneCase:true,budgetRule:'같은 사업의 원안·수정안·단계별 문서입니다. 문서별 금액과 조건을 보존하며 합산하지 않습니다. 최신 문서가 이전 문서를 대체했는지와 현재 효력은 별도 확인합니다.'});
+ }
+ return result;
+}
+module.exports={links,caseCounts,retainedLinks,catalogLinks};

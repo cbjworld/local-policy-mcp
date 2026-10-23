@@ -46,3 +46,17 @@ const sameUpper=mutate(upper,x=>{x.candidate.url='upper2';x.candidate.title+=' �
 assert.equal(links([upper,sameUpper,lower]).length,1);
 assert.equal(links([upper,sameUpper,lower])[0].documents.length,3);
 console.log('PASS: one case for body-linked provincial/municipal documents; budgets and citations preserved, title-only/year/sender/region/additional-project false matches excluded');
+
+const {catalogLinks}=require('./program-links');
+const revisionCandidates=[{title:'2026년 AI 서비스 운영계획',institution:'서울특별시 강동구',url:'https://www.open.go.kr/a'},{title:'2026년 AI 서비스 운영계획 수정',institution:'서울특별시 강동구',url:'https://www.open.go.kr/b'}];
+const catalog={items:[{projectId:'one',budgetRecords:[],budgetVariants:[],documentCandidates:[],name:'AI 업무지원',institution:'강동구',parent:'서울특별시',year:2026,documents:revisionCandidates.map(d=>({status:'body_supported',relationship:'same_named_budget_program',document:d,evidence:[{quote:'2026년 AI 서비스',page:1,sourceUrl:d.url}]}))}]};
+assert.equal(catalogLinks(catalog,revisionCandidates).length,1);
+assert.equal(catalogLinks(catalog,revisionCandidates,[],[{documents:[revisionCandidates[0]]}]).length,0);
+for(const status of ['title_candidate','not_read']){const c=structuredClone(catalog);c.items[0].documents[1].status=status;assert.equal(catalogLinks(c,revisionCandidates).length,0);}
+const referenceCatalog=structuredClone(catalog);referenceCatalog.items[0].documents[1].relationship='explicit_budget_line_reference';assert.equal(catalogLinks(referenceCatalog,revisionCandidates).length,0);
+assert.equal(catalogLinks(catalog,[revisionCandidates[0],{...revisionCandidates[1],institution:'서울특별시 중구'}]).length,0);
+const futureRevision={candidate:revisionCandidates[1],result:{status:'read',attempts:[{status:'read',source:{pages:[{page:1,text:'사업기간: 2027년'}]}}]}};assert.equal(catalogLinks(catalog,revisionCandidates,[futureRevision]).length,0);
+const revisionValue={catalogEvidence:catalog,candidates:revisionCandidates.map(d=>({...d,relevance:{kind:'project_candidate'},documentRole:'plan'})),investigations:[],projects:revisionCandidates.map(d=>({institution:d.institution,name:d.title,documents:[d],fields:{}}))};
+const revisionOutput=require('./presentation').present('research_policy',revisionValue);assert.equal(revisionOutput.summary.projectGroups,1);assert.equal(revisionOutput.summary.textReadDocuments,0);assert.equal(revisionOutput.quickBrief.length,1);assert.equal(revisionOutput.caseComparison.length,1);assert.equal(revisionOutput.caseComparison[0].documents.length,2);assert.equal(require('./presentation').present('research_policy',revisionValue,'full').presentation.projects.length,1);
+
+const splitCatalog={items:catalog.items[0].documents.map((d,i)=>({...catalog.items[0],projectId:"separate"+i,documents:[d]}))};assert.equal(catalogLinks(splitCatalog,revisionCandidates).length,0);
