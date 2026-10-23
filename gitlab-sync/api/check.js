@@ -1,7 +1,7 @@
 module.exports=async(req,res)=>{
  if(req.method!=='GET'){res.statusCode=405;return res.end();}
  const results=[];
- for(const url of ['https://gitlab.aigov.go.kr/','https://gitlab.aigov.go.kr/conicon/local-policy-mcp.git/info/refs?service=git-receive-pack']){
+ for(const url of ['https://github.com/cbjworld/local-policy-mcp.git/info/refs?service=git-upload-pack','https://gitlab.aigov.go.kr/','https://gitlab.aigov.go.kr/conicon/local-policy-mcp.git/info/refs?service=git-receive-pack']){
   const started=Date.now();
   try{const response=await fetch(url,{signal:AbortSignal.timeout(10000),redirect:'manual'});await response.body?.cancel();results.push({url,status:response.status,ms:Date.now()-started});}
   catch(error){results.push({url,error:error.cause?.code||error.name,ms:Date.now()-started});}

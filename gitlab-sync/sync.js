@@ -16,7 +16,9 @@ function httpClient(deadline,fetcher=fetch){
   allowedRequest(url,method,headers);
   const left=deadline-Date.now();if(left<=0)throw Error('SYNC_DEADLINE');
   const requestBody=body?(async function*(){for await(const chunk of body)yield chunk;})():undefined;
-  const r=await fetcher(url,{method,headers,redirect:'manual',signal:AbortSignal.timeout(left),...(requestBody?{body:requestBody,duplex:'half'}:{})});
+  let r;
+  try{r=await fetcher(url,{method,headers,redirect:'manual',signal:AbortSignal.timeout(left),...(requestBody?{body:requestBody,duplex:'half'}:{})});}
+  catch(error){const code=error.cause?.code||error.code||error.name;error.safeTransportCode=['ECONNREFUSED','ECONNRESET','ETIMEDOUT','ENOTFOUND','EAI_AGAIN','UND_ERR_CONNECT_TIMEOUT','UND_ERR_SOCKET','TimeoutError','AbortError'].includes(code)?code:'TRANSPORT_ERROR';error.safeTransportTarget=url.startsWith(SOURCE)?'github':'gitlab';throw error;}
   if(r.status>=300&&r.status<400){await r.body?.cancel();throw Error('REDIRECT_BLOCKED');}
   return {url,method,statusCode:r.status,statusMessage:r.statusText,headers:Object.fromEntries(r.headers),body:(async function*(){if(r.body)for await(const chunk of r.body){received+=chunk.length;if(received>128*1024*1024)throw Error('SYNC_DOWNLOAD_LIMIT');yield chunk;}})()};
  }};
