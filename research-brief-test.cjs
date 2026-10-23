@@ -18,3 +18,7 @@ const compact=require('./compact-research')({candidates:Array.from({length:200},
 assert(JSON.stringify(compact).length<=24000);
 assert(compact.quickBrief.every(b=>compact.documents.some(d=>d.id===b.documentId)));
 console.log('PASS: concise sourced brief, unread/private and supporting evidence separation, redaction, bounded quotes and references');
+
+const crowdedReads=Array.from({length:12},(_,i)=>({candidate:{title:'산후조리비 지원 계획',institution:'지역'+i,url:'read'+i,relevance:{kind:'project_candidate'}},result:{status:'read',attempts:[],evidence:{fields:{budget:{status:'needs_review',excerpts:[{quote:'사업예산 100만원',url:'read'+i,page:1}],amounts:Array.from({length:30},()=>({role:'budget_unspecified',quote:'예산'.repeat(400),amountTexts:['100만원'],url:'read'+i,page:1}))}}}}}));
+const crowdedResult=require('./presentation').present('research_policy',{candidates:crowdedReads.map(r=>r.candidate),investigations:crowdedReads,projects:[]});
+assert(JSON.stringify(crowdedResult).length<=24000);assert(crowdedResult.quickBrief.length>0);assert(crowdedResult.caseComparison.length>0);assert(crowdedResult.documents.length>0,'compaction must retain evidence rows rather than deleting every document');

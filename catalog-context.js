@@ -13,8 +13,14 @@ function lookup(request,search=require('./policy-catalog').search){
   const result=search({q,...(municipality?{institution:municipality}:{}),limit:20});coverage=result.coverage;
   searches.push({q,institution:municipality,total:result.total,nextOffset:result.nextOffset});
   for(const item of result.items)entries.set(item.projectId,item);
+  const linked=search({q,...(municipality?{institution:municipality}:{}),limit:20,linkedOnly:true});
+  Object.assign(searches.at(-1),{savedLinkedTotal:linked.total,savedLinkedNextOffset:linked.nextOffset});
+  for(const item of linked.items)entries.set(item.projectId,item);
  }catch(error){searches.push({q,status:'failed',message:error.message});}}
- const items=[...entries.values()].sort((a,b)=>Number(b.documents.length>0)-Number(a.documents.length>0)).slice(0,5);
+ const ranked=[...entries.values()].sort((a,b)=>Number(b.documents.length>0)-Number(a.documents.length>0)||Number(b.documentCandidates.length>0)-Number(a.documentCandidates.length>0));
+ const items=[],seenInstitutions=new Set();
+ for(const item of ranked){const key=(item.parent||'')+' '+item.institution;if(seenInstitutions.has(key))continue;items.push(item);seenInstitutions.add(key);if(items.length===5)break;}
+ for(const item of ranked)if(items.length<5&&!items.some(p=>p.projectId===item.projectId))items.push(item);
  const seedDocuments=new Map();
  if(!request.broad)for(const item of items)for(const link of item.documents){
   // Only direct, dated links seed live reading. Related accounts and title matches stay references.

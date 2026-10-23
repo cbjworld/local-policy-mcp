@@ -36,12 +36,14 @@ function open(directory=__dirname){
   const links=JSON.parse(packed).links,byId=new Map();for(const link of links){if(!byId.has(link.projectId))byId.set(link.projectId,[]);byId.get(link.projectId).push(link);}
   const regions=db.prepare('SELECT id,raw FROM contexts').all().map(row=>{const c=enrich(JSON.parse(row.raw),directory);return {id:row.id,key:normalize((c.parent||'')+' '+c.institution)};});
   const read=db.prepare('SELECT p.raw AS item,c.raw AS context FROM catalog_rows r JOIN projects p ON p.id=r.row_id JOIN contexts c ON c.id=p.context_id WHERE r.project_id=? ORDER BY r.row_id');
-  function search({q,institution,projectId:id,offset=0,limit=10}={}){
+  function search({q,institution,projectId:id,offset=0,limit=10,linkedOnly=false}={}){
+   if(typeof linkedOnly!=='boolean')throw Error('Invalid linkedOnly');
    if(q!==undefined&&(typeof q!=='string'||!q.trim()||q.length>100))throw Error('Invalid q');
    if(institution!==undefined&&(typeof institution!=='string'||!institution.trim()||institution.length>80))throw Error('Invalid institution');
    if(id!==undefined&&!/^bp-[a-f0-9]{24}$/.test(id))throw Error('Invalid projectId');
    if(!Number.isInteger(offset)||offset<0||offset>meta.rows||!Number.isInteger(limit)||limit<1||limit>20)throw Error('Invalid pagination');
    const where=[],params=[];if(id){where.push('id=?');params.push(id);}
+   if(linkedOnly){const ids=[...byId.keys()];where.push(ids.length?'id IN ('+ids.map(()=>'?').join(',')+')':'0');params.push(...ids);}
    for(const term of q?.trim().split(/\s+/)||[]){where.push('instr(name_key,?)>0');params.push(normalize(term));}
    const region=institution?.replace(/^전라남도(?=\s|.+[시군구]$)/,'전남광주통합특별시');
    const regionTerms=region?.trim().split(/\s+/).map(normalize)||[];

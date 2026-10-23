@@ -4,6 +4,8 @@ const entry={projectId:'one',name:'노인 보청기 지원',institution:'영암�
 const calls=[],search=args=>{calls.push(args);return {coverage:{year:2026},total:1,nextOffset:null,items:[entry]};};
 const request=workflow.plan({question:'영암군 노인 보청기 지원 사업 찾아줘',startDate:'20260101',endDate:'20261231'});
 const found=lookup(request,search);assert.equal(found.seedDocuments.length,1);assert(calls.every(c=>c.q==='노인 보청기'&&c.institution==='영암군'));
+const beyondPage=lookup(request,args=>({total:21,nextOffset:args.linkedOnly?null:20,items:args.linkedOnly?[entry]:Array.from({length:20},(_,i)=>({...entry,projectId:'unlinked'+i,documents:[],documentCandidates:[]}))}));
+assert.equal(beyondPage.seedDocuments.length,1,'linked evidence beyond the ordinary first page must survive');assert.equal(beyondPage.items[0].projectId,'one');
 assert.equal(compact(found).items[0].documents[0].status,'saved_body_supported_link');assert.equal(compact(found).items[0].documentCandidates[0].status,'title_candidate');
 assert.equal(lookup({...request,startDate:'20270101',endDate:'20271231'},search).seedDocuments.length,0);
 assert.equal(lookup({...request,broad:true},search).seedDocuments.length,0);

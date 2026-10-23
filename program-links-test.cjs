@@ -29,6 +29,10 @@ const signed=mutate(lower,x=>{x.result.attempts[0].source.pages[0].text=x.result
 for(const e of links([upper,signed])[0].evidence)assert([...upper.result.attempts,signed.result.attempts[0]].some(a=>a.source.pages.some(p=>p.text.includes(e.quote))));
 const reversed=mutate(upper,x=>{x.result.attempts[0].source.pages[0].text='부산형 산후조리비 지원사업\n사업기간: 2026년\n보조 사업자 : 16개 구·군';});
 assert.equal(links([reversed,lower]).length,1);
+const flattened=mutate(lower,x=>{x.result.attempts[0].source.pages[0].text='수영구 첨부 '+ '공문 본문 '.repeat(120)+'부산형 산후조리비 지원사업 보조금 교부결정 사업기간: 2026. 1. ~ 12. 부산광역시장 수신자 수영구청장 주무관';});
+assert.equal(links([upper,flattened]).length,1);
+for(const e of links([upper,flattened])[0].evidence)assert([upper,flattened].some(d=>d.result.attempts.some(a=>a.source.pages.some(p=>p.text.includes(e.quote)))));
+assert.equal(links([upper,mutate(flattened,x=>{x.result.attempts[0].source.pages[0].text=x.result.attempts[0].source.pages[0].text.replace('부산광역시장 수신자','부산광역시장의 처분에 따른다 수신자');})]).length,0);
 const extra=mutate(lower,x=>{x.candidate.url='lower2';x.candidate.institution='부산광역시 중구';});
 const many=links([upper,lower,extra]);
 const kept=require('./program-links').retainedLinks(many,[{url:'upper'},{url:'lower'}]);

@@ -38,7 +38,7 @@ function evidence(attempts){
     // A procurement qualification describes the deliverer, not the beneficiary.
     const eligibility=key==='target'&&/^신\s*청\s*자\s*격/.test(entry.quote);
     const compact=entry.quote.replace(/\s+/g,'');
-    const delivery=eligibility&&(/(?:수탁|수행|위탁|운영)(?:기관|업체)|지방계약법|국가계약법/.test(compact)||(/의료기관|전문기관|법인|단체|업체/.test(compact)&&/전문인력|검진장비|사업수행능력|위탁운영|용역수행/.test(compact)));
+    const delivery=eligibility&&(/(?:수탁|수행|위탁|운영)(?:기관|업체)|지방계약법|국가계약법/.test(compact)||(/의료기관|전문기관|법인|단체|업체/.test(compact)&&/전문인력|검진장비|사업수행능력|위탁운영|용역수행|위탁추진실적/.test(compact)));
     if(delivery)deliveryQualifications.push({...entry,role:'delivery_qualification'});
     else if(reference)referenceExcerpts.push({...entry,field:key});else excerpts.push(entry);
    }

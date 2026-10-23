@@ -28,11 +28,14 @@ module.exports=function compactResearch(value){
  output.responseSize.omittedBudgetLinks=0;
  output.responseSize.omittedEvidenceGroups=0;
  output.quickBrief=require('./research-brief')(briefInputs.filter(d=>documents.some(k=>k.id===d.id)),output.confirmedProgramLinks);
+ const refreshComparison=()=>{output.caseComparison=require('./case-comparison')(output.quickBrief,output.catalogEvidence);};
+ refreshComparison();
  const oversized=()=>JSON.stringify(output).length>24000;
  const pruneReferences=()=>{
   const kept=new Set(documents.map(d=>d.id));
   output.confirmedProgramLinks=require('./program-links').retainedLinks(output.confirmedProgramLinks,documents);
   output.quickBrief=require('./research-brief')(briefInputs.filter(d=>documents.some(k=>k.id===d.id)),output.confirmedProgramLinks);
+  refreshComparison();
   output.comparison=output.comparison.filter(p=>p.documentIds.length&&p.documentIds.every(id=>kept.has(id)));
   const links=output.possibleProjectLinks.filter(x=>x.documentIds.every(id=>kept.has(id)));
   output.responseSize.omittedLinks+=output.possibleProjectLinks.length-links.length;output.possibleProjectLinks=links;
@@ -48,14 +51,15 @@ module.exports=function compactResearch(value){
  while(oversized()&&output.possibleProjectLinks.length){output.possibleProjectLinks.pop();output.responseSize.omittedLinks++;}
  while(oversized()&&output.evidenceMap.length){output.evidenceMap.pop();output.responseSize.omittedEvidenceGroups++;}
  while(oversized()&&output.budgetCandidates.length){output.budgetCandidates.pop();output.responseSize.omittedBudgetCandidates++;}
- while(oversized()&&output.catalogEvidence?.items.length){output.catalogEvidence.items.pop();output.responseSize.omittedCatalogItems++;}
+ while(oversized()&&output.catalogEvidence?.items.length>1){output.catalogEvidence.items.pop();output.responseSize.omittedCatalogItems++;refreshComparison();}
  // Preserve whole quotations rather than cutting evidence mid-sentence.
  for(let i=documents.length-1;i>=0&&oversized();i--)if(documents[i].reading){delete documents[i].reading;documents[i].readingDetailsOmitted=true;output.responseSize.omittedReadingDetails++;}
  while(oversized()&&output.possibleProjectLinks.length){output.possibleProjectLinks.pop();output.responseSize.omittedLinks++;}
  while(oversized()&&output.evidenceMap.length){output.evidenceMap.pop();output.responseSize.omittedEvidenceGroups++;}
  while(oversized()&&output.budgetEvidenceLinks.length){output.budgetEvidenceLinks.pop();output.responseSize.omittedBudgetLinks++;}
- while(oversized()&&documents.length){documents.pop();output.responseSize.omittedDocuments++;}
+ while(oversized()&&documents.length){documents.pop();output.responseSize.omittedDocuments++;pruneReferences();}
  pruneReferences();
+ while(oversized()&&output.catalogEvidence?.items.length){output.catalogEvidence.items.pop();output.responseSize.omittedCatalogItems++;refreshComparison();}
  if(oversized())return {responseMode:'compact',responseSize:{maxCharacters:24000,metadataOmitted:true,omittedDocuments:rows.size},detailHint:output.detailHint,note:'메타데이터가 응답 한도를 초과했습니다. detail=full로 조회하세요.'};
  return output;
 };

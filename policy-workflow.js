@@ -8,6 +8,10 @@ function plan({question,queries,startDate,endDate}={},now=new Date()){
  const words=topic.split(/\s+/);
  // shortcut: mechanical fallback only; the host AI supplies semantic query variants without asking the user.
  const derived=[topic];if(words.length>2)derived.push(words.filter(w=>!['지원','사업','정책'].includes(w)).join(' '));
+ if(/음식물\s*처리기/.test(topic)){
+  const subject=words.filter(w=>!['지원','사업','정책'].includes(w)).join(' ');
+  derived.splice(1,derived.length,subject.replace(/음식물\s*처리기/,'음식물쓰레기 처리기'),subject.replace(/음식물\s*처리기/,'음식물 감량기'));
+ }
  const terms=queries===undefined?[...new Set(derived)]:queries;
  if(!Array.isArray(terms)||terms.length<1||terms.length>3||terms.some(q=>typeof q!=='string'||!q.trim()||q.length>150))throw Error('검색 표현은 1~3개의 150자 이하 문자열이어야 합니다.');
  if((startDate===undefined)!==(endDate===undefined))throw Error('기간을 지정하려면 시작일과 종료일을 함께 입력하세요.');

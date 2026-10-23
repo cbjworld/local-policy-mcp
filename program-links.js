@@ -1,6 +1,12 @@
 const normalize=s=>String(s||'').normalize('NFKC').replace(/\s+/g,'');
 function pages(x){return (x.result.attempts||[]).filter(a=>a.status==='read'&&a.assessment!=='form_or_cover').flatMap(a=>(a.source?.pages||[]).map(p=>({...p,sourceId:a.source.sourceId,url:a.source.url})));}
 const cite=(p,quote)=>({sourceId:p.sourceId,url:p.url,page:p.page,quote});
+function issuer(text,institution){
+ const exact=text.split('\n').find(line=>normalize(line.replace(/<[^>]+>|[*_#]/g,''))===institution+'장');
+ if(exact)return exact;
+ const escaped=[...institution+'장'].map(c=>c.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('\\s*');
+ return text.match(new RegExp(escaped+'(?=\\s+(?:수신자|주무관|협조자|시행)|\\s*$)'))?.[0];
+}
 function period(ps){
  const matches=ps.flatMap(p=>[...p.text.matchAll(/사\s*업\s*기\s*간\s*[:：)]\s*(20\d{2})(?:년|\.)/g)].map(m=>({year:m[1],evidence:cite(p,m[0])})));
  const years=new Set(matches.map(m=>m.year));return years.size===1?matches[0]:null;
@@ -24,11 +30,13 @@ function links(investigations=[]){
    const ps=pages(lower),lowerYear=period(ps);
    if(!lowerYear||lowerYear.year!==year.year)continue;
    // Require an explicit grant notice naming this program and its provincial/city issuer.
-   const grant=ps.find(p=>normalize(p.text).includes(normalize(name))&&/교부결정|교부통지|교부\s*알림/.test(p.text)&&p.text.split('\n').some(line=>normalize(line.replace(/<[^>]+>|[*_#]/g,''))===institution+'장'));
+   const grant=ps.find(p=>normalize(p.text).includes(normalize(name))&&/교부결정|교부통지|교부\s*알림/.test(p.text)&&issuer(p.text,institution));
    if(!grant)continue;
-   const programQuote=grant.text.split('\n').find(line=>normalize(line).includes(normalize(name))&&/교부결정|교부통지|교부\s*알림/.test(line));
+   const programLine=grant.text.split('\n').find(line=>normalize(line).includes(normalize(name))&&/교부결정|교부통지|교부\s*알림/.test(line));
+   const programPattern=[...normalize(name)].map(c=>c.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('\\s*');
+   const programQuote=programLine?.length<=500?programLine:grant.text.match(new RegExp(programPattern+'[^\\n]{0,100}?(?:교부결정|교부통지|교부\\s*알림)'))?.[0];
    if(!programQuote||programQuote.length>500)continue;
-   const issuerQuote=grant.text.split('\n').find(line=>normalize(line.replace(/<[^>]+>|[*_#]/g,''))===institution+'장');
+   const issuerQuote=issuer(grant.text,institution);
    members.push({url:lower.candidate.url,institution:lower.candidate.institution,evidence:[lowerYear.evidence,cite(grant,programQuote),cite(grant,issuerQuote)]});
   }
   if(members.length)groups.push({name:name.trim(),year:year.year,status:'same_program_body_supported',coordinatingInstitution:institution,primaryUrl:upper.candidate.url,documents:[{url:upper.candidate.url,institution},...members.map(({url,institution})=>({url,institution}))],evidence:[year.evidence,cite(distribution.p,distribution.m[0]),...members.flatMap(m=>m.evidence)],countAsOneCase:true,budgetRule:'사업은 한 사례로 비교합니다. 광역 전체액·기초 사업비·교부액은 문서별로 유지하고 합산하지 마세요. 문서 생산기관이 금액의 적용 범위를 뜻하지 않습니다.'});

@@ -45,6 +45,7 @@ async function budgetFallbackTest(){
 budgetFallbackTest().catch(e=>{console.error(e);process.exitCode=1});
 assert.equal(w.plan({question:'반려동물 정책 찾아줘'},now).broad,true);
 assert.deepEqual(w.plan({question:'청년 AI 구독료 지원 사례 찾아줘'},now).queries,['청년 AI 구독료 지원','청년 AI 구독료']);
+assert.deepEqual(w.plan({question:'가정용 음식물처리기 지원 사업 찾아줘'},now).queries,['가정용 음식물처리기 지원 사업','가정용 음식물쓰레기 처리기','가정용 음식물 감량기']);
 assert.equal(w.plan({question:'병원 동행'},now).startDate,'20241013');
 for(const args of [{question:''},{question:'사업',queries:[]},{question:'청년',startDate:'20260101'}])assert.throws(()=>w.plan(args));
 const calls=[],io={search:async({q,page})=>({total:3,hasMore:false,items:[{title:'청년 AI 구독료 지원사업 추진계획',institution:'A',url:'a'},{title:'청년 AI 구독료 지원계획',institution:'B',url:'b'}],reviewItems:[],relatedDocuments:[]}),research:async x=>{calls.push(x);return {status:'read'};}};

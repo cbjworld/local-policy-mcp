@@ -1,6 +1,6 @@
 {
   "name": "local-policy-mcp",
-  "version": "0.7.20",
+  "version": "0.7.21",
   "private": true,
   "description": "Korean municipal policy document research through the information disclosure portal",
   "license": "MIT",
@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node --use-system-ca mcp.js",
     "start:http": "node --use-system-ca http-server.js",
-    "test": "node catalog-context-test.cjs && node catalog-evidence-test.cjs && node policy-catalog-test.cjs && node short-question-test.cjs && node budget-search-test.cjs && node budget-index-test.cjs && node pdf-fast-test.cjs && node evidence-test.js && node funding-evidence-test.js && node budget-evidence-links-test.js && node extractor-setup-test.cjs && node hangul-reader-test.cjs && node relevance-test.js && node official-fetch-test.cjs && node seoul-relay/test.cjs && node external-prefetch-test.cjs && node open-portal-test.js && node policy-workflow-test.js && node policy-followup-test.cjs && node project-bundles-test.js && node research-brief-test.cjs && node session-queue-test.cjs && node program-links-test.cjs && node adoption-review-test.cjs && node smoke-test.cjs && node http-test.cjs",
+    "test": "node case-comparison-test.cjs && node catalog-context-test.cjs && node catalog-evidence-test.cjs && node policy-catalog-test.cjs && node short-question-test.cjs && node budget-search-test.cjs && node budget-index-test.cjs && node pdf-fast-test.cjs && node evidence-test.js && node funding-evidence-test.js && node budget-evidence-links-test.js && node extractor-setup-test.cjs && node hangul-reader-test.cjs && node relevance-test.js && node official-fetch-test.cjs && node seoul-relay/test.cjs && node external-prefetch-test.cjs && node open-portal-test.js && node policy-workflow-test.js && node policy-followup-test.cjs && node project-bundles-test.js && node research-brief-test.cjs && node session-queue-test.cjs && node program-links-test.cjs && node adoption-review-test.cjs && node smoke-test.cjs && node http-test.cjs",
     "prepare:index": "node build-budget-index.cjs",
     "import:catalog": "node import-catalog-evidence.cjs"
   },

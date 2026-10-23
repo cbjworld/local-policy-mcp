@@ -73,3 +73,6 @@ assert.equal(evidence(make('사 업 예 산 : 840백 만 원 (도 비 100%)')).f
 assert.equal(evidence(make('소요예산 '+String.raw`\*\*\*\*`)).fields.budget.status,'redacted');
 assert.equal(evidence(make('소요예산 *****')).fields.budget.status,'redacted');
 assert.equal(evidence(make('소요예산을 검토할 예정')).fields.budget.status,'unconfirmed');
+
+const commissioned=evidence(make('신청자격 : 주사무소가 광주에 소재하고 취업지원분야 사업위탁 추진 실적이 있으며 사업을 지속적으로 관리·운영 가능한 법인 또는 단체'));
+assert.equal(commissioned.fields.target.status,'unconfirmed');assert.equal(commissioned.deliveryQualifications.length,1);
