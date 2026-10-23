@@ -11,3 +11,5 @@ Only fast-forward updates to `main` are allowed. Divergent history stops the job
 Run `node test.cjs` for fixed-host, credential isolation, access checks, fast-forward, repeat-call, stale-event, verification and cleanup tests.
 
 The separate `/api/check` route checks two fixed public GitLab addresses without authentication or source content.
+
+Transient network or service failures are retried up to three times, with 30- and 90-second waits. Authentication, security-scan rejection, divergent history, and verification failures stop immediately. Run `node gitlab-sync/workflow-test.cjs` from the repository root to verify this policy.
