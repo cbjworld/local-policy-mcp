@@ -93,3 +93,15 @@ assert.equal(w.plan({question:'서울 산후조리비 지원 사업 찾아줘'},
  const r=await w.research({question:'산후조리비 지원',queries:['산후조리비']},{search:async()=>({total:8,hasMore:false,items:docs,reviewItems:[],relatedDocuments:[]}),research:async()=>({status:++attempts<=3?'unreadable':'read',evidence:{fields:Object.fromEntries(['target','activity','budget','period'].map(k=>[k,{excerpts:[{status:'evidence_candidate',quote:'근거 '+k}]}]))}})});
  assert.equal(attempts,5);assert.equal(r.investigations.filter(x=>x.result.status==='read').length,2);
 })().catch(e=>{console.error(e);process.exitCode=1});
+
+async function privateListingTest(){
+ const full=()=>({status:'read',evidence:{fields:Object.fromEntries(['target','activity','budget','period'].map(k=>[k,{status:'needs_review',excerpts:[{status:'evidence_candidate',quote:'실제 근거 후보 '+k}]}]))}});
+ const title='2026년 청년 주거 지원 추진계획',privateDocs=Array.from({length:5},(_,i)=>({title,institution:'기관A',url:'private'+i,disclosure:'비공개'})),publicDoc={title,institution:'기관A',url:'public',disclosure:'공개'},partial={title,institution:'기관B',url:'partial',disclosure:'부분공개'};
+ const called=[],r=await w.research({question:'청년 주거 지원',queries:['청년 주거']},{search:async()=>({items:[...privateDocs,partial,publicDoc],reviewItems:[],relatedDocuments:[],total:7,hasMore:false}),research:async a=>{called.push(a.url);return full();}});
+ assert.deepEqual(called,['public','partial']);assert.equal(r.candidates.length,7);assert.equal(r.investigations.length,2);
+ const view=require('./presentation').present('research_policy',r);assert.equal(view.summary.listedNonpublicDocuments,5);assert.equal(view.summary.attemptedDocuments,2);assert(view.documents.filter(d=>d.readingDecision).every(d=>d.readingStatus==='not_attempted'));
+ const seoul={...privateDocs[0],institution:'서울특별시 시험구',url:'seoul'},unknown={...privateDocs[0],institution:undefined,url:'unknown'};const exceptions=[];
+ const e=await w.research({question:'청년 주거 지원',queries:['청년 주거']},{search:async()=>({items:[seoul,unknown],reviewItems:[],relatedDocuments:[],total:2,hasMore:false}),research:async a=>{exceptions.push(a.url);return full();}});assert.equal(e.candidates.filter(d=>d.readingDecision).length,0);assert(exceptions.includes('seoul'));assert(exceptions.includes('unknown'));
+ console.log('PASS: nonpublic listing retained without downloads, partial disclosures read, public ties prioritized, Seoul and unknown exceptions preserved');
+}
+privateListingTest().catch(e=>{console.error(e);process.exitCode=1;});

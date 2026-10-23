@@ -97,6 +97,7 @@ async function runResearch(args={},io=portal){
  }
  const possibleProjectLinks=[...named].filter(([,docs])=>new Set(docs.map(d=>d.institution).filter(Boolean)).size>1).map(([name,documents])=>({name,status:'possible_same_program_not_merged',documents,note:'제목의 지역 사업명과 연도가 같은 문서입니다. 광역·기초 역할과 동일 사업 여부는 본문 확인이 필요합니다.'}));
  const candidates=screened.items;
+ for(const d of allDocuments)if(d.discovery!=='saved_catalog'&&d.institution&&!/^서울/.test(d.institution)&&['비공개','열람제한'].includes(d.disclosure))d.readingDecision={status:'listed_nonpublic',reason:'목록상 비공개·열람제한: 자동 첨부 조회는 생략하고 제목과 출처를 보존합니다.'};
  const anchorSets=request.queries.map(q=>q.split(/\s+/).filter(w=>!['지원','사업','정책','사례'].includes(w)));
  const stageDocuments=allDocuments.filter(d=>d.targetFit?.status!=='mismatch'&&anchorSets.some(anchors=>anchors.length&&anchors.every(w=>String((d.title||'')+(d.institution||'')).replace(/\s+/g,'').toLowerCase().includes(w.toLowerCase())))&&(d.relevance.kind==='project_candidate'||['allocation_or_deposit','execution_or_settlement','budget'].includes(d.documentRole)));
  const investigations=[];
@@ -104,7 +105,7 @@ async function runResearch(args={},io=portal){
  if(!request.broad){
   const institutions=new Set();
   const savedKeys=new Set(catalogEvidence.seedDocuments.map(d=>documentKey(d.url)));
-  const ordered=[...candidates].sort((a,b)=>Number(savedKeys.has(documentKey(b.url)))-Number(savedKeys.has(documentKey(a.url)))||Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||b.relevance.score-a.relevance.score);
+  const ordered=candidates.filter(d=>!d.readingDecision).sort((a,b)=>Number(savedKeys.has(documentKey(b.url)))-Number(savedKeys.has(documentKey(a.url)))||Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||b.relevance.score-a.relevance.score||Number(b.disclosure==='공개')-Number(a.disclosure==='공개'));
   io.preload?.(ordered.slice(0,6));
   const tried=new Set();
   for(let index=0;index<ordered.length;index++){
@@ -134,14 +135,14 @@ async function runResearch(args={},io=portal){
  let projects=require('./project-bundles').bundle(candidates,investigations);
  // shortcut: one supplemental document per request; retain other gaps for host-directed follow-up.
  if(!request.broad){
-  const project=projects.find(p=>p.missingFields.length&&p.nextDocuments.length&&investigations.some(x=>p.documents.some(d=>documentKey(d.url)===documentKey(x.candidate.url))));
+  const project=projects.find(p=>p.missingFields.length&&p.nextDocuments.some(d=>!d.readingDecision)&&investigations.some(x=>p.documents.some(d=>documentKey(d.url)===documentKey(x.candidate.url))));
   const readable=investigations.filter(x=>x.result.status==='read');
-  const finance=financialDocuments.find(d=>stageDocuments.some(s=>s.url===d.url)&&!investigations.some(x=>documentKey(x.candidate.url)===documentKey(d.url))&&investigations.some(x=>{
+  const finance=financialDocuments.find(d=>!d.readingDecision&&stageDocuments.some(s=>s.url===d.url)&&!investigations.some(x=>documentKey(x.candidate.url)===documentKey(d.url))&&investigations.some(x=>{
    const a=x.candidate,identity=require('./project-bundles').identity,year=identity(d).year,otherYear=identity(a).year;
    if(!d.institution||!a.institution||year&&otherYear&&year!==otherYear||d.department&&a.department&&d.department!==a.department)return false;
    return d.institution===a.institution||readable.includes(x)&&(a.institution.startsWith(d.institution+' ')||d.institution.startsWith(a.institution+' '));
   }));
-  const item=project?.nextDocuments[0]||finance;
+  const item=project?.nextDocuments.find(d=>!d.readingDecision)||finance;
   if(item){const purpose=project?'fill_missing_evidence':'link_financial_evidence';try{investigations.push({candidate:item,purpose,...(project?{missingFields:project.missingFields}:{}),result:await io.research({url:item.url,requestedQuery:request.question})});}catch(e){investigations.push({candidate:item,purpose,result:{status:'failed',message:e.message}});}projects=require('./project-bundles').bundle(candidates,investigations);}
  }
  const evidenceMap=require('./project-bundles').evidenceMap(stageDocuments,investigations);

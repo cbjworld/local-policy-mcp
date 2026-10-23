@@ -1,6 +1,6 @@
 {
   "name": "local-policy-mcp",
-  "version": "0.7.24",
+  "version": "0.7.25",
   "private": true,
   "description": "Korean municipal policy document research through the information disclosure portal",
   "license": "MIT",
