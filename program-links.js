@@ -1,5 +1,5 @@
 const normalize=s=>String(s||'').normalize('NFKC').replace(/\s+/g,'');
-function pages(x){return (x.result.attempts||[]).filter(a=>a.status==='read'&&a.assessment!=='form_or_cover').flatMap(a=>(a.source?.pages||[]).map(p=>({...p,sourceId:a.source.sourceId,url:a.source.url})));}
+function pages(x){return (x.result.attempts||[]).filter(a=>a.status==='read'&&a.assessment!=='form_or_cover'&&a.evidenceScope!=='attachment_reference').flatMap(a=>(a.source?.pages||[]).map(p=>({...p,sourceId:a.source.sourceId,url:a.source.url})));}
 const cite=(p,quote)=>({sourceId:p.sourceId,url:p.url,page:p.page,quote});
 function issuer(text,institution){
  const exact=text.split('\n').find(line=>normalize(line.replace(/<[^>]+>|[*_#]/g,''))===institution+'장');

@@ -7,6 +7,7 @@ assert.equal(links([upper,lower]).length,1);
 const mutate=(x,fn)=>{const copy=structuredClone(x);fn(copy);return copy;};
 for(const bad of [
  mutate(lower,x=>{x.result.status='unreadable';}),
+ mutate(lower,x=>{x.result.attempts[0].evidenceScope='attachment_reference';}),
  mutate(lower,x=>{x.result.attempts[0].source.pages[0].text=x.result.attempts[0].source.pages[0].text.replace('2026','2025');}),
  mutate(lower,x=>{x.result.attempts[0].source.pages[0].text='부산형 산후조리비 지원사업\n사업기간: 2026년\n시비 50%, 구비 50%';}),
  mutate(lower,x=>{x.result.attempts[0].source.pages[0].text=x.result.attempts[0].source.pages[0].text.replace('부산광역시장','부산광역시장의 처분에 따른다');}),

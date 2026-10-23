@@ -4,7 +4,7 @@ function links(investigations,search){
  for(const {candidate,result} of investigations){
   if(result.status!=='read')continue;
   for(const attempt of result.attempts||[])for(const p of attempt.source?.pages||[]){
-   if(attempt.status!=='read'||attempt.assessment==='form_or_cover')continue;
+   if(attempt.status!=='read'||attempt.assessment==='form_or_cover'||attempt.evidenceScope==='attachment_reference')continue;
    const name=p.text.match(/(?:보\s*조\s*)?사\s*업\s*명\s*[:：)]\s*([^\n|○□❍▢※]{2,160}?)(?=\n|[|○□❍▢※]|$)/);
    const period=p.text.match(/사\s*업\s*기\s*간\s*[:：)]\s*(20\d{2})(?:\.|년)/);
    if(!name||!period)continue;

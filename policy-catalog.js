@@ -56,8 +56,10 @@ function open(directory=__dirname){
     if(ids.length<=500){where.push(ids.length?'context_id IN ('+ids.map(()=>'?').join(',')+')':'0');params.push(...ids);}
     else for(const term of regionTerms){where.push('instr(institution_key,?)>0');params.push(term);}
    }
-   const filter=where.length?' WHERE '+where.join(' AND '):'',total=db.prepare('SELECT count(*) AS n FROM catalog'+filter).get(...params).n;
-   const items=db.prepare('SELECT id,name FROM catalog'+filter+' ORDER BY id LIMIT ? OFFSET ?').all(...params,limit,offset).map(group=>{
+   const filter=where.length?' WHERE '+where.join(' AND '):'';
+   const groups=db.prepare('SELECT id,name,count(*) OVER() AS total FROM catalog'+filter+' ORDER BY id LIMIT ? OFFSET ?').all(...params,limit,offset);
+   const total=groups[0]?.total??(offset?db.prepare('SELECT count(*) AS n FROM catalog'+filter).get(...params).n:0);
+   const items=groups.map(group=>{
     const records=read.all(group.id).map(r=>({...enrich(JSON.parse(r.context),directory),...JSON.parse(r.item)})),first=records[0];
     const budgetVariants=[...new Map(records.map(r=>[JSON.stringify([r.budget,r.unit]),{amount:r.budget,unit:r.unit}])).values()];
     const attached=byId.get(group.id)||[],documents=attached.filter(x=>x.status==='body_supported'),documentCandidates=attached.filter(x=>x.status==='title_candidate');

@@ -100,6 +100,8 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
   if(reason)selectionNotes.push({...f,reason,status:fit.status==='mismatch'?'target_mismatch':'unsupported_format'});
   return !reason;
  }).sort((a,b)=>attachmentScore(b,metadata.title)-attachmentScore(a,metadata.title));
+ const ownPlan=candidates.some(f=>attachmentScore(f,metadata.title)>=15&&!/지\s*침|가이드라인|매뉴얼/.test(f.name));
+ const scope=file=>ownPlan&&!/지\s*침|가이드라인|매뉴얼/.test(metadata.title)&&/지\s*침|가이드라인|매뉴얼/.test(file.name)?'attachment_reference':'document_attachment';
  const attempts=[];
  // shortcut: follow only an explicit Seoul disclosure link, one level; no general website search.
  for(const link of (metadata.externalLinks||[]).slice(0,1)){
@@ -131,7 +133,7 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
    selectionNotes.push({fileId:file.fileId,name:file.name,status:'target_mismatch',reason:'첨부 본문에 명시된 지원 대상이 질문과 다름'});
    continue;
   }
-  attempts.push({...result,fileId:file.fileId,fileName:file.name,assessment:form?'form_or_cover':plan?'plan_candidate':'text_needs_review'});
+  attempts.push({...result,fileId:file.fileId,fileName:file.name,evidenceScope:scope(file),assessment:form?'form_or_cover':plan?'plan_candidate':'text_needs_review'});
   const missing=()=>Object.values(require('./evidence').evidence(attempts.filter(a=>a.assessment!=='target_mismatch')).fields).some(f=>f.status==='unconfirmed');
   // shortcut: at most two more six-page ranges per PDF; expose remaining pages rather than claiming full reading.
   if(!form&&result.source?.format==='pdf'){
@@ -139,7 +141,7 @@ async function research({url,requestedQuery=''}={},reader=read,externalReader=re
     const page=Number(result.source.scannedThroughPage)+1;
     if(!Number.isInteger(page)||page<2||page>result.source.totalPages)break;
     let next;try{next=await reader({url,fileId:file.fileId,page});}catch(e){next={status:'download_failed',message:e.message};}
-    attempts.push({...next,fileId:file.fileId,fileName:file.name,startPage:page,assessment:plan?'plan_candidate':'text_needs_review'});
+    attempts.push({...next,fileId:file.fileId,fileName:file.name,evidenceScope:scope(file),startPage:page,assessment:plan?'plan_candidate':'text_needs_review'});
     result=next;
     if(!next.source)break;
    }

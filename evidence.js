@@ -1,7 +1,7 @@
 const labels={target:'지원대상|사업대상|참여대상|교육대상|가입자격|신청대상|신청자격|접종대상및비용|접종대상|사업위치|설치대상|대상구간|추진대상',activity:'지원내용|사업내용|주요내용|운영내용|지원내역|지원방법|접종내용|접종대상및비용|지원금액|지원한도|지원기준|지원규모|사업개요|설치내용|구축내용|추진내용',budget:'소요예산|사업예산|총사업비|사업비|예산액|총예산|금회교부결정내역|교부금액',period:'사업기간|운영기간|추진기간|지원기간|신청기간'};
 const spaced=s=>s.split('|').map(w=>[...w].join('\\s*')).join('|');
 const nextLabel=new RegExp('(?:'+spaced(Object.values(labels).join('|'))+')[ \\t]*(?:[:：]|\\r?\\n|(?=[․·]))');
-function evidence(attempts){
+function extractEvidence(attempts){
  const fields={},referenceExcerpts=[],deliveryQualifications=[];
  for(const [key,label] of Object.entries(labels)){
   const boundaryLabel=key==='activity'?new RegExp('(?:'+spaced(Object.entries(labels).filter(([k])=>k!=='activity').map(([,v])=>v).join('|'))+')\\s*[:：]'):nextLabel;
@@ -68,5 +68,20 @@ function evidence(attempts){
   for(const m of p.text.matchAll(/■\s*비예산|(?:20\d{2})년\s*기준|총\s*예산액\s*변동\s*없음/g))budgetNotes.push({quote:m[0],sourceId:a.source.sourceId,url:a.source.url,page:p.page});
  }
  return {fields,referenceExcerpts,deliveryQualifications:deliveryQualifications.slice(0,3),organizations:organizations.slice(0,12),budgetNotes:budgetNotes.slice(0,12),verification:'labelled-excerpts-only',instruction:'근거 후보입니다. deliveryQualifications는 사업 수행기관의 자격이며 주민 지원 대상으로 사용하지 마세요. 신청자격이라는 제목만으로 수혜자를 확정하지 마세요. 문서 생산기관과 organizations의 실제 지자체·수행기관을 구분하세요. 기관명 추출만으로 사업 귀속을 확정하지 마세요. 요청한 사업과의 관련성, 금액의 연도·단위·범위는 AI가 원문 문맥과 대조해야 합니다. 비예산 체크가 있어도 가려진 예산을 0원으로 해석하지 마세요. 예산은 계획액·편성액·집행액 중 무엇인지 확인하세요.'};
+}
+function evidence(attempts){
+ const primary=attempts.filter(a=>a.evidenceScope!=='attachment_reference');
+ const result=extractEvidence(primary),references=extractEvidence(attempts.filter(a=>a.evidenceScope==='attachment_reference'));
+ const decorate=e=>{const a=attempts.find(a=>a.source?.sourceId===e.sourceId&&a.source?.url===e.url);return {...e,...(a?.fileName?{attachmentTitle:a.fileName}:{}),sourceScope:a?.evidenceScope||'document_attachment'};};
+ for(const f of Object.values(result.fields)){
+  f.excerpts=f.excerpts.map(decorate);
+  if(f.amounts)f.amounts=f.amounts.map(decorate);
+  if(f.tables)f.tables=f.tables.map(decorate);
+ }
+ result.referenceExcerpts=[...result.referenceExcerpts,...Object.entries(references.fields).flatMap(([field,f])=>f.excerpts.map(e=>({...e,field,attribution:'attachment_reference'}))),...references.referenceExcerpts].map(decorate);
+ result.deliveryQualifications=result.deliveryQualifications.map(decorate);
+ result.referenceAmounts=(references.fields.budget.amounts||[]).map(e=>({...decorate(e),attribution:'attachment_reference'}));
+ result.instruction+=' 첨부 참고 지침은 referenceExcerpts와 referenceAmounts로 분리했습니다. 이 값으로 주 문서의 미확인 항목을 채우지 마세요.';
+ return result;
 }
 module.exports={evidence};

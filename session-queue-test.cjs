@@ -20,5 +20,12 @@ const {createQueue}=require('./research-queue');
  const c=queue(()=>{order.push(4);});
  finish();await a;await assert.rejects(b,/worker failed/);await c;
  assert.deepEqual(order,[1,2,3,4]);
+ for(const concurrency of [0,5,1.5,NaN])assert.throws(()=>createQueue({concurrency}),/Invalid/);
+ const two=createQueue({concurrency:2});let active=0,peak=0;
+ await Promise.all(Array.from({length:6},(_,i)=>two(async()=>{
+  active++;peak=Math.max(peak,active);await new Promise(r=>setTimeout(r,5));active--;
+  if(i===2)throw Error('expected failure');
+ }).catch(e=>assert.equal(e.message,'expected failure'))));
+ assert.equal(peak,2);assert.equal(active,0);assert.equal(await two(()=>42),42);
  console.log('PASS: concurrent citation isolation, bounded queue, timeout cleanup, ordered execution and failure recovery');
 })().catch(e=>{console.error(e);process.exitCode=1;});

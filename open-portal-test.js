@@ -18,6 +18,20 @@ async function main(){
  assert(p.attachmentScore({name:'추진 계획.pdf'})>p.attachmentScore({name:'공고.hwpx'}));
  const guriTitle='2026년 구리시 여성청소년 생리용품 보편지원사업 추진(변경)계획';
  assert(p.attachmentScore({name:'★'+guriTitle+'-최종.hwp'},guriTitle)>p.attachmentScore({name:'★(260303)(생리용품 보편 지원) 2026년 운영 지침 변경안.hwpx'},guriTitle));
+ const scopedFiles=[{fileId:'local',name:guriTitle+'.pdf',available:true},{fileId:'guideline',name:'2026년 운영 지침.hwpx',available:true}];
+ const scopedReader=period=>async a=>!a.fileId?{title:guriTitle,attachments:scopedFiles}:{status:'read',source:{sourceId:a.fileId,url:'https://www.open.go.kr/'+a.fileId,format:'hwp',pages:[{page:null,text:a.fileId==='local'?'지원대상: 구리시 여성청소년\n사업비: 428,400천원'+(period?'\n사업기간: 2026.2~12':''):'지원대상: 경기도 여성청소년\n사업기간: 2026.1~12\n사업비: 999백만원'}]}};
+ const scoped=await p.research({url},scopedReader(false));
+ assert.equal(scoped.evidence.fields.period.status,'unconfirmed');
+ assert.equal(scoped.evidence.fields.budget.excerpts[0].attachmentTitle,guriTitle+'.pdf');
+ assert(scoped.evidence.referenceExcerpts.some(e=>e.field==='period'&&e.quote.includes('2026.1~12')&&e.sourceScope==='attachment_reference'));
+ assert(scoped.evidence.fields.budget.amounts.every(a=>a.sourceId==='local'));
+ const view=require('./presentation').documentView(scoped);
+ assert.equal(view.fields.find(f=>f.key==='period').state,'미확인');
+ assert(view.referenceEvidence.some(e=>e.field==='period'));
+ const withPeriod=await p.research({url},scopedReader(true));
+ assert(withPeriod.evidence.fields.period.excerpts.every(e=>e.quote.includes('2026.2~12')));
+ const guidelineOnly=await p.research({url},async a=>a.fileId?scopedReader(false)(a):{title:'2026년 운영 지침',attachments:[scopedFiles[1]]});
+ assert.equal(guidelineOnly.evidence.fields.period.excerpts[0].sourceScope,'document_attachment');
  const pairedTitle='2026년 여성청소년 생리용품 지원 사업 추진계획(안)';
  assert(p.attachmentScore({name:'2026년 여성청소년 생리용품 지원사업 계획(안).hwp'},pairedTitle)>p.attachmentScore({name:pairedTitle+'.pdf'},pairedTitle),'equivalent text originals stay ahead of the signed PDF');
  for(const failedStage of ['wonmunFileRequest.ajax','wonmunFileFilter.ajax','wonmunFileDownload.down']){

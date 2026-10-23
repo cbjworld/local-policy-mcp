@@ -1,4 +1,6 @@
 const assert=require('node:assert/strict'),{classify,screen}=require('./relevance');
+assert.equal(classify('청사 내 1회용컵 사용 줄이기를 위한 개인용 텀블러 배부 및 실천서약 추진계획','텀블러 사용 지원').kind,'administration');
+assert.equal(classify('청사 내 1회용컵 사용 줄이기를 위한 개인용 텀블러 배부 및 실천서약 추진계획','청사 텀블러 사용').kind,'project_candidate');
 for(const title of ['2026년 직원 대상포진·독감 예방접종 지원 계획','공무원 건강검진 지원 계획','교직원 후생복지 지원계획']){
  assert.equal(screen({q:'대상포진 예방접종',items:[{title}]}).items.length,0);
  assert.equal(screen({q:'대상포진 예방접종',items:[{title}]},'documents').items.length,1);

@@ -14,6 +14,8 @@ try{
  assert.deepEqual(store.search({q:'조리비 산후',institution:'부산 중구'}),snapshot,'cached public results must be isolated copies');
  assert.equal(store.search({q:'산후 조리비',institution:'부산 중구',linkedOnly:true}).total,1);
  assert.equal(store.search({q:'산후 조리비',institution:'부산 중구',limit:1}).items.length,1);
+ assert.equal(store.search({q:'산후 조리비',institution:'부산 중구',offset:2}).total,2);
+ assert.equal(store.search({q:'산후 조리비',institution:'부산 중구',offset:2}).items.length,0);
  assert.equal(store.search({q:'산후 조리비',institution:'울산 중구'}).total,1);
  const empty=store.search({q:'없음'});empty.total=99;assert.equal(store.search({q:'없음'}).total,0);
  const project=store.search({projectId:id}).items[0];assert.equal(project.budgetRowCount,2);assert.deepEqual(project.budgetVariants,[{amount:100,unit:'천원'},{amount:200,unit:'천원'}]);assert.match(project.budgetStatus,/do_not_sum/);assert.equal(project.documents.length,1);assert.equal(project.budgetRecords[1].page,2);
