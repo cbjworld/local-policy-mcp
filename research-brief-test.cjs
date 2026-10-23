@@ -5,6 +5,11 @@ assert.equal(brief([{...doc,reading:{fields:[{key:'target',state:'원문 근거 
 const emptyRead={...doc,id:'empty',reading:{fields:[]}};
 assert.equal(brief([emptyRead,doc])[0].documentId,'d1');
 assert.equal(brief([emptyRead])[0].basis,'본문 열람 · 핵심 근거 미확인');
+assert.equal(brief([emptyRead])[0].budgetEvidenceStatus.status,'read_no_budget_excerpt');
+assert.equal(brief([doc])[0].budgetEvidenceStatus.status,'body_excerpt');
+assert.equal(brief([{...doc,readingStatus:'no_available_attachment',reading:undefined}])[0].budgetEvidenceStatus.status,'not_read');
+assert.equal(brief([{...doc,supportingOnly:true}])[0].budgetEvidenceStatus.status,'supporting_document');
+assert.equal(brief([{...doc,reading:{fields:[{key:'budget',state:'가림 처리',evidence:[]}]}}])[0].budgetEvidenceStatus.status,'redacted');
 let rows=brief([doc,{...doc,id:'d2',readingStatus:'unreadable',reading:undefined},{...doc,id:'d3',supportingOnly:true},{...doc,id:'d4',classification:'administration'}]);
 assert.equal(rows.length,3);
 assert.equal(rows[0].fields.budget.quote,'본예산 90백만원, 증액 계획 180백만원');

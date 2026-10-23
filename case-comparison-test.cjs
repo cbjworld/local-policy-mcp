@@ -6,3 +6,4 @@ const rows=compare([upper],catalog);assert.equal(rows.length,1);assert.equal(row
 console.log('PASS: one comparison row per linked case, document-specific budgets, benefit versus allocation separation, exact target citations, no parent-account promotion or amount summing');
 
 const changed=structuredClone(upper);changed.fields.budget.financialAmounts[0].quote='지원금액: (기존)50만원→(변경)100만원';assert.equal(compare([changed],catalog)[0].documents[0].supportAmounts[0].quote,changed.fields.budget.financialAmounts[0].quote);
+changed.budgetEvidenceStatus={status:'not_read',readingStatus:'no_available_attachment'};assert.equal(compare([changed],catalog)[0].documents[0].budgetEvidenceStatus.readingStatus,'no_available_attachment');

@@ -5,10 +5,12 @@ function plan({question,queries,startDate,endDate}={},now=new Date()){
  if(typeof question!=='string'||!question.trim()||question.length>300)throw Error('질문은 1~300자여야 합니다.');
  const topic=question.trim().replace(/^우리\s*(?:지자체|지역|시|군|구)(?:도|에서|에)?\s*/, '').replace(/^(?:다른\s*(?:지자체|지역|지방자치단체)|전국(?:의)?\s*(?:지자체|지방자치단체))(?:에서|의)?\s+/, '').replace(/[?？!.。]+$/,'').replace(/\s*(?:을|를)?\s*(?:새로\s*)?(?:도입\s*검토해\s*줘|도입하고\s*싶어|도입하려는데|추진하려는데|시작하려는데|하려는데)\s*$/,'').replace(/\s*(?:찾아\s*주세요|찾아\s*줘|알려\s*주세요|알려\s*줘|검색해\s*줘|검색해줘|비교해\s*줘|비교해\s*주세요)\s*$/,'').replace(/\s+(?:계획과\s*예산|예산과\s*계획|예산|계획)(?:을|를)?\s*$/,'').replace(/\s*(?:정책|사례)(?:를|을)?\s*$/,'').trim().replace(/\s지원사업$/,' 지원 사업');
  if(!topic)throw Error('찾을 주제가 필요합니다.');
- const words=topic.split(/\s+/);
+ const region=require('./catalog-context').regionScope(topic);
+ const searchTopic=topic.split(/\s+/).slice(region.regionTokens.length).join(' ')||topic;
+ const words=searchTopic.split(/\s+/);
  // shortcut: mechanical fallback only; the host AI supplies semantic query variants without asking the user.
- const derived=[topic];if(words.length>2)derived.push(words.filter(w=>!['지원','사업','정책'].includes(w)).join(' '));
- if(/음식물\s*처리기/.test(topic)){
+ const derived=[searchTopic];if(words.length>2)derived.push(words.filter(w=>!['지원','사업','정책'].includes(w)).join(' '));
+ if(/음식물\s*처리기/.test(searchTopic)){
   const subject=words.filter(w=>!['지원','사업','정책'].includes(w)).join(' ');
   derived.splice(1,derived.length,subject.replace(/음식물\s*처리기/,'음식물쓰레기 처리기'),subject.replace(/음식물\s*처리기/,'음식물 감량기'));
  }
@@ -30,7 +32,7 @@ async function runResearch(args={},io=portal){
  const budgetSearches=[],budgetRows=new Map();
  let budgetScope=null;
  for(const q of request.queries){
-  try{const b=require('./budget-search').search({q,limit:5});
+  try{const b=require('./budget-search').search({q,...(catalogEvidence.institution?{institution:catalogEvidence.institution}:{}),limit:5});
    budgetScope={year:b.scope.year,account:b.scope.account,collectedDate:b.scope.collectedDate,nationwideComplete:b.scope.nationwideComplete,excluded:b.scope.excluded};
    budgetSearches.push({q,year:b.scope.year,account:'일반회계',unit:'천원',totalCandidateRows:b.totalCandidateRows,nextOffset:b.nextOffset});
    for(const row of b.items){const key=JSON.stringify([row.institutionId,row.source,row.page,row.table,row.tableRow,row.name]);if(!budgetRows.has(key))budgetRows.set(key,row);}

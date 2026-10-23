@@ -21,6 +21,9 @@ assert.equal(focused.items.length,2);assert.equal(focused.reviewItems.length,1);
 
 assert.equal(classify('2025년 아동급식 지원사업 시비보조금 집행잔액 및 발생이자 반납').kind,'administration');
 const auxiliary=[
+ '직인날인 요청(경남 청년 면접정장 무료대여 사업 개인정보처리 위수탁 계약서)',
+ '2026년 구례군 어르신 목욕비 및 이·미용비 지원사업 대상자 3분기 정비 자료 제출',
+ '2026년 구례군 어르신 목욕비 및 이·미용비 지원사업 대상자 3분기 정비 요청',
  '2027년 청년 AI구독료 지원사업 현황조사 결과 제출',
  '2027년 청년 AI 구독료 지원사업 현황 제출',
  '국민신문고 국민제안에 대한 검토 보고(부산 재직 청년 생성형 AI 구독료 지원)',

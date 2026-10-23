@@ -18,6 +18,7 @@ function targetFit(text='',question=''){
 // shortcut: title rules infer existence only; body attribution still needs semantic review.
 function classify(title,q=''){
  const t=String(title||'').replace(/\s+/g,'');
+ if(/직인날인요청|대상자.*정비(?:자료)?(?:제출|요청)/.test(t))return {kind:'administration',reason:'직인·대상자 명부 정비 처리: 사업 계획과 구분',score:-2};
  if(/(?:직원|공무원|교직원).*(?:예방접종|건강검진|복지포인트|후생복지)/.test(t)&&!/(?:직원|공무원|교직원)/.test(q))return {kind:'administration',reason:'직원 후생·건강 지원 문서: 주민 대상 사업과 구분',score:-2};
  if(/현황조사|현황(?:자료)?(?:제출|회신)|국민신문고|국민제안|민원.*(?:답변|검토)|업무추진을위한.*구독료|홍보(?:협조|물|자료)|보도자료송부|통합접수시스템.*협조|권한신청서|담당자.*현행화/.test(t))return {kind:'administration',reason:'조사·제안·홍보·내부 처리 자료: 제목만으로 해당 기관의 사업 시행을 판단하지 않음',score:-2};
  if(/참여자|참여단/.test(t)&&/교육/.test(t)&&q&&!/교육/.test(q))return {kind:'administration',reason:'사업 참여자 교육: 요청 사업 자체의 시행계획과 구분',score:-2};
