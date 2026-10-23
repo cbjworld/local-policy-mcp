@@ -18,7 +18,8 @@ process.once('message',async({bytes,page,dir})=>{
   const initMs=Date.now()-initStart,primaryStart=Date.now();
   await worker.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'});const cleaned=await worker.recognize(path.join(dir,'clean.png'),{},{text:true,tsv:true});
   const primaryMs=Date.now()-primaryStart,quality=require('./ocr-quality').assess(cleaned.data.tsv||'',alternateTsv);
-  const text=cleaned.data.text||'';process.send({result:{text:text.slice(0,14000),truncated:text.length>14000,ocr:{engine:'Tesseract.js 7.0.0',languages:'kor+eng',...image,passes:2,initMs,primaryMs,totalMs:Date.now()-start,quality,acceleration}}});
+  const refined=await require('./ocr-number-review').refine(worker,path.join(dir,'raw.ppm'),path.join(dir,'clean.png'),cleaned.data,alternateTsv,image);
+  const text=refined.text;quality.numberCorrections=refined.corrections;process.send({result:{text:text.slice(0,14000),truncated:text.length>14000,ocr:{engine:'Tesseract.js 7.0.0',languages:'kor+eng',...image,passes:2+refined.passes,initMs,primaryMs,totalMs:Date.now()-start,quality,acceleration}}});
  }catch(e){process.send({error:'OCR 실행 실패: 모델·PDF 변환기·설치 환경을 확인하세요.'});}
  finally{if(worker)await worker.terminate().catch(()=>{});process.disconnect();}
 });
