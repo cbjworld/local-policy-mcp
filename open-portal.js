@@ -81,7 +81,7 @@ async function read({url,fileId,q='',page=1,scanEmptyPdf=false}={},io={get:downl
   return {...out,status:hasText?'read':'no_text',fileId:f.fileId,fileName:f.fileNm,source,retryCount,timings,...(hasText?{}:{message:'파일은 내려받았지만 이 범위에서 텍스트를 추출하지 못했습니다. 이미지 문서는 OCR이 필요하며 검색어 미일치일 수도 있습니다.'})};
  }catch(e){return {...out,status:stage==='extract'?'extraction_failed':'download_failed',fileId:f.fileId,message:e.message,phase:stage==='extract'?'extract':phase,errorCode:e.code||'PORTAL_ERROR',retryable:!!e.retryable,retryCount,timings};}
 }
-function isForm(name){return /표지/.test(name)||(/서식|신청서|동의서|양식/.test(name)&&!/지침/.test(name));}
+function isForm(name){return /표지/.test(name)||(/서식|신청서|동의서|서약서|양식/.test(name)&&!/지침/.test(name));}
 function attachmentScore(f,title=''){
  const key=s=>s.normalize('NFKC').replace(/\.(?:hwpx?|pdf)$/i,'').replace(/[-_\s]*최종$/,'').replace(/[^\p{L}\p{N}]/gu,'').replace(/(?:추진|시행|운영|기본|변경|수정|보완)*계획(?:안)?$/,'');
  const own=key(title),name=key(f.name);

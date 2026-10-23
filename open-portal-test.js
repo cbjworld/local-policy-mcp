@@ -3,6 +3,8 @@ const url='https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgst
 const html=r=>({bytes:Buffer.from('var result = '+JSON.stringify(r)+';')});
 const json=r=>({bytes:Buffer.from(JSON.stringify(r))});
 async function main(){
+ assert(p.isForm('청렴이행서약서.hwp'));
+ assert(!p.isForm('서약서 포함 운영지침.hwp'));
  for(const args of [{q:'x',startDate:'20260230',endDate:'20261013'},{q:'',startDate:'20260101',endDate:'20261013'},{q:'x',startDate:'20261013',endDate:'20260101'}])await assert.rejects(p.search(args,()=>assert.fail('invalid input requested')));
  const args={q:'청년',startDate:'20260101',endDate:'20261013',scope:'all',purpose:'documents'};
  const r=await p.search(args,async()=>html({code:200,rtnTotal:11,parameterVO:{...args,kwd:args.q},rtnList:[{INFO_SJ:'계획',PRDCTN_INSTT_REGIST_NO:'id',PRDCTN_DT:'20260716',INSTT_SE_CD:'B',OTHBC_SE_CD:'3'}]}));assert.equal(r.hasMore,true);assert.equal(r.items[0].disclosure,'비공개');assert.match(r.items[0].url,/infoListDetl2/);

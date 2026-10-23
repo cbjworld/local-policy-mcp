@@ -18,6 +18,7 @@ function targetFit(text='',question=''){
 // shortcut: title rules infer existence only; body attribution still needs semantic review.
 function classify(title,q=''){
  const t=String(title||'').replace(/\s+/g,'');
+ if(/^(?:청렴이행서약서|보조금교부신청서|개인정보.*동의서)/.test(t)&&!/서약서|신청서|동의서/.test(q))return {kind:'administration',reason:'서약·신청·동의 양식: 사업 자체의 계획과 구분',score:-2};
  if(/청사내.*(?:텀블러|일회용|1회용)|(?:직원|공무원).*(?:텀블러|개인컵)/.test(t)&&!/청사|직원|공무원/.test(q))return {kind:'administration',reason:'청사·직원 내부 실천 자료: 주민 지원 사업과 구분',score:-2};
  if(/직인날인요청|대상자.*정비(?:자료)?(?:제출|요청)/.test(t))return {kind:'administration',reason:'직인·대상자 명부 정비 처리: 사업 계획과 구분',score:-2};
  if(/(?:직원|공무원|교직원).*(?:예방접종|건강검진|복지포인트|후생복지)/.test(t)&&!/(?:직원|공무원|교직원)/.test(q))return {kind:'administration',reason:'직원 후생·건강 지원 문서: 주민 대상 사업과 구분',score:-2};
