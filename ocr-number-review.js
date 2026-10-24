@@ -20,8 +20,8 @@ function replaceLocated(text,group,first,last,value,occurrence){
  const skip=joined.length-joined.replace(/^\|+/,'').length,start=group.slice(0,first).map(w=>w.text.replace(/\s/g,'')).join('').length-skip,end=group.slice(0,last+1).map(w=>w.text.replace(/\s/g,'')).join('').length-skip;
  if(start<0||end>positions.length||end<=start)return null;rows[rowIndex]=row.slice(0,positions[start])+value+row.slice(positions[end-1]+1);return rows.join('\n');
 }
-async function cells(worker,raw,clean,primary,alternate,text){
- const imaging=require('./ocr-numeric-image');let image;try{image=imaging.grey(raw)||imaging.grey(clean);}catch{return {text,passes:0,corrections:[]};}if(!image)return {text,passes:0,corrections:[]};
+async function cells(worker,raw,clean,primary,alternate,text,read,image){
+ const imaging=require('./ocr-numeric-image');if(!image)return {text,passes:0,corrections:[]};
  const groups=lines(primary.tsv||''),other=words(alternate),corrections=[];let passes=0,retries=0;
  const tasks=groups.flatMap(group=>{const financialRow=group.filter(a=>/\d[,.]\d{3}/.test(a.text)).length>=2;return group.map((w,index)=>{
   const numeric=/^[\d,.]+$/.test(w.text),unit=/^\d+[a-z]$/i.test(w.text),grouped=/\d[,.]\d{3}/.test(w.text),symbol=grouped?imaging.sign(image,w):null;
@@ -38,7 +38,7 @@ async function cells(worker,raw,clean,primary,alternate,text){
    if(retries>=8||!(symbol||unit||disputed||numeric&&w.confidence<85&&(grouped||financialRow)))continue;retries++;
    const narrower=numeric&&!symbol&&other.find(a=>a.confidence>=85&&/^[\d,.]+$/.test(a.text)&&overlap(w,a)>=.6&&a.w<=w.w),area=narrower||w;
    const left=Math.max(0,area.x-6),top=Math.max(0,area.y-6),rectangle={left,top,width:Math.min(image.width-left,area.w+12),height:Math.min(image.height-top,area.h+12)};
-   let a,b;try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1'});a=(await worker.recognize(raw,{rectangle},{text:true,tsv:true})).data;passes++;b=(await worker.recognize(clean,{rectangle},{text:true,tsv:true})).data;passes++;}catch{continue;}
+   let a,b;try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1'});a=(await read(raw,rectangle)).data;passes++;b=(await read(clean,rectangle)).data;passes++;}catch{continue;}
    const trim=s=>compact(s||'').replace(/^[|]+|[|]+$/g,''),av=trim(a.text),bv=trim(b.text);if(av!==bv)continue;
    const scores=[a,b].flatMap(r=>words(r.tsv||'').filter(w=>/\d/.test(w.text)).map(w=>w.confidence));if(!scores.length||scores.some(s=>s<80))continue;
    const alt=other.filter(a=>a.x>=w.x-3&&a.x<w.x+w.w&&a.y+a.h/2>=w.y&&a.y+a.h/2<=w.y+w.h).sort((a,b)=>a.x-b.x).map(a=>a.text).join('');
@@ -53,9 +53,12 @@ async function cells(worker,raw,clean,primary,alternate,text){
  return {text,passes,corrections};
 }
 async function refine(worker,raw,clean,primary,alternate,size){
- let text=primary.text||'',passes=0;const corrections=[];
+ let text=primary.text||'',passes=0;const corrections=[],imaging=require('./ocr-numeric-image'),decoded=new Map();
+ const imageFor=input=>{if(!decoded.has(input)){try{decoded.set(input,imaging.grey(input));}catch{decoded.set(input,null);}}return decoded.get(input);};
+ // Crops retain exactly the same grayscale pixels and source resolution, avoiding full-page decoding on every retry.
+ const read=(input,rectangle)=>{const image=imageFor(input);return image?worker.recognize(imaging.crop(image,rectangle),{},{text:true,tsv:true}):worker.recognize(input,{rectangle},{text:true,tsv:true});};
  for(const item of candidates(primary.tsv||'',alternate,size)){
-  let a,b;try{await worker.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'});a=(await worker.recognize(raw,{rectangle:item.rectangle},{text:true,tsv:true})).data;passes++;b=(await worker.recognize(clean,{rectangle:item.rectangle},{text:true,tsv:true})).data;passes++;}catch{continue;}
+  let a,b;try{await worker.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'});a=(await read(raw,item.rectangle)).data;passes++;b=(await read(clean,item.rectangle)).data;passes++;}catch{continue;}
   const value=compact(a.text||''),num=digits(value);
   if(value!==compact(b.text||'')||context(value)!==context(item.source)||num.join(':')!==item.alternate.join(':')||num.join(':')===item.numbers.join(':'))continue;
   const scores=[a,b].flatMap(r=>words(r.tsv||'').filter(w=>/\d/.test(w.text)).map(w=>w.confidence));
@@ -64,7 +67,7 @@ async function refine(worker,raw,clean,primary,alternate,size){
   const index=matches[0];let n=0;rows[index]=rows[index].replace(/\d+/g,()=>num[n++]);text=rows.join('\n');
   corrections.push({from:item.numbers,to:num,box:Object.values(item.rectangle),method:'two_crop_passes_and_same_location_alternate'});
  }
- const repaired=await cells(worker,raw,clean,primary,alternate,text);
+ const repaired=await cells(worker,raw,clean,primary,alternate,text,read,imageFor(raw)||imageFor(clean));
  return {text:repaired.text,passes:passes+repaired.passes,corrections:[...corrections,...repaired.corrections]};
 }
 module.exports={refine,candidates,replaceLocated};

@@ -1,12 +1,20 @@
-const fs=require('node:fs'),{inflateSync}=require('node:zlib');
+const fs=require('node:fs'),{inflateSync,deflateSync,crc32}=require('node:zlib');
 function grey(input){
  const b=Buffer.isBuffer(input)?input:fs.readFileSync(input);if(b.length>8500000||b.length<33||b.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')return null;
  const width=b.readUInt32BE(16),height=b.readUInt32BE(20);if(!width||!height||width>2700||height>2700||width*height>8000000||b[24]!==8||b[25]!==0||b[28]!==0)return null;
- const parts=[];for(let i=8;i+12<=b.length;){const n=b.readUInt32BE(i);if(n>b.length-i-12)return null;if(b.toString('ascii',i+4,i+8)==='IDAT')parts.push(b.subarray(i+8,i+8+n));i+=n+12;}
+ let resolution;const parts=[];for(let i=8;i+12<=b.length;){const n=b.readUInt32BE(i);if(n>b.length-i-12)return null;if(b.toString('ascii',i+4,i+8)==='pHYs'&&n===9)resolution=b.subarray(i+8,i+17);if(b.toString('ascii',i+4,i+8)==='IDAT')parts.push(b.subarray(i+8,i+8+n));i+=n+12;}
  const raw=inflateSync(Buffer.concat(parts),{maxOutputLength:(width+1)*height});if(raw.length!==(width+1)*height)return null;const pixels=Buffer.alloc(width*height);
  const paeth=(a,b,c)=>{const p=a+b-c,x=Math.abs(p-a),y=Math.abs(p-b),z=Math.abs(p-c);return x<=y&&x<=z?a:y<=z?b:c;};
- for(let y=0;y<height;y++){const f=raw[y*(width+1)];if(f>4)return null;for(let x=0;x<width;x++){const i=y*width+x,a=x?pixels[i-1]:0,v=y?pixels[i-width]:0,c=x&&y?pixels[i-width-1]:0;pixels[i]=(raw[y*(width+1)+x+1]+[0,a,v,(a+v)>>1,paeth(a,v,c)][f])&255;}}
- return {width,height,pixels};
+ for(let y=0;y<height;y++){
+  const offset=y*width,source=y*(width+1)+1,f=raw[source-1];if(f>4)return null;
+  if(f===0){raw.copy(pixels,offset,source,source+width);continue;}
+  for(let x=0;x<width;x++){
+   const i=offset+x,a=x?pixels[i-1]:0,v=y?pixels[i-width]:0;
+   const prediction=f===1?a:f===2?v:f===3?(a+v)>>1:paeth(a,v,x&&y?pixels[i-width-1]:0);
+   pixels[i]=(raw[source+x]+prediction)&255;
+  }
+ }
+ return {width,height,pixels,resolution};
 }
 function components(image,box){
  const left=Math.max(0,Math.floor(box.left)),top=Math.max(0,Math.floor(box.top)),width=Math.max(0,Math.min(image.width-left,Math.ceil(box.width))),height=Math.max(0,Math.min(image.height-top,Math.ceil(box.height)));if(width*height>200000)return [];
@@ -25,4 +33,11 @@ function triangle(c){
 }
 function sign(image,w){return components(image,{left:w.x-40,top:w.y-10,width:Math.min(w.w+50,250),height:w.h+20}).find(c=>triangle(c)&&c.x>=w.x-40&&c.x<w.x+w.h&&c.y+c.h>w.y&&c.y<w.y+w.h);}
 function comma(image,w){return components(image,{left:w.x,top:w.y,width:w.w,height:w.h}).some(c=>c.x<w.x+w.w*.45&&c.w>=3&&c.h>=c.w*1.5&&c.h<=w.h*.35&&c.y>w.y+w.h*.55&&c.y+c.h>=w.y+w.h*.85);}
-module.exports={grey,components,triangle,sign,comma};
+function crop(image,box){
+ const {left,top,width,height}=box;if(![left,top,width,height].every(Number.isInteger)||left<0||top<0||width<1||height<1||left+width>image.width||top+height>image.height)throw Error('Invalid OCR crop');
+ const header=Buffer.alloc(13);header.writeUInt32BE(width);header.writeUInt32BE(height,4);header[8]=8;
+ const data=Buffer.alloc((width+1)*height);for(let y=0;y<height;y++)image.pixels.copy(data,y*(width+1)+1,(top+y)*image.width+left,(top+y)*image.width+left+width);
+ const chunk=(type,value)=>{const b=Buffer.alloc(value.length+12);b.writeUInt32BE(value.length);b.write(type,4);value.copy(b,8);b.writeUInt32BE(crc32(b.subarray(4,-4)),b.length-4);return b;};
+ return Buffer.concat([Buffer.from('89504e470d0a1a0a','hex'),chunk('IHDR',header),...(image.resolution?[chunk('pHYs',image.resolution)]:[]),chunk('IDAT',deflateSync(data,{level:1})),chunk('IEND',Buffer.alloc(0))]);
+}
+module.exports={grey,crop,components,triangle,sign,comma};

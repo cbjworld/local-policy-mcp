@@ -1,0 +1,792 @@
+{
+  "version": "1.3.4",
+  "method": "Transcribed from rendered original images before running OCR. Whitespace ignored; numeric token boundaries required. These are numeric transcription checks, not entire-document semantic accuracy.",
+  "frozenAt": "2026-10-24T02:20:17.163Z",
+  "groundTruthSha256": "7af64b1b5dbd59b000ced0d4fb069c0014fd7d12d64c6a758c946dc9c757dd38",
+  "previousNumericChecks": {
+    "passed": 72,
+    "total": 72
+  },
+  "documents": [
+    {
+      "id": "n01",
+      "institution": "경북경산시",
+      "title": "암환자 의료비·국가암검진 안내",
+      "url": "https://www.gbgs.go.kr:443/design2021/ko2023/img/popup/popup_260303_2.pdf",
+      "sha256": "505a62c61c9fefcb077509c0ef0f3ee1ab71717ac306f126420afb93ed801b1a",
+      "page": 1,
+      "sourcePages": 2,
+      "checks": [
+        {
+          "context": "성인 의료급여 최대",
+          "expected": "300만원",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "건강보험 최대",
+          "expected": "200만원",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "소아 최대",
+          "expected": "2,000만원",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "상위50% 검진 지원율",
+          "expected": "90%",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 799,
+      "commonPrimaryAndAuditMs": 12091,
+      "beforeReviewMs": 1439,
+      "afterReviewMs": 1153
+    },
+    {
+      "id": "n02",
+      "institution": "서울강남구",
+      "title": "압구정데이케어 일반회계 추경",
+      "url": "https://www.gangnam.go.kr/file/1/get/fa98148d-d5f7-4b4c-ba18-8dbe2e1953f4/download.do",
+      "sha256": "184f876f84a090268c3e71c8f65b127975c072c40c1f45a0bf011d6d5e9c512a",
+      "page": 1,
+      "sourcePages": 2,
+      "checks": [
+        {
+          "context": "사무비 2차",
+          "expected": "407,963,000",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "재산조성비 2차",
+          "expected": "42,400,000",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "사업비",
+          "expected": "63,016,000",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "합계 2차",
+          "expected": "523,590,000",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 523,
+      "commonPrimaryAndAuditMs": 4869,
+      "beforeReviewMs": 851,
+      "afterReviewMs": 414
+    },
+    {
+      "id": "n03",
+      "institution": "경북울진군",
+      "title": "울진 2010 조직별 세출",
+      "url": "https://www.uljin.go.kr/images/01_potal/file/budget/2010/budget_summary/3/3-1-3.pdf",
+      "sha256": "4cf870aae3b1299be3622fe51d59ce26d0a691331cdc20d8b4376d29ba9e2334",
+      "page": 1,
+      "sourcePages": 2,
+      "checks": [
+        {
+          "context": "총계 예산액",
+          "expected": "255,872,000",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "본청 예산액",
+          "expected": "199,277,008",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "기획감사실",
+          "expected": "7,031,416",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "본청 감소액",
+          "expected": "△3,354,403",
+          "before": false,
+          "after": false
+        }
+      ],
+      "prepareMs": 590,
+      "commonPrimaryAndAuditMs": 10796,
+      "beforeReviewMs": 930,
+      "afterReviewMs": 452
+    },
+    {
+      "id": "n04",
+      "institution": "경북울진군",
+      "title": "울진 성류굴관리사무소 세출",
+      "url": "https://www.uljin.go.kr/images/01_potal/file/budget/2010/general/2010_c2/3/25-1.pdf",
+      "sha256": "e0d489115e0b2effa12b7a1509b1028e6460e56b9015e6050694ecfc9ead8cf0",
+      "page": 1,
+      "sourcePages": 2,
+      "checks": [
+        {
+          "context": "부서 예산",
+          "expected": "354,414",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "부서 전년",
+          "expected": "283,034",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "증가액",
+          "expected": "71,380",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "재료비 감소",
+          "expected": "△2,337",
+          "before": false,
+          "after": false
+        }
+      ],
+      "prepareMs": 609,
+      "commonPrimaryAndAuditMs": 7331,
+      "beforeReviewMs": 1635,
+      "afterReviewMs": 943
+    },
+    {
+      "id": "n05",
+      "institution": "전북익산시",
+      "title": "익산 공통공시 총괄",
+      "url": "https://www.iksan.go.kr/resource/www/file/budget/fiscal/2026/2026_03.pdf",
+      "sha256": "c4855f219c863a93f454fe556460be8fb55bafd9d178a341f956446a3554f2d5",
+      "page": 1,
+      "sourcePages": 2,
+      "checks": [
+        {
+          "context": "예산 규모",
+          "expected": "19,138억",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "일반회계",
+          "expected": "16,836억",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "사회복지",
+          "expected": "7,255억",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "재정자립도",
+          "expected": "14.1%",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 606,
+      "commonPrimaryAndAuditMs": 10094,
+      "beforeReviewMs": 2510,
+      "afterReviewMs": 1992
+    },
+    {
+      "id": "n06",
+      "institution": "충남공주시",
+      "title": "공주 공통공시 총괄",
+      "url": "https://www.gongju.go.kr/thumbnail/dwld/kr/yesan_2026_02.pdf",
+      "sha256": "4fbec76176ea2877cb3cae41430e079f287af2eadd6b816a9c0da7af08561031",
+      "page": 1,
+      "sourcePages": 2,
+      "checks": [
+        {
+          "context": "예산 규모",
+          "expected": "1조996억",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "일반회계",
+          "expected": "9,504억",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "사회복지",
+          "expected": "3,045억",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "재정자립도",
+          "expected": "12.83%",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 543,
+      "commonPrimaryAndAuditMs": 10503,
+      "beforeReviewMs": 2504,
+      "afterReviewMs": 2123
+    },
+    {
+      "id": "n07",
+      "institution": "강원양양군",
+      "title": "양양 회계별 예산규모",
+      "url": "https://health.yangyang.go.kr/site/erms/upload/executive01/budget/2026/00/01.예산규모.pdf",
+      "sha256": "8d34ce57961eeb4482455c04ccc9abdc40e0ddba71eed38cb24899f7b4d9b75e",
+      "page": 1,
+      "sourcePages": 3,
+      "checks": [
+        {
+          "context": "총계",
+          "expected": "422,035,925",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "일반회계",
+          "expected": "393,640,796",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "일반회계 구성비",
+          "expected": "93.27%",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "총계 증가",
+          "expected": "8,653,101",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 897,
+      "commonPrimaryAndAuditMs": 4348,
+      "beforeReviewMs": 464,
+      "afterReviewMs": 285
+    },
+    {
+      "id": "n08",
+      "institution": "서울관악구",
+      "title": "관악 주민참여예산 사업목록",
+      "url": "https://www.gwanak.go.kr/common/files/Download.do?cfIdx=CF00070446&cfGroup=COMMON&cfRename=1546ffce-73b7-40dd-bf01-5935f8e9a931.pdf",
+      "sha256": "59588a219236aa4408bd25fa5452bb363fab5b6e4485c14464212137c70f5c5d",
+      "page": 1,
+      "sourcePages": 3,
+      "checks": [
+        {
+          "context": "사업 수",
+          "expected": "26개",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "총 사업비 백만원",
+          "expected": "1,135.8",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "해당연도",
+          "expected": "2019년",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "표제 순번",
+          "expected": "1.",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 607,
+      "commonPrimaryAndAuditMs": 5824,
+      "beforeReviewMs": 990,
+      "afterReviewMs": 883
+    },
+    {
+      "id": "n09",
+      "institution": "강원원주시",
+      "title": "원주 가정폭력성폭력상담소 예산",
+      "url": "https://www.wonju.go.kr/www/downloadBbsFile.do?key=216&atchmnflNo=405160",
+      "sha256": "124898fb54b56a2f1c5e542438959475dfaa4ef05dd73beb31bda2ddb1cf30ac",
+      "page": 1,
+      "sourcePages": 4,
+      "checks": [
+        {
+          "context": "합계 당해",
+          "expected": "477,629,000",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "인건비 당해",
+          "expected": "374,402,310",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "운영비 감소",
+          "expected": "-672,000",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "사업비 감소",
+          "expected": "-2,419,000",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 576,
+      "commonPrimaryAndAuditMs": 4232,
+      "beforeReviewMs": 978,
+      "afterReviewMs": 476
+    },
+    {
+      "id": "n10",
+      "institution": "강원화천군",
+      "title": "화천 청년문화예술패스 이벤트",
+      "url": "https://www.ihc.go.kr/www/downloadBbsFile.do?atchmnflNo=79347",
+      "sha256": "23f9e85387e3703e7727a48dac8363140cc46c13aae444ef6f48348bf2424339",
+      "page": 2,
+      "sourcePages": 4,
+      "checks": [
+        {
+          "context": "상품권",
+          "expected": "5,000원권",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "당첨 인원",
+          "expected": "50명",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "시작일",
+          "expected": "2월25일",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "발표일",
+          "expected": "3월25일",
+          "before": false,
+          "after": false
+        }
+      ],
+      "prepareMs": 621,
+      "commonPrimaryAndAuditMs": 1164,
+      "beforeReviewMs": 229,
+      "afterReviewMs": 105
+    },
+    {
+      "id": "n11",
+      "institution": "경북울진군",
+      "title": "울진 의회사무과 세출",
+      "url": "https://www.uljin.go.kr/images/01_potal/file/budget/2010/general/2010_c2/5/36-1.pdf",
+      "sha256": "06d4ae521a579b364953ed75b844957c880b8ff30d9b768121f874ea53144aa8",
+      "page": 1,
+      "sourcePages": 4,
+      "checks": [
+        {
+          "context": "부서 예산",
+          "expected": "1,153,800",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "부서 전년",
+          "expected": "1,136,521",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "증가액",
+          "expected": "17,279",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "일반운영비 감소",
+          "expected": "△8,400",
+          "before": false,
+          "after": false
+        }
+      ],
+      "prepareMs": 533,
+      "commonPrimaryAndAuditMs": 8558,
+      "beforeReviewMs": 1856,
+      "afterReviewMs": 1250
+    },
+    {
+      "id": "n12",
+      "institution": "서울동대문구",
+      "title": "동대문 최근5년 분야별 세출",
+      "url": "https://www.ddm.go.kr/www/downloadBbsFile.do?atchmnflNo=D8A3CCAAB4E7D8A587CF8ACA378E6C37",
+      "sha256": "3ba2dc1cf35a841f39d53c4fbe42f2b423746690a8c0590233d61628ba5ab670",
+      "page": 3,
+      "sourcePages": 5,
+      "checks": [
+        {
+          "context": "2026합계",
+          "expected": "957,500",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "2026사회복지",
+          "expected": "555,245",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "2026사회복지비중",
+          "expected": "57.99%",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "2026보건",
+          "expected": "27,139",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 668,
+      "commonPrimaryAndAuditMs": 5242,
+      "beforeReviewMs": 735,
+      "afterReviewMs": 323
+    },
+    {
+      "id": "n13",
+      "institution": "경북울진군",
+      "title": "울진 미래전략사업과 세출",
+      "url": "https://www.uljin.go.kr/images/01_potal/file/budget/2010/general/2010_c2/1/11-1.pdf",
+      "sha256": "e0a2f8058ee45d27788b4fcdf51cd7056a39c0b192cba8c8a00004678ff238f2",
+      "page": 1,
+      "sourcePages": 5,
+      "checks": [
+        {
+          "context": "부서 예산",
+          "expected": "6,324,309",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "부서 전년",
+          "expected": "6,825,665",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "감소액",
+          "expected": "△501,356",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "스킨스쿠버 리조트",
+          "expected": "2,200,000",
+          "before": false,
+          "after": false
+        }
+      ],
+      "prepareMs": 506,
+      "commonPrimaryAndAuditMs": 5569,
+      "beforeReviewMs": 1329,
+      "afterReviewMs": 620
+    },
+    {
+      "id": "n14",
+      "institution": "강원원주시",
+      "title": "원주 폭력피해이주여성보호시설",
+      "url": "https://www.wonju.go.kr/www/downloadBbsFile.do?key=216&atchmnflNo=405160",
+      "sha256": "df549c202e7216abc2ed86cce9d6dea418fb75148e633a41f1ca13240bcbb290",
+      "page": 1,
+      "sourcePages": 8,
+      "checks": [
+        {
+          "context": "합계 당해",
+          "expected": "405,416,947",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "합계 감소",
+          "expected": "-220,862",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "인건비 당해",
+          "expected": "261,191,000",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "시설비 감소",
+          "expected": "-21,259,000",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 610,
+      "commonPrimaryAndAuditMs": 4948,
+      "beforeReviewMs": 1634,
+      "afterReviewMs": 1277
+    },
+    {
+      "id": "n15",
+      "institution": "경기김포시",
+      "title": "김포 예산 홍보책자",
+      "url": "https://m.gimpo.go.kr/portal/downloadBbsFile.do?atchmnflNo=490152",
+      "sha256": "87dbf1d229bf7a8b0e2bcc3ce146022607008bdd5801fd8f11f4257cd11ace9f",
+      "page": 3,
+      "sourcePages": 10,
+      "checks": [
+        {
+          "context": "총예산",
+          "expected": "1조8,765억",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "일반회계",
+          "expected": "1조4,959억",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "일반회계 비중",
+          "expected": "79.7%",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "전년대비 증가율",
+          "expected": "5.74%",
+          "before": false,
+          "after": false
+        }
+      ],
+      "prepareMs": 7995,
+      "commonPrimaryAndAuditMs": 8079,
+      "beforeReviewMs": 1371,
+      "afterReviewMs": 1070
+    },
+    {
+      "id": "n16",
+      "institution": "경북울진군",
+      "title": "울진 민원봉사과 세출",
+      "url": "https://www.uljin.go.kr/images/01_potal/file/budget/2010/general/2010_c2/1/13-1.pdf",
+      "sha256": "a9f06a81647e1c2d5c99f7c26540a1e91e8e8142fce6f23b092d4808bebdedd7",
+      "page": 1,
+      "sourcePages": 8,
+      "checks": [
+        {
+          "context": "부서 예산",
+          "expected": "1,238,548",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "부서 전년",
+          "expected": "1,695,216",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "감소액",
+          "expected": "△456,668",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "가족관계등록사무",
+          "expected": "36,053",
+          "before": false,
+          "after": false
+        }
+      ],
+      "prepareMs": 579,
+      "commonPrimaryAndAuditMs": 5612,
+      "beforeReviewMs": 1014,
+      "afterReviewMs": 521
+    },
+    {
+      "id": "n17",
+      "institution": "경기의왕시",
+      "title": "의왕한글한마당 행사시간",
+      "url": "https://www.uiwang.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=7005654&fileTy=ATTACH&fileNo=1",
+      "sha256": "bb7299531eff70fcd491fca69f98dc0919563795bc518244ad73660ad98fee63",
+      "page": 3,
+      "sourcePages": 14,
+      "checks": [
+        {
+          "context": "개막시작",
+          "expected": "10:50",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "개막종료",
+          "expected": "11:50",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "마무리시작",
+          "expected": "16:30",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "마무리종료",
+          "expected": "17:00",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 1576,
+      "commonPrimaryAndAuditMs": 4226,
+      "beforeReviewMs": 120,
+      "afterReviewMs": 59
+    },
+    {
+      "id": "n18",
+      "institution": "경기양평군",
+      "title": "양평 주민참여예산 운영계획",
+      "url": "https://www.yp21.go.kr/www/downloadBbsFile.do?atchmnflNo=241106",
+      "sha256": "41a978fb94bbf00bffaabb6878b3e318b84452bba8c1167c38cd42d7a8b8a339",
+      "page": 4,
+      "sourcePages": 21,
+      "checks": [
+        {
+          "context": "최종선정 수",
+          "expected": "111",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "최종선정 예산 백만원",
+          "expected": "3,988",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "교육 참여",
+          "expected": "81명",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "주민투표 참여",
+          "expected": "383명",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 647,
+      "commonPrimaryAndAuditMs": 6562,
+      "beforeReviewMs": 515,
+      "afterReviewMs": 383
+    },
+    {
+      "id": "n19",
+      "institution": "울산중구",
+      "title": "울산중구 재정공시 개요",
+      "url": "https://www.junggu.ulsan.kr/board/download.ulsan?boardId=BBS_0000156&menuCd=DOM_000000108001000000&paging=ok&startPage=1&dataSid=719864&command=update&fileSid=273877",
+      "sha256": "ee022f4c89048608e3f7dc3869888f56bd59c4c64dfc5e772add53ab3cca0f82",
+      "page": 1,
+      "sourcePages": 25,
+      "checks": [
+        {
+          "context": "예산규모",
+          "expected": "5,615억",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "일반회계",
+          "expected": "5,267억",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "사회복지비중",
+          "expected": "63.61%",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "자체재원 비중",
+          "expected": "14.42%",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 749,
+      "commonPrimaryAndAuditMs": 8507,
+      "beforeReviewMs": 1054,
+      "afterReviewMs": 489
+    },
+    {
+      "id": "n20",
+      "institution": "대구수성구",
+      "title": "대구수성구 주민참여예산 현황",
+      "url": "https://www.suseong.kr/cmsh/suseong.kr/images/content/gov/2026/26gongsi_06_4.pdf",
+      "sha256": "4327383d7152d5f96d186f6b8fe0b7d4110169f2011c87acda1340832de3bf65",
+      "page": 1,
+      "sourcePages": 33,
+      "checks": [
+        {
+          "context": "총액",
+          "expected": "1,669",
+          "before": true,
+          "after": true
+        },
+        {
+          "context": "보조 긴급보수",
+          "expected": "160",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "동 긴급보수",
+          "expected": "270",
+          "before": false,
+          "after": false
+        },
+        {
+          "context": "공원유원지 정비",
+          "expected": "47",
+          "before": true,
+          "after": true
+        }
+      ],
+      "prepareMs": 687,
+      "commonPrimaryAndAuditMs": 19202,
+      "beforeReviewMs": 1566,
+      "afterReviewMs": 1367
+    }
+  ]
+}
