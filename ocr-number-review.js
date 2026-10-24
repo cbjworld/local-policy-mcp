@@ -23,22 +23,27 @@ function replaceLocated(text,group,first,last,value,occurrence){
 async function cells(worker,raw,clean,primary,alternate,text){
  const imaging=require('./ocr-numeric-image');let image;try{image=imaging.grey(raw)||imaging.grey(clean);}catch{return {text,passes:0,corrections:[]};}if(!image)return {text,passes:0,corrections:[]};
  const groups=lines(primary.tsv||''),other=words(alternate),corrections=[];let passes=0,retries=0;
- for(const group of groups)for(let index=0;index<group.length;index++){
+ const tasks=groups.flatMap(group=>{const financialRow=group.filter(a=>/\d[,.]\d{3}/.test(a.text)).length>=2;return group.map((w,index)=>{
+  const numeric=/^[\d,.]+$/.test(w.text),unit=/^\d+[a-z]$/i.test(w.text),grouped=/\d[,.]\d{3}/.test(w.text),symbol=grouped?imaging.sign(image,w):null;
+  return {group,index,numeric,unit,grouped,symbol,financialRow,priority:symbol||unit||numeric&&w.confidence<85&&(grouped||financialRow)?0:1};
+ });}).sort((a,b)=>a.priority-b.priority);
+ // Existing repair candidates keep their slots before the newly added high-score disputes.
+ for(const {group,index,numeric,unit,grouped,symbol,financialRow} of tasks){
   const w=group[index];if(!/\d/.test(w.text))continue;
-  const grouped=/\d[,.]\d{3}/.test(w.text),symbol=grouped?imaging.sign(image,w):null,previous=group[index-1];let first=index,value,method;
+  const previous=group[index-1];let first=index,value,method;
   if(symbol&&previous&&/^[스AΔ△▲N\\]+$/.test(previous.text)&&w.x-previous.x-previous.w<12){first=index-1;value='△'+w.text;method='closed_triangle_pixels';}
   else if(/^\d{1,3}\.\d{3}$/.test(w.text)&&group.some(a=>/원/.test(a.text))&&imaging.comma(image,w)){value=w.text.replace('.',',');method='comma_tail_pixels';}
   else{
-   const numeric=/^[\d,.]+$/.test(w.text),unit=/^\d+[a-z]$/i.test(w.text),financialRow=group.filter(a=>/\d[,.]\d{3}/.test(a.text)).length>=2;
-   if(retries>=8||!(symbol||unit||numeric&&w.confidence<85&&(grouped||financialRow)))continue;retries++;
+   const disputed=numeric&&other.some(a=>/^[\d,.]+$/.test(a.text)&&overlap(w,a)>=.6&&a.text!==w.text);
+   if(retries>=8||!(symbol||unit||disputed||numeric&&w.confidence<85&&(grouped||financialRow)))continue;retries++;
    const narrower=numeric&&!symbol&&other.find(a=>a.confidence>=85&&/^[\d,.]+$/.test(a.text)&&overlap(w,a)>=.6&&a.w<=w.w),area=narrower||w;
    const left=Math.max(0,area.x-6),top=Math.max(0,area.y-6),rectangle={left,top,width:Math.min(image.width-left,area.w+12),height:Math.min(image.height-top,area.h+12)};
    let a,b;try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1'});a=(await worker.recognize(raw,{rectangle},{text:true,tsv:true})).data;passes++;b=(await worker.recognize(clean,{rectangle},{text:true,tsv:true})).data;passes++;}catch{continue;}
    const trim=s=>compact(s||'').replace(/^[|]+|[|]+$/g,''),av=trim(a.text),bv=trim(b.text);if(av!==bv)continue;
    const scores=[a,b].flatMap(r=>words(r.tsv||'').filter(w=>/\d/.test(w.text)).map(w=>w.confidence));if(!scores.length||scores.some(s=>s<80))continue;
    const alt=other.filter(a=>a.x>=w.x-3&&a.x<w.x+w.w&&a.y+a.h/2>=w.y&&a.y+a.h/2<=w.y+w.h).sort((a,b)=>a.x-b.x).map(a=>a.text).join('');
-   if(symbol&&/^2\d/.test(w.text)&&/^[스AΔ△▲]\d/.test(av)&&digits(w.text.slice(1)).join('')===digits(av).join('')){value=av.replace(/^[스AΔ△▲]/,'△');method='closed_triangle_and_two_cell_passes';}
-   else if((/^\d[\d,]*(?:호|명|개|원|주|개월)?$/.test(av))&&compact(alt)===av){value=av;method='two_cell_passes_and_same_location_alternate';}
+   if(symbol&&/^[스AΔ△▲]\d/.test(av)&&(digits(w.text).join('')===digits(av).join('')||/^2\d/.test(w.text)&&digits(w.text.slice(1)).join('')===digits(av).join(''))){value=av.replace(/^[스AΔ△▲]/,'△');method='closed_triangle_and_two_cell_passes';}
+   else if((/^\d[\d,]*(?:호|명|개|원|주|개월)?$/.test(av))&&compact(alt)===av){const adjacent=group[index+1]?.text;value=numeric&&adjacent&&/^(호|명|개|원|주|개월)$/.test(adjacent)&&av.endsWith(adjacent)?av.slice(0,-adjacent.length):av;method='two_cell_passes_and_same_location_alternate';}
   }
   if(!value||value===group.slice(first,index+1).map(w=>w.text).join(''))continue;
   const same=groups.filter(g=>compact(g.map(w=>w.text).join(''))===compact(group.map(w=>w.text).join('')));
