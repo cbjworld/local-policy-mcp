@@ -1,1 +1,16 @@
-{"regions":["icn1"],"outputDirectory":"public","functions":{"api/ocr.js":{"maxDuration":60,"includeFiles":"{ocr-models/**,node_modules/tesseract.js/src/**,node_modules/tesseract.js-core/**}"}}}
+{
+  "regions": [
+    "icn1"
+  ],
+  "outputDirectory": "public",
+  "functions": {
+    "api/ocr.js": {
+      "maxDuration": 60,
+      "includeFiles": "{ocr-models/**,node_modules/tesseract.js/src/**,node_modules/tesseract.js-core/**}"
+    },
+    "api/ocr-audit.js": {
+      "maxDuration": 30,
+      "includeFiles": "{ocr-models/**,node_modules/tesseract.js/src/**,node_modules/tesseract.js-core/**}"
+    }
+  }
+}

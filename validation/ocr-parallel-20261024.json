@@ -1,0 +1,40 @@
+{
+  "version": "1.3.5",
+  "previousVersion": "1.3.4",
+  "target": {
+    "url": "https://www.suseong.kr/cmsh/suseong.kr/images/content/gov/2026/26gongsi_06_4.pdf",
+    "sha256": "4327383d7152d5f96d186f6b8fe0b7d4110169f2011c87acda1340832de3bf65",
+    "page": 1,
+    "beforeDiagnosticMs": 39744,
+    "afterRunsMs": [
+      23883,
+      22773,
+      22616
+    ],
+    "callerTimeoutMs": 30000
+  },
+  "local": {
+    "documents": 40,
+    "pages": 43,
+    "numericChecks": 152,
+    "previousCorrect": 123,
+    "retained": 123
+  },
+  "remote": {
+    "documents": 20,
+    "successes": 20,
+    "previousSuccesses": 19,
+    "numericChecks": 80,
+    "numbersMatching": 51,
+    "pairedBeforeMeanMs": 15598.736842105263,
+    "pairedAfterMeanMs": 10026.21052631579
+  },
+  "regressionTestScripts": 40,
+  "security": {
+    "updated": {
+      "body-parser": "2.4.0",
+      "fast-uri": "3.1.9"
+    },
+    "remaining": "Zod 3 / kordoc compatibility review; GitLab synchronization not restored"
+  }
+}
