@@ -4,7 +4,8 @@ const assert=require('node:assert/strict'),{configured,read}=require('./ocr-acce
  global.fetch=async(url,options)=>{called++;assert.equal(url.protocol,'https:');assert.equal(options.redirect,'error');assert.equal(options.headers.authorization,'Bearer test-only-key');assert.equal(options.headers['x-vercel-protection-bypass'].length,32);assert.equal(JSON.parse(options.body).rawImage,Buffer.from('raw').toString('base64'));return new Response(JSON.stringify(result));};
  assert.deepEqual(await read(Buffer.from('raw'),Buffer.from('clean')),result);assert.equal(called,1);
  global.fetch=async()=>new Response(JSON.stringify({...result,ocr:{...result.ocr,passes:4}}));assert.equal((await read(Buffer.from('raw'),Buffer.from('clean'))).ocr.passes,4);called=1;
- global.fetch=async()=>new Response(JSON.stringify({...result,ocr:{...result.ocr,passes:11}}));await assert.rejects(read(Buffer.from('raw'),Buffer.from('clean')),/INVALID/);
+ global.fetch=async()=>new Response(JSON.stringify({...result,ocr:{...result.ocr,passes:26}}));assert.equal((await read(Buffer.from('raw'),Buffer.from('clean'))).ocr.passes,26);
+ global.fetch=async()=>new Response(JSON.stringify({...result,ocr:{...result.ocr,passes:27}}));await assert.rejects(read(Buffer.from('raw'),Buffer.from('clean')),/INVALID/);
  process.env.POLICY_OCR_RELAY_URL='http://example.vercel.app/api/ocr';await assert.rejects(read(Buffer.from('raw'),Buffer.from('clean')),/INVALID/);assert.equal(called,1);
  process.env.POLICY_OCR_RELAY_URL='https://127.0.0.1/api/ocr';await assert.rejects(read(Buffer.from('raw'),Buffer.from('clean')),/INVALID/);assert.equal(called,1);
  process.env.POLICY_OCR_RELAY_URL='https://example.vercel.app/api/ocr';await assert.rejects(read(Buffer.alloc(3000000),Buffer.from('clean')),/PAYLOAD/);assert.equal(called,1);
