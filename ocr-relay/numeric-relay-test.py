@@ -72,3 +72,10 @@ with patch.object(nr,'session',return_value=(WidthModel(),['blank','1','0'])):
  result=nr.read([encoded,wide_encoded,encoded,wide_encoded],['korean','korean'])
  assert widths_seen==[320,384] and all(x['text']=='1' for x in result)
 print('PASS: Korean crops use stable padding regardless of wider neighboring cells')
+
+probs=np.zeros((11,5),dtype=np.float32)
+for frame,token in enumerate([1,3,1,2,2]):probs[frame*2,token]=.99;probs[frame*2+1,0]=.99
+probs[-1,0]=.99
+assert nr.candidates(probs,['blank','1','0',',','2'])==['1,100']
+assert nr.candidates(np.array([[1,0,0,0,0]],dtype=np.float32),['blank','1','0',',','2'])==[]
+print('PASS: CTC numeric alternatives are derived from model probabilities and bounded to eight formatted values')

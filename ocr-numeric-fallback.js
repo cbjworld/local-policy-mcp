@@ -17,7 +17,7 @@ function plan(primary,raw,clean,alternate=''){
  let koreanCells=0;const other=words(alternate),all=[...groups.values()],images=[imaging.grey(raw),imaging.grey(clean)];if(images.some(x=>!x))return [];
  const numeric=w=>/^[△Δ▲스A£N\\,0-9.%-]+$/.test(w.text),tasks=[];
  outer:for(const group of all)for(let first=0;first<group.length;first++){
-  const start=group[first];if(!numeric(start))continue;let last=first;
+  const start=group[first];if(!numeric(start)&&!(/^[A-Z]+,$/.test(start.text)&&imaging.sign(images[0],start)))continue;let last=first;
   while(last+1<group.length&&last-first<2){const a=group[last],b=group[last+1];if(!numeric(b)||b.x-a.x-a.w>Math.max(8,Math.min(a.h,b.h)*.6)||Math.abs(a.y+a.h/2-b.y-b.h/2)>Math.max(a.h,b.h)*.4)break;last++;}
   let span=group.slice(first,last+1),recoveredPrefix=false;
   if(span.some(w=>w.text.includes(','))){const prefix=[];for(let i=first-1;i>=Math.max(0,first-2);i--){const w=group[i],next=prefix[0]||span[0];if(w.confidence>=60||!/^\p{Script=Hangul}{1,2}$/u.test(w.text)||next.x-w.x-w.w>12||Math.abs(next.y+next.h/2-w.y-w.h/2)>Math.max(w.h,next.h)*.6)break;prefix.unshift(w);}if(prefix.some(w=>imaging.sign(images[0],w))){span=[...prefix,...span];recoveredPrefix=true;}}
@@ -32,7 +32,9 @@ function plan(primary,raw,clean,alternate=''){
   tasks.push({group,first:last-span.length+1,last,source,box,hasTriangle:!!triangle,...(korean?{mode:'korean'}:{}),images:images.map(im=>(triangle&&!source.includes(',')&&readBox.width<=256&&readBox.width/readBox.height<=8?wideCrop(im,readBox):imaging.crop(im,readBox)).toString('base64'))});if(tasks.length===32)break outer;
  }
  tasks.push(...require('./ocr-field-review').plan(all,images,alternate,32-tasks.length));
- return tasks.slice(0,32).map(t=>({...t,occurrence:{index:all.filter(g=>compact(g.map(w=>w.text).join(''))===compact(t.group.map(w=>w.text).join(''))).indexOf(t.group),total:all.filter(g=>compact(g.map(w=>w.text).join(''))===compact(t.group.map(w=>w.text).join(''))).length}}));
+ require('./ocr-budget-table').plan(primary,other,all,tasks);
+ tasks.push(...require('./ocr-budget-table').support(tasks,images));
+ return tasks.slice(0,36).map(t=>({...t,occurrence:{index:all.filter(g=>compact(g.map(w=>w.text).join(''))===compact(t.group.map(w=>w.text).join(''))).indexOf(t.group),total:all.filter(g=>compact(g.map(w=>w.text).join(''))===compact(t.group.map(w=>w.text).join(''))).length}}));
 }
 function apply(text,tasks,results,previousCorrections=[]){
  const corrections=[];if(!Array.isArray(results)||results.length!==tasks.length*2)return {text,corrections};
@@ -43,7 +45,7 @@ function apply(text,tasks,results,previousCorrections=[]){
   const t=tasks[i];if(blocked.has(t))continue;const [a,b]=results.slice(i*2,i*2+2),values=[a,b].map(r=>compact(r?.text||'')),value=t.hasTriangle?'△'+values[0].replace(/^[△-]/,''):values[0],other=t.hasTriangle?'△'+values[1].replace(/^[△-]/,''):values[1];
   if(t.kind){
    const fields=require('./ocr-field-review'),av=fields.canonical(a?.text,t),bv=fields.canonical(b?.text,t);
-   if(!av||av!==bv||![a,b].every(r=>Number.isFinite(r?.score)&&r.score>=.94&&r.score<=1)||t.kind==='percent'&&![a,b].every(r=>Number.isFinite(r?.koreanScore)&&r.koreanScore>=.90&&fields.canonical(r.koreanText,t)===av))continue;
+   if(!av||av!==bv||![a,b].every(r=>Number.isFinite(r?.score)&&r.score>=.94&&r.score<=1)||(t.mode==='percent'||t.kind==='percent')&&![a,b].every(r=>Number.isFinite(r?.koreanScore)&&r.koreanScore>=(t.kind==='integer'?.94:.90)&&fields.canonical(r.koreanText,t)===av))continue;
    const index=locations.get(t.group);if(!Number.isInteger(index)||av===compact(t.source))continue;const next=replaceLocated(rows[index],t.group,t.first,t.last,av);if(next===null)continue;
    corrections.push({from:[t.source],to:[av],box:Object.values(t.box),method:'two_source_'+t.kind+'_field_review',confidence:Math.min(a.score,b.score)});rows[index]=next;for(let j=t.first;j<t.last;j++)t.group[j].text='';t.group[t.last].text=av;continue;
   }
@@ -53,6 +55,7 @@ function apply(text,tasks,results,previousCorrections=[]){
   corrections.push({from:[t.source],to:[value],box:Object.values(t.box),method:'independent_numeric_model_two_source_crops',confidence:Math.min(a.score,b.score)});rows[index]=next;
   for(let j=t.first;j<t.last;j++)t.group[j].text='';t.group[t.last].text=value;
  }
+ corrections.push(...require('./ocr-budget-table').apply(rows,tasks,results,locations,blocked));
  return {text:rows.join('\n'),corrections};
 }
 module.exports={plan,apply,trimBox};

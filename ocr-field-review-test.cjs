@@ -9,3 +9,7 @@ assert.equal(fallback.apply('1,019 65.2490)',tasks,[money,money,percent,percent]
 const task={...base,group:[{text:'65.2490)',x:90,y:40,w:80,h:25}],first:0,last:0,source:'65.2490)',kind:'percent'};
 assert.equal(fallback.apply('65.2490)',[task],[{...percent,koreanScore:.89},percent]).text,'65.2490)');assert.equal(fallback.apply('65.2490)',[task],[{...percent,koreanText:'5.74억'},percent]).text,'65.2490)');
 console.log('PASS: calendar validation, unit formatting without digit synthesis, dual-model percentages, alternate-matched integers, and source-position alignment that preserves prior repairs');
+
+assert.equal(canonical('123','integer',{alternatePrefix:'12'}),'123');assert.equal(canonical('234','integer',{alternatePrefix:'12'}),null);assert.equal(canonical('1234','integer',{alternatePrefix:'12'}),null);
+
+const letterGroup=[{text:'ABC',x:20,y:30,w:50,h:20}],letterTask={group:letterGroup,first:0,last:0,source:'ABC',kind:'integer',mode:'percent',alternatePrefix:'12',box:{left:20,top:30,width:50,height:20},occurrence:{index:0,total:1}},letterRead={text:'123',score:.99,koreanText:'123',koreanScore:.99};assert.equal(fallback.apply('ABC',[letterTask],[letterRead,letterRead]).text,'123');assert.equal(fallback.apply('ABC',[{...letterTask,group:[{...letterGroup[0],text:'ABC'}]}],[{...letterRead,koreanScore:.93},letterRead]).text,'ABC');

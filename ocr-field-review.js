@@ -2,7 +2,7 @@ const {words,overlap}=require('./ocr-quality'),imaging=require('./ocr-numeric-im
 const compact=s=>s.normalize('NFC').replace(/\s/g,'');
 function canonical(text,task){
  if(typeof text!=='string'||text.length>64)return null;let value=compact(text);
- if(task.kind==='integer')return /^\d{1,3}$/.test(value)&&value===task.alternate?value:null;
+ if(task.kind==='integer')return /^\d{1,3}$/.test(value)&&(value===task.alternate||/^\d{2}$/.test(task.alternatePrefix||'')&&/^\d{3}$/.test(value)&&value.startsWith(task.alternatePrefix))?value:null;
  if(task.kind==='percent'){
   value=value.replace(/^\((.*)\)$/,'$1');const m=/^(\d{1,4}(?:\.\d{1,3})?)%(p)?$/.exec(value);return m&&Number(m[1])<=10000?value:null;
  }
@@ -18,12 +18,12 @@ function canonical(text,task){
 }
 function plan(groups,images,alternate,limit){
  const financial=/예산|회계|지원|사업|비용|세입|세출|[조억만원]/.test(groups.flatMap(g=>g.map(w=>w.text)).join('')),other=words(alternate||''),tasks=[],used=new Set();if(limit<=0)return tasks;
- function add(group,first,last,kind,{rightPad=8,leftPad=8,area,prefix,alternate}={}){
+ function add(group,first,last,kind,{rightPad=8,leftPad=8,area,prefix,alternate,alternatePrefix,mode}={}){
   if(tasks.length>=Math.min(8,limit)||last<first)return;const key=groups.indexOf(group)+':'+first+':'+last;if(used.has(key))return;
-  const span=group.slice(first,last+1),left=Math.max(0,(area?.x??Math.min(...span.map(w=>w.x)))-leftPad),top=Math.max(0,(area?.y??Math.min(...span.map(w=>w.y)))-8),right=Math.min(images[0].width,(area?area.x+area.w:Math.max(...span.map(w=>w.x+w.w)))+rightPad),bottom=Math.min(images[0].height,(area?area.y+area.h:Math.max(...span.map(w=>w.y+w.h)))+8);
+  const span=group.slice(first,last+1);let verticalPad=8;if(kind==='unit'&&!area){const found=other.filter(a=>/\d/.test(a.text)&&span.some(w=>overlap(w,a)>=.4)),xs=span.map(w=>w.x),ys=span.map(w=>w.y),l=Math.max(0,Math.min(...xs)),r=Math.min(images[0].width,Math.max(...span.map(w=>w.x+w.w))),t=Math.max(0,Math.min(...ys)),b=Math.min(images[0].height,Math.max(...span.map(w=>w.y+w.h)));let mid=0,total=0;for(let y=t;y<b;y+=2)for(let x=l;x<r;x+=2){const v=images[0].pixels[y*images[0].width+x];total++;if(v>80&&v<210)mid++;}if(found.length>=2&&found.length<=4&&mid>total*.5){area={x:Math.min(...found.map(a=>a.x)),y:Math.min(...found.map(a=>a.y)),w:0,h:0};area.w=Math.max(...found.map(a=>a.x+a.w))-area.x;area.h=Math.max(...found.map(a=>a.y+a.h))-area.y;leftPad=rightPad=verticalPad=4;}}const left=Math.max(0,(area?.x??Math.min(...span.map(w=>w.x)))-leftPad),top=Math.max(0,(area?.y??Math.min(...span.map(w=>w.y)))-verticalPad),right=Math.min(images[0].width,(area?area.x+area.w:Math.max(...span.map(w=>w.x+w.w)))+rightPad),bottom=Math.min(images[0].height,(area?area.y+area.h:Math.max(...span.map(w=>w.y+w.h)))+verticalPad);
   if(right<=left||bottom<=top||right-left>512||bottom-top>256)return;const box=imaging.trimBox(images[0],{left,top,width:right-left,height:bottom-top});if(box.width<8||box.height<8||box.height>192||box.width/box.height>16)return;
   if(kind!=='date'&&span.some(w=>imaging.sign(images[0],w)))return;
-  tasks.push({group,first,last,source:span.map(w=>w.text).join(''),box,kind,mode:kind==='percent'?'percent':kind==='integer'?'numeric':'korean',prefix,alternate,images:images.map(im=>imaging.crop(im,box).toString('base64'))});used.add(key);
+  tasks.push({group,first,last,source:span.map(w=>w.text).join(''),box,kind,mode:mode||(kind==='percent'?'percent':kind==='integer'?'numeric':'korean'),prefix,alternate,alternatePrefix,images:images.map(im=>imaging.crop(im,box).toString('base64'))});used.add(key);
  }
  for(const group of groups)for(let i=0;i<group.length;i++){
   if(tasks.length>=Math.min(8,limit))return tasks;
@@ -39,7 +39,7 @@ function plan(groups,images,alternate,limit){
  }
  for(const group of groups)for(let i=0;i<group.length;i++){
   if(tasks.length>=Math.min(8,limit))return tasks;
-  const w=group[i];if(w.confidence>=85||! /\d/.test(w.text)||w.h<8||! /^[\d,.%pP()!|\[\]A-Z]+$/.test(w.text))continue;
+  const w=group[i];if(financial&&w.confidence<85&&/^[A-Z]{2,6}$/.test(w.text)){const a=other.find(a=>a.confidence>=90&&/^\d{2}$/.test(a.text)&&overlap(w,a)>=.4);if(a){let boundary=null;for(let x=a.x+a.w;x<w.x+w.w;x++){let ink=0,count=0;for(let y=Math.max(0,w.y-w.h);y<Math.min(images[0].height,w.y+w.h*2);y++){count++;if(images[0].pixels[y*images[0].width+x]<170)ink++;}if(ink>count*.9){boundary=x;break;}}if(boundary){add(group,i,i,'integer',{area:{x:w.x,y:a.y,w:boundary-w.x,h:a.h},leftPad:4,rightPad:0,alternatePrefix:a.text,mode:'percent'});continue;}}}if(w.confidence>=85||! /\d/.test(w.text)||w.h<8||! /^[\d,.%pP()!|\[\]A-Z]+$/.test(w.text))continue;
   const alternatives=other.filter(a=>overlap(w,a)>=.4).sort((a,b)=>overlap(w,b)-overlap(w,a)),a=alternatives[0],integer=a?.text.replace(/[|.,]+$/,'');
   if(/^\d{1,3}$/.test(w.text)&&a?.confidence>=90&&/^\d{1,3}$/.test(integer)&&integer!==w.text){add(group,i,i,'integer',{area:a,alternate:integer});continue;}
   const percent=/%/.test(w.text)||a&&/%|\.\d{2}96\)?$/.test(a.text);if(percent){add(group,i,i,'percent',{area:a&&a.h<w.h*.8?a:undefined});continue;}
