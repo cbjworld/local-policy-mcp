@@ -6,7 +6,7 @@
     "node": "22.x"
   },
   "scripts": {
-    "build": "node prepare-ocr-models.cjs && python3 prepare-numeric-model.py"
+    "build": "node prepare-ocr-models.cjs && node prepare-numeric-model.cjs"
   },
   "dependencies": {
     "tesseract.js": "7.0.0"
