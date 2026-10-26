@@ -14,7 +14,7 @@
     },
     "api/numeric.py": {
       "maxDuration": 15,
-      "includeFiles": "numeric-model.onnx",
+      "includeFiles": "{numeric-model.onnx,korean-model.onnx}",
       "excludeFiles": "{node_modules/**,ocr-models/**,public/**}"
     }
   }

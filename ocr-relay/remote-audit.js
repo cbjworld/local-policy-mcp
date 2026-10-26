@@ -14,9 +14,10 @@ async function read(rawImage){
  const result=await post('ocr-audit',{rawImage},2100000,24000);
  return result?.engine==='Tesseract.js 7.0.0'&&typeof result.tsv==='string'&&Buffer.byteLength(result.tsv)<=2000000&&Number.isFinite(result.auditMs)&&result.auditMs>=0&&result.auditMs<=30000?result:null;
 }
-async function numeric(images,timeout){
+async function numeric(images,timeout,modes){
  if(timeout<500||!images.length)return null;
- const r=await post('numeric',{images},30000,timeout);
- return r?.model==='PP-OCRv4 numeric'&&Array.isArray(r.results)&&r.results.length===images.length&&r.results.every(x=>typeof x?.text==='string'&&x.text.length<=64&&Number.isFinite(x.score)&&x.score>=0&&x.score<=1)?r:null;
+ if(modes!==undefined&&(!Array.isArray(modes)||modes.length*2!==images.length||modes.some(x=>!['numeric','korean','percent'].includes(x))))return null;
+ const r=await post('numeric',{images,...(modes?{modes,budgetMs:Math.max(500,Math.min(6000,Math.floor(timeout)))}:{})},30000,timeout);
+ return ['PP-OCRv4 numeric','PP-OCRv4 numeric + PP-OCRv5 Korean'].includes(r?.model)&&(r.koreanStatus===undefined||['used','unavailable','not_requested'].includes(r.koreanStatus))&&Array.isArray(r.results)&&r.results.length===images.length&&r.results.every(x=>typeof x?.text==='string'&&x.text.length<=64&&Number.isFinite(x.score)&&x.score>=0&&x.score<=1&&(x.koreanText===undefined||typeof x.koreanText==='string'&&x.koreanText.length<=64&&Number.isFinite(x.koreanScore)&&x.koreanScore>=0&&x.koreanScore<=1)&&(x.koreanUnavailable===undefined||typeof x.koreanUnavailable==='boolean')&&(x.passes===undefined||x.passes===1||x.passes===2))?r:null;
 }
 module.exports={read,numeric};

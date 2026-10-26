@@ -30,13 +30,22 @@ function plan(primary,raw,clean,alternate=''){
   const leftEdge=triangle?Math.max(box.left,triangle.x+triangle.w+(recoveredPrefix?0:1)):box.left,readBox={...box,left:leftEdge,width:box.left+box.width-leftEdge};if(readBox.width<8)continue;
   tasks.push({group,first:last-span.length+1,last,source,box,hasTriangle:!!triangle,images:images.map(im=>(triangle&&!source.includes(',')&&readBox.width<=256&&readBox.width/readBox.height<=8?wideCrop(im,readBox):imaging.crop(im,readBox)).toString('base64'))});if(tasks.length===32)break outer;
  }
+ tasks.push(...require('./ocr-field-review').plan(all,images,alternate,32-tasks.length));
  return tasks.slice(0,32).map(t=>({...t,occurrence:{index:all.filter(g=>compact(g.map(w=>w.text).join(''))===compact(t.group.map(w=>w.text).join(''))).indexOf(t.group),total:all.filter(g=>compact(g.map(w=>w.text).join(''))===compact(t.group.map(w=>w.text).join(''))).length}}));
 }
-function apply(text,tasks,results){
+function apply(text,tasks,results,previousCorrections=[]){
  const corrections=[];if(!Array.isArray(results)||results.length!==tasks.length*2)return {text,corrections};
+ const groups=[...new Set(tasks.map(t=>t.group))],blocked=new Set();
+ for(const c of previousCorrections){if(!Array.isArray(c.from)||c.from.length!==1||!Array.isArray(c.to)||c.to.length!==1||!Array.isArray(c.box)||c.box.length!==4||typeof c.from[0]!=='string'||typeof c.to[0]!=='string')continue;const matches=groups.flatMap(group=>group.map((w,index)=>({group,w,index}))).filter(({w})=>w.text===c.from[0]&&[w.x,w.y,w.w,w.h].every((v,i)=>v===c.box[i]));if(matches.length!==1)continue;const {group,w,index}=matches[0];w.text=c.to[0];for(const t of tasks)if(t.group===group&&t.first<=index&&t.last>=index)blocked.add(t);}
  const rows=text.split('\n'),locations=new Map();for(const t of tasks)if(!locations.has(t.group)){const source=compact(t.group.map(w=>w.text).join('')),matches=rows.map((r,i)=>compact(r)===source?i:-1).filter(i=>i>=0);locations.set(t.group,matches.length===t.occurrence.total?matches[t.occurrence.index]:null);}
  for(let i=0;i<tasks.length;i++){
-  const t=tasks[i],[a,b]=results.slice(i*2,i*2+2),values=[a,b].map(r=>compact(r?.text||'')),value=t.hasTriangle?'△'+values[0].replace(/^[△-]/,''):values[0],other=t.hasTriangle?'△'+values[1].replace(/^[△-]/,''):values[1];
+  const t=tasks[i];if(blocked.has(t))continue;const [a,b]=results.slice(i*2,i*2+2),values=[a,b].map(r=>compact(r?.text||'')),value=t.hasTriangle?'△'+values[0].replace(/^[△-]/,''):values[0],other=t.hasTriangle?'△'+values[1].replace(/^[△-]/,''):values[1];
+  if(t.kind){
+   const fields=require('./ocr-field-review'),av=fields.canonical(a?.text,t),bv=fields.canonical(b?.text,t);
+   if(!av||av!==bv||![a,b].every(r=>Number.isFinite(r?.score)&&r.score>=.94&&r.score<=1)||t.kind==='percent'&&![a,b].every(r=>Number.isFinite(r?.koreanScore)&&r.koreanScore>=.90&&fields.canonical(r.koreanText,t)===av))continue;
+   const index=locations.get(t.group);if(!Number.isInteger(index)||av===compact(t.source))continue;const next=replaceLocated(rows[index],t.group,t.first,t.last,av);if(next===null)continue;
+   corrections.push({from:[t.source],to:[av],box:Object.values(t.box),method:'two_source_'+t.kind+'_field_review',confidence:Math.min(a.score,b.score)});rows[index]=next;for(let j=t.first;j<t.last;j++)t.group[j].text='';t.group[t.last].text=av;continue;
+  }
   const negative=/^[△-]/.test(value),sourceNegative=t.hasTriangle||/^[△-]/.test(t.source);if(negative!==sourceNegative)continue;
   if(!money.test(value)||value!==other||![a,b].every(r=>Number.isFinite(r?.score)&&r.score>=.94&&r.score<=1)||value===compact(t.source))continue;
   const index=locations.get(t.group);if(!Number.isInteger(index))continue;const next=replaceLocated(rows[index],t.group,t.first,t.last,value);if(next===null)continue;

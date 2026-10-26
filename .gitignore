@@ -14,3 +14,4 @@ budget-search-keys.json.gz
 ocr-models/*.traineddata
 
 ocr-relay/numeric-model.onnx
+ocr-relay/korean-model.onnx
