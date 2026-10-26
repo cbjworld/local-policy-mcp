@@ -62,3 +62,13 @@ for modes,budget in [(['invalid'],6000),(['numeric'],True),(['korean'],7000)]:
  except ValueError:pass
  else:raise AssertionError('Untrusted numeric mode/time accepted')
 print('PASS: bounded modes/deadline and Korean model failure preserve completed numeric results')
+
+wide_buffer=io.BytesIO();Image.new('L',(256,32),255).save(wide_buffer,format='PNG');wide_encoded=__import__('base64').b64encode(wide_buffer.getvalue()).decode()
+widths_seen=[]
+class WidthModel(FakeModel):
+ def run(self,_,feed):
+  widths_seen.append(feed['x'].shape[3]);return super().run(_,feed)
+with patch.object(nr,'session',return_value=(WidthModel(),['blank','1','0'])):
+ result=nr.read([encoded,wide_encoded,encoded,wide_encoded],['korean','korean'])
+ assert widths_seen==[320,384] and all(x['text']=='1' for x in result)
+print('PASS: Korean crops use stable padding regardless of wider neighboring cells')

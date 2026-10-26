@@ -38,9 +38,13 @@ def read(images,modes=None,budget_ms=6000):
   except Exception:
    if not korean:raise
    continue
-  for offset in range(0,len(indices),8):
+  batches=[]
+  widths={}
+  for index in indices:widths.setdefault(max(320,prepared[index].shape[1]) if korean else 0,[]).append(index)
+  for group in widths.values():batches.extend(group[offset:offset+8] for offset in range(0,len(group),8))
+  for selected in batches:
    if korean and time.monotonic()>=deadline:break
-   selected=indices[offset:offset+8];batch=[prepared[i] for i in selected];width=max(320,max(a.shape[1] for a in batch));tensor=np.zeros((len(batch),3,48,width),dtype=np.float32)
+   batch=[prepared[i] for i in selected];width=max(320,max(a.shape[1] for a in batch));tensor=np.zeros((len(batch),3,48,width),dtype=np.float32)
    for i,a in enumerate(batch):tensor[i,:,:,:a.shape[1]]=a
    try:preds=model.run(None,{model.get_inputs()[0].name:tensor})[0]
    except Exception:

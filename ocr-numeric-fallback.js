@@ -14,7 +14,7 @@ function wideCrop(image,box){
 }
 function plan(primary,raw,clean,alternate=''){
  const groups=new Map();for(const row of (primary.tsv||'').split('\n')){const a=row.split('\t'),w=words(row)[0];if(!w)continue;const key=a.slice(1,5).join(':');if(!groups.has(key))groups.set(key,[]);groups.get(key).push(w);}
- const other=words(alternate),all=[...groups.values()],images=[imaging.grey(raw),imaging.grey(clean)];if(images.some(x=>!x))return [];
+ let koreanCells=0;const other=words(alternate),all=[...groups.values()],images=[imaging.grey(raw),imaging.grey(clean)];if(images.some(x=>!x))return [];
  const numeric=w=>/^[△Δ▲스A£N\\,0-9.%-]+$/.test(w.text),tasks=[];
  outer:for(const group of all)for(let first=0;first<group.length;first++){
   const start=group[first];if(!numeric(start))continue;let last=first;
@@ -25,10 +25,11 @@ function plan(primary,raw,clean,alternate=''){
   if((digits<4&&!source.includes(',')&&!/^[△Δ▲스A£]/.test(source))||digits>12||money.test(source)&&span.every(w=>w.confidence>=85))continue;
   const triangle=span.map(w=>imaging.sign(images[0],w)).find(Boolean);if(digits<4&&!source.includes(',')&&!triangle)continue;
   const left=Math.max(0,Math.min(...span.map(w=>w.x))-8),top=Math.max(0,Math.min(...span.map(w=>w.y))-8),right=Math.min(images[0].width,Math.max(...span.map(w=>w.x+w.w))+8),bottom=Math.min(images[0].height,Math.max(...span.map(w=>w.y+w.h))+8),untrimmed={left,top,width:right-left,height:bottom-top};
-  if(untrimmed.width<8||untrimmed.height<8||untrimmed.width>512||untrimmed.height>256)continue;const disputed=other.some(a=>/\d/.test(a.text)&&compact(a.text)!==source&&span.some(w=>overlap(w,a)>=.45)),trimmed=trimBox(images[0],untrimmed,disputed),box=recoveredPrefix?trimBorder(images[0],trimmed):trimmed;
+  if(untrimmed.width<8||untrimmed.height<8||untrimmed.width>512||untrimmed.height>256)continue;const disputed=other.some(a=>/\d/.test(a.text)&&compact(a.text)!==source&&span.some(w=>overlap(w,a)>=.45)),trimmed=trimBox(images[0],untrimmed,disputed),originalBox=recoveredPrefix?trimBorder(images[0],trimmed):trimmed,cell=money.test(source)&&untrimmed.height>=48?trimBox(images[0],trimBorder(images[0],untrimmed),true):originalBox,korean=money.test(source)&&cell.height<untrimmed.height*.75&&koreanCells<4;let box=korean?cell:originalBox;if(korean)koreanCells++;
+  if(/,\d{1,2}$/.test(source)){let edge=0;for(let y=box.top;y<box.top+box.height;y++)if(images[0].pixels[y*images[0].width+box.left+box.width-1]<170)edge++;if(edge>2&&edge<box.height*.8){let right=Math.min(images[0].width,box.left+box.width+24);for(let x=box.left+box.width;x<right;x++){let ink=0;for(let y=box.top;y<box.top+box.height;y++)if(images[0].pixels[y*images[0].width+x]<170)ink++;if(ink>=box.height*.9){right=x;break;}}box={...box,width:right-box.left};}}
   if(box.width<8||box.height<8||box.width>512||box.height>192||box.width/box.height>16)continue;
   const leftEdge=triangle?Math.max(box.left,triangle.x+triangle.w+(recoveredPrefix?0:1)):box.left,readBox={...box,left:leftEdge,width:box.left+box.width-leftEdge};if(readBox.width<8)continue;
-  tasks.push({group,first:last-span.length+1,last,source,box,hasTriangle:!!triangle,images:images.map(im=>(triangle&&!source.includes(',')&&readBox.width<=256&&readBox.width/readBox.height<=8?wideCrop(im,readBox):imaging.crop(im,readBox)).toString('base64'))});if(tasks.length===32)break outer;
+  tasks.push({group,first:last-span.length+1,last,source,box,hasTriangle:!!triangle,...(korean?{mode:'korean'}:{}),images:images.map(im=>(triangle&&!source.includes(',')&&readBox.width<=256&&readBox.width/readBox.height<=8?wideCrop(im,readBox):imaging.crop(im,readBox)).toString('base64'))});if(tasks.length===32)break outer;
  }
  tasks.push(...require('./ocr-field-review').plan(all,images,alternate,32-tasks.length));
  return tasks.slice(0,32).map(t=>({...t,occurrence:{index:all.filter(g=>compact(g.map(w=>w.text).join(''))===compact(t.group.map(w=>w.text).join(''))).indexOf(t.group),total:all.filter(g=>compact(g.map(w=>w.text).join(''))===compact(t.group.map(w=>w.text).join(''))).length}}));
