@@ -17,8 +17,9 @@ module.exports=async(req,res)=>{
   if(remote){alternate={data:{tsv:remote.tsv}};auditMs=remote.auditMs;auditExecution='parallel_function';}
   else{const auditStart=Date.now();await worker.setParameters({tessedit_pageseg_mode:'3'});alternate=await worker.recognize(raw.bytes,{},{tsv:true});auditMs=Date.now()-auditStart;auditExecution='sequential_fallback';}
   const quality=assess(primary.data.tsv||'',alternate.data.tsv||'');
-  const refined=await require('../ocr-number-review').refine(worker,raw.bytes,clean.bytes,primary.data,alternate.data.tsv||'',raw),text=refined.text;quality.numberCorrections=refined.corrections;
-  return reply(200,{text:text.slice(0,14000),truncated:text.length>14000,ocr:{engine:'Tesseract.js 7.0.0',languages:'kor+eng',auditEngine:'Tesseract.js 7.0.0',passes:2+refined.passes,initMs,auditMs,primaryMs,auditExecution,totalMs:Date.now()-start,quality}});
+  const refined=await require('../ocr-number-review').refine(worker,raw.bytes,clean.bytes,primary.data,alternate.data.tsv||'',raw),fallback=require('../ocr-numeric-fallback'),tasks=fallback.plan(primary.data,raw.bytes,clean.bytes),numericStart=Date.now(),numeric=await require('../remote-audit').numeric(tasks.flatMap(t=>t.images),Math.max(0,Math.min(6000,start+28000-Date.now()))),supplement=numeric?fallback.apply(refined.text,tasks,numeric.results):{text:refined.text,corrections:[]},text=supplement.text;quality.numberCorrections=[...refined.corrections,...supplement.corrections];
+  const numericFallback={status:!tasks.length?'not_needed':numeric?'used':'unavailable',model:'PP-OCRv4 numeric',checked:numeric?tasks.length:0,passes:numeric?tasks.length*2:0,ms:Date.now()-numericStart};
+  return reply(200,{text:text.slice(0,14000),truncated:text.length>14000,ocr:{engine:'Tesseract.js 7.0.0',languages:'kor+eng',auditEngine:'Tesseract.js 7.0.0',passes:2+refined.passes,initMs,auditMs,primaryMs,auditExecution,numericFallback,totalMs:Date.now()-start,quality}});
  }catch{return reply(502,{error:'OCR_FAILED'});}
  finally{if(worker)await worker.terminate().catch(()=>{});busy=false;}
 };

@@ -37,9 +37,9 @@ OCR 결과에는 `OCR 판독값` 표시와 숫자 재검토 위치가 붙습니�
 <details>
 <summary>운영자: OCR 가속 서버 연결</summary>
 
-가속 서버는 같은 OCR 모델로 한 쪽 이미지를 처리합니다. 공개 첨부 확인·PDF 다운로드·이미지 생성은 MCP 서버에서 수행하며, 본문용 PNG는 픽셀을 바꾸지 않고 전송합니다. 가속 경로가 없거나 호출이 실패하면 기존 서버에서 계속 판독합니다.
+가속 서버는 Tesseract 본문·비교 판독과 필요한 금액 칸의 PP-OCRv4 대조를 처리합니다. 공개 첨부 확인·PDF 다운로드·이미지 생성은 MCP 서버에서 수행하며, 본문용 PNG는 픽셀을 바꾸지 않고 전송합니다. 가속 경로가 없거나 호출이 실패하면 기존 서버에서 계속 판독합니다.
 
-`node prepare-ocr-relay.cjs <빈 배포 폴더>`로 실행 서버를 준비해 Vercel에 배포합니다. 두 서버에 같은 전용 비밀키 `POLICY_OCR_RELAY_TOKEN`을 저장하고, MCP 서버의 `POLICY_OCR_RELAY_URL`에 해당 프로젝트의 `https://…vercel.app/api/ocr` 주소를 설정합니다. 배포 보호용 자동화 키는 전용 비밀키의 SHA-256 앞 32자리로 설정합니다. 사용자용 MCP 주소는 그대로 사용합니다.
+`node prepare-ocr-relay.cjs <빈 배포 폴더>`로 실행 서버를 준비해 Vercel에 배포합니다. 두 서버에 같은 전용 비밀키 `POLICY_OCR_RELAY_TOKEN`을 저장하고, MCP 서버의 `POLICY_OCR_RELAY_URL`에 해당 프로젝트의 `https://…vercel.app/api/ocr` 주소를 설정합니다. 배포 보호용 자동화 키는 전용 비밀키의 SHA-256 앞 32자리로 설정합니다. 사용자용 MCP 주소는 그대로 사용합니다. 숫자 대조용 Python 함수와 고정 모델도 같은 프로젝트에 배포됩니다. 모델의 출처·라이선스는 [별도 안내](ocr-relay/THIRD_PARTY_NOTICES.md)에 있습니다.
 
 </details>
 

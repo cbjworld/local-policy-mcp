@@ -1,1 +1,14 @@
-{"name":"local-policy-ocr-runner","version":"1.0.0","private":true,"engines":{"node":"22.x"},"scripts":{"build":"node prepare-ocr-models.cjs"},"dependencies":{"tesseract.js":"7.0.0"}}
+{
+  "name": "local-policy-ocr-runner",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "build": "node prepare-ocr-models.cjs && python3 prepare-numeric-model.py"
+  },
+  "dependencies": {
+    "tesseract.js": "7.0.0"
+  }
+}

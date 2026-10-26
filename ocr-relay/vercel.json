@@ -11,6 +11,11 @@
     "api/ocr-audit.js": {
       "maxDuration": 30,
       "includeFiles": "{ocr-models/**,node_modules/tesseract.js/src/**,node_modules/tesseract.js-core/**}"
+    },
+    "api/numeric.py": {
+      "maxDuration": 15,
+      "includeFiles": "numeric-model.onnx",
+      "excludeFiles": "{node_modules/**,ocr-models/**,public/**}"
     }
   }
 }
