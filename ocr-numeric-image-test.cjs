@@ -32,4 +32,16 @@ const priorityWorker={setParameters:async()=>{},recognize:async(_,{rectangle})=>
 const prioritised=await refine(priorityWorker,png(200,500),png(200,500),many,alternates,{width:200,height:500});assert(prioritised.text.endsWith('8호'));assert(seen.length>0);assert(prioritised.passes<=24);
 const a={text:'50.500',x:20,y:20,w:60,h:30},g=[{text:'😀항목'},a];assert.equal(replaceLocated('😀항목 50.500',g,1,1,'50,500'),'😀항목 50,500');
 const dup=[{text:'스'}, {text:'124,588'}];assert.equal(replaceLocated('스 124,588\n스 124,588',dup,0,1,'△124,588'),null);assert.equal(replaceLocated('스 124,588\n스 124,588',dup,0,1,'△124,588',{index:1,total:2}),'스 124,588\n△124,588');
+const glyphs=[];for(const x of [20,30,40,60,70,80])for(let y=20;y<39;y++)for(let dx=0;dx<6;dx++)glyphs.push([x+dx,y]);
+const tail=[];for(let y=38;y<44;y++)for(let x=50;x<53;x++)tail.push([x,y]);
+const groupedBox={x:20,y:20,w:66,h:24},groupedImage=png(200,100,[...glyphs,...tail]);
+assert(im.groupedComma(im.grey(groupedImage),groupedBox,'555,245'));
+assert(!im.groupedComma(im.grey(png(200,100,glyphs)),groupedBox,'555,245'));
+assert(!im.groupedComma(im.grey(png(200,100,[...glyphs,...tail.filter(p=>p[1]<41)])),groupedBox,'555,245'));
+assert(!im.groupedComma(im.grey(groupedImage),groupedBox,'55,245'));
+const groupedTsv=text=>`5\t1\t1\t1\t1\t1\t20\t20\t66\t24\t94\t${text}`;
+const lostComma={text:'555245\n',tsv:groupedTsv('555245')};calls=0;
+const restored=await refine(cellWorker('unused'),groupedImage,groupedImage,lostComma,groupedTsv('555,245'),{width:200,height:100});
+assert.equal(restored.text,'555,245\n');assert.equal(calls,0);assert.equal(restored.corrections[0].method,'matching_digits_and_source_comma_components');
+assert.equal((await refine(cellWorker('unused'),groupedImage,groupedImage,lostComma,groupedTsv('555,246'),{width:200,height:100})).text,lostComma.text);
 console.log('PASS: bounded grayscale decoding, closed triangle versus open/solid/digit rejection, source-located unit repair, low-confidence/disagreement preservation and duplicate row ordering');})().catch(e=>{console.error(e);process.exitCode=1;});

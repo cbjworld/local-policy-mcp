@@ -1,0 +1,50 @@
+{
+  "version": "1.3.7",
+  "date": "2026-10-26",
+  "scope": "Same actual page images and frozen numeric truth; cached full-page primary/audit outputs, fresh numeric crop OCR. Three extra pages freshly read.",
+  "documents": 40,
+  "pages": 43,
+  "numericChecks": 152,
+  "previousCorrect": 123,
+  "retained": 123,
+  "currentCorrect": 124,
+  "remaining": 28,
+  "numericReview": {
+    "pages": 40,
+    "beforePasses": 524,
+    "afterPasses": 466,
+    "beforeMeanMs": 535.85,
+    "afterMeanMs": 510
+  },
+  "extra": [
+    {
+      "id": "d11",
+      "page": 3,
+      "correct": 5,
+      "total": 5
+    },
+    {
+      "id": "d12",
+      "page": 5,
+      "correct": 5,
+      "total": 5
+    },
+    {
+      "id": "d05",
+      "page": 7,
+      "correct": 5,
+      "total": 5
+    }
+  ],
+  "newlyRestored": {
+    "id": "n12",
+    "value": "555,245",
+    "method": "unchanged digits in two page passes, confident located alternate, original digit and comma component count and shape"
+  },
+  "discardedExperiments": [
+    "Sparse layout as a global replacement",
+    "English-only numeric model",
+    "Native-image resize variants",
+    "Reordering numeric retry priorities: lost old correct values, rejected"
+  ]
+}

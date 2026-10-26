@@ -33,6 +33,12 @@ function triangle(c){
 }
 function sign(image,w){return components(image,{left:w.x-40,top:w.y-10,width:Math.min(w.w+50,250),height:w.h+20}).find(c=>triangle(c)&&c.x>=w.x-40&&c.x<w.x+w.h&&c.y+c.h>w.y&&c.y<w.y+w.h);}
 function comma(image,w){return components(image,{left:w.x,top:w.y,width:w.w,height:w.h}).some(c=>c.x<w.x+w.w*.45&&c.w>=3&&c.h>=c.w*1.5&&c.h<=w.h*.35&&c.y>w.y+w.h*.55&&c.y+c.h>=w.y+w.h*.85);}
+function groupedComma(image,w,value){
+ if(!/^\d{1,3},\d{3}$/.test(value))return false;
+ const all=components(image,{left:w.x,top:w.y,width:w.w,height:w.h}).sort((a,b)=>a.x-b.x),split=value.indexOf(',');
+ if(all.length!==value.length)return false;
+ return all.every((c,i)=>i===split?c.w>=2&&c.h>=c.w*1.5&&c.h<=w.h*.4&&c.y>w.y+w.h*.55&&c.y+c.h>=w.y+w.h*.85:c.h>=w.h*.55&&c.h<=w.h&&c.w<=w.h);
+}
 function crop(image,box){
  const {left,top,width,height}=box;if(![left,top,width,height].every(Number.isInteger)||left<0||top<0||width<1||height<1||left+width>image.width||top+height>image.height)throw Error('Invalid OCR crop');
  const header=Buffer.alloc(13);header.writeUInt32BE(width);header.writeUInt32BE(height,4);header[8]=8;
@@ -40,4 +46,4 @@ function crop(image,box){
  const chunk=(type,value)=>{const b=Buffer.alloc(value.length+12);b.writeUInt32BE(value.length);b.write(type,4);value.copy(b,8);b.writeUInt32BE(crc32(b.subarray(4,-4)),b.length-4);return b;};
  return Buffer.concat([Buffer.from('89504e470d0a1a0a','hex'),chunk('IHDR',header),...(image.resolution?[chunk('pHYs',image.resolution)]:[]),chunk('IDAT',deflateSync(data,{level:1})),chunk('IEND',Buffer.alloc(0))]);
 }
-module.exports={grey,crop,components,triangle,sign,comma};
+module.exports={grey,crop,components,triangle,sign,comma,groupedComma};
