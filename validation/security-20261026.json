@@ -1,0 +1,48 @@
+{
+  "version": "1.3.6",
+  "date": "2026-10-26",
+  "tests": {
+    "scripts": 41,
+    "passed": true
+  },
+  "security": {
+    "bodyParser": "2.4.0",
+    "fastUri": "3.1.9",
+    "zod": "4.6.7",
+    "npmAuditVulnerabilities": 0,
+    "packages": [
+      "root",
+      "ocr-relay",
+      "gitlab-sync"
+    ]
+  },
+  "hangul": {
+    "documents": 10,
+    "identicalOutputs": 10,
+    "scope": "Application CJS parseHwp/parseHwp3/parseHwpx path; not all Kordoc APIs"
+  },
+  "remoteOcrPrior": [
+    {
+      "id": "d11",
+      "page": 3,
+      "ms": 18060,
+      "correct": 5,
+      "total": 5
+    },
+    {
+      "id": "d12",
+      "page": 5,
+      "ms": 7428,
+      "correct": 5,
+      "total": 5
+    },
+    {
+      "id": "d05",
+      "page": 7,
+      "ms": 9430,
+      "correct": 5,
+      "total": 5
+    }
+  ],
+  "gitlabSync": "Verify after push; npm audit does not establish GitLab scan acceptance"
+}
