@@ -14,7 +14,8 @@
       "root",
       "ocr-relay",
       "gitlab-sync"
-    ]
+    ],
+    "pypdf": "6.21.2"
   },
   "hangul": {
     "documents": 10,
@@ -44,5 +45,11 @@
       "total": 5
     }
   ],
-  "gitlabSync": "Verify after push; npm audit does not establish GitLab scan acceptance"
+  "gitlabSync": "Verify after push; npm audit does not establish GitLab scan acceptance",
+  "pdf": {
+    "documents": 20,
+    "previousVersion": "6.21.1",
+    "currentVersion": "6.21.2",
+    "identicalFirstPageTextAndPageCounts": 20
+  }
 }
