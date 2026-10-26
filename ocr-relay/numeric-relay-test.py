@@ -26,3 +26,21 @@ for images in [[],['eA=='],['x']*65]:
  except ValueError:pass
  else:raise AssertionError('Invalid image accepted')
 print('PASS: numeric reader authentication, body/batch/PNG limits, sanitized failures and validation before model load')
+import runpy,tempfile,shutil,http.client
+from unittest.mock import patch
+class Download:
+ def __init__(self,host,timeout):assert host=='files.pythonhosted.org' and timeout==45;self.closed=False
+ def request(self,method,path):assert method=='GET' and path.startswith('/packages/') and path.endswith('rapidocr_onnxruntime-1.4.4-py3-none-any.whl')
+ def getresponse(self):return self
+ def read(self,limit):assert limit==16000001;return b'invalid package'
+ def close(self):self.closed=True
+for status,reason in [(302,'download'),(200,'integrity')]:
+ with tempfile.TemporaryDirectory() as tmp:
+  script=Path(tmp)/'prepare-numeric-model.py';shutil.copyfile(root/script.name,script)
+  connection=Download('files.pythonhosted.org',45);connection.status=status
+  with patch.object(http.client,'HTTPSConnection',return_value=connection):
+   try:runpy.run_path(str(script))
+   except ValueError as error:assert reason in str(error)
+   else:raise AssertionError('Invalid model download accepted')
+  assert connection.closed and not (Path(tmp)/'numeric-model.onnx').exists()
+print('PASS: fixed HTTPS model origin, redirects rejected, integrity enforced and connection closed')
