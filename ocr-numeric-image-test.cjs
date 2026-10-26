@@ -15,6 +15,7 @@ for(let f=0;f<5;f++){
 }
 
 const tri={x:0,y:0,w:28,h:20,points:[]};for(let y=0;y<20;y++){const x=Math.round(13.5*(1-y/19));tri.points.push([x,y],[27-x,y]);}for(let x=0;x<28;x++)tri.points.push([x,19]);assert(im.triangle(tri));
+const narrow={x:0,y:0,w:22,h:24,points:[]};for(let y=0;y<24;y++){const x=Math.round(10.5*(1-y/23));narrow.points.push([x,y],[21-x,y]);}for(let x=0;x<22;x++)narrow.points.push([x,23]);assert(im.triangle(narrow));assert(!im.triangle({...narrow,points:[...narrow.points,...Array.from({length:14},(_,i)=>[i+4,12])]}));
 assert(!im.triangle({...tri,points:tri.points.filter(p=>p[1]!==19)}));assert(!im.triangle({x:0,y:0,w:8,h:20,points:[]}));assert(!im.triangle({x:0,y:0,w:28,h:20,points:Array.from({length:560},(_,i)=>[i%28,Math.floor(i/28)])}));
 const word=(text,x=20,score=94)=>`5\t1\t1\t1\t1\t1\t${x}\t20\t60\t30\t${score}\t${text}`;
 async function check(original,recognized,alternate,score=94){const p={text:original+'\n',tsv:word(original,20,30)},w={setParameters:async()=>{},recognize:async()=>({data:{text:recognized,tsv:word(recognized,20,score)}})};return refine(w,png(),png(),p,word(alternate),{width:200,height:100});}

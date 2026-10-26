@@ -25,11 +25,12 @@ function components(image,box){
  }return out;
 }
 function triangle(c){
- if(c.h<8||c.h>45||c.w/c.h<1.1||c.w/c.h>1.8||c.points.length>c.w*c.h*.48)return false;
+ if(c.h<8||c.h>45||c.w/c.h<.75||c.w/c.h>1.8||c.points.length>c.w*c.h*.48)return false;
  const band=(lo,hi)=>c.points.filter(p=>p[1]>=c.y+c.h*lo&&p[1]<c.y+c.h*hi),upper=band(0,.2),mid=band(.25,.72),bottom=band(.88,1);
  if(!upper.length||!mid.length||!bottom.length)return false;
  const xs=a=>a.map(p=>p[0]-c.x),u=xs(upper),b=xs(bottom),m=xs(mid);
- return Math.min(...u)>c.w*.28&&Math.max(...u)<c.w*.72&&Math.min(...b)<c.w*.1&&Math.max(...b)>c.w*.9&&new Set(b).size>=c.w*.9&&m.filter(x=>x>c.w*.42&&x<c.w*.58).length<=mid.length*.1;
+ for(let y=Math.ceil(c.h*.35);y<c.h*.75;y++){const row=new Set(c.points.filter(p=>p[1]===c.y+y).map(p=>p[0]-c.x));let run=0;for(let x=0;x<c.w;x++){run=row.has(x)?run+1:0;if(run>=c.w*.5)return false;}}
+ return Math.min(...u)>c.w*.28&&Math.max(...u)<c.w*.72&&Math.min(...b)<c.w*.1&&Math.max(...b)>c.w*.9&&new Set(b).size>=c.w*.9&&m.filter(x=>x>c.w*.42&&x<c.w*.58).length<=mid.length*.12;
 }
 function sign(image,w){return components(image,{left:w.x-40,top:w.y-10,width:Math.min(w.w+50,250),height:w.h+20}).find(c=>triangle(c)&&c.x>=w.x-40&&c.x<w.x+w.h&&c.y+c.h>w.y&&c.y<w.y+w.h);}
 function comma(image,w){return components(image,{left:w.x,top:w.y,width:w.w,height:w.h}).some(c=>c.x<w.x+w.w*.45&&c.w>=3&&c.h>=c.w*1.5&&c.h<=w.h*.35&&c.y>w.y+w.h*.55&&c.y+c.h>=w.y+w.h*.85);}
@@ -39,6 +40,16 @@ function groupedComma(image,w,value){
  if(all.length!==value.length)return false;
  return all.every((c,i)=>i===split?c.w>=2&&c.h>=c.w*1.5&&c.h<=w.h*.4&&c.y>w.y+w.h*.55&&c.y+c.h>=w.y+w.h*.85:c.h>=w.h*.55&&c.h<=w.h&&c.w<=w.h);
 }
+function trimBox(image,box,singleBand=true){
+
+ if(box.height<48)return box;
+ const bands=[];let start=-1;
+ for(let y=0;y<=box.height;y++){let count=0;if(y<box.height)for(let x=0;x<box.width;x++)if(image.pixels[(box.top+y)*image.width+box.left+x]<170)count++;
+  const ink=count>=2&&count<box.width*.8;if(ink&&start<0)start=y;if(!ink&&start>=0){bands.push({top:start,height:y-start});start=-1;}
+ }
+ bands.sort((a,b)=>b.height-a.height);const main=bands[0];if(!main||main.height<12||!singleBand&&!bands[1]||bands[1]&&bands[1].height>main.height*.55)return box;
+ const top=Math.max(0,main.top-4),bottom=Math.min(box.height,main.top+main.height+4);return {...box,top:box.top+top,height:bottom-top};
+}
 function crop(image,box){
  const {left,top,width,height}=box;if(![left,top,width,height].every(Number.isInteger)||left<0||top<0||width<1||height<1||left+width>image.width||top+height>image.height)throw Error('Invalid OCR crop');
  const header=Buffer.alloc(13);header.writeUInt32BE(width);header.writeUInt32BE(height,4);header[8]=8;
@@ -46,4 +57,4 @@ function crop(image,box){
  const chunk=(type,value)=>{const b=Buffer.alloc(value.length+12);b.writeUInt32BE(value.length);b.write(type,4);value.copy(b,8);b.writeUInt32BE(crc32(b.subarray(4,-4)),b.length-4);return b;};
  return Buffer.concat([Buffer.from('89504e470d0a1a0a','hex'),chunk('IHDR',header),...(image.resolution?[chunk('pHYs',image.resolution)]:[]),chunk('IDAT',deflateSync(data,{level:1})),chunk('IEND',Buffer.alloc(0))]);
 }
-module.exports={grey,crop,components,triangle,sign,comma,groupedComma};
+module.exports={grey,crop,components,triangle,sign,comma,groupedComma,trimBox};
