@@ -4,7 +4,7 @@ function gaps(attempts,question=''){
  attempts=attempts.filter(a=>a.assessment!=='target_mismatch');
  const result={status:attempts.some(a=>a.status==='read')?'read':'unreadable',attempts,evidence:evidence(attempts)};
  result.targetFit=require('./relevance').targetFit(result.evidence.fields.target.excerpts.map(e=>e.quote).join(' '),question);
- return [...new Set([...missingFields(result),...require('./financial-summary').requestedGaps(result,question)])];
+ return [...new Set([...missingFields(result,question),...require('./financial-summary').requestedGaps(result,question)])];
 }
 async function readMissing({url,file,attempts,reader,question='',budget}){
  const events=[],used=new Set(attempts.filter(a=>a.fileId===file.fileId&&a.source?.ocr).flatMap(a=>a.source.pages.map(p=>p.page)));

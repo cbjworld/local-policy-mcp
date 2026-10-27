@@ -1,7 +1,8 @@
 const keys=['target','activity','budget','period'];
-function missingFields(result){
- if(result?.status!=='read'||result.relevanceStatus==='supporting_document'||result.targetFit?.status==='mismatch')return [...keys];
- return keys.filter(key=>key==='target'&&result.targetFit?.requested?.length&&result.targetFit.status==='unspecified'||!result.evidence?.fields?.[key]?.excerpts?.some(e=>['evidence_candidate','redacted'].includes(e.status)&&e.quote));
+function missingFields(result,question=''){
+ const required=question&&!/기간|연도|언제|시행일|신청일|기한|접수일|일정|시기|몇\s*월|올해|내년|작년|20\d{2}년/.test(question)?keys.filter(k=>k!=='period'):keys;
+ if(result?.status!=='read'||result.relevanceStatus==='supporting_document'||result.targetFit?.status==='mismatch')return [...required];
+ return required.filter(key=>key==='target'&&result.targetFit?.requested?.length&&result.targetFit.status==='unspecified'||!result.evidence?.fields?.[key]?.excerpts?.some(e=>['evidence_candidate','redacted'].includes(e.status)&&e.quote));
 }
 function sameProject(a,b){
  const {identity}=require('./project-bundles'),x=identity(a),y=identity(b);

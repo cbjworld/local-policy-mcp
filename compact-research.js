@@ -1,5 +1,5 @@
 module.exports=function compactResearch(value){
- const reads=new Map((value.investigations||[]).map(x=>[x.candidate.url,{...x.result,followup:x.candidate.followup||(x.purpose?{purpose:x.purpose,missingFields:x.missingFields}:undefined)}]));
+ const reads=new Map((value.investigations||[]).map(x=>[x.candidate.url,{...x.result,deferredOcr:x.deferredOcr,followup:x.candidate.followup||(x.purpose?{purpose:x.purpose,missingFields:x.missingFields}:undefined)}]));
  const rows=new Map();
  for(const d of [...(value.candidates||[]),...(value.financialDocuments||[]),...(value.reviewItems||[]),...(value.relatedDocuments||[])])if(!rows.has(d.url))rows.set(d.url,d);
  const priority=d=>{const r=reads.get(d.url);return r?.status==='read'?(r.relevanceStatus==='supporting_document'||r.targetFit?.status==='mismatch'?2:3):r?1:0;};
@@ -7,7 +7,7 @@ module.exports=function compactResearch(value){
   const r=reads.get(d.url);
   const reading=r&&require('./presentation').documentView({...r,metadata:{...d,...r.metadata}});
   if(reading){delete reading.reviewGuidance;delete reading.note;}
-  return {id:'d'+(i+1),title:d.title,url:d.url,institution:d.institution,role:d.documentRole||'other',readingDecision:d.readingDecision,followup:d.followup||reads.get(d.url)?.followup,classification:d.relevance?.kind,targetFit:r?.targetFit||d.targetFit,readingStatus:r?.status||'not_attempted',supportingOnly:r?.relevanceStatus==='supporting_document',...(r?{reading,selectionNotes:r.selectionNotes?.slice(0,8),failures:(r.attempts||[]).filter(a=>a.status!=='read').map(a=>({fileName:a.fileName,status:a.status,message:a.message,phase:a.phase,errorCode:a.errorCode,retryCount:a.retryCount,networkMs:a.networkMs})),message:r.message}: {})};
+  return {id:'d'+(i+1),title:d.title,url:d.url,institution:d.institution,role:d.documentRole||'other',readingDecision:d.readingDecision,followup:d.followup||reads.get(d.url)?.followup,classification:d.relevance?.kind,targetFit:r?.targetFit||d.targetFit,deferredOcr:r?.deferredOcr,readingStatus:r?.status||'not_attempted',supportingOnly:r?.relevanceStatus==='supporting_document',...(r?{reading,selectionNotes:r.selectionNotes?.slice(0,8),failures:(r.attempts||[]).filter(a=>a.status!=='read').map(a=>({fileName:a.fileName,status:a.status,message:a.message,phase:a.phase,errorCode:a.errorCode,retryCount:a.retryCount,networkMs:a.networkMs})),message:r.message}: {})};
  });
  const ids=new Map(documents.map(d=>[d.url,d.id]));
  const briefInputs=documents.map(d=>({...d}));

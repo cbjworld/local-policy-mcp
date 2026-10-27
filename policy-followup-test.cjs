@@ -13,9 +13,8 @@ async function main(){
  for(const initial of [{status:'unreadable',attempts:[{status:'external_failed'}]},{status:'read'},{...full(),evidence:{fields:{target:{excerpts:[{status:'evidence_candidate',quote:'지원대상: 산모'}]}}}}]){
   const calls=[],docs=[primary,other,...Array.from({length:4},(_,i)=>({...primary,institution:'별도시'+i,url:'extra'+i})),alternate];
   const result=await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search(docs),research:async({url})=>{calls.push(url);return url==='primary'?initial:full();}});
-  assert.deepEqual(calls,['primary','alternate','other']);
-  assert.equal(result.investigations[1].candidate.followup.fromUrl,'primary');
-  assert(result.investigations[1].candidate.followup.missingFields.includes('budget'));
+  assert.deepEqual(calls,['primary','other','extra0']);
+  assert(result.candidates.find(d=>d.url==='alternate').followup.missingFields.includes('budget'));
   assert.equal(result.investigations[0].result,initial,'initial failure/evidence is retained');
  }
  // Mere text extraction must not end the investigation as two successful cases.
@@ -33,9 +32,9 @@ async function main(){
  const crowded=[primary,alternate,...Array.from({length:4},(_,i)=>({...alternate,url:'blocked'+i})),other,{...other,institution:'세번째시',url:'third'}];
  const fairCalls=[];
  const fair=await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search(crowded),research:async({url})=>{fairCalls.push(url);return ['other','third'].includes(url)?full():{status:'unreadable'};}});
- assert.deepEqual(fairCalls,['primary','alternate','other','third']);
+ assert.deepEqual(fairCalls,['primary','other','third']);
  assert.equal(fair.candidates.length,crowded.length,'deferred titles and sources stay available');
- assert.equal(fair.investigations.filter(x=>x.result.status==='unreadable').length,2);
+ assert.equal(fair.investigations.filter(x=>x.result.status==='unreadable').length,1);
  // A focused search for one institution can still proceed to its third document.
  const singleCalls=[];
  await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search(crowded.slice(0,3)),research:async({url})=>{singleCalls.push(url);return url==='blocked0'?full():{status:'unreadable'};}});
@@ -49,3 +48,27 @@ async function main(){
  console.log('PASS: unreadable/text-only/partial plans follow same-project alternative, preserve failures and field provenance, reject cross-year/department merges, skip parameterless Seoul button');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});
+const partial=full();partial.evidence.fields.period.excerpts=[];
+assert.deepEqual(missingFields(partial,'연령 조건, 지원액과 예산 비교'),[]);
+assert.deepEqual(missingFields(partial,'지원 기간과 예산 비교'),['period']);
+assert.deepEqual(missingFields(partial),['period']);
+(async()=>{
+ const image={status:'unreadable',attempts:[{status:'no_text',assessment:'text_needs_review',evidenceScope:'document_attachment',source:{format:'pdf',pages:[{page:1,text:''}]}}]};
+ const docs=[primary,other,{...other,institution:'셋째시',url:'third'}],calls=[];
+ const io={search:search(docs),research:async a=>{calls.push([a.url,a.autoOcr]);return a.url==='primary'&&!a.autoOcr?image:full();}};
+ const r=await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},io);
+ assert.deepEqual(calls,[['primary',false],['other',false],['third',false]]);
+ assert.equal(r.investigations[0].deferredOcr.status,'pending');assert(!r.evidenceFollowups.some(e=>e.fromUrl==='primary'));
+ assert.equal(require('./presentation').present('research_policy',r).documents.find(d=>d.url==='primary').deferredOcr.status,'pending');
+ assert(r.candidates.some(d=>d.url==='primary'));
+ calls.length=0;
+ const scoped=await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{...io,search:search([primary])});
+ assert.deepEqual(calls,[['primary',false],['primary',true]]);assert.equal(scoped.investigations.length,1);assert.equal(scoped.investigations[0].deferredOcr.status,'attempted');assert.equal(scoped.investigations[0].result.status,'read');
+ calls.length=0;
+ await workflow.research({question:'산후조리비 지원',queries:['산후조리비'],autoOcr:false},{...io,search:search([primary])});
+ assert(calls.every(a=>a[1]===false));
+ const partial={...image,status:'read',evidence:full().evidence};partial.evidence.fields.budget.excerpts=[];
+ const failed=await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search([primary]),research:async a=>a.autoOcr?{status:'unreadable',message:'provider maintenance'}:partial});
+ assert.equal(failed.investigations[0].result,partial);assert.equal(failed.investigations[0].deferredOcr.status,'failed');
+ console.log('PASS: text-first comparison retains image candidates, scoped image search resumes OCR, explicit no-OCR honored');
+})().catch(e=>{console.error(e);process.exitCode=1;});

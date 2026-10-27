@@ -3,14 +3,15 @@ const {requestedGaps,summarize}=require('./financial-summary');
 const {documentKey}=require('./project-bundles');
 function gaps(base,investigations,question){
  const related=investigations.filter(x=>x===base||!['different_implementing_entity','unconfirmed_business_identity'].includes(x.relationshipStatus)&&sameBusinessEvidence(base,x));
- const core=missingFields(base.result).filter(k=>!related.some(x=>!missingFields(x.result).includes(k)));
+ const core=missingFields(base.result,question).filter(k=>!related.some(x=>!missingFields(x.result,question).includes(k)));
  const financial=requestedGaps(base.result,question).filter(k=>!related.some(x=>x.result.status==='read'&&x.result.relevanceStatus!=='supporting_document'&&x.result.targetFit?.status!=='mismatch'&&summarize(x.result.attempts||[],x.result.evidence?.fields?.budget?.amounts).rows.some(r=>r.key===k&&['stated','calculated'].includes(r.status))));
  return [...core,...financial];
 }
-async function supplement({request,investigations,allDocuments,io,byUrl,candidates,financialDocuments,stageDocuments,ocrBudget={remaining:2}}){
+async function supplement({request,investigations,allDocuments,io,byUrl,candidates,financialDocuments,stageDocuments,ocrBudget={remaining:2},focusUrls}){
  const events=[],searched=new Set();
  const tried=d=>investigations.some(x=>documentKey(x.candidate.url)===documentKey(d.url));
- const bases=()=>investigations.filter(x=>!x.purpose&&!(x.result.status!=='read'&&investigations.filter(y=>y.candidate.institution===x.candidate.institution).length>=2)&&gaps(x,investigations,request.question).length).sort((a,b)=>Number(b.result.status==='read')-Number(a.result.status==='read'));
+ const inFocus=x=>!focusUrls||focusUrls.has(x.candidate.url);
+ const bases=()=>investigations.filter(x=>inFocus(x)&&!x.purpose&&!(x.result.status!=='read'&&investigations.filter(y=>y.candidate.institution===x.candidate.institution).length>=2)&&gaps(x,investigations,request.question).length).sort((a,b)=>Number(b.result.status==='read')-Number(a.result.status==='read'));
  for(let n=0;n<2;n++){
   let anchor,item,purpose='fill_missing_evidence';
   for(const base of bases()){
@@ -21,6 +22,7 @@ async function supplement({request,investigations,allDocuments,io,byUrl,candidat
    const {identity}=require('./project-bundles');
    for(const d of financialDocuments.filter(d=>!d.readingDecision&&!tried(d)&&stageDocuments.some(s=>s.url===d.url))){
     const base=investigations.find(x=>{
+     if(!inFocus(x))return false;
      const a=x.candidate,year=identity(d).year,otherYear=identity(a).year;
      return a.institution&&d.institution&&!(year&&otherYear&&year!==otherYear)&&!(a.department&&d.department&&a.department!==d.department)&&(d.institution===a.institution||x.result.status==='read'&&(a.institution.startsWith(d.institution+' ')||d.institution.startsWith(a.institution+' ')));
     });

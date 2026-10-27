@@ -136,7 +136,7 @@ async function research({url,requestedQuery='',autoOcr=true}={},reader=read,exte
    continue;
   }
   attempts.push({...result,fileId:file.fileId,fileName:file.name,evidenceScope:scope(file),assessment:form?'form_or_cover':plan?'plan_candidate':'text_needs_review'});
-  const missing=()=>Object.values(require('./evidence').evidence(attempts.filter(a=>a.assessment!=='target_mismatch')).fields).some(f=>f.status==='unconfirmed');
+  const missing=()=>require('./automatic-ocr').gaps(attempts,requestedQuery).length>0;
   // shortcut: at most two more six-page ranges per PDF; expose remaining pages rather than claiming full reading.
   if(!form&&result.source?.format==='pdf'){
    for(let extra=0;extra<2&&missing()&&result.source?.scanComplete===false&&result.source.scannedThroughPage<18;extra++){

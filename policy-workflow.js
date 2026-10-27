@@ -112,6 +112,7 @@ async function runResearch(args={},io=portal){
  const anchorSets=request.queries.map(q=>q.split(/\s+/).filter(w=>!['지원','사업','정책','사례'].includes(w)));
  const stageDocuments=allDocuments.filter(d=>d.targetFit?.status!=='mismatch'&&anchorSets.some(anchors=>anchors.length&&anchors.every(w=>String((d.title||'')+(d.institution||'')).replace(/\s+/g,'').toLowerCase().includes(w.toLowerCase())))&&(d.relevance.kind==='project_candidate'||['allocation_or_deposit','execution_or_settlement','budget'].includes(d.documentRole)));
  const investigations=[];
+ const complete=x=>!missingFields(x.result,request.question).length;
  // Broad topics present real candidate titles first; choosing a single sub-topic would invent user intent.
  if(!request.broad){
   const institutions=new Set();
@@ -122,19 +123,24 @@ async function runResearch(args={},io=portal){
   const tried=new Set();
   for(let index=0;index<ordered.length;index++){
    if(investigations.length>=6||institutions.size>=2)break;
-   // Give another institution a turn after two reads; keep every deferred candidate available.
+   // Try other institutions before repeating an incomplete institution; retain all candidates.
    const attempts=d=>investigations.filter(x=>d.institution&&x.candidate.institution===d.institution).length;
-   if(attempts(ordered[index])>=2){
-    const nextIndex=ordered.findIndex((d,i)=>i>index&&!institutions.has(d.institution)&&!tried.has(documentKey(d.url))&&attempts(d)<2);
+   if(attempts(ordered[index])>=1){
+    const nextIndex=ordered.findIndex((d,i)=>i>index&&!institutions.has(d.institution)&&!tried.has(documentKey(d.url))&&attempts(d)===0);
     if(nextIndex>index){const [next]=ordered.splice(nextIndex,1);ordered.splice(index,0,next);}
    }
    const item=ordered[index];
    if(institutions.has(item.institution)||tried.has(documentKey(item.url)))continue;
    tried.add(documentKey(item.url));
    io.preload?.(ordered.slice(index,index+3).filter(d=>!tried.has(documentKey(d.url))||d===item));
-   try{const result=await io.research({url:item.url,requestedQuery:request.question,autoOcr:args.autoOcr!==false},{ocrBudget});investigations.push({candidate:item,result});if(!missingFields(result).length)institutions.add(item.institution);}
+   try{
+    const result=await io.research({url:item.url,requestedQuery:request.question,autoOcr:false},{ocrBudget});
+    const entry={candidate:item,result};investigations.push(entry);
+    if(complete(entry))institutions.add(item.institution);
+    else if(args.autoOcr!==false&&result.relevanceStatus!=='supporting_document'&&result.targetFit?.status!=='mismatch'&&result.attempts?.some(a=>a.evidenceScope==='document_attachment'&&a.assessment!=='form_or_cover'&&a.assessment!=='target_mismatch'&&a.source?.format==='pdf'&&a.source.pages?.some(p=>!p.text.trim())))entry.deferredOcr={status:'pending',reason:'text_candidates_first',tool:'research_open_document',arguments:{url:item.url,requestedQuery:request.question,autoOcr:true}};
+   }
    catch(e){investigations.push({candidate:item,result:{status:'failed',message:e.message}});}
-   const missing=missingFields(investigations.at(-1).result);
+   const missing=missingFields(investigations.at(-1).result,request.question);
    if(missing.length){
     const nextIndex=ordered.findIndex((d,i)=>i>index&&!tried.has(documentKey(d.url))&&sameProject(item,d));
     if(nextIndex>index){
@@ -143,9 +149,22 @@ async function runResearch(args={},io=portal){
     }
    }
   }
+  // Image-only or narrowly scoped searches still use OCR when text candidates cannot fill two cases.
+  for(const entry of investigations.filter(x=>x.deferredOcr)){
+   if(institutions.size>=2||ocrBudget.remaining<=0)break;
+   if(institutions.has(entry.candidate.institution))continue;
+   try{
+    const result=await io.research(entry.deferredOcr.arguments,{ocrBudget});
+    if(entry.result.status==='read'&&result.status!=='read'){
+     entry.deferredOcr.status='failed';entry.deferredOcr.failure={status:result.status,message:result.message};
+    }else{entry.result=result;entry.deferredOcr.status='attempted';}
+    if(complete(entry))institutions.add(entry.candidate.institution);
+   }catch(error){entry.deferredOcr.status='failed';entry.deferredOcr.message=error.message;}
+  }
  }
  let projects=require('./project-bundles').bundle(candidates,investigations);
- const evidenceFollowups=request.broad?[]:await require('./evidence-followup').supplement({request,investigations,allDocuments,io,byUrl,candidates,financialDocuments,stageDocuments,ocrBudget});
+ const completeEntries=investigations.filter(complete),focusUrls=new Set(completeEntries.map(x=>x.candidate.url));
+ const evidenceFollowups=request.broad?[]:await require('./evidence-followup').supplement({request,investigations,allDocuments,io,byUrl,candidates,financialDocuments,stageDocuments,ocrBudget,...(new Set(completeEntries.map(x=>x.candidate.institution)).size>=2?{focusUrls}:{})});
  projects=require('./project-bundles').bundle(candidates,investigations);
  const evidenceMap=require('./project-bundles').evidenceMap(stageDocuments,investigations);
  const budgetEvidenceLinks=require('./budget-evidence-links').links(investigations,args=>require('./budget-search').search(args));

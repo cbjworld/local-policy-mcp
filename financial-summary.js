@@ -84,7 +84,13 @@ function requestedGaps(result,question=''){
  if(/지원금\s*(?:총액|예산)|사업비\s*구성|예산\s*구성|지원금[·ㆍ과\s]+홍보비/.test(question))requested.push('supportBudget');
  if(/홍보비/.test(question))requested.push('promotionBudget');
  const summary=summarize(result.attempts||[],result.evidence?.fields?.budget?.amounts);
- return requested.filter(key=>(summary.rows.find(r=>r.key===key)?.status||'not_stated')==='not_stated');
+ // Conditional payments can be fully quoted without being reducible to one scalar amount.
+ const quotedBenefit=(result.evidence?.fields?.activity?.excerpts||[]).some(e=>{
+  if(e.status!=='evidence_candidate'||e.sourceScope==='attachment_reference')return false;
+  const payment=e.quote.match(/지원\s*(?:내용|금액|한도|범위|단가)([\s\S]*)/)?.[1]?.split(/예산|사업비|소요예산|교부액|교부금/)[0]||'';
+  return !/대출|융자|원금/.test(payment)&&/\d[\d,.]*\s*(?:만\s*)?원/.test(payment)&&/(?:1\s*인|인당|가구당|세대당|1\s*가구|1\s*명|1\s*대|1\s*회|교통카드\s*[12]\s*매)/.test(payment);
+ });
+ return requested.filter(key=>(summary.rows.find(r=>r.key===key)?.status||'not_stated')==='not_stated'&&!(key==='benefit'&&quotedBenefit));
 }
 function compact(s){return {rows:s.rows,checks:s.checks,completeTextRead:s.completeTextRead,scope:s.scope};}
 module.exports={summarize,money,requestedGaps,compact};

@@ -57,3 +57,10 @@ require('./discovery').withSources(new Map([['budget',source]]),()=>{
  assert.equal(b.cases[0].financialSummary.scope,'selected_budget_quote_only');assert.equal(row(b.cases[0].financialSummary,'planBudget').valueKRW,5000000);
 });
 console.log('PASS: normalized headings, exact monetary units, anchored support arithmetic, explicit versus calculated values, redaction, missing versus zero, direct-read integration');
+const conditional=quote=>({status:'read',attempts:[],evidence:{fields:{activity:{excerpts:[{status:'evidence_candidate',sourceScope:'document_attachment',quote}]}}}});
+for(const quote of ['지원내용 : 10만원 충전 교통카드 1매 지원(실 운전 증빙 시 2매) ※ 최초 1회에 한함','지원내용 - 일반 : 1인 50만원 / 실운전증빙 : 1인 60만원']){
+ const result=conditional(quote);assert(!require('./financial-summary').requestedGaps(result,'지원액과 사업예산').includes('benefit'));
+ assert(!require('./financial-summary').summarize([]).rows.some(r=>r.key==='benefit'&&r.valueKRW),'quoted conditional payment must not invent a scalar');
+}
+for(const quote of ['지원내용 : 1인 대출 원금 1억원','지원내용 : 운전면허 반납 지원. 예산 : 1인 50만원','지원내용 : 교부금 1인 50만원'])assert(require('./financial-summary').requestedGaps(conditional(quote),'지원액과 예산').includes('benefit'));
+const reference=conditional('지원내용: 1인 50만원');reference.evidence.fields.activity.excerpts[0].sourceScope='attachment_reference';assert(require('./financial-summary').requestedGaps(reference,'지원액').includes('benefit'));
