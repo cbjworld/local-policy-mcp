@@ -60,7 +60,23 @@ async function main(){
   if(!body)return new Promise(resolve=>delayed.set(url,()=>resolve({url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:{...metadata,fileList:[{fileId:url.split('TEST')[1],fileNm:'추진계획.pdf',fileByteNum:100}]}})+';')})));
   rankDownloads.push(new URLSearchParams(body).get('fileId'));return url.endsWith('.down')?{url,bytes:Buffer.from('%PDF-test')}:{url,bytes:Buffer.from(JSON.stringify({error_code:'00',esbFilePath:'path',esbFileName:'plan.pdf',fileName:'file',isPdf:'Y'}))};
  },extract:async()=>({sourceId:'rank',format:'pdf',pages:[{page:1,text:'사업비:1만원'}]})});
- rankSession.preload(items);await tick();delayed.get(doc(3))();await tick();assert.equal(rankDownloads.length,0,'third metadata response must not take a first-two file slot');delayed.get(doc(1))();delayed.get(doc(2))();await tick();await tick();assert.deepEqual([...new Set(rankDownloads)].sort(),['1','2']);rankSession.close();
- console.log('PASS: three overlapping full-deadline requests, isolated failure, serial parsing, cancellation, large metadata fallback, title verification, bounded municipal metadata prefetch');
+ rankSession.preload(items);await tick();delayed.get(doc(3))();await tick();assert.equal(rankDownloads.length,0,'third metadata response must not take a first-two file slot');delayed.get(doc(1))();delayed.get(doc(2))();await tick();await tick();assert.deepEqual([...new Set(rankDownloads)].sort(),['1','2']);
+ await rankSession.research({url:doc(1),autoOcr:false});
+ rankSession.preload(items.slice(2));await tick();await tick();
+ assert.deepEqual([...new Set(rankDownloads)].sort(),['1','2','3'],'an existing metadata entry gains the released file slot');
+ rankSession.preload(items.slice(2));await tick();assert.equal(rankDownloads.filter(x=>x==='3').length,3,'repeat preload must not download the same file again');
+ rankSession.close();delayed.get(doc(4))();await tick();assert(!rankDownloads.includes('4'),'closing cancels later speculative transfers');
+ let transfers=0;
+ const budgeted=createSession(portal,{get:async(url,hops,deadline,body)=>{
+  if(!body)return {url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:metadata})+';')};
+  transfers++;return url.endsWith('.down')?{url,bytes:Buffer.from('%PDF-test')}:{url,bytes:Buffer.from(JSON.stringify({error_code:'00',esbFilePath:'path',esbFileName:'plan.pdf',fileName:'file',isPdf:'Y'}))};
+ },extract:async()=>({sourceId:'bounded',format:'pdf',scanComplete:true,pages:[{page:1,text:'사업기간:2026년\n지원대상:청년\n사업비:100만원\n지원내용:이사비 지원'}]})});
+ for(let i=1;i<=8;i++){
+  const before=transfers;budgeted.preload([{url:doc(i)}]);for(let n=0;n<4;n++)await tick();
+  assert.equal(transfers-before,i<=6?3:0,'at most six speculative public files');
+  assert.equal((await budgeted.research({url:doc(i),autoOcr:false})).status,'read','prefetch limit must not block required later reads');
+ }
+ budgeted.close();
+ console.log('PASS: rolling two-file reservations, six-file speculative limit, required later reads, cancellation, serial parsing and privacy-filter preservation');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

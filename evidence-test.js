@@ -79,3 +79,8 @@ assert.equal(evidence(make('소요예산을 검토할 예정')).fields.budget.st
 
 const commissioned=evidence(make('신청자격 : 주사무소가 광주에 소재하고 취업지원분야 사업위탁 추진 실적이 있으며 사업을 지속적으로 관리·운영 가능한 법인 또는 단체'));
 assert.equal(commissioned.fields.target.status,'unconfirmed');assert.equal(commissioned.deliveryQualifications.length,1);
+const paymentTarget='지급대상 : 입영하는 현역병\n\n- 입영일 기준 1년 이상 관내에 주민등록을 두고 계속 거주한 자\n\n- 병역의무 부과 통지서 발급일이 2026. 1. 1. 이후인 자\n\n지원내용 : 1인당 1회 10만원\n소요예산 : 16,900천원';
+const paymentEvidence=evidence(make(paymentTarget)),paymentQuote=paymentEvidence.fields.target.excerpts[0].quote;
+assert(paymentQuote.includes('현역병')&&paymentQuote.includes('1년 이상')&&paymentQuote.includes('2026. 1. 1.'));
+assert(!paymentQuote.includes('10만원'));assert(paymentTarget.includes(paymentQuote),'keep an exact contiguous source quote');
+assert(!evidence(make('지급대상: 현역병\n\n- 기타 업무는 담당자에게 문의\n지원내용: 10만원')).fields.target.excerpts[0].quote.includes('담당자'));

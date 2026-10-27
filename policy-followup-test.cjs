@@ -30,11 +30,12 @@ async function main(){
  assert.deepEqual(stale,['primary'],'do not substitute an explicitly different fiscal year');
  // A run of failed documents from one city must not consume every automatic reading slot.
  const crowded=[primary,alternate,...Array.from({length:4},(_,i)=>({...alternate,url:'blocked'+i})),other,{...other,institution:'세번째시',url:'third'}];
- const fairCalls=[];
- const fair=await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search(crowded),research:async({url})=>{fairCalls.push(url);return ['other','third'].includes(url)?full():{status:'unreadable'};}});
+ const fairCalls=[],preloads=[];
+ const fair=await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search(crowded),preload:docs=>preloads.push(docs.map(d=>d.url)),research:async({url})=>{fairCalls.push(url);return ['other','third'].includes(url)?full():{status:'unreadable'};}});
  assert.deepEqual(fairCalls,['primary','other','third']);
  assert.equal(fair.candidates.length,crowded.length,'deferred titles and sources stay available');
  assert.equal(fair.investigations.filter(x=>x.result.status==='unreadable').length,1);
+ assert.deepEqual(preloads[0],['primary','other','third'],'prepare the next distinct institutions, preserving reading order and candidates');
  // A focused search for one institution can still proceed to its third document.
  const singleCalls=[];
  await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search(crowded.slice(0,3)),research:async({url})=>{singleCalls.push(url);return url==='blocked0'?full():{status:'unreadable'};}});

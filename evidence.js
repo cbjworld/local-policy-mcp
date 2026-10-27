@@ -1,4 +1,4 @@
-const labels={target:'지원대상|사업대상|참여대상|교육대상|가입자격|신청대상|신청자격|지원자격|접종대상및비용|접종대상|사업위치|설치대상|대상구간|추진대상',activity:'지원내용|사업내용|주요내용|운영내용|지원내역|지원방법|접종내용|접종대상및비용|지원금액|지원한도|지원기준|지원규모|사업개요|설치내용|구축내용|추진내용',budget:'소요예산|사업예산|운영예산|총사업비|사업비|예산액|총예산|금회교부결정내역|교부금액',period:'사업기간|운영기간|추진기간|지원기간|신청기간|시행일시'};
+const labels={target:'지원대상|지급대상|사업대상|참여대상|교육대상|가입자격|신청대상|신청자격|지원자격|접종대상및비용|접종대상|사업위치|설치대상|대상구간|추진대상',activity:'지원내용|사업내용|주요내용|운영내용|지원내역|지원방법|접종내용|접종대상및비용|지원금액|지원한도|지원기준|지원규모|사업개요|설치내용|구축내용|추진내용',budget:'소요예산|사업예산|운영예산|총사업비|사업비|예산액|총예산|금회교부결정내역|교부금액',period:'사업기간|운영기간|추진기간|지원기간|신청기간|시행일시'};
 const spaced=s=>s.split('|').map(w=>[...w].join('\\s*')).join('|');
 const nextLabel=new RegExp('(?:'+spaced(Object.values(labels).join('|'))+')[ \\t]*(?:[:：)]|\\r?\\n|(?=[․·❍○(-]))');
 function extractEvidence(attempts){
@@ -19,9 +19,10 @@ function extractEvidence(attempts){
     else if(!section){
      // OCR can lose indentation; retain at most four target lines, stopping at the next field or bullet.
      const lines=value.split('\n');let keep=1;
+     const continued=line=>/^[ \t]+\S/.test(line)||/^[ \t]*-\s+(?:입영일|신청일|병역의무|주민등록|거주|연령|소득)/.test(line);
      if(key==='target')while(keep<lines.length){
-      if(!lines[keep].trim()){if(keep+1<lines.length&&/^[ \t]+\S/.test(lines[keep+1])){keep++;continue;}break;}
-      if((!/^[ \t]+\S/.test(lines[keep])&&!(a.source?.ocr?.status==='read'&&keep<4))||/[:：]|^[ \t]*[□▢❍○]|^[ \t]*[ⅠⅡⅢⅣⅤⅥⅦ]|^[ \t]*(?:[O0J]\s|[\[(]?(?:소득기준|재산기준|지원내용)[)\]])/.test(lines[keep]))break;
+      if(!lines[keep].trim()){if(keep+1<lines.length&&continued(lines[keep+1])){keep++;continue;}break;}
+      if((!continued(lines[keep])&&!(a.source?.ocr?.status==='read'&&keep<4))||/[:：]|^[ \t]*[□▢❍○]|^[ \t]*[ⅠⅡⅢⅣⅤⅥⅦ]|^[ \t]*(?:[O0J]\s|[\[(]?(?:소득기준|재산기준|지원내용)[)\]])/.test(lines[keep]))break;
       keep++;
      }
      value=lines.slice(0,keep).join('\n').split(/<\/t[dh]>/)[0];
