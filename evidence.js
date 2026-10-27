@@ -1,14 +1,14 @@
 const labels={target:'지원대상|사업대상|참여대상|교육대상|가입자격|신청대상|신청자격|지원자격|접종대상및비용|접종대상|사업위치|설치대상|대상구간|추진대상',activity:'지원내용|사업내용|주요내용|운영내용|지원내역|지원방법|접종내용|접종대상및비용|지원금액|지원한도|지원기준|지원규모|사업개요|설치내용|구축내용|추진내용',budget:'소요예산|사업예산|운영예산|총사업비|사업비|예산액|총예산|금회교부결정내역|교부금액',period:'사업기간|운영기간|추진기간|지원기간|신청기간|시행일시'};
 const spaced=s=>s.split('|').map(w=>[...w].join('\\s*')).join('|');
-const nextLabel=new RegExp('(?:'+spaced(Object.values(labels).join('|'))+')[ \\t]*(?:[:：)]|\\r?\\n|(?=[․·❍○(]))');
+const nextLabel=new RegExp('(?:'+spaced(Object.values(labels).join('|'))+')[ \\t]*(?:[:：)]|\\r?\\n|(?=[․·❍○(-]))');
 function extractEvidence(attempts){
  const fields={},referenceExcerpts=[],deliveryQualifications=[];
  for(const [key,label] of Object.entries(labels)){
   const boundaryLabel=key==='activity'?new RegExp('(?:'+spaced(Object.entries(labels).filter(([k])=>k!=='activity').map(([,v])=>v).join('|'))+')\\s*[:：]'):nextLabel;
   const excerpts=[];
   for(const a of attempts.filter(a=>a.status==='read'&&a.assessment!=='form_or_cover'))for(const p of a.source?.pages||[]){
-   const pattern=new RegExp('(?:'+spaced(label)+')\\s*(?:\\*\\*)?\\s*'+(key==='budget'?'(?:[:：)]|(?=(?:\\\\?\\*){3,})|\\|[ \\t]*\\r?\\n)':'(?:[:：)]|</td>\\s*<td>|\\r?\\n|(?=[․·❍○(]))'),'g');let m;
-   while((m=pattern.exec(p.text))&&excerpts.length<3){
+   const pattern=new RegExp('(?:'+spaced(label)+')\\s*(?:\\*\\*)?\\s*'+(key==='budget'?'(?:[:：)]|(?=(?:\\\\?\\*){3,})|\\|[ \\t]*\\r?\\n)':'(?:[:：)]|</td>\\s*<td>|\\r?\\n|(?=[․·❍○(-]))'),'g');let m;
+   while((m=pattern.exec(p.text))&&excerpts.length<(key==='activity'?8:3)){
     const section=key==='budget'&&m[0].includes('|');
     const tail=p.text.slice(pattern.lastIndex,pattern.lastIndex+(section||m[0].includes('</t')?700:280));
     const end=tail.search(boundaryLabel);let value=tail.slice(0,end<0?tail.length:end);
@@ -55,6 +55,7 @@ function extractEvidence(attempts){
     excerpts.push({sourceId:a.source.sourceId,url:a.source.url,page:p.page,quote,status:'evidence_candidate',sectionTitle:'지원대상 조건',attribution:'requires_review'});
    }
   }
+  if(key==='activity'){const score=e=>Number(/^지원\s*(?:내용|금액|한도)/.test(e.quote))*2+Number(/\d[\d,.]*\s*(?:천|백|억|만)?\s*원/.test(e.quote));excerpts.sort((a,b)=>score(b)-score(a));excerpts.splice(3);}
   fields[key]={status:excerpts.some(x=>x.status==='evidence_candidate')?'needs_review':excerpts.some(x=>x.status==='redacted')?'redacted':'unconfirmed',excerpts};
  }
  const organizations=[],budgetNotes=[];

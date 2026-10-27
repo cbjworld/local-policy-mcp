@@ -43,3 +43,5 @@ assert.equal(benefit('지원내용 : 기납부한 보증료에 대해 전부 또
 
 assert.equal(benefit('지원내용: 기존 30만원에서 지급(최대 40만원)'),undefined);
 assert.equal(benefit('지원내용: 대출 원금 지원(최대 1억원)'),undefined);
+
+const regional=make('지원방법) 교통카드 대신 상품권(최대 20만원 시 배부)');regional[0].source.pages.push({page:3,text:'지원내용 - 일반 : 1인 50만원(울산시 10, 울주군 40) - 실운전증빙 : 1인 60만원(울산시 20, 울주군 40)'});const regionalActivity=evidence(regional).fields.activity.excerpts[0];assert.equal(regionalActivity.page,3);assert(regionalActivity.quote.includes('50만원')&&regionalActivity.quote.includes('60만원'));

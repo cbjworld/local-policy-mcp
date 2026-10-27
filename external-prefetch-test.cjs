@@ -55,6 +55,12 @@ async function main(){
  },extract:async()=>{parsed.push(1);return {sourceId:'p',format:'pdf',scanComplete:true,pages:[{page:1,text:'사업기간:2026년\n지원대상:청년\n사업비:100만원\n지원내용:이사비 지원'}]};}});
  publicSession.preload([items[0]]);await tick();await tick();assert.equal(posts.length,3);assert.equal(parsed.length,0,'speculative public download must not parse or OCR');
  const publicResult=await publicSession.research({url:doc(1),autoOcr:false});assert.equal(publicResult.status,'read');assert.equal(posts.length,3,'validated file reused without a second filter or download');assert.equal(parsed.length,1);publicSession.close();
+ const delayed=new Map(),rankDownloads=[];
+ const rankSession=createSession(portal,{get:async(url,hops,deadline,body)=>{
+  if(!body)return new Promise(resolve=>delayed.set(url,()=>resolve({url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:{...metadata,fileList:[{fileId:url.split('TEST')[1],fileNm:'추진계획.pdf',fileByteNum:100}]}})+';')})));
+  rankDownloads.push(new URLSearchParams(body).get('fileId'));return url.endsWith('.down')?{url,bytes:Buffer.from('%PDF-test')}:{url,bytes:Buffer.from(JSON.stringify({error_code:'00',esbFilePath:'path',esbFileName:'plan.pdf',fileName:'file',isPdf:'Y'}))};
+ },extract:async()=>({sourceId:'rank',format:'pdf',pages:[{page:1,text:'사업비:1만원'}]})});
+ rankSession.preload(items);await tick();delayed.get(doc(3))();await tick();assert.equal(rankDownloads.length,0,'third metadata response must not take a first-two file slot');delayed.get(doc(1))();delayed.get(doc(2))();await tick();await tick();assert.deepEqual([...new Set(rankDownloads)].sort(),['1','2']);rankSession.close();
  console.log('PASS: three overlapping full-deadline requests, isolated failure, serial parsing, cancellation, large metadata fallback, title verification, bounded municipal metadata prefetch');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

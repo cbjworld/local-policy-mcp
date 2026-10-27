@@ -2,6 +2,7 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),cryp
 const {download,validateUrl,publicIP}=require('./official-fetch');
 const sourceContext=new (require('node:async_hooks').AsyncLocalStorage)();
 const defaultSources=new Map();
+const pdfText=new WeakMap();
 const withSources=(store,fn)=>sourceContext.run(store,fn);
 function queryInput(q,limit){if(typeof q!=='string'||q.length>300||!Number.isInteger(limit)||limit<1||limit>30)throw new Error('검색어는 300자 이하, 결과 수는 1~30이어야 합니다.');}
 function pythonPath(){
@@ -28,10 +29,19 @@ async function read({url,q='',page=1}={}){
 }
 async function readResponse(response,{q='',page=1,scanEmptyPdf=false,ocr=false}={}){
  if(typeof ocr!=='boolean'||ocr&&q)throw Error('OCR은 검색어 없이 지정한 PDF 한 쪽을 읽습니다.');
- let result=await extract(response.bytes,{url:response.url,type:response.type,q,page,scanEmptyPdf});
- if(ocr&&result.format==='pdf')result={...result,pages:result.pages.filter(p=>p.page===page),scannedThroughPage:page,scanComplete:page===1&&result.totalPages===1};
+ const digest=ocr?crypto.createHash('sha256').update(response.bytes).digest('hex'):null,cached=ocr?pdfText.get(response.bytes):null;
+ const known=cached&&cached.sha256===digest&&cached.result.pages.some(p=>p.page===page&&!p.truncated)?cached.result:null;
+ let result=known?structuredClone(known):await extract(response.bytes,{url:response.url,type:response.type,q,page,scanEmptyPdf});
+ if(!ocr&&!q&&result.format==='pdf'){
+  const sha256=crypto.createHash('sha256').update(response.bytes).digest('hex'),previous=pdfText.get(response.bytes),pages=new Map();
+  if(previous?.sha256===sha256)for(const p of previous.result.pages)pages.set(p.page,p);
+  for(const p of result.pages)pages.set(p.page,p);
+  pdfText.set(response.bytes,{sha256,result:structuredClone({...result,pages:[...pages.values()].slice(-18)})});
+ }
+ const nextPage=known?.pages.some(p=>p.page===page+1&&!p.text.trim()&&!p.truncated)&&page<18?page+1:undefined;
+ if(ocr&&result.format==='pdf')result={...result,textExtractionReused:!!known,pages:result.pages.filter(p=>p.page===page),scannedThroughPage:page,scanComplete:page===1&&result.totalPages===1};
  if(ocr&&result.format==='pdf'&&!result.pages.some(p=>p.text.trim())){
-  try{const r=await require('./ocr-reader').read(response.bytes,{page});result={...result,pages:[{page,text:r.text,truncated:r.truncated}],scannedThroughPage:page,scanComplete:page===1&&result.totalPages===1,parser:'tesseract',ocr:{status:r.text.trim()?'read':'no_text',...r.ocr},warning:'OCR로 지정한 한 쪽을 전사했습니다. 숫자·단위·감액·행열은 원본 이미지와 대조하세요.'};}
+  try{const r=await require('./ocr-reader').read(response.bytes,{page,...(nextPage?{nextPage}:{})});result={...result,pages:[{page,text:r.text,truncated:r.truncated}],scannedThroughPage:page,scanComplete:page===1&&result.totalPages===1,parser:'tesseract',ocr:{status:r.text.trim()?'read':'no_text',...r.ocr},warning:'OCR로 지정한 한 쪽을 전사했습니다. 숫자·단위·감액·행열은 원본 이미지와 대조하세요.'};}
   catch(e){result={...result,ocr:{status:'failed',message:e.message},warning:'지정한 쪽 OCR 실행이 완료되지 않았습니다. 기존 텍스트 읽기 결과를 유지했습니다.'};}
  }
  const sourceId=crypto.createHash('sha256').update(response.url).update(JSON.stringify(result.pages)).digest('hex').slice(0,20);
