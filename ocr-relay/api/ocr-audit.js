@@ -9,10 +9,10 @@ module.exports=async(req,res)=>{
  try{
   const modelPath=path.join(__dirname,'..','ocr-models');
   worker=await require('tesseract.js').createWorker('kor+eng',1,{langPath:modelPath,cachePath:modelPath,cacheMethod:'none',gzip:false,errorHandler:()=>{}});
-  const start=Date.now();await worker.setParameters({tessedit_pageseg_mode:'3'});
+  const start=Date.now(),segmentation=require('../ocr-region-review').auditMode(image.bytes);await worker.setParameters({tessedit_pageseg_mode:segmentation});
   const result=await worker.recognize(image.bytes,{},{tsv:true}),tsv=result.data.tsv||'';
   if(Buffer.byteLength(tsv)>2000000)throw Error('TSV limit');
-  return reply(200,{engine:'Tesseract.js 7.0.0',tsv,auditMs:Date.now()-start});
+  return reply(200,{engine:'Tesseract.js 7.0.0',tsv,segmentation,auditMs:Date.now()-start});
  }catch{return reply(502,{error:'OCR_FAILED'});}
  finally{if(worker)await worker.terminate().catch(()=>{});busy=false;}
 };

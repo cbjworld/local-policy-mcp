@@ -14,7 +14,15 @@ m.read=lambda images,modes=None,budget=6000:[dict(text='3,000',score=.99) for x 
 assert request(dict(images=['test'])).status==200
 assert request(dict(images=['test']),'wrong').status==401
 assert request(dict(images=[])).status==400
-assert request(dict(images=['test']*65)).status==400
+assert request(dict(images=['test']*113)).status==400
+seen=[]
+def partial(images,modes=None,budget=6000):
+ seen.append(len(images))
+ if len(seen)>1:raise RuntimeError('supplementary failed')
+ return [dict(text='3,000',score=.99) for x in images]
+m.read=partial
+f=request(dict(images=['test']*66));assert f.status==200 and seen==[64,2] and f.value['supportStatus']=='unavailable' and len(f.value['results'])==66 and f.value['results'][63]['text']=='3,000' and f.value['results'][64]['score']==0
+m.read=lambda images,modes=None,budget=6000:[dict(text='3,000',score=.99) for x in images]
 assert request(dict(images=[None])).status==400
 assert request(dict(images=['test','test'],modes=['invalid'])).status==400
 assert request(dict(images=['test','test'],modes=[True])).status==400
@@ -79,3 +87,14 @@ probs[-1,0]=.99
 assert nr.candidates(probs,['blank','1','0',',','2'])==['1,100']
 assert nr.candidates(np.array([[1,0,0,0,0]],dtype=np.float32),['blank','1','0',',','2'])==[]
 print('PASS: CTC numeric alternatives are derived from model probabilities and bounded to eight formatted values')
+
+counts=[]
+class CountingModel(FakeModel):
+ def run(self,a,feed):
+  counts.append(feed['x'].shape[0]);return super().run(a,feed)
+with patch.object(nr,'session',return_value=(CountingModel(),['blank','1','0'])):
+ r=nr.read([encoded,encoded],['numeric']);assert counts==[1] and r[0]['text']==r[1]['text'] and r[1]['reused']
+ counts.clear();different=io.BytesIO();im=Image.new('L',(32,32),255);im.putpixel((8,8),0);im.save(different,format='PNG');changed=__import__('base64').b64encode(different.getvalue()).decode()
+ r=nr.read([encoded,changed],['numeric']);assert counts==[2] and not any(x.get('reused') for x in r)
+ counts.clear();r=nr.read([encoded]*4,['numeric','korean']);assert counts==[1,1] and len(r)==4
+print('PASS: identical prepared pixels share inference only within the same reading mode; changed pixels remain independent')

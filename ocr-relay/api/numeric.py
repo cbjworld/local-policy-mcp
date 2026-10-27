@@ -14,10 +14,18 @@ class handler(BaseHTTPRequestHandler):
    body=json.loads(self.rfile.read(length));images=body['images'];modes=body.get('modes');budget=body.get('budgetMs',6000)
    if type(budget) is not int or not 500<=budget<=6000:raise ValueError('Invalid time budget')
    if modes is not None and (not isinstance(modes,list) or len(modes)*2!=len(images) or any(x not in ('numeric','korean','percent','table') for x in modes)):raise ValueError('Invalid modes')
-   if not isinstance(images,list) or not 0<len(images)<=64 or any(not isinstance(x,str) or len(x)>160000 for x in images):raise ValueError('Invalid image batch')
+   if not isinstance(images,list) or not 0<len(images)<=112 or any(not isinstance(x,str) or len(x)>160000 for x in images):raise ValueError('Invalid image batch')
   except (ValueError,KeyError,TypeError):return self.reply(400,dict(error='INVALID_CROPS'))
   try:
-   start=time.monotonic();modes=body.get('modes');results=read(images,modes,body.get('budgetMs',6000))
-   return self.reply(200,dict(model='PP-OCRv4 numeric + PP-OCRv5 Korean' if modes and any(x in ('korean','percent') for x in modes) else 'PP-OCRv4 numeric',koreanStatus='unavailable' if any(x.get('koreanUnavailable') for x in results) else 'used' if modes and any(x in ('korean','percent') for x in modes) else 'not_requested',results=results,ms=round((time.monotonic()-start)*1000)))
+   start=time.monotonic();results=[];support='not_needed' if len(images)<=64 else 'used'
+   for offset in range(0,len(images),64):
+    batch=images[offset:offset+64];remaining=budget-round((time.monotonic()-start)*1000)
+    if remaining<500:
+     results.extend(dict(text='',score=0) for _ in images[offset:]);support='unavailable';break
+    try:results.extend(read(batch,modes[offset//2:(offset+len(batch))//2] if modes is not None else None,remaining))
+    except Exception:
+     if not offset:raise
+     results.extend(dict(text='',score=0) for _ in images[offset:]);support='unavailable';break
+   return self.reply(200,dict(model='PP-OCRv4 numeric + PP-OCRv5 Korean' if modes and any(x in ('korean','percent') for x in modes) else 'PP-OCRv4 numeric',koreanStatus='unavailable' if any(x.get('koreanUnavailable') for x in results) else 'used' if modes and any(x in ('korean','percent') for x in modes) else 'not_requested',results=results,supportStatus=support,ms=round((time.monotonic()-start)*1000)))
   except (ValueError,OSError):return self.reply(400,dict(error='INVALID_CROPS'))
   except Exception:return self.reply(503,dict(error='NUMERIC_READER_UNAVAILABLE'))

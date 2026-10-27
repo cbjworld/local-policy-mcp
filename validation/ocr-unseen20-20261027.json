@@ -1090,5 +1090,32 @@
   "errors": [],
   "tests": 44,
   "method": "Unused PDF hashes verified against prior 40-document corpus. AI transcribed original page images before evaluating OCR outputs; numeric boundaries and whitespace normalization. Server processing times on documents read in both phases; timeout retained as failure. Fixed 137 results replayed plus 3 pages freshly read (15 checks).",
-  "groundTruthSha256": "8c7c111e7af4427fc358e5ffbd1c4099714da52a99ba3f54bf88bd502e6f984d"
+  "groundTruthSha256": "8c7c111e7af4427fc358e5ffbd1c4099714da52a99ba3f54bf88bd502e6f984d",
+  "erratum": {
+    "recorded": "2026-10-27",
+    "sourceCorrections": [
+      {
+        "id": "u19",
+        "from": "990,004",
+        "to": "990,034",
+        "reason": "Original source image visually rechecked; former expected value was a transcription error, not an OCR repair."
+      },
+      {
+        "id": "u19",
+        "from": "1,009,996",
+        "to": "1,009,966",
+        "reason": "Original source image visually rechecked; former expected value was a transcription error, not an OCR repair."
+      },
+      {
+        "id": "u15",
+        "from": "870-6671",
+        "to": "870-6871",
+        "reason": "Original source image visually rechecked; former expected value was a transcription error, not an OCR repair."
+      }
+    ],
+    "correctedNumericBefore": 46,
+    "correctedNumericAfter": 47,
+    "total": 60,
+    "note": "The three original expected strings were wrongly transcribed. This is an evaluation correction, not three additional OCR repairs. Historical per-item fields above are retained."
+  }
 }

@@ -32,12 +32,16 @@ def candidates(pred,chars):
 
 def read(images,modes=None,budget_ms=6000):
  if type(budget_ms) is not int or not 500<=budget_ms<=6000:raise ValueError('Numeric time bounds')
- deadline=time.monotonic()+max(0,(budget_ms-1200)/1000)
+ started=time.monotonic()
  import numpy as np
  from PIL import Image
  if not isinstance(images,list) or not 0<len(images)<=64:raise ValueError('Numeric batch bounds')
  if modes is not None and (not isinstance(modes,list) or len(modes)*2!=len(images) or any(x not in ('numeric','korean','percent','table') for x in modes)):raise ValueError('Numeric mode bounds')
  labels=[x for mode in modes for x in (mode,mode)] if modes is not None else ['numeric']*len(images)
+ required={False} if modes is None else ({True} if all(x=='korean' for x in modes) else {False,True} if any(x in ('korean','percent') for x in modes) else {False})
+ # Warm supplementary calls do not need the cold import/model reserve.
+ reserve=200 if all(k in _models for k in required) else 600 if _models else 1200
+ deadline=started+max(0,(budget_ms-reserve)/1000)
  prepared=[]
  for value in images:
   data=base64.b64decode(value,validate=True)
@@ -46,9 +50,14 @@ def read(images,modes=None,budget_ms=6000):
   if im.format!='PNG' or im.width<8 or im.height<8 or im.width>512 or im.height>192 or im.width/im.height>16:raise ValueError('Numeric crop bounds')
   width=math.ceil(im.width/im.height*48)
   prepared.append(np.asarray(im.convert('L').resize((width,48),Image.Resampling.BILINEAR),dtype=np.float32)/127.5-1)
+ aliases={};seen={}
+ for i,a in enumerate(prepared):
+  key=(labels[i],a.shape,a.tobytes())
+  if key in seen:aliases[i]=seen[key]
+  else:seen[key]=i
  results=[None]*len(images)
  for korean in (False,True):
-  indices=[i for i,mode in enumerate(labels) if (mode in ('korean','percent') if korean else mode!='korean')]
+  indices=[i for i,mode in enumerate(labels) if i not in aliases and (mode in ('korean','percent') if korean else mode!='korean')]
   if not indices:continue
   if korean and time.monotonic()>=deadline:continue
   try:model,chars=session(korean)
@@ -73,6 +82,8 @@ def read(images,modes=None,budget_ms=6000):
     if not korean and labels[index]=='table' and time.monotonic()<deadline and (value['score']<.98 or not re.fullmatch(r'\d{1,3}(?:,\d{3})+',value['text'].replace(' ',''))):value['candidates']=candidates(pred,chars)
     if korean and labels[index]=='percent':results[index].update(koreanText=value['text'],koreanScore=value['score'],passes=2)
     else:results[index]=value
+ for i,original in aliases.items():
+  if results[original] is not None:results[i]={**results[original],'reused':True}
  for i,r in enumerate(results):
   if r is None:results[i]=dict(text='',score=0,koreanUnavailable=True)
   elif labels[i]=='percent' and 'koreanText' not in r:r['koreanUnavailable']=True

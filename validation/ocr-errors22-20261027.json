@@ -1,0 +1,1264 @@
+{
+  "version": "1.7.0",
+  "documents": [
+    {
+      "id": "u01",
+      "institution": "경북울진군",
+      "url": "https://www.uljin.go.kr/images/01_potal/file/budget/2010/budget_summary/3/3-1-2.pdf",
+      "page": 1,
+      "sha256": "a8fe230c2cf4aa162a9bc33f250e4230e3734dd108ba4f29ac486b1d4c4e4906",
+      "before": {
+        "id": "u01",
+        "numeric": [
+          {
+            "expected": "255,872,000",
+            "correct": false
+          },
+          {
+            "expected": "248,786,000",
+            "correct": true
+          },
+          {
+            "expected": "7,086,000",
+            "correct": false
+          }
+        ],
+        "text": {
+          "expected": "세출총괄표",
+          "correct": true
+        },
+        "ms": 18737,
+        "wallMs": 22937
+      },
+      "after": {
+        "id": "u01",
+        "numeric": [
+          {
+            "expected": "255,872,000",
+            "correct": true
+          },
+          {
+            "expected": "248,786,000",
+            "correct": true
+          },
+          {
+            "expected": "7,086,000",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "세출총괄표",
+          "correct": true
+        },
+        "ms": 17775,
+        "wallMs": 18595
+      }
+    },
+    {
+      "id": "u02",
+      "institution": "경북울진군",
+      "url": "https://www.uljin.go.kr/images/01_potal/file/budget/2010/budget_summary/3/3-1-4.pdf",
+      "page": 1,
+      "sha256": "d16f58fca908c4284e330c2a2a46d8f64ca5b6b3cd06f42aa6ac9a8024454800",
+      "before": {
+        "id": "u02",
+        "numeric": [
+          {
+            "expected": "34,887,017",
+            "correct": true
+          },
+          {
+            "expected": "35,947,728",
+            "correct": false
+          },
+          {
+            "expected": "△1,060,711",
+            "correct": false
+          }
+        ],
+        "text": {
+          "expected": "세출총괄표",
+          "correct": false
+        },
+        "ms": 15775,
+        "wallMs": 17799
+      },
+      "after": {
+        "id": "u02",
+        "numeric": [
+          {
+            "expected": "34,887,017",
+            "correct": true
+          },
+          {
+            "expected": "35,947,728",
+            "correct": true
+          },
+          {
+            "expected": "△1,060,711",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "세출총괄표",
+          "correct": true
+        },
+        "ms": 16458,
+        "wallMs": 16862
+      }
+    },
+    {
+      "id": "u03",
+      "institution": "충북단양군",
+      "url": "https://www.danyang.go.kr/File/0c0dd24576210594e7d38bf347a77611",
+      "page": 1,
+      "sha256": "0e606a73426aeabf0c402391d14ab33ed2420632c2d7c418905bce627f23e2a2",
+      "before": {
+        "id": "u03",
+        "numeric": [
+          {
+            "expected": "2011",
+            "correct": true
+          },
+          {
+            "expected": "3,261",
+            "correct": true
+          },
+          {
+            "expected": "2,142",
+            "correct": false
+          }
+        ],
+        "text": {
+          "expected": "단양군 지방재정공시",
+          "correct": false
+        },
+        "ms": 21950,
+        "wallMs": 23663
+      },
+      "after": {
+        "id": "u03",
+        "numeric": [
+          {
+            "expected": "2011",
+            "correct": true
+          },
+          {
+            "expected": "3,261",
+            "correct": true
+          },
+          {
+            "expected": "2,142",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "단양군 지방재정공시",
+          "correct": true
+        },
+        "ms": 24187,
+        "wallMs": 24430
+      }
+    },
+    {
+      "id": "u04",
+      "institution": "전북익산시",
+      "url": "https://www.iksan.go.kr/resource/www/file/budget/fiscal/2026/2026_07.pdf",
+      "page": 1,
+      "sha256": "8030ba0cfdaab362ed44128b804ff09c364db4a833fcb8fa7c2d2374376d78a8",
+      "before": {
+        "id": "u04",
+        "numeric": [
+          {
+            "expected": "139.4",
+            "correct": true
+          },
+          {
+            "expected": "42.4",
+            "correct": true
+          },
+          {
+            "expected": "90.2",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "보통교부세",
+          "correct": true
+        },
+        "ms": 5506,
+        "wallMs": 6148
+      },
+      "after": {
+        "id": "u04",
+        "numeric": [
+          {
+            "expected": "139.4",
+            "correct": true
+          },
+          {
+            "expected": "42.4",
+            "correct": true
+          },
+          {
+            "expected": "90.2",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "보통교부세",
+          "correct": true
+        },
+        "ms": 5625,
+        "wallMs": 5760
+      }
+    },
+    {
+      "id": "u05",
+      "institution": "충남공주시",
+      "url": "https://www.gongju.go.kr/thumbnail/dwld/kr/yesan_2026_04.pdf",
+      "page": 1,
+      "sha256": "82d072fe1e6c571fd7918b1a0f87f8f175d9bb476d5a3dd0721744e2bf8e52c0",
+      "before": {
+        "id": "u05",
+        "numeric": [
+          {
+            "expected": "12.83",
+            "correct": true
+          },
+          {
+            "expected": "9,504",
+            "correct": true
+          },
+          {
+            "expected": "8,025",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "재정자립도",
+          "correct": true
+        },
+        "ms": 9880,
+        "wallMs": 10163
+      },
+      "after": {
+        "id": "u05",
+        "numeric": [
+          {
+            "expected": "12.83",
+            "correct": true
+          },
+          {
+            "expected": "9,504",
+            "correct": true
+          },
+          {
+            "expected": "8,025",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "재정자립도",
+          "correct": true
+        },
+        "ms": 8966,
+        "wallMs": 9126
+      }
+    },
+    {
+      "id": "u06",
+      "institution": "강원원주시",
+      "url": "https://www.wonju.go.kr/www/downloadBbsFile.do?key=216&atchmnflNo=405160",
+      "page": 1,
+      "sha256": "fd4601e327523ee42ab95e70646a62c9d68121b1a15eccdffacbe4d6e572705a",
+      "before": {
+        "id": "u06",
+        "numeric": [
+          {
+            "expected": "640,531,760",
+            "correct": true
+          },
+          {
+            "expected": "589,255,430",
+            "correct": true
+          },
+          {
+            "expected": "51,276,330",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "예산총괄표",
+          "correct": true
+        },
+        "ms": 6878,
+        "wallMs": 7216
+      },
+      "after": {
+        "id": "u06",
+        "numeric": [
+          {
+            "expected": "640,531,760",
+            "correct": true
+          },
+          {
+            "expected": "589,255,430",
+            "correct": true
+          },
+          {
+            "expected": "51,276,330",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "예산총괄표",
+          "correct": true
+        },
+        "ms": 7450,
+        "wallMs": 7580
+      }
+    },
+    {
+      "id": "u07",
+      "institution": "전북익산시",
+      "url": "https://www.iksan.go.kr/resource/www/file/budget/fiscal/2026/2026_05.pdf",
+      "page": 1,
+      "sha256": "d24490038f1aee5e2709d5d895a64f4d27fe8d5cc8f6ec8f33bbcd1a189fc7ca",
+      "before": {
+        "id": "u07",
+        "numeric": [
+          {
+            "expected": "16,836",
+            "correct": true
+          },
+          {
+            "expected": "2,371",
+            "correct": true
+          },
+          {
+            "expected": "14,001",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "재정자립도",
+          "correct": true
+        },
+        "ms": 6537,
+        "wallMs": 6943
+      },
+      "after": {
+        "id": "u07",
+        "numeric": [
+          {
+            "expected": "16,836",
+            "correct": true
+          },
+          {
+            "expected": "2,371",
+            "correct": true
+          },
+          {
+            "expected": "14,001",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "재정자립도",
+          "correct": true
+        },
+        "ms": 7390,
+        "wallMs": 7536
+      }
+    },
+    {
+      "id": "u08",
+      "institution": "서울관악구",
+      "url": "https://www.gwanak.go.kr/common/files/Download.do?cfIdx=CF00077420&cfGroup=COMMON&cfRename=0d48ac75-0eca-465e-9a27-25a89994b258.pdf",
+      "page": 1,
+      "sha256": "c29a10e3d78ba0aeec54b1b99f6411c9bf39174baf02f35a9b49d0aa15207f69",
+      "before": {
+        "id": "u08",
+        "numeric": [
+          {
+            "expected": "1,398",
+            "correct": true
+          },
+          {
+            "expected": "2020",
+            "correct": true
+          },
+          {
+            "expected": "28",
+            "correct": false
+          }
+        ],
+        "text": {
+          "expected": "소외 동물 돌보미 사업",
+          "correct": true
+        },
+        "ms": 10946,
+        "wallMs": 12694
+      },
+      "after": {
+        "id": "u08",
+        "numeric": [
+          {
+            "expected": "1,398",
+            "correct": true
+          },
+          {
+            "expected": "2020",
+            "correct": true
+          },
+          {
+            "expected": "28",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "소외 동물 돌보미 사업",
+          "correct": true
+        },
+        "ms": 12496,
+        "wallMs": 12903
+      }
+    },
+    {
+      "id": "u09",
+      "institution": "충남공주시",
+      "url": "https://www.gongju.go.kr/thumbnail/dwld/kr/yesan_2026_06.pdf",
+      "page": 1,
+      "sha256": "a0710497ebb9d7e7182f9dde12a4dc58185b32149c11b4fc7bdc2a96d9709106",
+      "before": {
+        "id": "u09",
+        "numeric": [
+          {
+            "expected": "-57",
+            "correct": true
+          },
+          {
+            "expected": "-35",
+            "correct": true
+          },
+          {
+            "expected": "-22",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "보통교부세",
+          "correct": true
+        },
+        "ms": 5445,
+        "wallMs": 6428
+      },
+      "after": {
+        "id": "u09",
+        "numeric": [
+          {
+            "expected": "-57",
+            "correct": true
+          },
+          {
+            "expected": "-35",
+            "correct": true
+          },
+          {
+            "expected": "-22",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "보통교부세",
+          "correct": true
+        },
+        "ms": 6262,
+        "wallMs": 6373
+      }
+    },
+    {
+      "id": "u10",
+      "institution": "강원원주시",
+      "url": "https://www.wonju.go.kr/www/downloadBbsFile.do?key=216&atchmnflNo=405160",
+      "page": 1,
+      "sha256": "5679fcafc031a55f7732fc2dd089acb042220dadd478d8831d79e3f42819e80b",
+      "before": {
+        "id": "u10",
+        "numeric": [
+          {
+            "expected": "324,364,932",
+            "correct": true
+          },
+          {
+            "expected": "333,831,172",
+            "correct": true
+          },
+          {
+            "expected": "9,466,240",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "예산총괄표",
+          "correct": true
+        },
+        "ms": 6978,
+        "wallMs": 7534
+      },
+      "after": {
+        "id": "u10",
+        "numeric": [
+          {
+            "expected": "324,364,932",
+            "correct": true
+          },
+          {
+            "expected": "333,831,172",
+            "correct": true
+          },
+          {
+            "expected": "9,466,240",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "예산총괄표",
+          "correct": true
+        },
+        "ms": 7695,
+        "wallMs": 8164
+      }
+    },
+    {
+      "id": "u11",
+      "institution": "경북울진군",
+      "url": "https://www.uljin.go.kr/images/01_potal/file/budget/2010/general/2010_c2/4/28-1.pdf",
+      "page": 1,
+      "sha256": "28c12c15a23c638a5ff59781a1e1e22219def1bf53ba812af72ff9ca59df2048",
+      "before": {
+        "id": "u11",
+        "numeric": [
+          {
+            "expected": "19,000",
+            "correct": true
+          },
+          {
+            "expected": "55,000",
+            "correct": true
+          },
+          {
+            "expected": "△36,000",
+            "correct": false
+          }
+        ],
+        "text": {
+          "expected": "주민숙원사업 해결",
+          "correct": false
+        },
+        "ms": 12904,
+        "wallMs": 14070
+      },
+      "after": {
+        "id": "u11",
+        "numeric": [
+          {
+            "expected": "19,000",
+            "correct": true
+          },
+          {
+            "expected": "55,000",
+            "correct": true
+          },
+          {
+            "expected": "△36,000",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "주민숙원사업 해결",
+          "correct": true
+        },
+        "ms": 13133,
+        "wallMs": 13400
+      }
+    },
+    {
+      "id": "u12",
+      "institution": "경북울진군",
+      "url": "https://www.uljin.go.kr/images/01_potal/file/budget/2010/general/2010_c2/3/24-1.pdf",
+      "page": 1,
+      "sha256": "7bff2d8230990e2faed932ccb482d7e2c0072548032ce84ae073e150160f9879",
+      "before": {
+        "id": "u12",
+        "numeric": [
+          {
+            "expected": "1,621,771",
+            "correct": false
+          },
+          {
+            "expected": "1,529,498",
+            "correct": true
+          },
+          {
+            "expected": "92,273",
+            "correct": false
+          }
+        ],
+        "text": {
+          "expected": "엑스포공원관리",
+          "correct": true
+        },
+        "ms": 12843,
+        "wallMs": 13242
+      },
+      "after": {
+        "id": "u12",
+        "numeric": [
+          {
+            "expected": "1,621,771",
+            "correct": true
+          },
+          {
+            "expected": "1,529,498",
+            "correct": true
+          },
+          {
+            "expected": "92,273",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "엑스포공원관리",
+          "correct": true
+        },
+        "ms": 13336,
+        "wallMs": 13611
+      }
+    },
+    {
+      "id": "u13",
+      "institution": "서울노원구",
+      "url": "https://www.nowon.kr/component/file/ND_fileDownload.do?q_fileSn=277505&q_fileId=f3f97084-1c58-405b-b93f-ebadf8d0f2e5",
+      "page": 1,
+      "sha256": "874f34e9d5d7248f608950f91ed5616405fcec8dfd6dde291da9f5411a88e587",
+      "before": {
+        "id": "u13",
+        "numeric": [
+          {
+            "expected": "89.10",
+            "correct": false
+          },
+          {
+            "expected": "97.20",
+            "correct": false
+          },
+          {
+            "expected": "24.30",
+            "correct": false
+          }
+        ],
+        "text": {
+          "expected": "중계동",
+          "correct": true
+        },
+        "ms": 28273,
+        "wallMs": 28727
+      },
+      "after": {
+        "id": "u13",
+        "numeric": [
+          {
+            "expected": "89.10",
+            "correct": true
+          },
+          {
+            "expected": "97.20",
+            "correct": true
+          },
+          {
+            "expected": "24.30",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "중계동",
+          "correct": true
+        },
+        "ms": 23253,
+        "wallMs": 23604
+      }
+    },
+    {
+      "id": "u14",
+      "institution": "울산본청",
+      "url": "https://www.ulsan.go.kr/u/media/data.do?mediaId=MEDIA_00000000008820",
+      "page": 3,
+      "sha256": "eaa7b3d9251bd4099e6fecd0ce984b8f4b3188e6638d4ac874de357ae22d5729",
+      "before": {
+        "id": "u14",
+        "numeric": [
+          {
+            "expected": "1,122,346",
+            "correct": true
+          },
+          {
+            "expected": "499,049",
+            "correct": true
+          },
+          {
+            "expected": "584,005",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "울산시 일반현황",
+          "correct": true
+        },
+        "ms": 5588,
+        "wallMs": 5754
+      },
+      "after": {
+        "id": "u14",
+        "numeric": [
+          {
+            "expected": "1,122,346",
+            "correct": true
+          },
+          {
+            "expected": "499,049",
+            "correct": true
+          },
+          {
+            "expected": "584,005",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "울산시 일반현황",
+          "correct": true
+        },
+        "ms": 5963,
+        "wallMs": 6081
+      }
+    },
+    {
+      "id": "u15",
+      "institution": "경북청송군",
+      "url": "https://www.cs.go.kr/board/download.do?gcode=1098&name=%EC%B2%AD%EC%86%A1%EC%83%88%EC%86%8C%EC%8B%9D%205%EC%9B%94%ED%98%B8(579%ED%98%B8)_%EC%B5%9C%EC%A2%85(%EC%9B%90%EB%B3%B8).pdf",
+      "page": 3,
+      "sha256": "57290d663646ee0065d5af35f4ec72ceadd6012b90f64144f5948a9023b80913",
+      "before": {
+        "id": "u15",
+        "numeric": [
+          {
+            "expected": "870-6851",
+            "correct": true
+          },
+          {
+            "expected": "870-6871",
+            "correct": true
+          },
+          {
+            "expected": "870-6861",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "고추 정식 후 관리 요령",
+          "correct": false
+        },
+        "ms": 14047,
+        "wallMs": 14249
+      },
+      "after": {
+        "id": "u15",
+        "numeric": [
+          {
+            "expected": "870-6851",
+            "correct": true
+          },
+          {
+            "expected": "870-6871",
+            "correct": true
+          },
+          {
+            "expected": "870-6861",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "고추 정식 후 관리 요령",
+          "correct": true
+        },
+        "ms": 16351,
+        "wallMs": 16551
+      }
+    },
+    {
+      "id": "u16",
+      "institution": "경북울진군",
+      "url": "https://www.uljin.go.kr/images/01_potal/file/budget/2010/general/2010_c2/1/8-1.pdf",
+      "page": 1,
+      "sha256": "5c023f614831f10414a1ebc7397255e5170db9f05f8ff86e6e72e444c3c71a56",
+      "before": {
+        "id": "u16",
+        "numeric": [
+          {
+            "expected": "7,031,416",
+            "correct": true
+          },
+          {
+            "expected": "6,852,246",
+            "correct": true
+          },
+          {
+            "expected": "179,170",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "군정발전추진",
+          "correct": true
+        },
+        "ms": 12803,
+        "wallMs": 13121
+      },
+      "after": {
+        "id": "u16",
+        "numeric": [
+          {
+            "expected": "7,031,416",
+            "correct": true
+          },
+          {
+            "expected": "6,852,246",
+            "correct": true
+          },
+          {
+            "expected": "179,170",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "군정발전추진",
+          "correct": true
+        },
+        "ms": 13191,
+        "wallMs": 13527
+      }
+    },
+    {
+      "id": "u17",
+      "institution": "강원양양군",
+      "url": "https://health.yangyang.go.kr/site/erms/upload/executive01/budget/2026/00/02.세입총괄.pdf",
+      "page": 3,
+      "sha256": "b25734e7e3f0d688a520ca423be6f9a6addbdf79c6efd7904863e51719e71858",
+      "before": {
+        "id": "u17",
+        "numeric": [
+          {
+            "expected": "393,640,796",
+            "correct": true
+          },
+          {
+            "expected": "386,144,305",
+            "correct": true
+          },
+          {
+            "expected": "7,496,491",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "세입총괄표",
+          "correct": false
+        },
+        "ms": 12557,
+        "wallMs": 12716
+      },
+      "after": {
+        "id": "u17",
+        "numeric": [
+          {
+            "expected": "393,640,796",
+            "correct": true
+          },
+          {
+            "expected": "386,144,305",
+            "correct": true
+          },
+          {
+            "expected": "7,496,491",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "세입총괄표",
+          "correct": true
+        },
+        "ms": 12772,
+        "wallMs": 12953
+      }
+    },
+    {
+      "id": "u18",
+      "institution": "서울마포구",
+      "url": "https://www.mapo.go.kr/site/main/file/download/uu/ed278ae5137f491ba8f5d784cb630da6",
+      "page": 3,
+      "sha256": "634339b9b403b08566a766489d30e5c83186ffddc293a5cbc111c119ad2d811f",
+      "before": {
+        "id": "u18",
+        "numeric": [
+          {
+            "expected": "5,105",
+            "correct": true
+          },
+          {
+            "expected": "3,813",
+            "correct": true
+          },
+          {
+            "expected": "1,292",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "마포구 재정공시",
+          "correct": true
+        },
+        "ms": 8348,
+        "wallMs": 8663
+      },
+      "after": {
+        "id": "u18",
+        "numeric": [
+          {
+            "expected": "5,105",
+            "correct": true
+          },
+          {
+            "expected": "3,813",
+            "correct": true
+          },
+          {
+            "expected": "1,292",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "마포구 재정공시",
+          "correct": true
+        },
+        "ms": 9971,
+        "wallMs": 10243
+      }
+    },
+    {
+      "id": "u19",
+      "institution": "충북청주시",
+      "url": "https://www.cheongju.go.kr/www/download/budget/2016_01/2016_069s.pdf",
+      "page": 3,
+      "sha256": "a1404e17cd3dec61d09f2c2ac1cc16a112a384158cce2c8ce804393785c10c70",
+      "before": {
+        "id": "u19",
+        "numeric": [
+          {
+            "expected": "2,000,000",
+            "correct": true
+          },
+          {
+            "expected": "990,034",
+            "correct": true
+          },
+          {
+            "expected": "1,009,966",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "계속비사업(변경)조서",
+          "correct": false
+        },
+        "ms": 22287,
+        "wallMs": 22423
+      },
+      "after": {
+        "id": "u19",
+        "numeric": [
+          {
+            "expected": "2,000,000",
+            "correct": true
+          },
+          {
+            "expected": "990,034",
+            "correct": true
+          },
+          {
+            "expected": "1,009,966",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "계속비사업(변경)조서",
+          "correct": true
+        },
+        "ms": 24098,
+        "wallMs": 24245
+      }
+    },
+    {
+      "id": "u20",
+      "institution": "충북충주시",
+      "url": "https://www.chungju.go.kr/www/downloadBbsFile.do?atchmnflNo=279194",
+      "page": 3,
+      "sha256": "e8f039e73ce10db893b07bc0fe754e87be83b4d05ce71e5f6714a11096d1fd31",
+      "before": {
+        "id": "u20",
+        "numeric": [
+          {
+            "expected": "100,000",
+            "correct": true
+          },
+          {
+            "expected": "312",
+            "correct": false
+          },
+          {
+            "expected": "2025",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "주민참여예산 사업제안서",
+          "correct": true
+        },
+        "ms": 4876,
+        "wallMs": 5088
+      },
+      "after": {
+        "id": "u20",
+        "numeric": [
+          {
+            "expected": "100,000",
+            "correct": true
+          },
+          {
+            "expected": "312",
+            "correct": true
+          },
+          {
+            "expected": "2025",
+            "correct": true
+          }
+        ],
+        "text": {
+          "expected": "주민참여예산 사업제안서",
+          "correct": true
+        },
+        "ms": 6051,
+        "wallMs": 6267
+      }
+    }
+  ],
+  "read": 20,
+  "numeric": {
+    "before": 47,
+    "after": 60,
+    "total": 60
+  },
+  "korean": {
+    "before": 14,
+    "after": 20,
+    "total": 20
+  },
+  "existingNumeric": {
+    "correct": 152,
+    "total": 152,
+    "method": "40 frozen primary/audit transcriptions with freshly run crop models (137 checks); 3 additional pages fully re-read locally (15 checks)"
+  },
+  "serverOcrMs": {
+    "beforeMean": 12157.9,
+    "afterMean": 12621.1,
+    "beforeMedian": 11751.5,
+    "afterMedian": 12634.0,
+    "scope": "same 20 prepared page images; downloads, PDF rendering, network and retry wait excluded; sequential remote calls"
+  },
+  "sourceCorrectionCount": 3,
+  "functionalScripts": 45,
+  "method": "AI visual transcription and source recheck, not an independent human audit; designated strings only, not whole-document accuracy or comprehension",
+  "sourceCorrections": [
+    {
+      "id": "u19",
+      "from": "990,004",
+      "to": "990,034",
+      "reason": "Original source image visually rechecked; former expected value was a transcription error, not an OCR repair."
+    },
+    {
+      "id": "u19",
+      "from": "1,009,996",
+      "to": "1,009,966",
+      "reason": "Original source image visually rechecked; former expected value was a transcription error, not an OCR repair."
+    },
+    {
+      "id": "u15",
+      "from": "870-6671",
+      "to": "870-6871",
+      "reason": "Original source image visually rechecked; former expected value was a transcription error, not an OCR repair."
+    }
+  ],
+  "manualSourceCheck": {
+    "method": "AI visual comparison to original source crops; not external human scoring",
+    "checked": 16,
+    "matched": 16,
+    "sourceCorrections": 3
+  },
+  "previousRemoteChecks": {
+    "documents": 4,
+    "correct": 16,
+    "total": 16,
+    "rows": [
+      {
+        "id": "n13",
+        "page": 1,
+        "ms": 11316,
+        "checks": [
+          {
+            "context": "부서 예산",
+            "expected": "6,324,309",
+            "before": false,
+            "after": true,
+            "previous": true
+          },
+          {
+            "context": "부서 전년",
+            "expected": "6,825,665",
+            "before": false,
+            "after": true,
+            "previous": true
+          },
+          {
+            "context": "감소액",
+            "expected": "△501,356",
+            "before": false,
+            "after": true,
+            "previous": true
+          },
+          {
+            "context": "스킨스쿠버 리조트",
+            "expected": "2,200,000",
+            "before": false,
+            "after": true,
+            "previous": true
+          }
+        ]
+      },
+      {
+        "id": "n15",
+        "page": 3,
+        "ms": 12194,
+        "checks": [
+          {
+            "context": "총예산",
+            "expected": "1조8,765억",
+            "before": true,
+            "after": true,
+            "previous": true
+          },
+          {
+            "context": "일반회계",
+            "expected": "1조4,959억",
+            "before": false,
+            "after": true,
+            "previous": true
+          },
+          {
+            "context": "일반회계 비중",
+            "expected": "79.7%",
+            "before": true,
+            "after": true,
+            "previous": true
+          },
+          {
+            "context": "전년대비 증가율",
+            "expected": "5.74%",
+            "before": false,
+            "after": true,
+            "previous": true
+          }
+        ]
+      },
+      {
+        "id": "n16",
+        "page": 1,
+        "ms": 12369,
+        "checks": [
+          {
+            "context": "부서 예산",
+            "expected": "1,238,548",
+            "before": false,
+            "after": true,
+            "previous": true
+          },
+          {
+            "context": "부서 전년",
+            "expected": "1,695,216",
+            "before": false,
+            "after": true,
+            "previous": true
+          },
+          {
+            "context": "감소액",
+            "expected": "△456,668",
+            "before": false,
+            "after": true,
+            "previous": true
+          },
+          {
+            "context": "가족관계등록사무",
+            "expected": "36,053",
+            "before": false,
+            "after": true,
+            "previous": true
+          }
+        ]
+      },
+      {
+        "id": "n20",
+        "page": 1,
+        "ms": 23102,
+        "checks": [
+          {
+            "context": "총액",
+            "expected": "1,669",
+            "before": true,
+            "after": true,
+            "previous": true
+          },
+          {
+            "context": "보조 긴급보수",
+            "expected": "160",
+            "before": false,
+            "after": true,
+            "previous": true
+          },
+          {
+            "context": "동 긴급보수",
+            "expected": "270",
+            "before": false,
+            "after": true,
+            "previous": true
+          },
+          {
+            "context": "공원유원지 정비",
+            "expected": "47",
+            "before": true,
+            "after": true,
+            "previous": true
+          }
+        ]
+      }
+    ]
+  }
+}
