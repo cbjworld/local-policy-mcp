@@ -33,15 +33,18 @@ async function runResearch(args={},io=portal){
  if(args.autoOcr!==undefined&&typeof args.autoOcr!=='boolean')throw Error('autoOcr은 boolean이어야 합니다.');
  const ocrBudget={remaining:args.autoOcr===false?0:2,supplementRemaining:args.autoOcr===false?0:1};
  // Start independent portal requests before synchronous index work; preserve result merge order.
+ let firstSearch;
+ const firstSearchPending=new Promise(resolve=>{firstSearch=resolve;});
  const batchesPending=Promise.all(request.queries.map(async q=>{
   const pages=[],errors=[];
   for(let page=1;page<=4;page++){
-   try{const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page});pages.push({q,page,r});if(!r.hasMore)break;}
+   try{const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page});pages.push({q,page,r});firstSearch(true);if(!r.hasMore)break;}
    catch(e){errors.push({q,page,scope:'original',message:e.message});break;}
   }
   return {pages,errors};
- }));
-  const metadataPending=batchesPending.then(batches=>batches.some(b=>b.pages.length)?Promise.all(request.queries.map(async q=>{
+ })).then(batches=>{firstSearch(false);return batches;});
+ // Title-only searches need one successful response, not every remaining public page.
+ const metadataPending=firstSearchPending.then(success=>success?Promise.all(request.queries.map(async q=>{
    try{return {q,r:await io.search({q,startDate:request.startDate,endDate:request.endDate,page:1,scope:'all'})};}
    catch(e){return {q,error:e.message};}
   })):[]);

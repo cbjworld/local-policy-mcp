@@ -12,9 +12,27 @@ const now=new Date('2026-10-13T00:00:00Z');
   calls.push(a.q+':'+a.page);active++;peak=Math.max(peak,active);await new Promise(r=>setTimeout(r,a.q==='청년 지원'?15:5));active--;
   return {total:0,hasMore:a.page===1,items:[],reviewItems:[],relatedDocuments:[],url:a.q+':'+a.page};
  }});
- assert.equal(peak,2);assert.deepEqual(result.searches.filter(s=>s.scope==='original').map(s=>s.url),['청년 지원:1','청년 지원:2','청년 사업:1','청년 사업:2']);
+ assert(peak>=2&&peak<=4);assert.deepEqual(result.searches.filter(s=>s.scope==='original').map(s=>s.url),['청년 지원:1','청년 지원:2','청년 사업:1','청년 사업:2']);
  assert.equal(result.coverage.queriedPages,6);assert.equal(result.failures.length,0);assert(result.timings.searchMs>=0);
  console.log('PASS: independent queries overlap, page and merge order remain stable, metadata fallback preserved');
+})().catch(e=>{console.error(e);process.exitCode=1;});
+// A slow public second page must not delay independent title-only searches.
+(async()=>{
+ let finishPage,startedTitles=0,timedOut=false;
+ const secondPage=new Promise(resolve=>{finishPage=resolve;});
+ const timer=setTimeout(()=>{timedOut=true;finishPage();},1000);
+ const empty={total:20,hasMore:false,items:[],reviewItems:[],relatedDocuments:[]};
+ const result=await w.research({question:'청년',queries:['청년 지원','청년 사업']},{search:async a=>{
+  if(a.scope==='all'){startedTitles++;if(startedTitles===2)finishPage();return {...empty,url:'all:'+a.q};}
+  if(a.page===2)await secondPage;
+  return {...empty,hasMore:a.page===1,url:a.q+':'+a.page};
+ }});
+ clearTimeout(timer);assert.equal(timedOut,false,'title search must start before the blocked second page');assert.equal(startedTitles,2);assert.equal(result.failures.length,0);
+ assert.deepEqual(result.searches.map(s=>[s.q,s.scope,s.page]),[['청년 지원','original',1],['청년 지원','original',2],['청년 사업','original',1],['청년 사업','original',2],['청년 지원','all',1],['청년 사업','all',1]]);
+ let titleCalls=0;
+ const failed=await w.research({question:'청년',queries:['청년 지원','청년 사업']},{search:async a=>{if(a.scope==='all')titleCalls++;throw Error('offline');}});
+ assert.equal(titleCalls,0);assert.equal(failed.status,'search_failed');assert.equal(failed.failures.length,2);
+ console.log('PASS: title searches overlap public pagination, deterministic merge order, no extra searches after total failure');
 })().catch(e=>{console.error(e);process.exitCode=1;});
 async function semanticVariantsTest(){
  const docs=[{title:'2026년 산후조리비 지원사업 추진계획',institution:'A',url:'variant-plan'},{title:'2026년 산후조리비 지원사업 교부결정',institution:'A',url:'variant-grant'},{title:'2026년 반려동물 지원사업 추진계획',institution:'A',url:'unrelated-variant'}];
