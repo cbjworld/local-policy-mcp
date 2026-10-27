@@ -17,8 +17,14 @@ function createSession(portal,{get=download,extract=readResponse,warm=require('.
    if(closed)break;
    if(prepared.has(item.url)){prepareFile(item.url);continue;}
    if(prepared.size>=3)continue;
-   let downloading=false;
-   const reader=portal.createReader({extract:(response,args)=>downloading?Promise.resolve({format:'deferred',pages:[]}):extract(response,args),post:(step,params,deadline)=>get('https://www.open.go.kr/util/wonmunUtils/'+step,0,deadline,new URLSearchParams(Object.entries(params).filter(([,v])=>v!==undefined&&v!==null)).toString(),controller.signal),get:async url=>{
+   let downloading=false,lastRequest,failedRequest;
+   const reader=portal.createReader({extract:(response,args)=>downloading?Promise.resolve({format:'deferred',pages:[]}):extract(response,args),post:async(step,params,deadline)=>{
+    const body=new URLSearchParams(Object.entries(params).filter(([,v])=>v!==undefined&&v!==null)).toString();
+    if(step==='wonmunFileRequest.ajax'&&failedRequest?.body===body)return failedRequest.response;
+    const response=await get('https://www.open.go.kr/util/wonmunUtils/'+step,0,deadline,body,controller.signal);
+    if(step==='wonmunFileRequest.ajax')lastRequest={body,response};
+    return response;
+   },get:async url=>{
     const response=await fetch(url);
     if(response.bytes.length>1024*1024)throw Object.assign(Error('Prefetch metadata limit'),{code:'PREFETCH_METADATA_LIMIT'});
     return response;
@@ -27,7 +33,11 @@ function createSession(portal,{get=download,extract=readResponse,warm=require('.
     if(!closed&&(metadata.attachments||[]).some(f=>f.available&&/\.hwpx?$/i.test(f.name)&&!portal.isForm(f.name)&&(!/지\s*침|가이드라인|매뉴얼/.test(f.name)||/지\s*침|가이드라인|매뉴얼/.test(metadata.title))))warm();
     for(const link of (metadata.externalLinks||[]).slice(0,1))prepareNotice(link);
     const file=(metadata.attachments||[]).filter(f=>f.available&&f.bytes>0&&f.bytes<=5*1024*1024&&/\.(?:pdf|hwpx?)$/i.test(f.name)&&!portal.isForm(f.name)).sort((a,b)=>portal.attachmentScore(b,metadata.title)-portal.attachmentScore(a,metadata.title))[0];
-    return {reader,prefetchFile:async()=>{if(!closed&&file){downloading=true;try{await reader({url:item.url,fileId:file.fileId});}catch{}finally{downloading=false;}}}};
+    return {reader,prefetchFile:async()=>{if(!closed&&file){downloading=true;try{
+     const result=await reader({url:item.url,fileId:file.fileId});
+     // Reuse only definitive provider failures within this investigation; transient failures retry normally.
+     if(result.phase==='wonmunFileRequest.ajax'&&['PROVIDER_MAINTENANCE','PROVIDER_FILE_MISMATCH'].includes(result.errorCode))failedRequest=lastRequest;
+    }catch{}finally{downloading=false;}}}};
    },error=>({error}));
    prepared.set(item.url,promise);
    prepareFile(item.url);

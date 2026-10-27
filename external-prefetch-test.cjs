@@ -77,6 +77,24 @@ async function main(){
   assert.equal((await budgeted.research({url:doc(i),autoOcr:false})).status,'read','prefetch limit must not block required later reads');
  }
  budgeted.close();
+ // The same investigation must not repeat a definitive provider failure from prefetch.
+ let requestCount=0;
+ const providerSession=()=>createSession(portal,{get:async(url,hops,deadline,body)=>{
+  if(!body)return {url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:metadata})+';')};
+  requestCount++;return {url,bytes:Buffer.from(JSON.stringify({error_code:'99',error_msg:'시스템 점검'}))};
+ }});
+ const failed=providerSession();failed.preload([items[0]]);for(let i=0;i<4;i++)await tick();
+ const unavailable=await failed.research({url:doc(1),requestedQuery:'청년 이사비',autoOcr:false});
+ assert.equal(unavailable.attempts[0].errorCode,'PROVIDER_MAINTENANCE');assert.equal(requestCount,1);failed.close();
+ const refreshed=providerSession();refreshed.preload([items[0]]);await refreshed.research({url:doc(1),autoOcr:false});assert.equal(requestCount,2,'a new investigation must recheck availability');refreshed.close();
+ let transientRequests=0;
+ const transient=createSession(portal,{get:async(url,hops,deadline,body)=>{
+  if(!body)return {url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:metadata})+';')};
+  if(++transientRequests===1)throw Object.assign(Error('timeout'),{code:'ETIMEDOUT'});
+  return url.endsWith('.down')?{url,bytes:Buffer.from('%PDF-test')}:{url,bytes:Buffer.from(JSON.stringify({error_code:'00',esbFilePath:'path',esbFileName:'plan.pdf',fileName:'file',isPdf:'Y'}))};
+ },extract:async()=>({format:'pdf',pages:[{page:1,text:'사업비:100만원'}]})});
+ transient.preload([items[0]]);for(let i=0;i<4;i++)await tick();
+ assert.equal((await transient.research({url:doc(1),autoOcr:false})).status,'read');assert.equal(transientRequests,4,'transient prefetch failure must still perform required transfer');transient.close();
  let warms=0;
  for(const [name,publicFile,expected] of [['추진계획.hwp',true,1],['참고 지침.hwpx',true,1],['추진계획.hwpx',false,1]]){
   const warmSession=createSession(portal,{warm:()=>warms++,get:async url=>({url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:{...metadata,oppSeCd:publicFile?'1':'3',fileList:[{fileId:'warm',fileNm:name,fileByteNum:100}]}})+';')})});

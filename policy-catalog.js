@@ -21,6 +21,7 @@ function buildTables(db,data,directory){
  data.rows.forEach(([contextId,item],index)=>{const original=data.contexts[contextId],context=enrich(original,directory),id=projectId(original,item);insert.run(id,contextId,item.name,normalize(item.name),normalize((context.parent||'')+' '+context.institution));row.run(index,id);});
  const packed=documentsFile(directory),documents=JSON.parse(packed);
  db.exec('CREATE INDEX catalog_context ON catalog(context_id);');
+ db.exec("CREATE VIRTUAL TABLE catalog_search USING fts5(name_key,content='catalog',content_rowid='rowid',tokenize='trigram'); INSERT INTO catalog_search(catalog_search) VALUES ('rebuild');");
  if(documents.formatVersion!==1||!Array.isArray(documents.links))throw Error('Invalid project document links');
  const exists=db.prepare('SELECT id FROM catalog WHERE id=?');
  for(const link of documents.links){if(!exists.get(link.projectId))throw Error('Linked budget project is missing: '+link.projectId);if(!Array.isArray(link.evidence)||!link.evidence.length||!/^https:\/\/www\.open\.go\.kr\//.test(link.document?.url||''))throw Error('Invalid linked document evidence');}
@@ -36,6 +37,7 @@ function open(directory=__dirname){
   const links=JSON.parse(packed).links,byId=new Map();for(const link of links){if(!byId.has(link.projectId))byId.set(link.projectId,[]);byId.get(link.projectId).push(link);}
   const regions=db.prepare('SELECT id,raw FROM contexts').all().map(row=>{const c=enrich(JSON.parse(row.raw),directory);return {id:row.id,key:normalize((c.parent||'')+' '+c.institution)};});
   const read=db.prepare('SELECT p.raw AS item,c.raw AS context FROM catalog_rows r JOIN projects p ON p.id=r.row_id JOIN contexts c ON c.id=p.context_id WHERE r.project_id=? ORDER BY r.row_id');
+  const substringIndex=!!db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='catalog_search'").get();
   // This read-only deployment snapshot changes only when the catalog is reopened.
   const cached=new Map();let cachedSize=0;
   function search({q,institution,projectId:id,offset=0,limit=10,linkedOnly=false}={}){
@@ -50,6 +52,9 @@ function open(directory=__dirname){
    const where=[],params=[];if(id){where.push('id=?');params.push(id);}
    if(linkedOnly){const ids=[...byId.keys()];where.push(ids.length?'id IN ('+ids.map(()=>'?').join(',')+')':'0');params.push(...ids);}
    for(const term of q?.trim().split(/\s+/)||[]){where.push('instr(name_key,?)>0');params.push(normalize(term));}
+   // Index only a literal substring; retain every original filter and short-query fallback.
+   const indexedTerm=terms(q).filter(t=>/^[\p{L}\p{N}]{3,}$/u.test(t)).sort((a,b)=>b.length-a.length)[0];
+   if(substringIndex&&indexedTerm){where.push('rowid IN (SELECT rowid FROM catalog_search WHERE name_key MATCH ?)');params.push('"'+indexedTerm+'"');}
    const region=institution?.replace(/^전라남도(?=\s|.+[시군구]$)/,'전남광주통합특별시');
    const regionTerms=region?.trim().split(/\s+/).map(normalize)||[];
    if(regionTerms.length){const ids=regions.filter(r=>regionTerms.every(t=>r.key.includes(t))).map(r=>r.id);

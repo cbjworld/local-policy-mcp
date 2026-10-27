@@ -21,6 +21,10 @@ try{
  const project=store.search({projectId:id}).items[0];assert.equal(project.budgetRowCount,2);assert.deepEqual(project.budgetVariants,[{amount:100,unit:'천원'},{amount:200,unit:'천원'}]);assert.match(project.budgetStatus,/do_not_sum/);assert.equal(project.documents.length,1);assert.equal(project.budgetRecords[1].page,2);
  const other=store.search({institution:'울산 중구'}).items[0];assert.equal(other.documentStatus,'title_candidates_only');assert.equal(other.documents.length,0);assert.equal(other.documentCandidates.length,1);
  assert.equal(store.search({q:'%_'}).total,0);assert.throws(()=>store.search({projectId:'invalid'}));assert.throws(()=>store.search({limit:100}));assert.equal(store.search({limit:1}).nextOffset,1);
+ const queries=[{q:'산후 조리비'},{q:'후조리'},{q:'산후'},{q:'산후조리비',institution:'울산 중구'},{q:'산후조리비',linkedOnly:true},{q:'산후조리비',offset:1,limit:1},{q:'산후조리비',offset:3},{q:'%_산후'},{q:'"산후조리비"'},{q:'산후\0조리비'},{q:'ＡＩ'},{q:"' OR 1=1 --"},{projectId:id}];
+ const indexed=queries.map(args=>store.search(args));store.close();store=null;
+ const legacy=new (require('node:sqlite').DatabaseSync)(path.join(dir,'budget-search.sqlite'));legacy.exec('DROP TABLE catalog_search');legacy.close();store=catalog.open(dir);
+ for(let i=0;i<queries.length;i++)assert.deepEqual(store.search(queries[i]),indexed[i],'substring index must preserve literal filters, order, offsets and old-index fallback');
  store.close();store=null;fs.appendFileSync(path.join(dir,'project-document-links.json'),' ');assert.throws(()=>catalog.open(dir),/Rebuild/);
  console.log('PASS: stable source-backed catalog identities, region/department/year separation, exact row preservation, unsummed budget variants, body/title link separation, literal search, pagination and stale evidence detection');
 }finally{store?.close();fs.rmSync(dir,{recursive:true,force:true});}
