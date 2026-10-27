@@ -137,9 +137,10 @@ async function research({url,requestedQuery='',autoOcr=true}={},reader=read,exte
   }
   attempts.push({...result,fileId:file.fileId,fileName:file.name,evidenceScope:scope(file),assessment:form?'form_or_cover':plan?'plan_candidate':'text_needs_review'});
   const missing=()=>require('./automatic-ocr').gaps(attempts,requestedQuery).length>0;
+  const missingText=()=>missing()||require('./evidence').evidence(attempts.filter(a=>a.assessment!=='target_mismatch')).fields.period.status==='unconfirmed';
   // shortcut: at most two more six-page ranges per PDF; expose remaining pages rather than claiming full reading.
   if(!form&&result.source?.format==='pdf'){
-   for(let extra=0;extra<2&&missing()&&result.source?.scanComplete===false&&result.source.scannedThroughPage<18;extra++){
+   for(let extra=0;extra<2&&missingText()&&result.source?.scanComplete===false&&result.source.scannedThroughPage<18;extra++){
     const page=Number(result.source.scannedThroughPage)+1;
     if(!Number.isInteger(page)||page<2||page>result.source.totalPages)break;
     let next;try{next=await reader({url,fileId:file.fileId,page});}catch(e){next={status:'download_failed',message:e.message};}

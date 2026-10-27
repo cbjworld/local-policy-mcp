@@ -96,3 +96,15 @@ async function main(){
  console.log('PASS: dates, search failures, pagination, private files, request/filter/download order, provider failure, empty text, URL boundaries');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});
+(async()=>{
+ const url='https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=test',calls=[];
+ const result=await p.research({url,requestedQuery:'전기자전거 대상, 지원액과 예산 비교',autoOcr:false},async a=>{
+  if(!a.fileId)return {title:'2026년 전기자전거 지원사업 추진계획',attachments:[{fileId:'plan',name:'지원사업 추진계획.pdf',available:true},{fileId:'form',name:'신청서.hwp',available:true}]};
+  calls.push([a.fileId,a.page]);
+  return {status:'read',source:{sourceId:'text-pages',format:'pdf',totalPages:8,scannedThroughPage:a.page?8:6,scanComplete:!!a.page,pages:[{page:a.page?8:1,text:a.page?'사업기간: 2026년 4월 ~ 9월':'지원대상: 관내 주민\n지원내용: 1인 30만원\n사업비: 1,500만원'}]}};
+ });
+ assert.deepEqual(calls,[['plan',undefined],['plan',7]]);
+ assert(result.evidence.fields.period.excerpts.some(e=>e.page===8&&e.quote.includes('2026년')));
+ assert.equal(result.remaining[0].fileId,'form');
+ console.log('PASS: later PDF text preserves period while unnecessary separate forms remain unread');
+})().catch(e=>{console.error(e);process.exitCode=1;});
