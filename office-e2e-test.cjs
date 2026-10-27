@@ -21,6 +21,7 @@ withSources(new Map([['plan',make(text)[0].source]]),()=>{
  cases[0].name='<img> | [link]';const safe=brief({cases}).comparisonTable;assert(!safe.includes('<img>'));assert(safe.includes('\\|'));assert(safe.includes('\\[link\\]'));
  cases[0].fields.benefit.quote='지원액: 999만원';assert.throws(()=>brief({cases}),/인용문/);
 });
+const ocrSource={...make(text)[0].source,ocr:{status:'read'}};withSources(new Map([['plan',ocrSource]]),()=>{const r=brief({cases:['가시','나시'].map(region=>({region,name:'OCR 계획',fields:{budget:{sourceId:'plan',page:2,quote:'사업비: 10,000천원'}}}))});assert(r.comparisonTable.includes('(OCR 판독값)'));});
 const rich=require('./research-brief')([{classification:'project_candidate',readingStatus:'read',reading:{fields:[{key:'target',evidence:[{quote:'지원대상: 청년가구'},{quote:'지원대상: 19세 이상 39세 이하 무주택 청년 세대주'}]}]}}]);assert(rich[0].fields.target.quote.includes('39세 이하'));
 (async()=>{
  const docs=[{title:'2026년 이사비 지원 교부결정 계획',institution:'교부시',documentRole:'allocation_or_deposit',url:'grant'},{title:'2026년 이사비 지원 계획',institution:'계획시',documentRole:'plan',url:'plan'}],order=[];
