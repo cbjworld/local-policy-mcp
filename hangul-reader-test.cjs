@@ -2,6 +2,7 @@ const assert=require('node:assert/strict'),{EventEmitter}=require('node:events')
 async function main(){
  const children=[];const fake=()=>{const c=new EventEmitter();c.jobs=[];c.kill=()=>{c.killed=true;};c.send=(j,cb)=>{c.jobs.push(j);cb();};children.push(c);return c;};
  const r=createReader(fake),opts={page:1,q:''};
+ r.warm();r.warm();assert.equal(children.length,1);assert.equal(children[0].jobs.length,0,'warming must not send document bytes or parse');
  const a=r.read(Buffer.from('a'),opts),b=r.read(Buffer.from('b'),opts),c=r.read(Buffer.from('c'),opts);
  await assert.rejects(r.read(Buffer.from('d'),opts),/대기/);assert.equal(children.length,1);
  for(const [i,promise] of [a,b,c].entries()){const job=children[0].jobs.at(-1);assert.equal(job.bytes.toString(),String.fromCharCode(97+i));children[0].emit('message',{id:job.id,result:{pages:[{page:null,text:String(i)}]}});assert.equal((await promise).pages[0].text,String(i));}
@@ -14,9 +15,14 @@ async function main(){
  const set=global.setTimeout;let expire;global.setTimeout=fn=>{expire=fn;return {unref(){}};};
  try{const timed=createReader(fake),p=timed.read(Buffer.from('x'),opts);expire();await assert.rejects(p,/30초/);timed.close();}finally{global.setTimeout=set;}
  const real=createReader();try{
+  real.warm();
   const template=fs.readFileSync(path.join(path.dirname(require.resolve('kordoc')),'../templates/일반기안문_서식.hwpx'));
   const first=await real.read(template,opts),second=await real.read(template,{page:1,q:'absent-query-713950'});
   assert.equal(first.format,'hwpx');assert(first.pages[0].text);assert.equal(first.pages[0].page,null);assert.deepEqual(second.pages,[]);
+  assert.equal(first.parserCacheHit,false);assert.equal(second.parserCacheHit,true,'same bytes reuse parsing but the new query is applied again');
+  const third=await real.read(template,opts);assert.equal(third.parserCacheHit,true);assert.deepEqual(third.pages,first.pages);
+  const altered=Buffer.from(template);assert.equal(altered.subarray(0,4).toString('hex'),'504b0304');altered[10]^=1;
+  const changed=await real.read(altered,opts);assert.equal(changed.parserCacheHit,false,'changed document bytes must be parsed again');assert.deepEqual(changed.pages,first.pages);
   await assert.rejects(real.read(Buffer.from('not a document'),opts));assert.deepEqual((await real.read(template,opts)).pages,first.pages);
  }finally{real.close();}
  const discovery=require('./discovery'),template=fs.readFileSync(path.join(path.dirname(require.resolve('kordoc')),'../templates/일반기안문_서식.hwpx')),aStore=new Map(),bStore=new Map();

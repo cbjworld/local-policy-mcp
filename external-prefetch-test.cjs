@@ -77,6 +77,11 @@ async function main(){
   assert.equal((await budgeted.research({url:doc(i),autoOcr:false})).status,'read','prefetch limit must not block required later reads');
  }
  budgeted.close();
+ let warms=0;
+ for(const [name,publicFile,expected] of [['추진계획.hwp',true,1],['참고 지침.hwpx',true,1],['추진계획.hwpx',false,1]]){
+  const warmSession=createSession(portal,{warm:()=>warms++,get:async url=>({url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:{...metadata,oppSeCd:publicFile?'1':'3',fileList:[{fileId:'warm',fileNm:name,fileByteNum:100}]}})+';')})});
+  warmSession.preload([{url:doc(1)}]);await tick();assert.equal(warms,expected,'only public useful HWP metadata should warm the worker');warmSession.close();
+ }
  console.log('PASS: rolling two-file reservations, six-file speculative limit, required later reads, cancellation, serial parsing and privacy-filter preservation');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

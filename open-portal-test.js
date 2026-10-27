@@ -30,6 +30,17 @@ async function main(){
  const view=require('./presentation').documentView(scoped);
  assert.equal(view.fields.find(f=>f.key==='period').state,'미확인');
  assert(view.referenceEvidence.some(e=>e.field==='period'));
+ const referenceCalls=[],purposeReader=async a=>{if(a.fileId)referenceCalls.push(a.fileId);return scopedReader(false)(a);};
+ const deferred=await p.research({url,requestedQuery:'청년 사업의 대상, 예산과 기간',autoOcr:false},purposeReader);
+ assert.deepEqual(referenceCalls,['local']);assert(deferred.remaining.some(f=>f.fileId==='guideline'));
+ assert(deferred.selectionNotes.some(f=>f.fileId==='guideline'&&f.status==='deferred_reference'));
+ assert.equal(deferred.evidence.fields.period.status,'unconfirmed','a provincial guideline must not fill the municipal period');
+ const failedOwn=await p.research({url,requestedQuery:'사업 예산과 대상',autoOcr:false},async a=>a.fileId==='local'?{status:'download_failed',errorCode:'PROVIDER_MAINTENANCE'}:purposeReader(a));
+ assert.equal(failedOwn.status,'unreadable');assert(failedOwn.remaining.some(f=>f.fileId==='guideline'));
+ assert.equal(failedOwn.evidence.fields.budget.status,'unconfirmed','provider failure must not turn a reference budget into a local budget');
+ referenceCalls.length=0;
+ await p.research({url,requestedQuery:'사업 계획과 참고 지침도 확인해줘',autoOcr:false},purposeReader);
+ assert(referenceCalls.includes('guideline'),'explicit guideline request still reads it');
  const withPeriod=await p.research({url},scopedReader(true));
  assert(withPeriod.evidence.fields.period.excerpts.every(e=>e.quote.includes('2026.2~12')));
  const guidelineOnly=await p.research({url},async a=>a.fileId?scopedReader(false)(a):{title:'2026년 운영 지침',attachments:[scopedFiles[1]]});

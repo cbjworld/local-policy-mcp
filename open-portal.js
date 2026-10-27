@@ -120,6 +120,10 @@ async function research({url,requestedQuery='',autoOcr=true}={},reader=read,exte
  }
  // shortcut: at most three files per document; expose the rest for explicit follow-up.
  for(const file of candidates.slice(0,3)){
+  if(scope(file)==='attachment_reference'&&requestedQuery&&!/지침|가이드라인|매뉴얼/.test(requestedQuery)){
+   selectionNotes.push({...file,status:'deferred_reference',reason:'다른 기관의 참고 지침은 해당 지자체의 사업비·대상 근거를 채울 수 없어 후속 조회로 보존합니다.'});
+   continue;
+  }
   if(isForm(file.name)&&attempts.some(a=>a.status==='read'&&a.assessment==='plan_candidate'))continue;
   let result;try{result=await reader({url,fileId:file.fileId,scanEmptyPdf:true});}catch(e){result={status:'download_failed',message:e.message};}
   if(result.status==='download_failed'&&!result.errorCode&&/시간 초과|timeout|timed out|ECONNRESET|ETIMEDOUT/i.test(result.message||'')){

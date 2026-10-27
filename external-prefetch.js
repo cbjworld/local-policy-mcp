@@ -2,7 +2,7 @@ const {download}=require('./official-fetch');
 const {readResponse,researchNotice}=require('./discovery');
 
 // Overlap public file transfers; parsing and OCR remain sequential and session-scoped.
-function createSession(portal,{get=download,extract=readResponse}={}){
+function createSession(portal,{get=download,extract=readResponse,warm=require('./hangul-reader').warm}={}){
  const controller=new AbortController(),prepared=new Map(),notices=new Map(),reserved=new Set();let fileSlots=2,fileDownloads=0;
  let closed=false;
  const fetch=url=>get(url,0,Date.now()+25000,undefined,controller.signal);
@@ -24,6 +24,7 @@ function createSession(portal,{get=download,extract=readResponse}={}){
     return response;
    }});
    const promise=reader({url:item.url}).then(async metadata=>{
+    if(!closed&&(metadata.attachments||[]).some(f=>f.available&&/\.hwpx?$/i.test(f.name)&&!portal.isForm(f.name)&&(!/지\s*침|가이드라인|매뉴얼/.test(f.name)||/지\s*침|가이드라인|매뉴얼/.test(metadata.title))))warm();
     for(const link of (metadata.externalLinks||[]).slice(0,1))prepareNotice(link);
     const file=(metadata.attachments||[]).filter(f=>f.available&&f.bytes>0&&f.bytes<=5*1024*1024&&/\.(?:pdf|hwpx?)$/i.test(f.name)&&!portal.isForm(f.name)).sort((a,b)=>portal.attachmentScore(b,metadata.title)-portal.attachmentScore(a,metadata.title))[0];
     return {reader,prefetchFile:async()=>{if(!closed&&file){downloading=true;try{await reader({url:item.url,fileId:file.fileId});}catch{}finally{downloading=false;}}}};
