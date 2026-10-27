@@ -35,7 +35,7 @@ async function main(){
  assert.deepEqual(fairCalls,['primary','other','third']);
  assert.equal(fair.candidates.length,crowded.length,'deferred titles and sources stay available');
  assert.equal(fair.investigations.filter(x=>x.result.status==='unreadable').length,1);
- assert.deepEqual(preloads[0],['primary','other','third'],'prepare the next distinct institutions, preserving reading order and candidates');
+ assert.deepEqual(preloads[0],['primary','other','third','alternate'],'prepare up to four metadata entries, prioritizing distinct institutions without changing reading order');
  // A focused search for one institution can still proceed to its third document.
  const singleCalls=[];
  await workflow.research({question:'산후조리비 지원',queries:['산후조리비']},{search:search(crowded.slice(0,3)),research:async({url})=>{singleCalls.push(url);return url==='blocked0'?full():{status:'unreadable'};}});

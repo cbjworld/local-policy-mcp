@@ -129,7 +129,7 @@ async function runResearch(args={},io=portal){
     if(d.institution&&seen.has(d.institution))rest.push(d);
     else{first.push(d);seen.add(d.institution);}
    }
-   io.preload?.([...first,...rest].slice(0,3));
+   io.preload?.([...first,...rest].slice(0,4));
   };
   preload(ordered);
   const tried=new Set();

@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),portal=require('./open-portal'),{crea
 const doc=i=>'https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=TEST'+i;
 const notice=i=>'https://opengov.seoul.go.kr/sanction/'+i;
 const title=i=>'청년 이사비 지원 추진계획 '+i;
-const items=[1,2,3,4].map(i=>({institution:'서울특별시 '+i,url:doc(i)}));
+const items=[1,2,3,4,5].map(i=>({institution:'서울특별시 '+i,url:doc(i)}));
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 const html=(i,padding='')=>({url:doc(i),bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:{infoSj:title(i),oppSeCd:'3',fileYn:'N',fileList:[],oppUrl:notice(i)}})+';'+padding)});
 async function main(){
@@ -38,12 +38,12 @@ async function main(){
  mismatch.preload([items[0]]);await tick();const wrong=await mismatch.research({url:doc(1)});assert.match(wrong.attempts[0].message,/제목 일치 확인 실패/);assert.equal(wrong.metadata.externalNotice,undefined);mismatch.close();
  const mainlandItems=items.map(x=>({...x,institution:'충청남도 시험시'})),metadataStarts=[],resolvers=new Map();
  const mainland=createSession(portal,{get:async url=>{metadataStarts.push(url);return new Promise(resolve=>resolvers.set(url,()=>resolve({url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:{infoSj:'교통비 지원 계획',oppSeCd:'3',fileYn:'N',fileList:[]}})+';')})));}});
- mainland.preload(mainlandItems);await tick();assert.equal(metadataStarts.length,3);
- mainland.preload([mainlandItems[3]]);await tick();assert.equal(metadataStarts.length,3,'at most three metadata slots');
- resolvers.get(doc(1))();resolvers.get(doc(2))();resolvers.get(doc(3))();
+ mainland.preload(mainlandItems);await tick();assert.equal(metadataStarts.length,4);
+ mainland.preload([mainlandItems[4]]);await tick();assert.equal(metadataStarts.length,4,'at most four metadata slots');
+ resolvers.get(doc(1))();resolvers.get(doc(2))();resolvers.get(doc(3))();resolvers.get(doc(4))();
  assert.equal((await mainland.research({url:doc(1)})).status,'no_available_attachment');
- mainland.preload([mainlandItems[3]]);await tick();assert.equal(metadataStarts.length,4);resolvers.get(doc(4))();
- await mainland.research({url:doc(4)});assert.equal(metadataStarts.filter(x=>x===doc(1)).length,1);mainland.close();
+ mainland.preload([mainlandItems[4]]);await tick();assert.equal(metadataStarts.length,5);resolvers.get(doc(5))();
+ await mainland.research({url:doc(5)});assert.equal(metadataStarts.filter(x=>x===doc(1)).length,1);mainland.close();
  let resetCalls=0;
  const reset=createSession(portal,{get:async url=>{if(++resetCalls===1)throw Object.assign(Error('reset'),{code:'ECONNRESET',retryable:true});return {url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:{infoSj:'교통비 지원 계획',oppSeCd:'3',fileYn:'N',fileList:[]}})+';')};}});
  reset.preload([mainlandItems[0]]);await tick();const restored=await reset.research({url:doc(1)});assert.equal(restored.status,'no_available_attachment');assert.equal(restored.metadataPrefetchFailure.code,'ECONNRESET');assert.equal(resetCalls,2);reset.close();
@@ -95,6 +95,23 @@ async function main(){
  },extract:async()=>({format:'pdf',pages:[{page:1,text:'사업비:100만원'}]})});
  transient.preload([items[0]]);for(let i=0;i<4;i++)await tick();
  assert.equal((await transient.research({url:doc(1),autoOcr:false})).status,'read');assert.equal(transientRequests,4,'transient prefetch failure must still perform required transfer');transient.close();
+ // A failed transfer frees its reservation before any document is read.
+ const earlyRequests=[];let unblock;
+ const early=createSession(portal,{get:async(url,hops,deadline,body,signal)=>{
+  if(!body)return {url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:{...metadata,fileList:[{fileId:url.split('TEST')[1],fileNm:'추진계획.pdf',fileByteNum:100}]}})+';')};
+  if(signal.aborted)throw Error('aborted');
+  const id=new URLSearchParams(body).get('fileId');
+  if(url.endsWith('wonmunFileRequest.ajax')){
+   earlyRequests.push(id);
+   if(id==='1')return {url,bytes:Buffer.from(JSON.stringify({error_code:'99',error_msg:'시스템 점검'}))};
+   if(id==='2')await new Promise((resolve,reject)=>{unblock=resolve;signal.addEventListener('abort',()=>reject(Error('aborted')),{once:true});});
+  }
+  return url.endsWith('.down')?{url,bytes:Buffer.from('%PDF-test')}:{url,bytes:Buffer.from(JSON.stringify({error_code:'00',esbFilePath:'path',esbFileName:'plan.pdf',fileName:'file',isPdf:'Y'}))};
+ },extract:async()=>({format:'pdf',pages:[{page:1,text:'사업비:100만원'}]})});
+ early.preload(items);for(let i=0;i<8;i++)await tick();
+ assert.deepEqual(earlyRequests,['1','2','3'],'failed first file must release a slot to the third; two speculative residents remain bounded');
+ unblock();for(let i=0;i<8;i++)await tick();assert(!earlyRequests.includes('4'),'successful prefetched files retain their two resident slots');
+ await early.research({url:doc(2),autoOcr:false});early.preload(items.slice(3));for(let i=0;i<8;i++)await tick();assert(earlyRequests.includes('4'),'released slot continues with the later required candidate');early.close();
  let warms=0;
  for(const [name,publicFile,expected] of [['추진계획.hwp',true,1],['참고 지침.hwpx',true,1],['추진계획.hwpx',false,1]]){
   const warmSession=createSession(portal,{warm:()=>warms++,get:async url=>({url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:{...metadata,oppSeCd:publicFile?'1':'3',fileList:[{fileId:'warm',fileNm:name,fileByteNum:100}]}})+';')})});

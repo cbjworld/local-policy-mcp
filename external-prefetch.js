@@ -3,7 +3,7 @@ const {readResponse,researchNotice}=require('./discovery');
 
 // Overlap public file transfers; parsing and OCR remain sequential and session-scoped.
 function createSession(portal,{get=download,extract=readResponse,warm=require('./hangul-reader').warm}={}){
- const controller=new AbortController(),prepared=new Map(),notices=new Map(),reserved=new Set();let fileSlots=2,fileDownloads=0;
+ const controller=new AbortController(),prepared=new Map(),notices=new Map(),reserved=new Set(),resident=new Set();let fileSlots=2,fileDownloads=0;
  let closed=false;
  const fetch=url=>get(url,0,Date.now()+25000,undefined,controller.signal);
  function prepareNotice(url){
@@ -13,10 +13,10 @@ function createSession(portal,{get=download,extract=readResponse,warm=require('.
   notices.set(url,promise);
  }
  function preload(items){
-  for(const item of items.slice(0,3)){
+  for(const item of items.slice(0,4)){
    if(closed)break;
    if(prepared.has(item.url)){prepareFile(item.url);continue;}
-   if(prepared.size>=3)continue;
+   if(prepared.size>=4)continue;
    let downloading=false,lastRequest,failedRequest;
    const reader=portal.createReader({extract:(response,args)=>downloading?Promise.resolve({format:'deferred',pages:[]}):extract(response,args),post:async(step,params,deadline)=>{
     const body=new URLSearchParams(Object.entries(params).filter(([,v])=>v!==undefined&&v!==null)).toString();
@@ -37,6 +37,7 @@ function createSession(portal,{get=download,extract=readResponse,warm=require('.
      const result=await reader({url:item.url,fileId:file.fileId});
      // Reuse only definitive provider failures within this investigation; transient failures retry normally.
      if(result.phase==='wonmunFileRequest.ajax'&&['PROVIDER_MAINTENANCE','PROVIDER_FILE_MISMATCH'].includes(result.errorCode))failedRequest=lastRequest;
+     return result.source?.format==='deferred';
     }catch{}finally{downloading=false;}}}};
    },error=>({error}));
    prepared.set(item.url,promise);
@@ -45,10 +46,17 @@ function createSession(portal,{get=download,extract=readResponse,warm=require('.
  }
  function prepareFile(url){
   // Reuse two resident-file slots as documents finish; at most six speculative files per request.
-  if(fileSlots<=0||fileDownloads>=6||reserved.has(url))return;
-  fileSlots--;fileDownloads++;reserved.add(url);
-  prepared.set(url,prepared.get(url).then(async result=>{await result.prefetchFile?.();return result;}));
+  if(closed||fileSlots<=0||fileDownloads>=6||reserved.has(url)||!prepared.has(url))return;
+  fileSlots--;fileDownloads++;reserved.add(url);resident.add(url);
+  prepared.set(url,prepared.get(url).then(async result=>{
+   if(!await result.prefetchFile?.()){
+    releaseFile(url);
+    for(const next of prepared.keys())prepareFile(next);
+   }
+   return result;
+  }));
  }
+ function releaseFile(url){if(resident.delete(url))fileSlots++;}
  async function externalReader(args){
   return researchNotice(args,async sourceArgs=>{
    const cached=notices.get(sourceArgs.url);
@@ -68,8 +76,8 @@ function createSession(portal,{get=download,extract=readResponse,warm=require('.
    const investigation=await portal.research(args,result.reader||portal.createReader({get}),externalReader,options);
    if(result.error)investigation.metadataPrefetchFailure={code:result.error.code,message:result.error.message};
    return investigation;
-  }finally{prepared.delete(args.url);if(reserved.delete(args.url))fileSlots++;}
+  }finally{prepared.delete(args.url);reserved.delete(args.url);releaseFile(args.url);}
  }
- return {preload,research,close(){closed=true;controller.abort();prepared.clear();notices.clear();reserved.clear();}};
+ return {preload,research,close(){closed=true;controller.abort();prepared.clear();notices.clear();reserved.clear();resident.clear();}};
 }
 module.exports={createSession};
