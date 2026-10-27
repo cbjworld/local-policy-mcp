@@ -1,0 +1,21 @@
+{
+  "version": "1.7.1",
+  "scope": "One-shot demo preparation; no keepalive schedule or paid plan changes",
+  "functionalScripts": 46,
+  "checks": [
+    "transient HTTP 503 startup response retried",
+    "HTTP 200 HTML not accepted as healthy",
+    "MCP connection failure not accepted as ready",
+    "SDK initialize, required tools and OCR schema verified",
+    "real indexed budget result includes source and numeric budget",
+    "check session closed; second check succeeds with one-session server limit",
+    "bounded health wait and invalid configuration rejection"
+  ],
+  "liveBeforeDeployment": {
+    "serverVersion": "1.7.0",
+    "status": "ready",
+    "elapsedMs": 17500,
+    "scope": "health, MCP initialization, tools and real indexed query; not a measured sleep-to-wake benchmark"
+  },
+  "ocr": "v1.7.0 implementation unchanged"
+}
