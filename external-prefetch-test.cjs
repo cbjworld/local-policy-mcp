@@ -47,6 +47,14 @@ async function main(){
  let resetCalls=0;
  const reset=createSession(portal,{get:async url=>{if(++resetCalls===1)throw Object.assign(Error('reset'),{code:'ECONNRESET',retryable:true});return {url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:{infoSj:'교통비 지원 계획',oppSeCd:'3',fileYn:'N',fileList:[]}})+';')};}});
  reset.preload([mainlandItems[0]]);await tick();const restored=await reset.research({url:doc(1)});assert.equal(restored.status,'no_available_attachment');assert.equal(restored.metadataPrefetchFailure.code,'ECONNRESET');assert.equal(resetCalls,2);reset.close();
+ const metadata={infoSj:'2026년 청년 이사비 지원 추진계획',oppSeCd:'1',fileYn:'Y',nstSeCd:'B',urtxtYn:'Y',fileList:[{fileId:'plan',fileNm:'2026년 청년 이사비 지원 추진계획.pdf',fileByteNum:12345}]};
+ const posts=[],parsed=[];
+ const publicSession=createSession(portal,{get:async(url,hops,deadline,body)=>{
+  if(!body)return {url,bytes:Buffer.from('var result = '+JSON.stringify({openCateSearchVO:metadata})+';')};
+  posts.push(url);return url.endsWith('.down')?{url,bytes:Buffer.from('%PDF-test')}:{url,bytes:Buffer.from(JSON.stringify({error_code:'00',esbFilePath:'path',esbFileName:'plan.pdf',fileName:'file',isPdf:'Y'}))};
+ },extract:async()=>{parsed.push(1);return {sourceId:'p',format:'pdf',scanComplete:true,pages:[{page:1,text:'사업기간:2026년\n지원대상:청년\n사업비:100만원\n지원내용:이사비 지원'}]};}});
+ publicSession.preload([items[0]]);await tick();await tick();assert.equal(posts.length,3);assert.equal(parsed.length,0,'speculative public download must not parse or OCR');
+ const publicResult=await publicSession.research({url:doc(1),autoOcr:false});assert.equal(publicResult.status,'read');assert.equal(posts.length,3,'validated file reused without a second filter or download');assert.equal(parsed.length,1);publicSession.close();
  console.log('PASS: three overlapping full-deadline requests, isolated failure, serial parsing, cancellation, large metadata fallback, title verification, bounded municipal metadata prefetch');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

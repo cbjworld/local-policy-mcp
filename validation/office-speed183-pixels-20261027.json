@@ -1,0 +1,127 @@
+{
+  "documents": 20,
+  "identicalRawAndCleanPixels": true,
+  "scope": "Existing OCR source pages; pixel equivalence preserves inputs to unchanged OCR and numeric review. Not a new full-document accuracy score.",
+  "pages": [
+    {
+      "id": "u01",
+      "page": 1,
+      "sha256Raw": "dfa0f7895bd0fe0e042d1fb7226fd6482e98944e24d218e39aedc024e0e0ba3e",
+      "sha256Clean": "1749385618b4dd87b541cb66f5019a54925746f241daad35d92928ab2dda77d9"
+    },
+    {
+      "id": "u02",
+      "page": 1,
+      "sha256Raw": "1c9e6e19550185896a72d91010966db944615c69882304f37874340c80c3614d",
+      "sha256Clean": "2b424ca1bf4eab6e2d57d1de4723ce2c5f689912b078ce81f258fda399fa9579"
+    },
+    {
+      "id": "u03",
+      "page": 1,
+      "sha256Raw": "b3560db0cb1148e4ddb8fb24c7b9d6c5312d3ea0dfcd05e29bb1bd483756dd5a",
+      "sha256Clean": "8713eda70eec3edea003c90e0b0e568eac9c8b5c4d0880ede5f5d3fff8109da3"
+    },
+    {
+      "id": "u04",
+      "page": 1,
+      "sha256Raw": "8a9bc0cce0c8d85e11632e06deefa35e2a338c0b83814d58348cd83aecf7a9bb",
+      "sha256Clean": "00c586ab637ce2237e0eded1286fc1e0a90465ebaf0888dfb656a0a6b692a314"
+    },
+    {
+      "id": "u05",
+      "page": 1,
+      "sha256Raw": "b5c715e1eccf6f353760655f583642733c5cf3934de383f315b302d1733b3718",
+      "sha256Clean": "92096b548537885f0592ac7f255bce84f24b3fb1314150d99383bfc80eb851f6"
+    },
+    {
+      "id": "u06",
+      "page": 1,
+      "sha256Raw": "11cf8868c326cd650a1a64e4acb02d5aae2363092c05e860370dcdf7e23f1a1c",
+      "sha256Clean": "7ea9a8f673cdc3f49a4082c9bdc4b372c96298e80000ccb5a63bd0f37c1f1d57"
+    },
+    {
+      "id": "u07",
+      "page": 1,
+      "sha256Raw": "7895981cee0204478494abdb7e76f327dfd8b812ecc4caff2a6d8a74e4c315b9",
+      "sha256Clean": "668dff2875bba38e12af8e1a8a3f3921f50e477eeab87a6692a0aa4719bccdab"
+    },
+    {
+      "id": "u08",
+      "page": 1,
+      "sha256Raw": "9e1a2ae78bb615b2530cd5cb59f72d848009ce3b70feff023e3172c225da00dc",
+      "sha256Clean": "38a2b4922554554f03319de4f9e4e320f1d4862c47c9b93ad55b6f667242fab6"
+    },
+    {
+      "id": "u09",
+      "page": 1,
+      "sha256Raw": "bbc3b7134ab4ee21efe9007f4b6c10c81f04178a236bc5067bdada33f9c64b83",
+      "sha256Clean": "3783f78bd16f47ab010f06f0888bcd388ff229e066388bb6d3b6c24a2702dcb9"
+    },
+    {
+      "id": "u10",
+      "page": 1,
+      "sha256Raw": "683348af87c4a8d8039acdf35e61b2706e87297eafe5db9ab343641ad965f0d3",
+      "sha256Clean": "5fe6e1ae400b68ed6437eca45722da79a379702909c98d199c4ec0c73d49a2f1"
+    },
+    {
+      "id": "u11",
+      "page": 1,
+      "sha256Raw": "1daf1c0166d3ec9272bb80e534c13b2092559310743dfe800046b6294434f6ca",
+      "sha256Clean": "08ac260880e451679c329f7434e48da0eadca3039910715e5203b8a32d995614"
+    },
+    {
+      "id": "u12",
+      "page": 1,
+      "sha256Raw": "fae0e3cdcf0ee780d46ba0634e01a32541d74945addbd28a7159639ee92e1275",
+      "sha256Clean": "625f2bd4fb041bf1d788e4127e2c6bb0520cb450a356cf22de1ccfdfa4c5227e"
+    },
+    {
+      "id": "u13",
+      "page": 1,
+      "sha256Raw": "760ac2f3ba7bd56445ca1e3afde91e1b49e212a769f17b7b8166931e7b47afde",
+      "sha256Clean": "1c16cb99ec81a59a156f3eb7b8c7fea97a4e9d6f9aab2ff6ef7f5d7b4eb4ff89"
+    },
+    {
+      "id": "u14",
+      "page": 3,
+      "sha256Raw": "b34d6a3be7b34a56fa34cf036a074425cb1aa79e22e25bd452674b8f0ae4134f",
+      "sha256Clean": "29a5fc585a9b0f33e77a9c8522807801d88bfde3d19c4ee9ee33e50e646dcf90"
+    },
+    {
+      "id": "u15",
+      "page": 3,
+      "sha256Raw": "5fa8876bf8050ac595743adf0b31000929347d9e1c63372411a32d7c629ab049",
+      "sha256Clean": "285b678945353fad6fcfc789f6a7afba45bde38876974115aef2065d432283e5"
+    },
+    {
+      "id": "u16",
+      "page": 1,
+      "sha256Raw": "d17832f786b8c6cb8fc699223f4bd49d0c817aff452d20d8448bcbc62cadf4f7",
+      "sha256Clean": "8c7e3b47054d5bd598ef311e09c76f14e90edcf4acb3361333a9a94e2dbff66e"
+    },
+    {
+      "id": "u17",
+      "page": 3,
+      "sha256Raw": "ef32fd311d794d2990a76b237cc396ba9326327b71165e647000742052dbbb12",
+      "sha256Clean": "2edf21ed63833d68923f396444c4e9e24c461c1a9be5609d43c13b8231b6a5f5"
+    },
+    {
+      "id": "u18",
+      "page": 3,
+      "sha256Raw": "5d0f1844d0c8a68db128be81778ae992bcc2b5562c59e7b8ed7994acb6f9649c",
+      "sha256Clean": "397f201e04042e851aabf0b3c9b96fffab428d7fde6c8dc151be6072004eecd7"
+    },
+    {
+      "id": "u19",
+      "page": 3,
+      "sha256Raw": "a385d4d9f51e90f1d6aedd80fe4db82a4a629c50841b87a394aa2455eb97db2c",
+      "sha256Clean": "35a36a49c930d54f69f43fb2824c9d0a82418941e0bade1472421e759a44797b"
+    },
+    {
+      "id": "u20",
+      "page": 3,
+      "sha256Raw": "3dba617a169bea1ecb9ff1e331238e639dc4588d310326b66f7dc86461828661",
+      "sha256Clean": "c201564cc1eaa6c9be4512967b49158205a48e2b31efdc8d1c5929085137d40a"
+    }
+  ]
+}

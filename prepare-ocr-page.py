@@ -21,16 +21,16 @@ arr=np.array(im);ink=arr<170
 def lines(a,k,axis):
  z=np.moveaxis(a,axis,1);s=np.pad(np.cumsum(z,axis=1,dtype=np.int32),((0,0),(1,0)));starts=(s[:,k:]-s[:,:-k])==k
  delta=np.zeros((z.shape[0],z.shape[1]+1),np.int32);delta[:,:starts.shape[1]]+=starts;delta[:,k:k+starts.shape[1]]-=starts
- return np.moveaxis(np.cumsum(delta[:,:-1],axis=1)>0,1,axis)
-arr[lines(ink,90,1)|lines(ink,90,0)]=255
+ return np.moveaxis(np.cumsum(delta[:,:-1],axis=1,dtype=np.int32)>0,1,axis)
+for axis in (1,0):arr[lines(ink,90,axis)]=255
 clean=ImageOps.autocontrast(Image.fromarray(arr))
-clean.save(directory/'clean.png',compress_level=0)
 if '--transfer' in sys.argv[4:]:
  # The comparison pass uses grayscale to stay within the transport limit; primary pixels are unchanged.
  im.save(directory/'raw-transfer.png',compress_level=1,dpi=(sourceDpi,sourceDpi))
  clean.save(directory/'clean-transfer.png',compress_level=1)
  print(json.dumps({'width':im.width,'height':im.height,'dpi':220,'sourceDpi':sourceDpi,'maxDimension':2700,'prepareMs':round((time.perf_counter()-start)*1000)}))
  sys.exit(0)
+clean.save(directory/'clean.png',compress_level=0)
 prepareMs=round((time.perf_counter()-start)*1000)
 import tesserocr
 auditStart=time.perf_counter()

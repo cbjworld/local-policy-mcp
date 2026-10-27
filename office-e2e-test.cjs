@@ -37,3 +37,9 @@ const rich=require('./research-brief')([{classification:'project_candidate',read
  assert.equal(peak,2);assert.deepEqual(r.searches.filter(s=>s.scope==='all').map(s=>s.q),['청년 지원','청년 사업']);
  console.log('PASS: actual-office wording retains separate benefit ceilings, components, OCR target conditions, operating budgets, exact comparison quotes, plan priority and concurrent metadata search');
 })().catch(e=>{console.error(e);process.exitCode=1;});
+
+assert.equal(benefit('지원내용 : 기납부한 보증료에 대해 전부 또는 일부 지급(최대 40만원)').valueKRW,400000);
+assert.equal(benefit('지원내용 : 기납부한 보증료에 대해 전부 또는 일부 지급(최대 40만원)').observations[0].amountBasis,'ceiling_not_fixed_payment');
+
+assert.equal(benefit('지원내용: 기존 30만원에서 지급(최대 40만원)'),undefined);
+assert.equal(benefit('지원내용: 대출 원금 지원(최대 1억원)'),undefined);

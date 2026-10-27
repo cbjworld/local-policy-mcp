@@ -5,7 +5,7 @@ function documentKey(value){
 function identity(doc){
  const years=[...new Set(String(doc.title||'').match(/20\d{2}/g)||[])];
  const year=years.length===1?years[0]:null;
- const name=String(doc.title||'').replace(/20\d{2}년도?/g,'').replace(/20\d{2}년?/g,'').replace(/[「」『』]/g,'').replace(/\s+/g,'').replace(/\((?:안|수정|변경)\)$/,'').replace(/(?:사업)?(?:추진변경계획|추진계획|시행계획|운영계획|예산편성계획|예산서|변경계획|기본계획|모집공고|공고)(?:보고)?$/,'');
+ const name=String(doc.title||'').replace(/20\d{2}년도?/g,'').replace(/20\d{2}년?/g,'').replace(/[「」『』]/g,'').replace(/\s+/g,'').replace(/\((?:안|수정|변경)\)$/,'').replace(/(?:사업)?(?:추진변경계획|추진계획|시행계획|운영계획|예산편성계획|예산서|변경계획|기본계획|모집공고|공고)(?:보고|통보|안내)?$/,'');
  return {year,name,key:doc.institution&&year&&name?JSON.stringify([doc.institution,doc.department||'',year,name]):doc.url};
 }
 function bundle(documents,investigations=[]){

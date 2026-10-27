@@ -10,7 +10,7 @@ function gaps(base,investigations,question){
 async function supplement({request,investigations,allDocuments,io,byUrl,candidates,financialDocuments,stageDocuments,ocrBudget={remaining:2}}){
  const events=[],searched=new Set();
  const tried=d=>investigations.some(x=>documentKey(x.candidate.url)===documentKey(d.url));
- const bases=()=>investigations.filter(x=>!x.purpose&&!(x.result.status!=='read'&&investigations.filter(y=>y.candidate.institution===x.candidate.institution).length>=2)&&gaps(x,investigations,request.question).length);
+ const bases=()=>investigations.filter(x=>!x.purpose&&!(x.result.status!=='read'&&investigations.filter(y=>y.candidate.institution===x.candidate.institution).length>=2)&&gaps(x,investigations,request.question).length).sort((a,b)=>Number(b.result.status==='read')-Number(a.result.status==='read'));
  for(let n=0;n<2;n++){
   let anchor,item,purpose='fill_missing_evidence';
   for(const base of bases()){
@@ -24,7 +24,7 @@ async function supplement({request,investigations,allDocuments,io,byUrl,candidat
      const a=x.candidate,year=identity(d).year,otherYear=identity(a).year;
      return a.institution&&d.institution&&!(year&&otherYear&&year!==otherYear)&&!(a.department&&d.department&&a.department!==d.department)&&(d.institution===a.institution||x.result.status==='read'&&(a.institution.startsWith(d.institution+' ')||d.institution.startsWith(a.institution+' ')));
     });
-    if(base){anchor=base;item=d;purpose='link_financial_evidence';break;}
+    if(base&&gaps(base,investigations,request.question).some(k=>['budget','planBudget','supportBudget','promotionBudget'].includes(k))){anchor=base;item=d;purpose='link_financial_evidence';break;}
    }
   }
   if(!item){
@@ -32,7 +32,7 @@ async function supplement({request,investigations,allDocuments,io,byUrl,candidat
    if(!anchor)break;
    searched.add(anchor.candidate.institution);
    const missing=gaps(anchor,investigations,request.question);
-   const q=request.queries[0]+' '+(missing.some(k=>['budget','planBudget','supportBudget','promotionBudget'].includes(k))?'예산':'계획');
+   const q=missing.includes('benefit')&&!missing.some(k=>['budget','planBudget'].includes(k))?anchor.candidate.title.replace(/20\d{2}년?/g,'').replace(/(?:추진|시행)계획.*$/,'').replace(/[「」『』]/g,'').trim()+' 시행계획':request.queries[0]+' '+(missing.some(k=>['budget','planBudget','supportBudget','promotionBudget'].includes(k))?'예산':'계획');
    // Search dates are production dates; a next-year plan may be written in the preceding year.
    const args={q,scope:'all',page:1,startDate:request.startDate,endDate:request.endDate};
    const event={fromUrl:anchor.candidate.url,missingFields:missing,search:args,status:'no_matching_document',candidates:[]};events.push(event);
@@ -65,6 +65,27 @@ async function supplement({request,investigations,allDocuments,io,byUrl,candidat
   }
   catch(error){investigations.push({candidate:item,purpose,missingFields:missing,result:{status:'failed',message:error.message}});event.status='failed';event.message=error.message;}
   event.remainingFields=gaps(anchor,investigations,request.question);
+ }
+ // One additional page only after same-business document lookup cannot fill a benefit ceiling.
+ if(ocrBudget.supplementRemaining>0&&io.read){
+  for(const anchor of bases()){
+   const missing=gaps(anchor,investigations,request.question);
+   if(anchor.result.status!=='read'||missing.length!==1||missing[0]!=='benefit')continue;
+   const attempts=anchor.result.attempts||[],ocr=attempts.filter(a=>a.automaticOcr&&a.status==='read'&&a.source?.ocr?.status==='read');
+   const last=ocr.at(-1);if(!last||ocr.length<2)continue;
+   const page=Math.max(...ocr.filter(a=>a.fileId===last.fileId).flatMap(a=>a.source.pages.map(p=>p.page)))+1;
+   if(page>18||!attempts.some(a=>a.fileId===last.fileId&&a.source?.pages?.some(p=>p.page===page&&!p.text.trim())))continue;
+   ocrBudget.supplementRemaining--;
+   const event={purpose:'fill_missing_benefit_next_page',fromUrl:anchor.candidate.url,url:anchor.candidate.url,fileId:last.fileId,page,missingFields:missing,status:'reading'};events.push(event);
+   try{
+    const result=await io.read({url:anchor.candidate.url,fileId:last.fileId,page,ocr:true});
+    attempts.push({...result,fileId:last.fileId,fileName:last.fileName,evidenceScope:'document_attachment',assessment:last.assessment,automaticOcr:true,startPage:page});
+    anchor.result.evidence=require('./evidence').evidence(attempts.filter(a=>a.assessment!=='target_mismatch'));
+    (anchor.result.automaticOcr||=[]).push({fileId:last.fileId,page,status:result.status,reason:'benefit_missing_after_other_document_lookup'});
+    event.status=result.status;event.remainingFields=gaps(anchor,investigations,request.question);
+   }catch(error){event.status='failed';event.message=error.message;}
+   break;
+  }
  }
  return events;
 }

@@ -1,9 +1,9 @@
 const {download}=require('./official-fetch');
 const {readResponse,researchNotice}=require('./discovery');
 
-// Overlap only network waits. Parsing and attachment downloads stay sequential.
+// Overlap public file transfers; parsing and OCR remain sequential and session-scoped.
 function createSession(portal,{get=download,extract=readResponse}={}){
- const controller=new AbortController(),prepared=new Map(),notices=new Map();
+ const controller=new AbortController(),prepared=new Map(),notices=new Map();let fileSlots=2;
  let closed=false;
  const fetch=url=>get(url,0,Date.now()+25000,undefined,controller.signal);
  function prepareNotice(url){
@@ -16,13 +16,16 @@ function createSession(portal,{get=download,extract=readResponse}={}){
   for(const item of items.slice(0,3)){
    if(closed||prepared.has(item.url))continue;
    if(prepared.size>=3)break;
-   const reader=portal.createReader({get:async url=>{
+   let downloading=false;
+   const reader=portal.createReader({extract:(response,args)=>downloading?Promise.resolve({format:'deferred',pages:[]}):extract(response,args),post:(step,params,deadline)=>get('https://www.open.go.kr/util/wonmunUtils/'+step,0,deadline,new URLSearchParams(Object.entries(params).filter(([,v])=>v!==undefined&&v!==null)).toString(),controller.signal),get:async url=>{
     const response=await fetch(url);
     if(response.bytes.length>1024*1024)throw Object.assign(Error('Prefetch metadata limit'),{code:'PREFETCH_METADATA_LIMIT'});
     return response;
    }});
-   const promise=reader({url:item.url}).then(metadata=>{
+   const promise=reader({url:item.url}).then(async metadata=>{
     for(const link of (metadata.externalLinks||[]).slice(0,1))prepareNotice(link);
+    const file=(metadata.attachments||[]).filter(f=>f.available&&f.bytes>0&&f.bytes<=5*1024*1024&&/\.(?:pdf|hwpx?)$/i.test(f.name)&&!portal.isForm(f.name)).sort((a,b)=>portal.attachmentScore(b,metadata.title)-portal.attachmentScore(a,metadata.title))[0];
+    if(!closed&&file&&fileSlots>0){fileSlots--;downloading=true;try{await reader({url:item.url,fileId:file.fileId});}catch{}finally{downloading=false;}}
     return {reader};
    },error=>({error}));
    prepared.set(item.url,promise);

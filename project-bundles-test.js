@@ -1,3 +1,4 @@
+const followupIdentity=require('./policy-followup');
 const assert=require('node:assert/strict');
 const {evidenceMap}=require('./project-bundles');
 const {documentKey}=require('./project-bundles');
@@ -47,3 +48,5 @@ assert.equal(crowded.responseSize.omittedReadingDetails,0);
  assert(!result.evidenceMap.some(g=>g.stages.some(s=>s.documents.some(d=>d.url==='unrelated'))));
  console.log('PASS: stage paths, exact years and institutions, unknown-year separation, no invented reading, bounded compact references, unrelated-topic exclusion');
 })().catch(e=>{console.error(e);process.exitCode=1});
+
+require('assert/strict')(followupIdentity.sameBusinessCandidate({institution:'도',department:'과',title:'2026년 전세보증료 지원사업 시행계획'}, {institution:'도',department:'과',title:'전세보증료 지원사업 시행계획 통보'}));
