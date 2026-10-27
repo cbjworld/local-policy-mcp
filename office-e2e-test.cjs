@@ -1,0 +1,31 @@
+const assert=require('node:assert/strict'),{summarize}=require('./financial-summary'),{evidence}=require('./evidence'),{withSources,brief}=require('./discovery'),workflow=require('./policy-workflow');
+const make=text=>[{status:'read',source:{sourceId:'plan',url:'https://test.go.kr/plan',checkedAt:'2026-10-27',pages:[{page:2,text}],scanComplete:true}}];
+const benefit=text=>summarize(make(text)).rows.find(r=>r.key==='benefit');
+const split='지원내용: 1인당 최대 50만원 한도 내 실비 지원 (생애 1회) · 중개보수료 30만원, 이사비 20만원';
+assert.equal(benefit(split).valueKRW,500000);assert(benefit(split).display.startsWith('최대 '));
+assert.equal(benefit('사업내용: 남구 전입에 따라 발생한 중개보수 및 이사비를 최대 30만원 한도 내 실비 지원').valueKRW,300000);
+assert.equal(benefit('(지원내용) 가구 당 이사비 및 중개보수 포함 50만원 이내 지원').valueKRW,500000);
+assert(benefit('(지원내용) 가구 당 이사비 및 중개보수 포함 50만원 이내 지원').display.startsWith('최대 '));
+for(const text of ['지원내용: 1인당 50만원에서 60만원으로 변경','지원내용: 1인당 50만원 → 60만원','지원내용: 1인당 50만원 또는 60만원','사업비: 최대 30만원 한도 내 실비 지원'])assert.equal(benefit(text),undefined,text);
+assert(benefit('지원금액: 1대당 구입금액의 30%이내(최대30만원)').display.startsWith('최대 '));
+const scanned=make('(운영예산) 24,000천원 (군비)\n(지원대상) 전입 후 1개월 이상 경과한\n18세 이상~45세 이하 무주택 청년 세대주\n(지원내용) 가구당 50만원 이내 지원');scanned[0].source.ocr={status:'read'};
+assert(evidence(scanned).fields.target.excerpts[0].quote.includes('청년 세대주'));assert.equal(summarize(scanned).rows.find(r=>r.key==='planBudget').valueKRW,24000000);
+assert(evidence(make('지원 자격 ❍ 만19세 이상이며 30일 전부터 거주한 시민')).fields.target.excerpts[0].quote.includes('만19세'));
+assert.equal(evidence(make('지원자격: 수탁기관으로 의료기관 전문인력 보유')).fields.target.excerpts.length,0);
+const text='지원대상: 만19세 이상\n사업기간: 2026년\n'+split+'\n사업비: 10,000천원';
+withSources(new Map([['plan',make(text)[0].source]]),()=>{
+ const cases=['가시','나시'].map(region=>({region,name:'이사비 지원',fields:{target:{sourceId:'plan',page:2,quote:'지원대상: 만19세 이상'},benefit:{sourceId:'plan',page:2,quote:split},budget:{sourceId:'plan',page:2,quote:'사업비: 10,000천원'},period:{sourceId:'plan',page:2,quote:'사업기간: 2026년'}}}));
+ const r=brief({cases});assert(r.comparisonTable.includes('| 지원액 | 사업 예산 |'));assert(r.comparisonTable.includes('2026년'));assert.equal(r.verification,'quote-match-only');
+ cases[0].name='<img> | [link]';const safe=brief({cases}).comparisonTable;assert(!safe.includes('<img>'));assert(safe.includes('\\|'));assert(safe.includes('\\[link\\]'));
+ cases[0].fields.benefit.quote='지원액: 999만원';assert.throws(()=>brief({cases}),/인용문/);
+});
+const rich=require('./research-brief')([{classification:'project_candidate',readingStatus:'read',reading:{fields:[{key:'target',evidence:[{quote:'지원대상: 청년가구'},{quote:'지원대상: 19세 이상 39세 이하 무주택 청년 세대주'}]}]}}]);assert(rich[0].fields.target.quote.includes('39세 이하'));
+(async()=>{
+ const docs=[{title:'2026년 이사비 지원 교부결정 계획',institution:'교부시',documentRole:'allocation_or_deposit',url:'grant'},{title:'2026년 이사비 지원 계획',institution:'계획시',documentRole:'plan',url:'plan'}],order=[];
+ await workflow.research({question:'이사비 지원 계획 비교',queries:['이사비']},{search:async()=>({items:docs,reviewItems:[],relatedDocuments:[],hasMore:false}),research:async a=>{order.push(a.url);return {status:'read'};}});
+ assert.equal(order[0],'plan');
+ let active=0,peak=0;
+ const r=await workflow.research({question:'청년',queries:['청년 지원','청년 사업']},{search:async a=>{if(a.scope==='all'){active++;peak=Math.max(peak,active);await new Promise(r=>setTimeout(r,10));active--;}return {total:0,items:[],reviewItems:[],relatedDocuments:[],hasMore:false,url:a.q};}});
+ assert.equal(peak,2);assert.deepEqual(r.searches.filter(s=>s.scope==='all').map(s=>s.q),['청년 지원','청년 사업']);
+ console.log('PASS: actual-office wording retains separate benefit ceilings, components, OCR target conditions, operating budgets, exact comparison quotes, plan priority and concurrent metadata search');
+})().catch(e=>{console.error(e);process.exitCode=1;});

@@ -12,7 +12,8 @@ module.exports=function researchBrief(documents,links=[]){
    let owner=d,f=!d.supportingOnly&&d.reading?.fields.find(f=>f.key===key);
    if(!d.supportingOnly&&!f?.evidence?.some(e=>e.quote)){const extra=documents.find(s=>d.url&&!s.supportingOnly&&s.followup?.fromUrl===d.url&&s.followup?.relationship==='same_name_institution_year_department'&&s.reading?.fields?.some(f=>f.key===key&&f.evidence?.some(e=>e.quote)));if(extra){owner=extra;f=extra.reading.fields.find(f=>f.key===key);}}
    const excerpts=f?.evidence?.filter(e=>e.quote&&e.quote.length<=500)||[];
-   const quote=(key==='target'&&excerpts.find(e=>/^신\s*청\s*자\s*격/.test(e.quote)))||excerpts[0];
+   const conditions=e=>(e.quote.match(/이상|이하|미만|거주|무주택|연소득|보증금|신고|가구|세대주/g)||[]).length;
+   const quote=(key==='target'&&excerpts.find(e=>/^(?:신\s*청|지\s*원)\s*자\s*격/.test(e.quote)))||(key==='target'?[...excerpts].sort((a,b)=>conditions(b)-conditions(a))[0]:excerpts[0]);
    return [key,{state:f?.state||'미확인',...(owner!==d?{supplementedFrom:{documentId:owner.id,title:owner.title,url:owner.url,role:owner.role}}:{}),...(key==='budget'&&f?.financialAmounts?.length?{financialAmounts:f.financialAmounts.slice(0,3).map(a=>({role:a.role,label:a.label,amountTexts:a.amountTexts,recipientBasis:a.recipientBasis,amountBasis:a.amountBasis,url:a.url,page:a.page,sourceId:a.sourceId,...(a.quote?.length<=300?{quote:a.quote}:{detailDocumentId:d.id})})),omittedFinancialAmounts:Math.max(0,f.financialAmounts.length-3)}:{}),...(key==='target'&&f?.documentDifferences?.length?{documentDifferences:f.documentDifferences}:{}),...(key==='target'&&f?.deliveryQualifications?.length?{deliveryQualifications:f.deliveryQualifications}:{}),...(quote?{quote:quote.quote,attachmentTitle:quote.attachmentTitle,sourceScope:quote.sourceScope,extraction:quote.extraction,url:quote.url||d.url,page:quote.page,sourceId:quote.sourceId}:{}),...(f?.evidence?.length&&!quote?{detailDocumentId:d.id}:{})}];
   }))
  }));

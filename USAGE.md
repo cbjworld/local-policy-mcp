@@ -60,7 +60,7 @@ Node.js 22 이상과 `npm ci`로 설치한 의존성이 필요합니다. 준비 
 | `read_open_document` | 특정 첨부파일·페이지 읽기 |
 | `read_official_source` | 공식 URL의 텍스트 읽기 |
 | `research_official_notice` | 공식 공고와 연결된 첨부 읽기 |
-| `build_research_brief` | 원문 인용문 대조와 사례 비교 초안 |
+| `build_research_brief` | 원문 인용문 대조와 사업기간·대상·지원액·예산 비교표 |
 | `search_budget_projects` | 일반회계 세출 사업명·편성액 검색 |
 | `search_verified_budget_totals` | 부서 합계와 공식 총액을 대조한 지자체 예산 조회 |
 
@@ -76,7 +76,7 @@ Node.js 22 이상과 `npm ci`로 설치한 의존성이 필요합니다. 준비 
 
 `budgetCandidates`에는 같은 검색 표현으로 찾은 본예산 초기 후보를 최대 5행 제공합니다. 본문과 대조된 `budgetEvidenceLinks`와 구분하며, `budgetSearches`의 검색어와 다음 위치로 예산 조회를 이어갈 수 있습니다. 압축 응답은 읽은 근거를 우선 남기고 미열람 후보를 먼저 생략합니다.
 
-`research_open_document`로 특정 문서를 더 읽거나 `build_research_brief`로 읽은 사례를 비교할 수 있습니다. 응답은 기본 `compact`, 전체 근거는 `detail: "full"`로 요청합니다.
+`research_open_document`로 특정 문서를 더 읽거나 `build_research_brief`로 읽은 사례를 비교할 수 있습니다. 비교 입력의 `benefit`(지원액)과 `period`(사업기간)는 선택 항목이며 각 항목에 이번 세션에서 읽은 정확한 인용문·쪽수를 넣습니다. `comparisonTable`은 지원액과 사업예산을 별도 열로 보여줍니다. 응답은 기본 `compact`, 전체 근거는 `detail: "full"`로 요청합니다.
 
 ### 예산 검색
 

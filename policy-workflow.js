@@ -75,12 +75,15 @@ async function runResearch(args={},io=portal){
  // Include nonpublic title evidence even when some public plans were found.
  const metadataFallback=searches.length>0&&screened.items.length===0;
  if(searches.length>0){
-  for(const q of request.queries){
-   try{
-    const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page:1,scope:'all'});
+  const metadata=await Promise.all(request.queries.map(async q=>{
+   try{return {q,r:await io.search({q,startDate:request.startDate,endDate:request.endDate,page:1,scope:'all'})};}
+   catch(e){return {q,error:e.message};}
+  }));
+  for(const {q,r,error} of metadata){
+   if(r){
     searches.push({q,page:1,scope:'all',total:r.total,url:r.url,hasMore:r.hasMore});
     for(const item of [...r.items,...r.reviewItems,...r.relatedDocuments])if(!byUrl.has(documentKey(item.url)))byUrl.set(documentKey(item.url),item);
-   }catch(e){failures.push({q,page:1,scope:'all',message:e.message});}
+   }else failures.push({q,page:1,scope:'all',message:error});
   }
   screened=screen();
  }
@@ -110,7 +113,8 @@ async function runResearch(args={},io=portal){
  if(!request.broad){
   const institutions=new Set();
   const savedKeys=new Set(catalogEvidence.seedDocuments.map(d=>documentKey(d.url)));
-  const ordered=candidates.filter(d=>!d.readingDecision).sort((a,b)=>Number(savedKeys.has(documentKey(b.url)))-Number(savedKeys.has(documentKey(a.url)))||Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||b.relevance.score-a.relevance.score||Number(b.disclosure==='공개')-Number(a.disclosure==='공개'));
+  const plansFirst=!/교부|예탁|집행|결산/.test(request.question);
+  const ordered=candidates.filter(d=>!d.readingDecision).sort((a,b)=>Number(savedKeys.has(documentKey(b.url)))-Number(savedKeys.has(documentKey(a.url)))||Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||(plansFirst?Number(b.documentRole==='plan')-Number(a.documentRole==='plan'):0)||b.relevance.score-a.relevance.score||Number(b.disclosure==='공개')-Number(a.disclosure==='공개'));
   io.preload?.(ordered.slice(0,6));
   const tried=new Set();
   for(let index=0;index<ordered.length;index++){

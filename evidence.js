@@ -1,13 +1,13 @@
-const labels={target:'지원대상|사업대상|참여대상|교육대상|가입자격|신청대상|신청자격|접종대상및비용|접종대상|사업위치|설치대상|대상구간|추진대상',activity:'지원내용|사업내용|주요내용|운영내용|지원내역|지원방법|접종내용|접종대상및비용|지원금액|지원한도|지원기준|지원규모|사업개요|설치내용|구축내용|추진내용',budget:'소요예산|사업예산|총사업비|사업비|예산액|총예산|금회교부결정내역|교부금액',period:'사업기간|운영기간|추진기간|지원기간|신청기간|시행일시'};
+const labels={target:'지원대상|사업대상|참여대상|교육대상|가입자격|신청대상|신청자격|지원자격|접종대상및비용|접종대상|사업위치|설치대상|대상구간|추진대상',activity:'지원내용|사업내용|주요내용|운영내용|지원내역|지원방법|접종내용|접종대상및비용|지원금액|지원한도|지원기준|지원규모|사업개요|설치내용|구축내용|추진내용',budget:'소요예산|사업예산|운영예산|총사업비|사업비|예산액|총예산|금회교부결정내역|교부금액',period:'사업기간|운영기간|추진기간|지원기간|신청기간|시행일시'};
 const spaced=s=>s.split('|').map(w=>[...w].join('\\s*')).join('|');
-const nextLabel=new RegExp('(?:'+spaced(Object.values(labels).join('|'))+')[ \\t]*(?:[:：]|\\r?\\n|(?=[․·]))');
+const nextLabel=new RegExp('(?:'+spaced(Object.values(labels).join('|'))+')[ \\t]*(?:[:：)]|\\r?\\n|(?=[․·❍○]))');
 function extractEvidence(attempts){
  const fields={},referenceExcerpts=[],deliveryQualifications=[];
  for(const [key,label] of Object.entries(labels)){
   const boundaryLabel=key==='activity'?new RegExp('(?:'+spaced(Object.entries(labels).filter(([k])=>k!=='activity').map(([,v])=>v).join('|'))+')\\s*[:：]'):nextLabel;
   const excerpts=[];
   for(const a of attempts.filter(a=>a.status==='read'&&a.assessment!=='form_or_cover'))for(const p of a.source?.pages||[]){
-   const pattern=new RegExp('(?:'+spaced(label)+')\\s*(?:\\*\\*)?\\s*'+(key==='budget'?'(?:[:：)]|(?=(?:\\\\?\\*){3,})|\\|[ \\t]*\\r?\\n)':'(?:[:：)]|</td>\\s*<td>|\\r?\\n|(?=[․·]))'),'g');let m;
+   const pattern=new RegExp('(?:'+spaced(label)+')\\s*(?:\\*\\*)?\\s*'+(key==='budget'?'(?:[:：)]|(?=(?:\\\\?\\*){3,})|\\|[ \\t]*\\r?\\n)':'(?:[:：)]|</td>\\s*<td>|\\r?\\n|(?=[․·❍○]))'),'g');let m;
    while((m=pattern.exec(p.text))&&excerpts.length<3){
     const section=key==='budget'&&m[0].includes('|');
     const tail=p.text.slice(pattern.lastIndex,pattern.lastIndex+(section||m[0].includes('</t')?700:280));
@@ -17,11 +17,11 @@ function extractEvidence(attempts){
      if(boundary>=0)value=value.slice(0,boundary);
     }
     else if(!section){
-     // shortcut: keep indented continuation lines only; unindented prose still needs source review.
+     // OCR can lose indentation; retain at most four target lines, stopping at the next field or bullet.
      const lines=value.split('\n');let keep=1;
      if(key==='target')while(keep<lines.length){
       if(!lines[keep].trim()){if(keep+1<lines.length&&/^[ \t]+\S/.test(lines[keep+1])){keep++;continue;}break;}
-      if(!/^[ \t]+\S/.test(lines[keep])||/[:：]|^[ \t]*[□▢❍○]|^[ \t]*[ⅠⅡⅢⅣⅤⅥⅦ]/.test(lines[keep]))break;
+      if((!/^[ \t]+\S/.test(lines[keep])&&!(a.source?.ocr?.status==='read'&&keep<4))||/[:：]|^[ \t]*[□▢❍○]|^[ \t]*[ⅠⅡⅢⅣⅤⅥⅦ]|^[ \t]*(?:[O0J]\s|[\[(]?(?:소득기준|재산기준|지원내용)[)\]])/.test(lines[keep]))break;
       keep++;
      }
      value=lines.slice(0,keep).join('\n').split(/<\/t[dh]>/)[0];
@@ -38,7 +38,7 @@ function extractEvidence(attempts){
     const reference=!!sectionTitle&&/현황|필요성|참고|타\s*지자체|추진실적/.test(sectionTitle);
     const entry={sourceId:a.source.sourceId,url:a.source.url,page:p.page,quote:p.text.slice(m.index,pattern.lastIndex)+value,status:masked?'redacted':key==='budget'&&!amount?'label_only':'evidence_candidate',sectionTitle,attribution:reference?'reference_context':'requires_review'};
     // A procurement qualification describes the deliverer, not the beneficiary.
-    const eligibility=key==='target'&&/^신\s*청\s*자\s*격/.test(entry.quote);
+    const eligibility=key==='target'&&/^(?:신\s*청|지\s*원)\s*자\s*격/.test(entry.quote);
     const compact=entry.quote.replace(/\s+/g,'');
     const delivery=eligibility&&(/(?:수탁|수행|위탁|운영)(?:기관|업체)|지방계약법|국가계약법/.test(compact)||(/의료기관|전문기관|법인|단체|업체/.test(compact)&&/전문인력|검진장비|사업수행능력|위탁운영|용역수행|위탁추진실적/.test(compact)));
     if(delivery)deliveryQualifications.push({...entry,role:'delivery_qualification'});

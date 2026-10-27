@@ -45,7 +45,7 @@ async function readResponse(response,{q='',page=1,scanEmptyPdf=false,ocr=false}=
 }
 function brief({title='지자체 정책 사례 검토',cases}={}){
  if(typeof title!=='string'||title.length>150||!Array.isArray(cases)||cases.length<2||cases.length>4)throw new Error('제목 150자 이하, 사례 2~4개가 필요합니다.');
- const labels={target:'지원 대상',budget:'사업 예산',operation:'운영 방식',result:'성과'};
+ const labels={target:'지원 대상',benefit:'지원액',budget:'사업 예산',period:'사업기간',operation:'운영 방식',result:'성과'};
  const used=new Map();
  const normalized=cases.map(c=>{
   if(!c||typeof c.region!=='string'||!c.region.trim()||c.region.length>100||typeof c.name!=='string'||!c.name.trim()||c.name.length>200||!c.fields||typeof c.fields!=='object'||Array.isArray(c.fields)||Object.keys(c.fields).some(k=>!Object.hasOwn(labels,k)))throw new Error('사례 이름·지역·비교 항목이 올바르지 않습니다.');
@@ -67,7 +67,10 @@ function brief({title='지자체 정책 사례 검토',cases}={}){
  const lines=['# '+title,'','원문 인용을 모은 검토 초안입니다. 사업 귀속·연도·표 단위·항목 의미는 별도 검토가 필요합니다. 계획과 실제 실적을 구분하세요.',''];
  for(const c of normalized){lines.push('## '+c.region+' · '+c.name);for(const [k,label]of Object.entries(labels)){const f=c.fields[k];lines.push('- '+label+': '+(f?f.quote+' ['+(refs.indexOf(f.sourceId)+1)+(f.page?' / PDF '+f.page+'쪽':'')+']':'미확인'));}lines.push('');}
  lines.push('## 원문');for(const s of used.values())lines.push('['+(refs.indexOf(s.sourceId)+1)+'] '+s.url+' · 조회 '+s.checkedAt.slice(0,10));
- return {title,cases:normalized,text:lines.join('\n'),verification:'quote-match-only',sources:[...used.values()].map(s=>({sourceId:s.sourceId,url:s.url,checkedAt:s.checkedAt}))};
+ const escape=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/[|\\[\]`*_]/g,'\\$&').replace(/\s+/g,' ');
+ const cell=f=>f?escape(f.quote.replace(/\s+/g,' ').slice(0,200))+(f.quote.replace(/\s+/g,' ').length>200?'…':'')+' ['+(refs.indexOf(f.sourceId)+1)+(f.page?' / '+f.page+'쪽':'')+']':'—';
+ const comparisonTable=['| 지역 · 사업 | 사업기간 | 지원 대상 | 지원액 | 사업 예산 |','| --- | --- | --- | --- | --- |',...normalized.map(c=>'| '+escape(c.region+' · '+c.name)+' | '+['period','target','benefit','budget'].map(k=>cell(c.fields[k])).join(' | ')+' |'),'','—는 이번 비교에서 해당 항목의 인용을 선택하지 않았다는 뜻입니다. 지원액과 사업 예산은 합산하지 않습니다.'].join('\n');
+ return {title,cases:normalized,comparisonTable,text:lines.join('\n'),verification:'quote-match-only',sources:[...used.values()].map(s=>({sourceId:s.sourceId,url:s.url,checkedAt:s.checkedAt}))};
 }
 async function researchNotice({url,expectedTitle}={},reader=read){
  validateUrl(url);
