@@ -1,0 +1,976 @@
+{
+  "version": "1.8.7",
+  "codeCommit": "c454f64ec6efba3229ceb1b690c4cc0987669bfe",
+  "deployment": {
+    "id": "dep-dbg50k6c6qcc73ec56r0",
+    "status": "Live",
+    "codeCommit": "c454f64ec6efba3229ceb1b690c4cc0987669bfe",
+    "url": "https://dashboard.render.com/web/srv-dbal9hom7kps739a18r0/deploys/dep-dbg50k6c6qcc73ec56r0",
+    "verifyUrl": "https://github.com/cbjworld/local-policy-mcp/actions/runs/40466274735",
+    "syncUrl": "https://github.com/cbjworld/local-policy-mcp/actions/runs/40466274516"
+  },
+  "scope": "Actual MCP SDK calls on the same Render endpoint, same questions/query/date window. One run per version; wake and connection initialization excluded. AI source-selected fact audit, not whole-document or independent human accuracy.",
+  "functionalTestScripts": 47,
+  "originalFacts": {
+    "checked": 24,
+    "correct": 24
+  },
+  "newQuestionFacts": {
+    "checked": 12,
+    "correct": 12
+  },
+  "numericRegression": {
+    "checked": 5,
+    "correct": 5,
+    "expected": [
+      "36,800",
+      "30%",
+      "70%",
+      "70만원",
+      "68,000원"
+    ]
+  },
+  "imageFallback": {
+    "institution": "충청남도 서천군",
+    "ms": 42354,
+    "ocrPages": 1,
+    "factsChecked": 4,
+    "factsCorrect": 4
+  },
+  "timings": [
+    {
+      "id": "moving",
+      "question": "청년 이사비 지원사업을 새로 만들려고 해. 다른 지자체의 지원 대상, 1인당 지원액, 사업예산과 추진계획을 비교해줘.",
+      "beforeMs": 40690,
+      "afterMs": 19488,
+      "briefMs": 503,
+      "ocrPages": 0,
+      "cases": [
+        {
+          "region": "대구광역시 남구",
+          "name": "청년 부동산 중개보수 및 이사비 지원사업 추진계획",
+          "fields": {
+            "target": {
+              "quote": "사업대상 : 18∼39세 무주택 청년 세대주 200명 정도 ",
+              "sourceId": "33d4accb15c97a19f09d",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT82F32F98DA35FF352F54484F34A03594&prdnDt=20261022175159&nstSeCd=B#fileId=002450941357f57c2af0df4519e23e4f",
+              "page": 2,
+              "checkedAt": "2026-10-27T07:20:44.650Z"
+            },
+            "benefit": {
+              "quote": "사업내용 : 남구 전입에 따라 발생한 부동산 중개보수 및 이사비를 최대 30만원 한도 내 실비 지원",
+              "sourceId": "33d4accb15c97a19f09d",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT82F32F98DA35FF352F54484F34A03594&prdnDt=20261022175159&nstSeCd=B#fileId=002450941357f57c2af0df4519e23e4f",
+              "page": 2,
+              "checkedAt": "2026-10-27T07:20:44.650Z"
+            },
+            "budget": {
+              "quote": "소요예산 : 60,000천원(구비) 정도 ≪모집개요≫ ◆ 기 간 : 2027. 1월 ~ 11월(예산 소진 시 종료) ◆ 방 법 : 대구광역시민원공모홈서비스 온라인 신청 ◆ 자격요건 - (연 령) : 18세 ~ 39세 무주택 청년 세대주 - (소 득) : 가구당 기준중위소득 150% 이하 - (전입기준) : 2026. 12. 1. 이후 남구에 전입신고 완료(관내 전입 포함) ≪추진일정≫ ◆ 2026. 10월∼ : 사업 홍보 ◆ 2026. 12월 :「대구광역시 남구 청년 기본 조례」개정(12. 18일 공포) ◆ 2026. 12월 : 모집 공고 ◆",
+              "sourceId": "33d4accb15c97a19f09d",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT82F32F98DA35FF352F54484F34A03594&prdnDt=20261022175159&nstSeCd=B#fileId=002450941357f57c2af0df4519e23e4f",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:20:44.650Z"
+            },
+            "period": {
+              "quote": "사업기간 : 2027. 1월 ~ 12월 ◆ 내 용 : 무주택 청년 세대주에게 부동산 중개보수 및 이사비를 최대 30만원 한도 내 실비지원(연 1회) ◆ 인 원 : 200명 정도 ◆",
+              "sourceId": "33d4accb15c97a19f09d",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT82F32F98DA35FF352F54484F34A03594&prdnDt=20261022175159&nstSeCd=B#fileId=002450941357f57c2af0df4519e23e4f",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:20:44.650Z"
+            },
+            "operation": {
+              "quote": "사업내용 : 남구 전입에 따라 발생한 부동산 중개보수 및 이사비를 최대 30만원 한도 내 실비 지원(연 1회) (단일 항목 지출도 가능) - (중개보수) 부동산 임대차 계약 체결 시 소요되는 부동산 중개보수 - (이사비) 개인용달, 사다리차 이용비, (반)포장이사, 입주청소비 등 - (제외대상) 택배비, 개인적 차량 렌트비, 대중교통비 등 ",
+              "sourceId": "33d4accb15c97a19f09d",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT82F32F98DA35FF352F54484F34A03594&prdnDt=20261022175159&nstSeCd=B#fileId=002450941357f57c2af0df4519e23e4f",
+              "page": 2,
+              "checkedAt": "2026-10-27T07:20:44.650Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "6,000만원",
+                "observations": [
+                  {
+                    "sourceId": "33d4accb15c97a19f09d",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT82F32F98DA35FF352F54484F34A03594&prdnDt=20261022175159&nstSeCd=B#fileId=002450941357f57c2af0df4519e23e4f",
+                    "page": 1,
+                    "quote": "소요예산 : 60,000천원(구비) 정도 ≪모집개요≫ ◆ 기 간 : 2027. 1월 ~ 11월(예산 소진 시 종료) ◆ 방 법 : 대구광역시민원공모홈서비스 온라인 신청 ◆ 자격요건 - (연 령) : 18세 ~ 39세 무주택 청년 세대주 - (소 득) : 가구당 기준중위소득 150% 이하 - (전입기준) : 2026. 12. 1. 이후 남구에 전입신고 완료(관내 전입 포함) ≪추진일정≫ ◆ 2026. 10월∼ : 사업 홍보 ◆ 2026. 12월 :「대구광역시 남구 청년 기본 조례」개정(12. 18일 공포) ◆ 2026. 12월 : 모집 공고 ◆",
+                    "basis": "stated",
+                    "sourceLabel": "소요예산",
+                    "amountText": "60,000천원",
+                    "valueKRW": 60000000
+                  }
+                ],
+                "valueKRW": 60000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        },
+        {
+          "region": "충청북도 옥천군",
+          "name": "2026년 청년 부동산 중개보수 및 이사비 지원 사업 추진 계획",
+          "fields": {
+            "target": {
+              "quote": "지원대상: 2024. 1. 1. 이후 옥천군으로 전입 및 옥천군 내에서 이사 후 전입신고 완료한 19~39세 청년 - (연령요건) 19세 ~ 39세 (1986. 1. 1.~ 2006. 12. 31. 출생) - (재산요건) 무주택자(주민등록상 세대주, 세대원 모두) - (소득요건) 기준중위소득 180% 이하 ※ 소득이 없는 경우 부모의 기준중위소득으로 판단, 부부의 경우 주민등록을 달리 두어도 소득 합산 - (주택요건) 임차보증금 5천만원 이하 및 월세 50만원 이하의 주택 ",
+              "sourceId": "b42a3b68a307c06ee030",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA85B12519FD5F71A39A7C8471853779F&prdnDt=20260113173911&nstSeCd=B#fileId=140ba729371b9e0911d1d098ffde943c",
+              "page": 2,
+              "checkedAt": "2026-10-27T07:20:48.446Z"
+            },
+            "benefit": {
+              "quote": "지원내용: 1인당 최대 50만원 실비 지원 (생애 1회) (중개보수료 30만원, 이사비 20만원) ❍ 사업홍보: 군청 홈페이지, 보도자료, 옥천군 SNS 홍보 등 ❍ 지급방식: 신청월 기준 익월 20일 개인별 계좌 입금 ❍ 향후계획 - 사업공고 및 신청접수 : 2026. 1. 16. ~ - 대상자 선정 및 사업비 지급 : 2026. 2. ~ 옥 천 군 ( 성 장 정 책 과 )",
+              "sourceId": "b42a3b68a307c06ee030",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA85B12519FD5F71A39A7C8471853779F&prdnDt=20260113173911&nstSeCd=B#fileId=140ba729371b9e0911d1d098ffde943c",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:20:48.446Z"
+            },
+            "budget": {
+              "quote": "사 업 비: 10,000천원(군비 100%) ❍ 지원내용: 1인당 최대 50만원 실비 지원 (생애 1회) (중개보수료 30만원, 이사비 20만원) ❍ 사업홍보: 군청 홈페이지, 보도자료, 옥천군 SNS 홍보 등 ❍ 지급방식: 신청월 기준 익월 20일 개인별 계좌 입금 ❍ 향후계획 - 사업공고 및 신청접수 : 2026. 1. 16. ~ - 대상자 선정 및 사업비 지급 : 2026. 2. ~ 옥 천 군 ( 성 장 정 책 과 )",
+              "sourceId": "b42a3b68a307c06ee030",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA85B12519FD5F71A39A7C8471853779F&prdnDt=20260113173911&nstSeCd=B#fileId=140ba729371b9e0911d1d098ffde943c",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:20:48.446Z"
+            },
+            "period": {
+              "quote": "사업기간: 2026. 1. ~ 12. ❍",
+              "sourceId": "b42a3b68a307c06ee030",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA85B12519FD5F71A39A7C8471853779F&prdnDt=20260113173911&nstSeCd=B#fileId=140ba729371b9e0911d1d098ffde943c",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:20:48.446Z"
+            },
+            "operation": {
+              "quote": "지원내용: 1인당 최대 50만원 실비 지원 (생애 1회) (중개보수료 30만원, 이사비 20만원) ❍ 사업홍보: 군청 홈페이지, 보도자료, 옥천군 SNS 홍보 등 ❍ 지급방식: 신청월 기준 익월 20일 개인별 계좌 입금 ❍ 향후계획 - 사업공고 및 신청접수 : 2026. 1. 16. ~ - 대상자 선정 및 사업비 지급 : 2026. 2. ~ 옥 천 군 ( 성 장 정 책 과 )",
+              "sourceId": "b42a3b68a307c06ee030",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA85B12519FD5F71A39A7C8471853779F&prdnDt=20260113173911&nstSeCd=B#fileId=140ba729371b9e0911d1d098ffde943c",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:20:48.446Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "1,000만원",
+                "observations": [
+                  {
+                    "sourceId": "b42a3b68a307c06ee030",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA85B12519FD5F71A39A7C8471853779F&prdnDt=20260113173911&nstSeCd=B#fileId=140ba729371b9e0911d1d098ffde943c",
+                    "page": 1,
+                    "quote": "사 업 비: 10,000천원(군비 100%) ❍ 지원내용: 1인당 최대 50만원 실비 지원 (생애 1회) (중개보수료 30만원, 이사비 20만원) ❍ 사업홍보: 군청 홈페이지, 보도자료, 옥천군 SNS 홍보 등 ❍ 지급방식: 신청월 기준 익월 20일 개인별 계좌 입금 ❍ 향후계획 - 사업공고 및 신청접수 : 2026. 1. 16. ~ - 대상자 선정 및 사업비 지급 : 2026. 2. ~ 옥 천 군 ( 성 장 정 책 과 )",
+                    "basis": "stated",
+                    "sourceLabel": "사업비",
+                    "amountText": "10,000천원",
+                    "valueKRW": 10000000
+                  }
+                ],
+                "valueKRW": 10000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "benefit",
+                "label": "지원액",
+                "status": "stated",
+                "display": "최대 50만원",
+                "observations": [
+                  {
+                    "sourceId": "b42a3b68a307c06ee030",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA85B12519FD5F71A39A7C8471853779F&prdnDt=20260113173911&nstSeCd=B#fileId=140ba729371b9e0911d1d098ffde943c",
+                    "page": 1,
+                    "quote": "지원내용: 1인당 최대 50만원 ",
+                    "basis": "stated",
+                    "sourceLabel": "수혜 단위가 명시된 지급액",
+                    "amountBasis": "ceiling_not_fixed_payment",
+                    "amountText": "50만원",
+                    "valueKRW": 500000
+                  }
+                ],
+                "valueKRW": 500000
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        }
+      ]
+    },
+    {
+      "id": "license",
+      "question": "청년 자격증 응시료 지원사업을 검토 중이야. 다른 지자체의 지원 대상, 1인당 지원 한도와 사업예산, 계획을 비교해줘.",
+      "beforeMs": 14208,
+      "afterMs": 11069,
+      "briefMs": 486,
+      "ocrPages": 0,
+      "cases": [
+        {
+          "region": "경상남도 진주시",
+          "name": "2026년 진주시 청년 자격증 응시료 지원사업 추진계획",
+          "fields": {
+            "target": {
+              "quote": "지원대상 : 18 ~ 39세 미취업 청년으로 아래 요건을 충족하는 자 - 연 령 : 2026. 1. 1. 기준 18 ~ 39세(1986.1.2. ~ 2008.1.1. 출생자) - 주 소 : 응시일부터 신청일까지 진주시에 거주 중인 자 - 취업여부 : 신청일 기준 미취업자(시험 응시 후 취업 여부 무관) - 시험응시 : 2026. 1. 1. 이후 시험의 실제 응시자(합격 여부 무관) ❍",
+              "sourceId": "04d6c1ebcb229e7eac3f",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT8020137C08099AC96F0356CE2048AB0C&prdnDt=20260202151558&nstSeCd=B#fileId=aa26da1ab68fcf656a78d7f9a0a1c7f5",
+              "page": 3,
+              "checkedAt": "2026-10-27T07:20:57.756Z"
+            },
+            "benefit": {
+              "quote": "지원내용 : 시험 응시료 실비 ※ 1인 연 2회, 연 10만원 한도 ❍ 지원분야 : 국가기술자격(541종), 어학시험, 한국사능력검정시험 ❍ 신청방법 : 온라인 신청(진주시 청년 온라인 플랫폼) ❍ 지급방법 : 개인별 계좌 입금 ❍",
+              "sourceId": "04d6c1ebcb229e7eac3f",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT8020137C08099AC96F0356CE2048AB0C&prdnDt=20260202151558&nstSeCd=B#fileId=aa26da1ab68fcf656a78d7f9a0a1c7f5",
+              "page": 3,
+              "checkedAt": "2026-10-27T07:20:57.756Z"
+            },
+            "budget": {
+              "quote": "소요예산 : 80백만 원 4. 분야별 지원과목 및 응시료 ❍ 지원과목 분 야 지 원 과 목 자격증 「국가기술자격법 시행규칙」제3조 별표 2에 따른 국가기술자격 어 학 영 어 토익(TOEIC) 아이엘츠(IELTS) 토익스피킹 텝스(TEPS) 토플(TOEFL) 지텔프(G-TELP) 중 국 어 HSK, TSC, BCT 일 본 어 JPT, JLPT 러시아어 토르플(TORFL) 스 페 인 어 델레(DELE) 독 일 어 Goethe-Zertifikat Test DAF 프랑스어 델프/달프(DELF/DALF) 기 타 오픽(OPIC), 스널트(SNULT),",
+              "sourceId": "04d6c1ebcb229e7eac3f",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT8020137C08099AC96F0356CE2048AB0C&prdnDt=20260202151558&nstSeCd=B#fileId=aa26da1ab68fcf656a78d7f9a0a1c7f5",
+              "page": 3,
+              "checkedAt": "2026-10-27T07:20:57.756Z"
+            },
+            "period": {
+              "quote": "사업기간 : 2026. 2. 11. ~ 연중 ※ 1, 2월분 소급 신청 가능 ※ 예산 소진 시 조기 마감 ❍",
+              "sourceId": "04d6c1ebcb229e7eac3f",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT8020137C08099AC96F0356CE2048AB0C&prdnDt=20260202151558&nstSeCd=B#fileId=aa26da1ab68fcf656a78d7f9a0a1c7f5",
+              "page": 3,
+              "checkedAt": "2026-10-27T07:20:57.756Z"
+            },
+            "operation": {
+              "quote": "지원내용 : 시험 응시료 실비 ※ 1인 연 2회, 연 10만원 한도 ❍ 지원분야 : 국가기술자격(541종), 어학시험, 한국사능력검정시험 ❍ 신청방법 : 온라인 신청(진주시 청년 온라인 플랫폼) ❍ 지급방법 : 개인별 계좌 입금 ❍",
+              "sourceId": "04d6c1ebcb229e7eac3f",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT8020137C08099AC96F0356CE2048AB0C&prdnDt=20260202151558&nstSeCd=B#fileId=aa26da1ab68fcf656a78d7f9a0a1c7f5",
+              "page": 3,
+              "checkedAt": "2026-10-27T07:20:57.756Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "8,000만원",
+                "observations": [
+                  {
+                    "sourceId": "04d6c1ebcb229e7eac3f",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT8020137C08099AC96F0356CE2048AB0C&prdnDt=20260202151558&nstSeCd=B#fileId=aa26da1ab68fcf656a78d7f9a0a1c7f5",
+                    "page": 3,
+                    "quote": "소요예산 : 80백만 원 4. 분야별 지원과목 및 응시료 ❍ 지원과목 분 야 지 원 과 목 자격증 「국가기술자격법 시행규칙」제3조 별표 2에 따른 국가기술자격 어 학 영 어 토익(TOEIC) 아이엘츠(IELTS) 토익스피킹 텝스(TEPS) 토플(TOEFL) 지텔프(G-TELP) 중 국 어 HSK, TSC, BCT 일 본 어 JPT, JLPT 러시아어 토르플(TORFL) 스 페 인 어 델레(DELE) 독 일 어 Goethe-Zertifikat Test DAF 프랑스어 델프/달프(DELF/DALF) 기 타 오픽(OPIC), 스널트(SNULT),",
+                    "basis": "stated",
+                    "sourceLabel": "소요예산",
+                    "amountText": "80백만 원",
+                    "valueKRW": 80000000
+                  }
+                ],
+                "valueKRW": 80000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        },
+        {
+          "region": "제주특별자치도",
+          "name": "2026년 제주시 취업준비 청년 자격증 등 응시료 지원사업 추진계획",
+          "fields": {
+            "target": {
+              "quote": "지원대상 : 신청일 현재 제주시에 주소지를 둔 미취업 청년(19\\~39세)",
+              "sourceId": "6cd65f76b628f2671adf",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE9598C3EFDDCBF109332483424E52C31&prdnDt=20260129173031&nstSeCd=W#fileId=44850c8bf6ad0686e0697daeecc2dd1b",
+              "page": null,
+              "checkedAt": "2026-10-27T07:20:59.851Z"
+            },
+            "benefit": {
+              "quote": "지원내용 : 자격증 및 어학시험 등 응시료 지원\n\n- 지원범위 : 1인 연 10만원 한도 내 실비 지원\n\n- 자격시험 : 어학시험, 한국사능력검정시험, 국가기술자격시험,\n\n국가전문자격시험, 국가공인민간자격증",
+              "sourceId": "6cd65f76b628f2671adf",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE9598C3EFDDCBF109332483424E52C31&prdnDt=20260129173031&nstSeCd=W#fileId=44850c8bf6ad0686e0697daeecc2dd1b",
+              "page": null,
+              "checkedAt": "2026-10-27T07:20:59.851Z"
+            },
+            "budget": {
+              "quote": "총사업비 : 50백만 원",
+              "sourceId": "6cd65f76b628f2671adf",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE9598C3EFDDCBF109332483424E52C31&prdnDt=20260129173031&nstSeCd=W#fileId=44850c8bf6ad0686e0697daeecc2dd1b",
+              "page": null,
+              "checkedAt": "2026-10-27T07:20:59.851Z"
+            },
+            "period": {
+              "quote": "신청기간: 2026. 2. 9. \\~ 예산소진시 (예산소진 시까지 상시 접수, 월별 집행)",
+              "sourceId": "6cd65f76b628f2671adf",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE9598C3EFDDCBF109332483424E52C31&prdnDt=20260129173031&nstSeCd=W#fileId=44850c8bf6ad0686e0697daeecc2dd1b",
+              "page": null,
+              "checkedAt": "2026-10-27T07:20:59.851Z"
+            },
+            "operation": {
+              "quote": "지원내용 : 자격증 및 어학시험 등 응시료 지원\n\n- 지원범위 : 1인 연 10만원 한도 내 실비 지원\n\n- 자격시험 : 어학시험, 한국사능력검정시험, 국가기술자격시험,\n\n국가전문자격시험, 국가공인민간자격증",
+              "sourceId": "6cd65f76b628f2671adf",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE9598C3EFDDCBF109332483424E52C31&prdnDt=20260129173031&nstSeCd=W#fileId=44850c8bf6ad0686e0697daeecc2dd1b",
+              "page": null,
+              "checkedAt": "2026-10-27T07:20:59.851Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "5,000만원",
+                "observations": [
+                  {
+                    "sourceId": "6cd65f76b628f2671adf",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE9598C3EFDDCBF109332483424E52C31&prdnDt=20260129173031&nstSeCd=W#fileId=44850c8bf6ad0686e0697daeecc2dd1b",
+                    "page": null,
+                    "quote": "총사업비 : 50백만 원",
+                    "basis": "stated",
+                    "sourceLabel": "총사업비",
+                    "amountText": "50백만 원",
+                    "valueKRW": 50000000
+                  }
+                ],
+                "valueKRW": 50000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        }
+      ]
+    },
+    {
+      "id": "driving",
+      "question": "고령운전자 운전면허 자진반납 지원사업을 검토 중이야. 다른 지자체의 연령 조건, 지원액과 사업예산, 계획을 비교해줘.",
+      "beforeMs": 65328,
+      "afterMs": 27697,
+      "briefMs": 187,
+      "ocrPages": 0,
+      "cases": [
+        {
+          "region": "경상남도 김해시",
+          "name": "2026 고령자 운전면허 자진반납 사업 추진계획",
+          "fields": {
+            "target": {
+              "quote": "지원대상 : 김해시에 주민등록된 65세 이상 운전면허 자진반납자 ❍",
+              "sourceId": "f50688178ca8db640052",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT57864B808E24529478D37A05ABEF5603&prdnDt=20260128182307&nstSeCd=B#fileId=281c68dcda3d48489ae9a09e4a85ae31",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:24.956Z"
+            },
+            "benefit": {
+              "quote": "지원내용 : 10만원 충전 교통카드 1매 지원(실 운전 증빙 시 2매) ※ 최초 1회에 한함 - 접 수 처 : 읍면동 행정복지센터 Ⅲ 예산현황 ❍ 그간 예산지원 현황 (단위: 천원) ❍ 반납현황 - 우리 시 고령자 운전면허 소지 현황 (단위: 명) - 전국 기준 고령운전자 운전면허 반납률 (출처: 국회예산정책처) - 전국 기준 고령자 운전면허 반납률은 4년 평균 2.3%로 나타나며, 우리 시도 작년 1,000여 명이 운전면허를 반납하여 전국 평균과 비슷한 수준인 2.4%를 기록함 ❍",
+              "sourceId": "f50688178ca8db640052",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT57864B808E24529478D37A05ABEF5603&prdnDt=20260128182307&nstSeCd=B#fileId=281c68dcda3d48489ae9a09e4a85ae31",
+              "page": 3,
+              "checkedAt": "2026-10-27T07:21:24.956Z"
+            },
+            "budget": {
+              "quote": "사 업 비 : 120,000천원 □ 변경 및 특이사항 ❍ 실제 운전 증빙 시 지원 확대(10만원 ⇒ 20만원) ❍ 교통카드 브랜드 변경(이즐카드 ⇒ 티머니카드) ❍ 고령운전자 스티커 배부 □ 행정사항 ❍ 고령자 운전면허 자진반납 사업 홍보 시 민 안 전 국 (교 통 정 책 과 )",
+              "sourceId": "f50688178ca8db640052",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT57864B808E24529478D37A05ABEF5603&prdnDt=20260128182307&nstSeCd=B#fileId=281c68dcda3d48489ae9a09e4a85ae31",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:24.956Z"
+            },
+            "period": {
+              "quote": "사업기간 : 2026. 1. ~ 12. - 추진근거 : 「김해시 교통안전 증진 조례」 제22조 -",
+              "sourceId": "f50688178ca8db640052",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT57864B808E24529478D37A05ABEF5603&prdnDt=20260128182307&nstSeCd=B#fileId=281c68dcda3d48489ae9a09e4a85ae31",
+              "page": 2,
+              "checkedAt": "2026-10-27T07:21:24.956Z"
+            },
+            "operation": {
+              "quote": "지원내용 : 10만원 충전 교통카드 1매 지원(실 운전 증빙 시 2매) ※ 최초 1회에 한함 - 접 수 처 : 읍면동 행정복지센터 Ⅲ 예산현황 ❍ 그간 예산지원 현황 (단위: 천원) ❍ 반납현황 - 우리 시 고령자 운전면허 소지 현황 (단위: 명) - 전국 기준 고령운전자 운전면허 반납률 (출처: 국회예산정책처) - 전국 기준 고령자 운전면허 반납률은 4년 평균 2.3%로 나타나며, 우리 시도 작년 1,000여 명이 운전면허를 반납하여 전국 평균과 비슷한 수준인 2.4%를 기록함 ❍",
+              "sourceId": "f50688178ca8db640052",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT57864B808E24529478D37A05ABEF5603&prdnDt=20260128182307&nstSeCd=B#fileId=281c68dcda3d48489ae9a09e4a85ae31",
+              "page": 3,
+              "checkedAt": "2026-10-27T07:21:24.956Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "12,000만원",
+                "observations": [
+                  {
+                    "sourceId": "f50688178ca8db640052",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT57864B808E24529478D37A05ABEF5603&prdnDt=20260128182307&nstSeCd=B#fileId=281c68dcda3d48489ae9a09e4a85ae31",
+                    "page": 1,
+                    "quote": "사 업 비 : 120,000천원 □ 변경 및 특이사항 ❍ 실제 운전 증빙 시 지원 확대(10만원 ⇒ 20만원) ❍ 교통카드 브랜드 변경(이즐카드 ⇒ 티머니카드) ❍ 고령운전자 스티커 배부 □ 행정사항 ❍ 고령자 운전면허 자진반납 사업 홍보 시 민 안 전 국 (교 통 정 책 과 )",
+                    "basis": "stated",
+                    "sourceLabel": "사업비",
+                    "amountText": "120,000천원",
+                    "valueKRW": 120000000
+                  }
+                ],
+                "valueKRW": 120000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        },
+        {
+          "region": "울산광역시 울주군",
+          "name": "2026년 고령운전자 운전면허 자진반납 지원 계획",
+          "fields": {
+            "target": {
+              "quote": "지원대상 : 관내 주소를 두고있는 만 65세 이상* 운전면허 소지자 *26년도 기준 : 1961년 12월 31일 이전 출생자 ※ 울주군 65세 이상 운전면허 소지자 : 약 26,000명 ❍",
+              "sourceId": "ae3fc66ff851d67abe64",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTBB5CDE3B85B4CDB72438F791ACFF8E1D&prdnDt=20260123091752&nstSeCd=B#fileId=a2a8d06eb0ebe73c9861822766999935",
+              "page": 2,
+              "checkedAt": "2026-10-27T07:21:28.247Z"
+            },
+            "benefit": {
+              "quote": "지원내용 - 일 반 : 1인 50만원(온누리상품권) / 울산시 10, 울주군 40 - 실운전증빙 : 1인 60만원(온누리상품권) / 울산시 20, 울주군 40 ❍",
+              "sourceId": "ae3fc66ff851d67abe64",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTBB5CDE3B85B4CDB72438F791ACFF8E1D&prdnDt=20260123091752&nstSeCd=B#fileId=a2a8d06eb0ebe73c9861822766999935",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:28.247Z"
+            },
+            "budget": {
+              "quote": "사 업 비 : 300백만원(400천원 × 750명) □ 달라진 점 ❍ (지원방법) 교통카드 → 온누리상품권(1인100천원, 최대 200천원* 시 배부 ) * 실운전이 증빙되는 경우 온누리상품권 200천원 지급 □ 추진일정 ❍ 2026. 1. : 온누리상품권 구입(300백만원, 인당 40만원) ❍ 2026. 1 ~. : 자진반납자 인센티브* (50~60만원 상당) 배부(읍·면) 울 주 군 (교통정책과)",
+              "sourceId": "ae3fc66ff851d67abe64",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTBB5CDE3B85B4CDB72438F791ACFF8E1D&prdnDt=20260123091752&nstSeCd=B#fileId=a2a8d06eb0ebe73c9861822766999935",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:28.247Z"
+            },
+            "period": null,
+            "operation": {
+              "quote": "지원내용 - 일 반 : 1인 50만원(온누리상품권) / 울산시 10, 울주군 40 - 실운전증빙 : 1인 60만원(온누리상품권) / 울산시 20, 울주군 40 ❍",
+              "sourceId": "ae3fc66ff851d67abe64",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTBB5CDE3B85B4CDB72438F791ACFF8E1D&prdnDt=20260123091752&nstSeCd=B#fileId=a2a8d06eb0ebe73c9861822766999935",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:28.247Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "30,000만원",
+                "observations": [
+                  {
+                    "sourceId": "ae3fc66ff851d67abe64",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTBB5CDE3B85B4CDB72438F791ACFF8E1D&prdnDt=20260123091752&nstSeCd=B#fileId=a2a8d06eb0ebe73c9861822766999935",
+                    "page": 1,
+                    "quote": "사 업 비 : 300백만원(400천원 × 750명) □ 달라진 점 ❍ (지원방법) 교통카드 → 온누리상품권(1인100천원, 최대 200천원* 시 배부 ) * 실운전이 증빙되는 경우 온누리상품권 200천원 지급 □ 추진일정 ❍ 2026. 1. : 온누리상품권 구입(300백만원, 인당 40만원) ❍ 2026. 1 ~. : 자진반납자 인센티브* (50~60만원 상당) 배부(읍·면) 울 주 군 (교통정책과)",
+                    "basis": "stated",
+                    "sourceLabel": "사업비",
+                    "amountText": "300백만원",
+                    "valueKRW": 300000000
+                  }
+                ],
+                "valueKRW": 300000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        }
+      ]
+    },
+    {
+      "id": "deposit",
+      "question": "전세보증금 반환보증 보증료 지원사업의 다른 지자체 사례를 찾아 대상, 지원액, 사업예산과 계획을 비교해줘.",
+      "beforeMs": 15632,
+      "afterMs": 17473,
+      "briefMs": 510,
+      "ocrPages": 0,
+      "cases": [
+        {
+          "region": "전라남도 고흥군",
+          "name": "2026년『전세보증금반환보증 보증료 지원사업』추진계획",
+          "fields": {
+            "target": {
+              "quote": "지원대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증 (HUG, HF, SGI)에 가입한 고흥군 거주 무주택 임차인 <지원 제외 대상> ▪ 외국인 및 국내에 거주하지 않는 재외국민 ▪ 「민간임대주택법」에 따른 등록임대사업자의 등록임대주택에 거주하는 임차인 ▪ 임차인이 법인인 경우(회사 지원 숙소 등) ▪ 보증료 지원을 받았던 보증과 동일한 보증서 번호로 재신청하는 경우 ▪ 그 밖에 해당 지자체장이 지원이 적합하지 않다고 판단하는 경우",
+              "sourceId": "1fe0cde106d7b4fe3341",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+              "page": 2,
+              "checkedAt": "2026-10-27T07:21:41.160Z"
+            },
+            "benefit": {
+              "quote": "지원 내용(1인 최대 40만원 한도) 구분 청년 신혼부부 신혼부부 ⑷연소득 5천만원 이하 7천5백만원 이하 7천5백만원 이하 지원내용 납부 보증료 전액 보증료의 90% ·보증기관 : 주택도시보증공사(HUG), 서울보증보험(SGI) 한국주택금용공사(HF) ·",
+              "sourceId": "1fe0cde106d7b4fe3341",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:41.160Z"
+            },
+            "budget": {
+              "quote": "총사업비 : 5,214천원(국 50%, 도 15%, 군 35%) 고 흥 군 (종합민원실) 문서번호 종합민원실-17815 기 안 자 건축관리팀장 종합민원실장 부군수 군수 2026. 3. 23.",
+              "sourceId": "1fe0cde106d7b4fe3341",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:41.160Z"
+            },
+            "period": {
+              "quote": "사업기간 : 2026. 1. ~ 예산소진 시까지 ·",
+              "sourceId": "1fe0cde106d7b4fe3341",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:41.160Z"
+            },
+            "operation": {
+              "quote": "지원 내용(1인 최대 40만원 한도) 구분 청년 신혼부부 신혼부부 ⑷연소득 5천만원 이하 7천5백만원 이하 7천5백만원 이하 지원내용 납부 보증료 전액 보증료의 90% ·보증기관 : 주택도시보증공사(HUG), 서울보증보험(SGI) 한국주택금용공사(HF) ·",
+              "sourceId": "1fe0cde106d7b4fe3341",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:41.160Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "521.4만원",
+                "observations": [
+                  {
+                    "sourceId": "1fe0cde106d7b4fe3341",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+                    "page": 1,
+                    "quote": "총사업비 : 5,214천원(국 50%, 도 15%, 군 35%) 고 흥 군 (종합민원실) 문서번호 종합민원실-17815 기 안 자 건축관리팀장 종합민원실장 부군수 군수 2026. 3. 23.",
+                    "basis": "stated",
+                    "sourceLabel": "총사업비",
+                    "amountText": "5,214천원",
+                    "valueKRW": 5214000
+                  }
+                ],
+                "valueKRW": 5214000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        },
+        {
+          "region": "경상북도 영주시",
+          "name": "2026년「전세보증금반환보증 보증료 지원사업」추진계획",
+          "fields": {
+            "target": {
+              "quote": "사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:42.957Z"
+            },
+            "benefit": {
+              "quote": "지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:42.957Z"
+            },
+            "budget": {
+              "quote": "사 업 비 : 1백만원(국 0.5, 도 0.15, 시 0.35) ◦ 사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦ 지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:42.957Z"
+            },
+            "period": {
+              "quote": "사업기간 : 2026. 3. ~ 12. ◦",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:42.957Z"
+            },
+            "operation": {
+              "quote": "지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:42.957Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "100만원",
+                "observations": [
+                  {
+                    "sourceId": "ac51ca1bac7ab455c9fc",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+                    "page": 1,
+                    "quote": "사 업 비 : 1백만원(국 0.5, 도 0.15, 시 0.35) ◦ 사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦ 지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+                    "basis": "stated",
+                    "sourceLabel": "사업비",
+                    "amountText": "1백만원",
+                    "valueKRW": 1000000
+                  }
+                ],
+                "valueKRW": 1000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        }
+      ]
+    },
+    {
+      "id": "bicycle",
+      "question": "전기자전거 구입비 지원사업을 검토 중이야. 다른 지자체의 대상, 지원액, 사업예산과 계획을 비교해줘.",
+      "beforeMs": 19701,
+      "afterMs": 17652,
+      "briefMs": 168,
+      "ocrPages": 0,
+      "cases": [
+        {
+          "region": "충청남도 보령시",
+          "name": "2026년 전기자전거 구입 지원사업 추진계획",
+          "fields": {
+            "target": {
+              "quote": "지원자격) 공고일 기준 보령시에 1년 이상 주민등록을 두고 거주하는 19세 이상의 사람  (",
+              "sourceId": "3791dfa7eb9729909f60",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTDE7DB4C1EEF1B0C44B60E0DEC7452287&prdnDt=20260211163248&nstSeCd=B#fileId=d177403f5778de7136e5e3bdb395e065",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:59.358Z"
+            },
+            "benefit": {
+              "quote": "지원 금액) - 전기자전거 구입 금액의 50% 이내, 최대 50만원 - 1가구당 1인 1대(중복 불가), 본인만 신청 가능  (자격 요건) - 공고일 기준 보령시에 1년 이상 주민등록을 두고 거주하는 19세 이상의 사람 - 우선 지원 대상 선정 후 · (1순위) 기초생활수급자, 차상위계층 · (2순위) 다자녀가구, 차량 미소유자 - 지원 제외 대상: 지방보조금 부정수급 이력자, 공고일 이전 구입한 자, 지방세·세외수입 등의 체납이 있는 자 □ 신청 절차 및 제출 서류  (신청 방법) 방문 접수(접수 장소",
+              "sourceId": "3791dfa7eb9729909f60",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTDE7DB4C1EEF1B0C44B60E0DEC7452287&prdnDt=20260211163248&nstSeCd=B#fileId=d177403f5778de7136e5e3bdb395e065",
+              "page": 4,
+              "checkedAt": "2026-10-27T07:21:59.358Z"
+            },
+            "budget": {
+              "quote": "소요예산) 15,000천원(시비) 교 통 과 <교 통 시 설 팀>",
+              "sourceId": "3791dfa7eb9729909f60",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTDE7DB4C1EEF1B0C44B60E0DEC7452287&prdnDt=20260211163248&nstSeCd=B#fileId=d177403f5778de7136e5e3bdb395e065",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:21:59.358Z"
+            },
+            "period": {
+              "quote": "사업기간) 2026년 4월 ~ 2026년 9월 다. (",
+              "sourceId": "436c717843f61fc8ecf7",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTDE7DB4C1EEF1B0C44B60E0DEC7452287&prdnDt=20260211163248&nstSeCd=B#fileId=d177403f5778de7136e5e3bdb395e065",
+              "page": 8,
+              "checkedAt": "2026-10-27T07:22:01.361Z"
+            },
+            "operation": {
+              "quote": "지원 금액) - 전기자전거 구입 금액의 50% 이내, 최대 50만원 - 1가구당 1인 1대(중복 불가), 본인만 신청 가능  (자격 요건) - 공고일 기준 보령시에 1년 이상 주민등록을 두고 거주하는 19세 이상의 사람 - 우선 지원 대상 선정 후 · (1순위) 기초생활수급자, 차상위계층 · (2순위) 다자녀가구, 차량 미소유자 - 지원 제외 대상: 지방보조금 부정수급 이력자, 공고일 이전 구입한 자, 지방세·세외수입 등의 체납이 있는 자 □ 신청 절차 및 제출 서류  (신청 방법) 방문 접수(접수 장소",
+              "sourceId": "3791dfa7eb9729909f60",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTDE7DB4C1EEF1B0C44B60E0DEC7452287&prdnDt=20260211163248&nstSeCd=B#fileId=d177403f5778de7136e5e3bdb395e065",
+              "page": 4,
+              "checkedAt": "2026-10-27T07:21:59.358Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "1,500만원",
+                "observations": [
+                  {
+                    "sourceId": "3791dfa7eb9729909f60",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTDE7DB4C1EEF1B0C44B60E0DEC7452287&prdnDt=20260211163248&nstSeCd=B#fileId=d177403f5778de7136e5e3bdb395e065",
+                    "page": 1,
+                    "quote": "소요예산) 15,000천원(시비) 교 통 과 <교 통 시 설 팀>",
+                    "basis": "stated",
+                    "sourceLabel": "소요예산",
+                    "amountText": "15,000천원",
+                    "valueKRW": 15000000
+                  }
+                ],
+                "valueKRW": 15000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        },
+        {
+          "region": "경기도 과천시",
+          "name": "2026년 전기자전거 구입 보조금 지원 계획",
+          "fields": {
+            "target": {
+              "quote": "지원자격 : 공고일 기준 30일 전부터 주민등록을 두고 거주하고 있는 만 19세 이상 과천시민 ",
+              "sourceId": "a375771ba8c264d36b59",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B#fileId=41265d1adc16fd474977baccb4a975de",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:22:05.148Z"
+            },
+            "benefit": {
+              "quote": "지원금액 : 1대당 구입 금액의 30% 이내 (최대 300천원/1인) □ 지원인원 : 80명 □ 지원기종 : 전기자전거 중 PAS전용 방식의 행정안전부령으로 정하는 안전 요건에 인증된 제품에 한하여 지원",
+              "sourceId": "a375771ba8c264d36b59",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B#fileId=41265d1adc16fd474977baccb4a975de",
+              "page": 3,
+              "checkedAt": "2026-10-27T07:22:05.148Z"
+            },
+            "budget": {
+              "quote": "소요예산 : 24,000천원(300천원×80명) 건설도시국 도로건설과 (도로시설팀)",
+              "sourceId": "a375771ba8c264d36b59",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B#fileId=41265d1adc16fd474977baccb4a975de",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:22:05.148Z"
+            },
+            "period": {
+              "quote": "사업기간 : 2026. 1월 ~ 6월 (예산 소진시 조기 종료) ",
+              "sourceId": "a375771ba8c264d36b59",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B#fileId=41265d1adc16fd474977baccb4a975de",
+              "page": 1,
+              "checkedAt": "2026-10-27T07:22:05.148Z"
+            },
+            "operation": {
+              "quote": "지원금액 : 1대당 구입 금액의 30% 이내 (최대 300천원/1인) □ 지원인원 : 80명 □ 지원기종 : 전기자전거 중 PAS전용 방식의 행정안전부령으로 정하는 안전 요건에 인증된 제품에 한하여 지원",
+              "sourceId": "a375771ba8c264d36b59",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B#fileId=41265d1adc16fd474977baccb4a975de",
+              "page": 3,
+              "checkedAt": "2026-10-27T07:22:05.148Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "2,400만원",
+                "observations": [
+                  {
+                    "sourceId": "a375771ba8c264d36b59",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B#fileId=41265d1adc16fd474977baccb4a975de",
+                    "page": 1,
+                    "quote": "소요예산 : 24,000천원(300천원×80명) 건설도시국 도로건설과 (도로시설팀)",
+                    "basis": "stated",
+                    "sourceLabel": "소요예산",
+                    "amountText": "24,000천원",
+                    "valueKRW": 24000000
+                  }
+                ],
+                "valueKRW": 24000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        }
+      ]
+    }
+  ],
+  "driving": {
+    "beforeCandidateCount": 43,
+    "afterCandidateCount": 43,
+    "beforeInvestigations": 6,
+    "afterInvestigations": 4,
+    "beforeSupplementalEvents": 2,
+    "afterSupplementalEvents": 0,
+    "deferredCandidates": [
+      {
+        "title": "2026년 고령운전자 운전면허 자진반납 지원사업 추진 계획 보고",
+        "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT15D5F3F2792476E19D2E951386E88571&prdnDt=20260305174959&nstSeCd=B",
+        "followup": {
+          "status": "pending",
+          "reason": "text_candidates_first",
+          "tool": "research_open_document",
+          "arguments": {
+            "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT15D5F3F2792476E19D2E951386E88571&prdnDt=20260305174959&nstSeCd=B",
+            "requestedQuery": "고령운전자 운전면허 자진반납 지원사업을 검토 중이야. 다른 지자체의 연령 조건, 지원액과 사업예산, 계획을 비교해줘.",
+            "autoOcr": true
+          }
+        }
+      },
+      {
+        "title": "2026년 논산시 고령운전자(70세 이상) 운전면허 자진반납자 지원사업 추진 계획",
+        "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT92802A5962163B2CDC62B55D1E0318F6&prdnDt=20260130192410&nstSeCd=B",
+        "followup": {
+          "status": "pending",
+          "reason": "text_candidates_first",
+          "tool": "research_open_document",
+          "arguments": {
+            "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT92802A5962163B2CDC62B55D1E0318F6&prdnDt=20260130192410&nstSeCd=B",
+            "requestedQuery": "고령운전자 운전면허 자진반납 지원사업을 검토 중이야. 다른 지자체의 연령 조건, 지원액과 사업예산, 계획을 비교해줘.",
+            "autoOcr": true
+          }
+        }
+      }
+    ]
+  },
+  "regressionFoundAndFixed": "Intermediate v1.8.6 stopped before Boryeong PDF page 8 and missed a period fact. v1.8.7 continues later text ranges of the same PDF while avoiding separate unnecessary forms. Rechecked original 24 facts.",
+  "remaining": "Automatic comparison targets two readable institutions within bounded candidate/page budgets. Other candidates remain available for follow-up; source failures and free-server wake delay still apply."
+}
