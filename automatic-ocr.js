@@ -12,8 +12,10 @@ async function readMissing({url,file,attempts,reader,question='',budget}){
  for(const a of attempts.filter(a=>a.fileId===file.fileId&&a.source?.format==='pdf'&&a.evidenceScope!=='attachment_reference'&&a.assessment!=='form_or_cover'&&a.assessment!=='target_mismatch')){
   for(const p of a.source.pages||[])if(Number.isInteger(p.page)&&p.page>=1&&p.page<=18&&!p.text.trim())candidates.set(p.page,p);
  }
- // shortcut: read the earliest textless page, then the next only if fields remain missing; never claim semantic page selection.
- for(const page of [...candidates.keys()].sort((a,b)=>a-b)){
+ // shortcut: try page two first in multipage image plans, then page one if fields remain missing; this is a page-order heuristic.
+ const ordered=[...candidates.keys()].sort((a,b)=>a-b);
+ if(ordered.includes(1)&&ordered.includes(2)&&attempts.some(a=>a.fileId===file.fileId&&a.source?.totalPages>=3))ordered.splice(0,2,2,1);
+ for(const page of ordered){
   if(budget.remaining<=0||used.size>=2||!gaps(attempts,question).length)break;
   if(used.has(page))continue;
   const missingFields=gaps(attempts,question),event={fileId:file.fileId,fileName:file.name,page,missingFields,reason:'textless_page_with_missing_fields'};
