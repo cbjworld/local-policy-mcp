@@ -1,0 +1,191 @@
+{
+  "version": "1.8.1",
+  "method": "Additional live local MCP check of the same deposit-insurance question after finding saved-catalog priority and parenthesized payment headings in the hosted 1.8.0 run. Local time is not a hosted speed comparison.",
+  "question": "전세보증금 반환보증 보증료 지원사업의 다른 지자체 사례를 찾아 대상, 지원액, 사업예산과 계획을 비교해줘.",
+  "ms": 7833,
+  "briefMs": 8,
+  "investigations": [
+    {
+      "institution": "전라남도 고흥군",
+      "title": "2026년『전세보증금반환보증 보증료 지원사업』추진계획",
+      "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B",
+      "status": "read"
+    },
+    {
+      "institution": "경상북도 영주시",
+      "title": "2026년「전세보증금반환보증 보증료 지원사업」추진계획",
+      "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B",
+      "status": "read"
+    }
+  ],
+  "cases": [
+    {
+      "region": "전라남도 고흥군",
+      "name": "2026년『전세보증금반환보증 보증료 지원사업』추진계획",
+      "fields": {
+        "target": {
+          "quote": "지원대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증 (HUG, HF, SGI)에 가입한 고흥군 거주 무주택 임차인 <지원 제외 대상> ▪ 외국인 및 국내에 거주하지 않는 재외국민 ▪ 「민간임대주택법」에 따른 등록임대사업자의 등록임대주택에 거주하는 임차인 ▪ 임차인이 법인인 경우(회사 지원 숙소 등) ▪ 보증료 지원을 받았던 보증과 동일한 보증서 번호로 재신청하는 경우 ▪ 그 밖에 해당 지자체장이 지원이 적합하지 않다고 판단하는 경우",
+          "sourceId": "1fe0cde106d7b4fe3341",
+          "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+          "page": 2,
+          "checkedAt": "2026-10-27T05:00:24.670Z"
+        },
+        "benefit": {
+          "quote": "지원 내용(1인 최대 40만원 한도",
+          "sourceId": "1fe0cde106d7b4fe3341",
+          "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+          "page": 1,
+          "checkedAt": "2026-10-27T05:00:24.670Z"
+        },
+        "budget": {
+          "quote": "총사업비 : 5,214천원(국 50%, 도 15%, 군 35%) 고 흥 군 (종합민원실) 문서번호 종합민원실-17815 기 안 자 건축관리팀장 종합민원실장 부군수 군수 2026. 3. 23.",
+          "sourceId": "1fe0cde106d7b4fe3341",
+          "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+          "page": 1,
+          "checkedAt": "2026-10-27T05:00:24.670Z"
+        },
+        "period": {
+          "quote": "사업기간 : 2026. 1. ~ 예산소진 시까지 ·",
+          "sourceId": "1fe0cde106d7b4fe3341",
+          "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+          "page": 1,
+          "checkedAt": "2026-10-27T05:00:24.670Z"
+        },
+        "operation": {
+          "quote": "지원 내용(1인 최대 40만원 한도) 구분 청년 신혼부부 신혼부부 ⑷연소득 5천만원 이하 7천5백만원 이하 7천5백만원 이하 지원내용 납부 보증료 전액 보증료의 90% ·보증기관 : 주택도시보증공사(HUG), 서울보증보험(SGI) 한국주택금용공사(HF) ·",
+          "sourceId": "1fe0cde106d7b4fe3341",
+          "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+          "page": 1,
+          "checkedAt": "2026-10-27T05:00:24.670Z"
+        },
+        "result": null
+      },
+      "financialSummary": {
+        "checks": [],
+        "rows": [
+          {
+            "key": "planBudget",
+            "label": "계획서 사업비",
+            "status": "stated",
+            "display": "521.4만원",
+            "observations": [
+              {
+                "sourceId": "1fe0cde106d7b4fe3341",
+                "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+                "page": 1,
+                "quote": "총사업비 : 5,214천원(국 50%, 도 15%, 군 35%) 고 흥 군 (종합민원실) 문서번호 종합민원실-17815 기 안 자 건축관리팀장 종합민원실장 부군수 군수 2026. 3. 23.",
+                "basis": "stated",
+                "sourceLabel": "총사업비",
+                "amountText": "5,214천원",
+                "valueKRW": 5214000
+              }
+            ],
+            "valueKRW": 5214000
+          },
+          {
+            "key": "supportBudget",
+            "label": "지원금 예산",
+            "status": "not_stated",
+            "display": "읽은 범위 별도 표기 없음",
+            "observations": []
+          },
+          {
+            "key": "promotionBudget",
+            "label": "홍보비",
+            "status": "not_stated",
+            "display": "읽은 범위 별도 표기 없음",
+            "observations": []
+          }
+        ],
+        "scope": "selected_budget_quote_only",
+        "completeTextRead": false,
+        "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+      }
+    },
+    {
+      "region": "경상북도 영주시",
+      "name": "2026년「전세보증금반환보증 보증료 지원사업」추진계획",
+      "fields": {
+        "target": {
+          "quote": "사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦",
+          "sourceId": "58756da8928e4146829c",
+          "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+          "page": 1,
+          "checkedAt": "2026-10-27T05:00:26.259Z"
+        },
+        "benefit": {
+          "quote": "지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+          "sourceId": "58756da8928e4146829c",
+          "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+          "page": 1,
+          "checkedAt": "2026-10-27T05:00:26.259Z"
+        },
+        "budget": {
+          "quote": "사 업 비 : 1백만원(국 0.5, 도 0.15, 시 0.35) ◦ 사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦ 지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+          "sourceId": "58756da8928e4146829c",
+          "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+          "page": 1,
+          "checkedAt": "2026-10-27T05:00:26.259Z"
+        },
+        "period": {
+          "quote": "사업기간 : 2026. 3. ~ 12. ◦",
+          "sourceId": "58756da8928e4146829c",
+          "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+          "page": 1,
+          "checkedAt": "2026-10-27T05:00:26.259Z"
+        },
+        "operation": {
+          "quote": "지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+          "sourceId": "58756da8928e4146829c",
+          "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+          "page": 1,
+          "checkedAt": "2026-10-27T05:00:26.259Z"
+        },
+        "result": null
+      },
+      "financialSummary": {
+        "checks": [],
+        "rows": [
+          {
+            "key": "planBudget",
+            "label": "계획서 사업비",
+            "status": "stated",
+            "display": "100만원",
+            "observations": [
+              {
+                "sourceId": "58756da8928e4146829c",
+                "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+                "page": 1,
+                "quote": "사 업 비 : 1백만원(국 0.5, 도 0.15, 시 0.35) ◦ 사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦ 지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+                "basis": "stated",
+                "sourceLabel": "사업비",
+                "amountText": "1백만원",
+                "valueKRW": 1000000
+              }
+            ],
+            "valueKRW": 1000000
+          },
+          {
+            "key": "supportBudget",
+            "label": "지원금 예산",
+            "status": "not_stated",
+            "display": "읽은 범위 별도 표기 없음",
+            "observations": []
+          },
+          {
+            "key": "promotionBudget",
+            "label": "홍보비",
+            "status": "not_stated",
+            "display": "읽은 범위 별도 표기 없음",
+            "observations": []
+          }
+        ],
+        "scope": "selected_budget_quote_only",
+        "completeTextRead": false,
+        "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+      }
+    }
+  ],
+  "verification": "quote-match-only",
+  "functionalScripts": 47
+}

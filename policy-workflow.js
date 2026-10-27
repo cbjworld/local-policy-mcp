@@ -114,7 +114,7 @@ async function runResearch(args={},io=portal){
   const institutions=new Set();
   const savedKeys=new Set(catalogEvidence.seedDocuments.map(d=>documentKey(d.url)));
   const plansFirst=!/교부|예탁|집행|결산/.test(request.question);
-  const ordered=candidates.filter(d=>!d.readingDecision).sort((a,b)=>Number(savedKeys.has(documentKey(b.url)))-Number(savedKeys.has(documentKey(a.url)))||Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||(plansFirst?Number(b.documentRole==='plan')-Number(a.documentRole==='plan'):0)||b.relevance.score-a.relevance.score||Number(b.disclosure==='공개')-Number(a.disclosure==='공개'));
+  const ordered=candidates.filter(d=>!d.readingDecision).sort((a,b)=>Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||(plansFirst?Number(b.documentRole==='plan')-Number(a.documentRole==='plan'):0)||Number(savedKeys.has(documentKey(b.url)))-Number(savedKeys.has(documentKey(a.url)))||b.relevance.score-a.relevance.score||Number(b.disclosure==='공개')-Number(a.disclosure==='공개'));
   io.preload?.(ordered.slice(0,6));
   const tried=new Set();
   for(let index=0;index<ordered.length;index++){

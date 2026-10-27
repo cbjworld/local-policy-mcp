@@ -31,7 +31,7 @@ function summarize(attempts,existingAmounts){
  for(const a of readable)for(const p of a.source?.pages||[]){
   if(/타\s*지자체|타\s*시[·ㆍ]?군|시군명.{0,80}사업비/.test(p.text.slice(0,350)))continue;
   // A single explicit per-recipient payment in a support-content line is not the project budget.
-  const payment=new RegExp('(?:지원\\s*내용|사업\\s*내용|보조\\s*금액)\\s*[:：)]\\s*([가-힣 \\t]{0,12}?(?:1\\s*인|1?\\s*가구|세대|1\\s*명|1?\\s*호)\\s*당[^\\n:：;|]{0,24}?('+amount+')\\s*(?:한도(?:\\s*내)?|이내)?)','g');
+  const payment=new RegExp('(?:지원\\s*내용|사업\\s*내용|보조\\s*금액)\\s*[:：)(]\\s*([가-힣 \\t]{0,12}?(?:1\\s*인\\s*당?|(?:1?\\s*가구|세대|1\\s*명|1?\\s*호)\\s*당)[^\\n:：;|]{0,24}?('+amount+')\\s*(?:한도(?:\\s*내)?|이내)?)','g');
   for(const m of p.text.matchAll(payment)){if(/^\s*(?:에서|→|[~∼〜]|또는)/.test(p.text.slice(m.index+m[0].length))||/기존|종전|변경|에서|→|%/.test(m[1])||[...m[1].matchAll(new RegExp(amount,'g'))].length!==1)continue;const valueKRW=money(m[2]);if(valueKRW!==null)add('benefit',{sourceId:a.source.sourceId,url:a.source.url,page:p.page,quote:m[0],basis:'stated',sourceLabel:'수혜 단위가 명시된 지급액',amountBasis:/최대|한도|이내/.test(m[1])?'ceiling_not_fixed_payment':'source_label',amountText:m[2],valueKRW});}
   const ceiling=new RegExp('(?:지원\\s*내용|사업\\s*내용)\\s*[:：)]\\s*([^\\n:：;|]{0,100}?최대\\s*('+amount+')\\s*한도\\s*내\\s*실비\\s*지원)','g');
   for(const m of p.text.matchAll(ceiling)){if(/기존|종전|변경|→/.test(m[1])||[...m[1].matchAll(new RegExp(amount,'g'))].length!==1)continue;const valueKRW=money(m[2]);if(valueKRW!==null)add('benefit',{sourceId:a.source.sourceId,url:a.source.url,page:p.page,quote:m[0],basis:'stated',sourceLabel:'실비 지원 한도',amountBasis:'ceiling_not_fixed_payment',amountText:m[2],valueKRW});}
