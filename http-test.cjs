@@ -42,6 +42,7 @@ const {createServer}=require('./http-server');
   const oldId=transports[0].sessionId;await transports[0].terminateSession();
   assert.equal((await fetch(url,{method:'POST',body:JSON.stringify({jsonrpc:'2.0',id:2,method:'ping'}),headers:{...headers,'Mcp-Session-Id':oldId}})).status,404);
   assert.equal((await clients[1].listTools()).tools.length,12);
+  const realNow=Date.now;let third;try{Date.now=()=>realNow()+121000;third=new Client({name:'reclaim-test',version:'1'});const tt=new StreamableHTTPClientTransport(url,{requestInit:{headers:{Authorization:'Bearer test-only'}}});await third.connect(tt);assert.equal((await third.listTools()).tools.length,12);const fourth=new Client({name:'reclaim-fourth',version:'1'}),ft=new StreamableHTTPClientTransport(url,{requestInit:{headers:{Authorization:'Bearer test-only'}}});await fourth.connect(ft);await ft.terminateSession();await fourth.close();assert.equal((await fetch(url,{method:'POST',body:JSON.stringify({jsonrpc:'2.0',id:2,method:'ping'}),headers:{...headers,'Mcp-Session-Id':transports[1].sessionId}})).status,404);await tt.terminateSession();}finally{Date.now=realNow;await third?.close();}
   console.log('PASS: HTTP SDK handshake, tools, isolated sessions, auth, origin, request limit, capacity, invalid URL, deletion');
  }finally{await Promise.allSettled(clients.map(c=>c.close()));await server.shutdown();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

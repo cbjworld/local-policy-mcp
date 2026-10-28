@@ -9,5 +9,6 @@ const {read}=require('./ocr-reader');cp.fork=original;
  await assert.rejects(read(pdf,{page:0}));assert.equal(calls,3);
  for(let i=0;i<4;i++)await read(Buffer.from('%PDF-'+i));await read(pdf);assert.equal(calls,8);
  const pipeline=Buffer.from('%PDF-pipeline');await read(pipeline,{page:1,nextPage:2});await read(pipeline,{page:2});assert.equal(sent.at(-1).prepared.page,2);assert.equal(sent.at(-1).prepared.raw.toString(),'raw');await read(Buffer.from('%PDF-other-pipeline'),{page:2});assert.equal(sent.at(-1).prepared,undefined);await assert.rejects(read(pipeline,{page:1,nextPage:3}));
+ const concurrent=await Promise.all([read(Buffer.from('%PDF-simultaneous-a')),read(Buffer.from('%PDF-simultaneous-b'))]);assert.equal(concurrent.length,2);assert(concurrent.every(x=>x.text==='page 1'));
  console.log('PASS: bounded OCR cache uses PDF content and page, isolates results, preserves validation and records cached timing');
 })().catch(e=>{console.error(e);process.exitCode=1;});

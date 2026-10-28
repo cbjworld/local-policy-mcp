@@ -45,3 +45,10 @@ for(const [institution,q,department,budget,page] of [
   while(!item&&result.nextOffset!==null){result=search({q,institution,limit:20,offset:result.nextOffset});item=result.items.find(row=>row.department===department);}
   assert.ok(item,`${institution} ${department}`);assert.equal(item.budget,budget);assert.equal(item.page,page);
 }
+
+for(const [short,full,wrong] of [['부산 수영구','부산광역시 수영구','울산 수영구'],['울산 중구','울산광역시 중구','부산 중구']]){
+ const totals=require('./verified-budget-search').search;
+ assert.equal(totals({institution:short}).total,1);
+ assert.deepEqual(totals({institution:short}).items,totals({institution:full}).items);
+ assert.notDeepEqual(totals({institution:short}).items,totals({institution:wrong}).items);
+}

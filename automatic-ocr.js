@@ -23,6 +23,7 @@ async function readMissing({url,file,attempts,reader,question='',budget}){
   let result;
   try{result=await reader({url,fileId:file.fileId,page,ocr:true});}
   catch(error){result={status:'extraction_failed',message:error.message};}
+  if(result.source?.ocr?.status==='failed'&&/대기열|대기 시간/.test(result.source.ocr.message||''))budget.remaining++;
   const fit=require('./relevance').targetFit(evidence([result]).fields.target.excerpts.map(e=>e.quote).join(' '),question);
   const text=(result.source?.pages||[]).map(p=>p.text).join('\n');
   const assessment=fit.status==='mismatch'?'target_mismatch':/사업기간|사업개요|사업\s*개요|소요예산|추진\s*계획|사업비/.test(text)?'plan_candidate':'text_needs_review';

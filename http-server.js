@@ -40,7 +40,11 @@ function createServer({publicUrl,token,allowPublic=false,maxSessions=Number(proc
    if(id){s=sessions.get(id);if(!s)return fail(res,404,'Session expired; initialize again');}
    else{
     if(req.method!=='POST'||!isInitializeRequest(body))return fail(res,400,'Initialize first');
-    if(sessions.size+starting>=maxSessions){res.setHeader('Retry-After','30');return fail(res,503,'Session capacity reached');}
+    if(sessions.size+starting>=maxSessions){
+     const idle=[...sessions.values()].filter(x=>!x.active&&!x.waiters.length&&Date.now()-x.last>120000).sort((a,b)=>a.last-b.last)[0];
+     if(idle)await dispose(idle);
+     if(sessions.size+starting>=maxSessions){res.setHeader('Retry-After','30');return fail(res,503,'Session capacity reached');}
+    }
     starting++;reserved=true;
     let rpc;
     try{
