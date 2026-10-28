@@ -57,7 +57,7 @@ const {catalogLinks}=require('./program-links');
 const revisionCandidates=[{title:'2026년 AI 서비스 운영계획',institution:'서울특별시 강동구',url:'https://www.open.go.kr/a'},{title:'2026년 AI 서비스 운영계획 수정',institution:'서울특별시 강동구',url:'https://www.open.go.kr/b'}];
 const catalog={items:[{projectId:'one',budgetRecords:[],budgetVariants:[],documentCandidates:[],name:'AI 업무지원',institution:'강동구',parent:'서울특별시',year:2026,documents:revisionCandidates.map(d=>({status:'body_supported',relationship:'same_named_budget_program',document:d,evidence:[{quote:'2026년 AI 서비스',page:1,sourceUrl:d.url}]}))}]};
 assert.equal(catalogLinks(catalog,revisionCandidates).length,1);
-assert.equal(catalogLinks(catalog,revisionCandidates,[],[{documents:[revisionCandidates[0]]}]).length,0);
+assert.equal(catalogLinks(catalog,revisionCandidates,[],[{documents:[revisionCandidates[0]]}]).length,1);
 for(const status of ['title_candidate','not_read']){const c=structuredClone(catalog);c.items[0].documents[1].status=status;assert.equal(catalogLinks(c,revisionCandidates).length,0);}
 const referenceCatalog=structuredClone(catalog);referenceCatalog.items[0].documents[1].relationship='explicit_budget_line_reference';assert.equal(catalogLinks(referenceCatalog,revisionCandidates).length,0);
 assert.equal(catalogLinks(catalog,[revisionCandidates[0],{...revisionCandidates[1],institution:'서울특별시 중구'}]).length,0);
@@ -73,3 +73,19 @@ const pressure=Array.from({length:250},(_,i)=>({url:'https://www.open.go.kr/nois
 const crowded=require('./presentation').present('research_policy',{...value,candidates:[upper.candidate,lower.candidate,...pressure],projects:[...value.projects,...pressure.map(d=>({institution:d.institution,name:d.title,documents:[d],fields:{}}))]});
 assert.equal(crowded.confirmedProgramSummaries.length,1);assert.equal(crowded.confirmedProgramSummaries[0].documents.length,2);assert.equal(crowded.confirmedProgramSummaries[0].countAsOneCase,true);assert(JSON.stringify(crowded).length<=24000);assert(crowded.responseSize.omittedDocuments>0);
 console.log('PASS: spaced grant text and confirmed grouping survive large compact outputs');
+
+// Real 부산시 plan, 수영구 approval and two 부산시 grant documents; excerpts are from saved originals.
+const stored=require('./project-document-links.json').links.filter(x=>x.projectId==='bp-fe3fc82227fc0633cfb027c6');
+const city=doc('부산광역시','부산형 산후조리비 지원사업 추진 계획',stored.find(x=>x.document.role==='plan').document.url,'부산형 산후조리비 지원사업\n구·군 보건소 보조금 교부\n(사업기간) 2026년','');
+const suyeong=doc('부산광역시 수영구','추가경정예산의 성립 전 사용승인 건의[부산형 산후조리비 지원사업]','https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT9689C047EDFA6DB10AAE984CF459D499&prdnDt=20260921090634&nstSeCd=B','1.「부산형 산후조리비 지원사업」보조금을 다음과 같이 교부결정 하오니 붙임 교부조건을 준수하여 보조사업 수행에 만전을 기하여 주시기 바랍니다.\n사업기간 : 2026. 1. ~ 2026. 12.\n부산광역시장','');
+const realCatalog={items:[{projectId:'bp-fe3fc82227fc0633cfb027c6',name:'부산형 산후조리비 지원사업',institution:'부산광역시',year:2026,documents:stored}]};
+const realCandidates=[city.candidate,suyeong.candidate,...stored.map(x=>x.document)].filter((d,i,a)=>a.findIndex(v=>v.url===d.url)===i);
+const body=links([city,suyeong]),catalogGroups=catalogLinks(realCatalog,realCandidates,[city,suyeong],body);
+const merged=require('./program-links').combineLinks([...body,...catalogGroups]);
+assert.equal(merged.length,1);assert.equal(merged[0].documents.length,4);
+const result=require('./presentation').present('research_policy',{candidates:realCandidates,investigations:[city,suyeong],catalogEvidence:realCatalog,projects:realCandidates.map(d=>({institution:d.institution,name:d.title,documents:[d],fields:{}}))},'full');
+assert.equal(result.summary.projectGroups,1);assert.equal(result.presentation.projects.length,1);assert.equal(result.presentation.projects[0].documents.length,4);
+assert.equal(require('./program-links').combineLinks([body[0],{...catalogGroups[0],year:'2027'}]).length,2,'different years never bridge');
+const unrelated={...catalogGroups[0],documents:catalogGroups[0].documents.map((d,i)=>({...d,url:'https://www.open.go.kr/other/'+i}))};
+assert.equal(require('./program-links').combineLinks([body[0],unrelated]).length,2,'similar names without a shared source do not bridge');
+console.log('PASS: actual 부산 plan and 수영구 grant linked with both saved 부산 grant documents; different years and unrelated documents remain separate');

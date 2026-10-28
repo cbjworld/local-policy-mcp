@@ -64,13 +64,12 @@ function retainedLinks(confirmed,documents){
 }
 function catalogLinks(context,candidates=[],investigations=[],existing=[]){
  const {documentKey,institutionKey}=require('./catalog-evidence'),present=new Map(candidates.map(d=>[documentKey(d.url),d])),read=new Map(investigations.map(d=>[documentKey(d.candidate.url),d]));
- const occupied=new Set(existing.flatMap(l=>l.documents.map(d=>documentKey(d.url))));
  const result=[];
  for(const item of context?.items||[]){
   const matched=[];
   for(const link of item.documents||[]){
    if(link.status!=='body_supported'||link.relationship!=='same_named_budget_program'||!link.evidence?.some(e=>e.quote))continue;
-   const key=documentKey(link.document.url),candidate=present.get(key);if(!candidate||occupied.has(key)||institutionKey(candidate.institution)!==institutionKey(link.document.institution))continue;
+   const key=documentKey(link.document.url),candidate=present.get(key);if(!candidate||institutionKey(candidate.institution)!==institutionKey(link.document.institution))continue;
    const fresh=read.get(key),freshPages=fresh?.result.status==='read'?pages(fresh):[],freshPeriod=period(freshPages);
    if(!freshPeriod&&freshPages.some(p=>/사\s*업\s*기\s*간\s*[:：)]\s*20\d{2}/.test(p.text)))continue;
    if(freshPeriod&&Number(freshPeriod.year)!==item.year)continue;
@@ -81,4 +80,21 @@ function catalogLinks(context,candidates=[],investigations=[],existing=[]){
  }
  return result;
 }
-module.exports={links,caseCounts,retainedLinks,catalogLinks};
+// Links from independently confirmed body and budget evidence may share a source.
+// Only that exact source and matching year can bridge them; names alone never do.
+function combineLinks(links){
+ const {documentKey}=require('./catalog-evidence'),groups=[];
+ for(const link of links){
+  const keys=new Set(link.documents.map(d=>documentKey(d.url)));
+  const overlaps=groups.filter(g=>String(g.year)===String(link.year)&&g.documents.some(d=>keys.has(documentKey(d.url))));
+  if(!overlaps.length){groups.push({...link,documents:[...link.documents],evidence:[...link.evidence]});continue;}
+  const target=overlaps[0];
+  for(const other of [...overlaps.slice(1),link]){
+   target.documents=[...new Map([...target.documents,...other.documents].map(d=>[documentKey(d.url),d])).values()];
+   target.evidence.push(...other.evidence);
+   const i=groups.indexOf(other);if(i>=0)groups.splice(i,1);
+  }
+ }
+ return groups;
+}
+module.exports={links,caseCounts,retainedLinks,catalogLinks,combineLinks};

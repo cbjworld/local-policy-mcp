@@ -2,6 +2,16 @@ const assert=require('node:assert/strict');
 const {search}=require('./budget-search');
 const all=search({q:'청년',limit:2});assert.equal(all.items.length,2);assert.equal(all.nextOffset,2);
 const next=search({q:'청년',limit:2,offset:2});assert.notDeepEqual(all.items,next.items);
+for(const [shorthand,expanded] of [['음식물처리기','음식물 처리기'],['전세보증료','전세 보증료']]){
+ const first=search({q:shorthand,limit:2}),wide=search({q:expanded,limit:2});
+ assert.ok(first.totalCandidateRows>2,shorthand);assert.deepEqual(first.expandedSearchTerms,expanded.split(' '));
+ assert.equal(first.totalCandidateRows,wide.totalCandidateRows);assert.deepEqual(first.items,wide.items);
+ assert.ok(first.items.every(item=>item.source&&Number.isFinite(item.budget)));
+ const second=search({q:shorthand,limit:2,offset:2});assert.equal(second.totalCandidateRows,first.totalCandidateRows);assert.deepEqual(second.items,search({q:expanded,limit:2,offset:2}).items);
+}
+const food=search({q:'음식물처리기',institution:'부산 금정구'});
+assert.equal(food.totalCandidateRows,1);assert.equal(food.items[0].name,'가정용 음식물쓰레기 처리기 구입 지원');assert.ok(food.items[0].source);assert.equal(food.items[0].page,102);
+assert.equal(search({q:'산후조리비'}).expandedSearchTerms,undefined);
 assert.equal(search({q:'120미추홀콜센터'}).items[0].budget,229409);
 assert.equal(search({q:'합천호 노후관광지',institution:'합천'}).items[0].budget,1500000);
 assert.equal(search({q:'산후',institution:'존재하지않는기관'}).totalCandidateRows,0);
