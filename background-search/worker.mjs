@@ -28,7 +28,7 @@ export class SearchGate {
   constructor(ctx) { this.storage=ctx.storage; }
   async fetch(request) {
     const kind=new URL(request.url).pathname;
-    if (!['/admit','/page','/release','/inspect'].includes(kind)) return new Response(null,{status:404});
+    if (!['/admit','/page','/release','/yield','/inspect'].includes(kind)) return new Response(null,{status:404});
     const id=new URL(request.url).searchParams.get('id');
     if(!validId(id||''))return new Response(null,{status:400});
     const result=await this.storage.transaction(async tx=>{
@@ -47,14 +47,23 @@ export class SearchGate {
         if(new URL(request.url).searchParams.get('rollback')==='1'&&ticket?.day===day){data.jobs=Math.max(0,data.jobs-1);await tx.put('quota',data);}
         await tx.delete('ticket:'+id);await tx.delete(key);await tx.delete('waiting:'+id);await tx.delete('pending:'+id);return {ok:true};
       }
+      if(kind==='/yield'){
+        // Keep the admission ticket and saved job; a full waiting list is retried later.
+        if(!await tx.get('ticket:'+id))await tx.put('ticket:'+id,{day:null});
+        const waitingKey='waiting:'+id;
+        if(!await tx.get(waitingKey)&&(await tx.list({prefix:'waiting:',limit:51})).size<50)await tx.put(waitingKey,{order:now,lastSeen:now});
+        await tx.delete(key);await tx.delete('pending:'+id);return {ok:true};
+      }
       if(kind==='/admit'&&!active){
         const waitingKey='waiting:'+id;
         let queued=await tx.get(waitingKey),isNew=false;
         if(!queued){
-          if(data.jobs>=100)return {ok:false,retryAt:nextDay,reason:'daily_job_limit'};
+          const ticket=await tx.get('ticket:'+id);
+          if(!ticket&&data.jobs>=100)return {ok:false,retryAt:nextDay,reason:'daily_job_limit'};
           const backlog=await tx.list({prefix:'waiting:',limit:51});
           if(backlog.size>=50)return {ok:false,retryAt:now+1800000,reason:'backlog_limit'};
-          queued={order:now,lastSeen:now};isNew=true;await tx.put(waitingKey,queued);await tx.put('ticket:'+id,{day});data.jobs++;await tx.put('quota',data);
+          queued={order:now,lastSeen:now};await tx.put(waitingKey,queued);
+          if(!ticket){isNew=true;await tx.put('ticket:'+id,{day});data.jobs++;await tx.put('quota',data);}
         }
         else{queued.lastSeen=now;await tx.put(waitingKey,queued);}
         const entries=await tx.list({prefix:'active:',limit:100});
@@ -67,6 +76,7 @@ export class SearchGate {
       }
       if(kind==='/admit')return {ok:true,waiting:false,isNew:false};
       if(kind==='/page'){
+        if(!active)return {ok:false,retryAt:now+1800000,reason:'not_admitted'};
         if((data.attempts||0)>=8000)return {ok:false,retryAt:nextDay,reason:'daily_attempt_limit'};
         data.attempts=(data.attempts||0)+1;await tx.put('quota',data);
       }
@@ -93,6 +103,15 @@ export class SearchGate {
 }
 export class SearchJob {
   constructor(ctx,env) { this.storage=ctx.storage; this.env=env; }
+  async deferForAdmission(job) {
+    job.status='waiting_admission';job.needsYield=true;job.waitingUntil=Date.now()+1800000;
+    await this.storage.transaction(async tx=>{await tx.put('job',job);await tx.setAlarm(job.waitingUntil);});
+    try{
+      const gate=this.env.GATE.get(this.env.GATE.idFromName('global'));
+      const result=await (await gate.fetch('https://gate.internal/yield?id='+job.id)).json();
+      if(result.ok){delete job.needsYield;await this.storage.put('job',job);}
+    }catch{}
+  }
   async fetch(request) {
     const url = new URL(request.url);
     if (request.method === 'POST' && url.pathname === '/start') {
@@ -132,6 +151,11 @@ export class SearchJob {
     if(job.status==='waiting_admission'){
       try{
         const gate=this.env.GATE.get(this.env.GATE.idFromName('global'));
+        if(job.needsYield){
+          const yielded=await (await gate.fetch('https://gate.internal/yield?id='+job.id)).json();
+          if(!yielded.ok)throw Error('yield_failed');
+          delete job.needsYield;await this.storage.put('job',job);
+        }
         const permit=await (await gate.fetch('https://gate.internal/admit?id='+job.id)).json();
         if(!permit.ok||permit.waiting){job.waitingUntil=permit.retryAt||Date.now()+1800000;await this.storage.put('job',job);await this.storage.setAlarm(job.waitingUntil);return;}
         job.status='running';delete job.waitingUntil;await this.storage.put('job',job);
@@ -146,6 +170,7 @@ export class SearchJob {
       const gate=this.env?.GATE?.get(this.env.GATE.idFromName('global'));
       if (gate) {
         const permit=await (await gate.fetch('https://gate.internal/page?id='+job.id)).json();
+        if(permit.reason==='not_admitted'){await this.deferForAdmission(job);return;}
         if (!permit.ok) {job.waitingUntil=permit.retryAt;await this.storage.put('job',job);await this.storage.setAlarm(permit.retryAt);return;}
       }
       const result=await portalPage(c);
@@ -167,6 +192,7 @@ export class SearchJob {
       });
     } catch (error) {
       job.failures++; job.updatedAt=Date.now(); job.lastError=String(error.message).slice(0,100);
+      if(job.failures>=6&&this.env?.GATE&&job.id){await this.deferForAdmission(job);return;}
       await this.storage.put('job',job);
     }
     const next=await this.storage.get('job');
