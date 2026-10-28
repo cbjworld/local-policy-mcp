@@ -13,7 +13,7 @@ const now=new Date('2026-10-13T00:00:00Z');
   return {total:0,hasMore:a.page===1,items:[],reviewItems:[],relatedDocuments:[],url:a.q+':'+a.page};
  }});
  assert(peak>=2&&peak<=4);assert.deepEqual(result.searches.filter(s=>s.scope==='original').map(s=>s.url),['청년 지원:1','청년 지원:2','청년 사업:1','청년 사업:2']);
- assert.equal(result.coverage.queriedPages,6);assert.equal(result.failures.length,0);assert(result.timings.searchMs>=0);
+ assert.equal(result.coverage.queriedPages,8);assert.equal(result.failures.length,0);assert(result.timings.searchMs>=0);
  console.log('PASS: independent queries overlap, page and merge order remain stable, metadata fallback preserved');
 })().catch(e=>{console.error(e);process.exitCode=1;});
 // A slow public second page must not delay independent title-only searches.
@@ -88,8 +88,8 @@ assert.equal(w.plan({question:'서울 산후조리비 지원 사업 찾아줘'},
 (async()=>{
  const empty={total:100,hasMore:true,items:[],reviewItems:[],relatedDocuments:[]};
  const r=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>empty});
- assert.deepEqual(r.coverage.nextSearches.map(x=>[x.arguments.scope,x.arguments.page]),[['original',5],['all',2]]);
- assert.equal(r.coverage.queriedPages,5);assert.equal(r.coverage.hasMore,true);
+ assert.deepEqual(r.coverage.nextSearches.map(x=>[x.arguments.scope,x.arguments.page]),[['original',5],['all',5]]);
+ assert.equal(r.coverage.queriedPages,8);assert.equal(r.coverage.hasMore,true);
  const f=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>{throw Error('offline')}});
  assert.equal(f.coverage.nextSearches[0].arguments.page,1);assert.equal(f.coverage.nextSearches[0].reason,'실패한 페이지 재시도');
  const done=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>({...empty,hasMore:false})});
@@ -123,3 +123,17 @@ async function privateListingTest(){
  console.log('PASS: nonpublic listing retained without downloads, partial disclosures read, public ties prioritized, Seoul and unknown exceptions preserved');
 }
 privateListingTest().catch(e=>{console.error(e);process.exitCode=1;});
+
+(async()=>{
+ const docs=[{title:'[이송] 「2026년 진천군 청년세대 이사비 지원 사업」신청자 중복지원 여부 조회요청',institution:'경상북도 영주시',url:'forward'},{title:'「2026년 진천군 청년세대 이사비 지원 사업」추진계획',institution:'충청북도 진천군',url:'own'}];
+ const x=await w.research({question:'청년 이사비',queries:['청년 이사비']},{search:async()=>({total:2,hasMore:false,items:docs,reviewItems:[],relatedDocuments:[]}),research:async()=>({status:'unreadable',attempts:[]})});
+ assert(!x.candidates.some(d=>d.url==='forward'));assert(x.relatedDocuments.some(d=>d.url==='forward'));assert(x.candidates.some(d=>d.url==='own'));
+ console.log('PASS: forwarded other-municipality documents remain supporting records, not producer-owned policy candidates');
+})().catch(e=>{console.error(e);process.exitCode=1});
+
+(async()=>{
+ const empty={total:50,hasMore:true,items:[],reviewItems:[],relatedDocuments:[]};
+ const r=await w.research({question:'청년',queries:['청년']},{search:async a=>{if(a.scope==='all'&&a.page===3)throw Error('test page 3 failure');return {...empty,url:(a.scope||'original')+a.page};}});
+ assert.deepEqual(r.searches.filter(x=>x.scope==='all').map(x=>x.page),[1,2]);assert(r.coverage.nextSearches.some(x=>x.arguments.scope==='all'&&x.arguments.page===3));
+ console.log('PASS: additional metadata page failures preserve earlier results and exact continuation page');
+})().catch(e=>{console.error(e);process.exitCode=1});

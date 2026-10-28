@@ -45,8 +45,12 @@ async function runResearch(args={},io=portal){
  })).then(batches=>{firstSearch(false);return batches;});
  // Title-only searches need one successful response, not every remaining public page.
  const metadataPending=firstSearchPending.then(success=>success?Promise.all(request.queries.map(async q=>{
-   try{return {q,r:await io.search({q,startDate:request.startDate,endDate:request.endDate,page:1,scope:'all'})};}
-   catch(e){return {q,error:e.message};}
+   const pages=[],errors=[];
+   for(let page=1;page<=4;page++){
+    try{const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page,scope:'all'});pages.push({q,page,r});if(!r.hasMore)break;}
+    catch(e){errors.push({q,page,scope:'all',message:e.message});break;}
+   }
+   return {pages,errors};
   })):[]);
  const catalogEvidence=require('./catalog-context').lookup(request,io.searchCatalog);
  timings.catalogMs=Date.now()-started;
@@ -85,11 +89,12 @@ async function runResearch(args={},io=portal){
  const metadataFallback=searches.length>0&&screened.items.length===0;
  if(searches.length>0){
   const metadata=await metadataPending;
-  for(const {q,r,error} of metadata){
-   if(r){
-    searches.push({q,page:1,scope:'all',total:r.total,url:r.url,hasMore:r.hasMore});
+  for(const batch of metadata){
+   failures.push(...batch.errors);
+   for(const {q,page,r} of batch.pages){
+    searches.push({q,page,scope:'all',total:r.total,url:r.url,hasMore:r.hasMore});
     for(const item of [...r.items,...r.reviewItems,...r.relatedDocuments])if(!byUrl.has(documentKey(item.url)))byUrl.set(documentKey(item.url),item);
-   }else failures.push({q,page:1,scope:'all',message:error});
+   }
   }
   screened=screen();
  }
@@ -190,7 +195,7 @@ async function runResearch(args={},io=portal){
  timings.readingMs=Date.now()-readStart;timings.totalMs=Date.now()-started;
  return {automaticOcr:{enabled:args.autoOcr!==false,maxPages:3,attemptedPages:(args.autoOcr===false?0:3)-ocrBudget.remaining-ocrBudget.supplementRemaining,events:investigations.flatMap(x=>(x.result.automaticOcr||[]).map(e=>({...e,documentUrl:x.candidate.url})))},evidenceFollowups,catalogEvidence:{...catalogEvidence,liveSearchDocuments},timings,budgetScope,budgetCandidates,budgetSearches,budgetEvidenceLinks,evidenceMap,financialDocuments,possibleProjectLinks,coverage,request,projects,status:searches.length?(request.broad?'topic_overview':'research_draft'):'search_failed',searches,failures,candidates,reviewItems:screened.reviewItems,relatedDocuments:screened.relatedDocuments,investigations,
  searchOutcome:{metadataFallback,status:candidates.length?'candidates_found':failures.length?'incomplete':'not_found_in_searched_scope',note:'후보가 없어도 사업 부존재를 뜻하지 않습니다. 검색 기간·조회 페이지·실패 내역을 함께 확인하세요.'},
- limits:{maxQueries:3,maxPagesPerQuery:4,maxMetadataFallbackPagesPerQuery:1,maxSearchRequests:17,maxPrimarySearchRequests:15,maxDocuments:8,maxSupplementalDocuments:2,maxSupplementalSearchRequests:2,targetReadableInstitutions:2,readableCriterion:'core_field_quotes_required_not_text_only',examinedDocuments:byUrl.size,complete:false},
+ limits:{maxQueries:3,maxPagesPerQuery:4,maxMetadataFallbackPagesPerQuery:4,maxSearchRequests:26,maxPrimarySearchRequests:24,maxDocuments:8,maxSupplementalDocuments:2,maxSupplementalSearchRequests:2,targetReadableInstitutions:2,readableCriterion:'core_field_quotes_required_not_text_only',examinedDocuments:byUrl.size,complete:false},
  instruction:request.broad?'후보 제목에 실제로 나타난 사업 종류를 출처와 함께 먼저 제시하세요. 임의로 한 사업을 선택하지 마세요. 필요할 때만 관심 사업을 물으세요.':'제목이 요청 사업의 존재를 뒷받침하면 비공개·읽기 실패여도 사업 존재 추정 사례로 포함하고 제목과 출처를 제시하세요. 존재 추정과 본문 근거 확인을 별도로 구분하세요. 계획안은 현재 시행이나 예산 확정을 뜻하지 않습니다. 요청과 실제 본문이 같은 사업인지 먼저 판단하세요. 적합한 문서의 대상·내용·예산·기간을 근거와 함께 정리하고 미확인 항목은 명시하세요. 실패하거나 다른 사업이면 반환된 다음 후보를 research_open_document로 조사하세요. 부족한 사례를 만들어 채우지 마세요. 단계별 성공과 최종 관련성은 다릅니다.'};
 }
 async function research(args={},io=portal){

@@ -27,7 +27,7 @@ assert.deepEqual(groups[0].missingStages,['budget']);
 assert.equal(groups[0].stages[1].documents[0].readingStatus,'not_attempted');
 assert.match(groups[0].relationship,/not_confirmed/);
 const compact=require('./presentation').present('research_policy',{candidates:docs,financialDocuments:[],evidenceMap:groups});
-assert.equal(compact.evidenceMap[0].stages[1].documentIds[0],'d2');
+assert.equal(compact.documents.find(d=>d.id===compact.evidenceMap[0].stages[1].documentIds[0]).url,groups[0].stages[1].documents[0].url);
 assert(JSON.stringify(compact).length<=24000);
 const many=Array.from({length:300},(_,i)=>({...docs[0],url:'url'+i,institution:'기관'+i,title:docs[0].title+'x'.repeat(500)}));
 const small=require('./presentation').present('research_policy',{candidates:many,evidenceMap:evidenceMap(many)});
