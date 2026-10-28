@@ -147,3 +147,9 @@ Node.js 22 이상과 이 저장소의 의존성이 필요합니다. 처음에는
 **공개 버전** · 계획과 참고 지침의 근거 분리 · 두 사용자 원문 조사 동시 처리
 
 [상세 기능·설치](USAGE.md) · [1.0 검증·운영](RELEASE.md) · [업데이트 이력](CHANGELOG.md) · [의견 남기기](https://github.com/cbjworld/local-policy-mcp/issues) · [MIT 라이선스](LICENSE)
+
+### 검색 출처 보관
+
+검색 결과의 출처 목록은 `list_research_sources`로 나눠 볼 수 있습니다. 저장소가 연결되어 `storage`가 `archived`로 표시된 목록은 서버가 재시작된 뒤에도 검색 ID로 다시 열 수 있습니다. 검색 ID는 목록을 여는 열쇠이므로 안전하게 보관하세요. 저장소 미설정 또는 저장 실패 시에는 `temporary`로 표시됩니다. 무료 저장소의 계정별 용량과 일일 사용량 한도가 적용됩니다.
+
+직접 운영할 때는 Cloudflare Workers KV 저장소를 만들고 `POLICY_KV_ACCOUNT`, `POLICY_KV_NAMESPACE`, `POLICY_KV_TOKEN` 환경변수를 설정합니다. 토큰은 Workers KV Storage 편집 권한만 부여하고 비밀로 관리하세요. 저장되는 목록과 검색어는 검색 ID로 암호화됩니다.
