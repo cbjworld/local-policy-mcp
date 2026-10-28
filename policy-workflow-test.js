@@ -88,8 +88,8 @@ assert.equal(w.plan({question:'서울 산후조리비 지원 사업 찾아줘'},
 (async()=>{
  const empty={total:100,hasMore:true,items:[],reviewItems:[],relatedDocuments:[]};
  const r=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>empty});
- assert.deepEqual(r.coverage.nextSearches.map(x=>[x.arguments.scope,x.arguments.page]),[['original',9],['all',9]]);
- assert.equal(r.coverage.queriedPages,16);assert.equal(r.coverage.hasMore,true);
+ assert.deepEqual(r.coverage.nextSearches.map(x=>[x.arguments.scope,x.arguments.page]),[['original',41],['all',41]]);
+ assert.equal(r.coverage.queriedPages,80);assert.equal(r.coverage.hasMore,true);
  const f=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>{throw Error('offline')}});
  assert.equal(f.coverage.nextSearches[0].arguments.page,1);assert.equal(f.coverage.nextSearches[0].reason,'실패한 페이지 재시도');
  const done=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>({...empty,hasMore:false})});
