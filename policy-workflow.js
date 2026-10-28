@@ -100,6 +100,31 @@ async function runResearch(args={},io=portal){
   }
   screened=screen();
  }
+ // shortcut: bounded extra work per request; persist remaining cursors when the portal is slow or has more pages.
+ const continuationDeadline=Date.now()+8000,continuation=[];
+ for(const q of request.queries)for(const scope of ['original','all']){
+  const failure=failures.find(f=>f.q===q&&f.scope===scope),last=searches.filter(x=>x.q===q&&x.scope===scope).at(-1);
+  if(failure)continuation.push({q,scope,page:failure.page});
+  else if(last?.hasMore&&last.page<100)continuation.push({q,scope,page:last.page+1});
+ }
+ let continuationAttempts=0,continuationSucceeded=0;
+ while(continuation.length&&continuationAttempts<12&&Date.now()<continuationDeadline){
+  const cursor=continuation.shift();continuationAttempts++;
+  try{
+   const r=await io.search({q:cursor.q,startDate:request.startDate,endDate:request.endDate,page:cursor.page,...(cursor.scope==='all'?{scope:'all'}:{})});
+   continuationSucceeded++;
+   const failureIndex=failures.findIndex(f=>f.q===cursor.q&&f.scope===cursor.scope&&f.page===cursor.page);
+   if(failureIndex>=0)failures.splice(failureIndex,1);
+   searches.push({q:cursor.q,page:cursor.page,scope:cursor.scope,total:r.total,url:r.url,hasMore:r.hasMore});
+   for(const item of [...r.items,...r.reviewItems,...r.relatedDocuments])if(!byUrl.has(documentKey(item.url)))byUrl.set(documentKey(item.url),item);
+   if(cursor.scope==='original'&&!searches.some(x=>x.q===cursor.q&&x.scope==='all')&&!continuation.some(x=>x.q===cursor.q&&x.scope==='all'))continuation.push({q:cursor.q,scope:'all',page:1});
+   if(r.hasMore&&cursor.page<100)continuation.push({...cursor,page:cursor.page+1});
+  }catch(e){
+   const failure=failures.find(f=>f.q===cursor.q&&f.scope===cursor.scope);
+   if(!failure)failures.push({...cursor,message:e.message});else failure.message=e.message;
+  }
+ }
+ if(continuationSucceeded)screened=screen();
  const liveSearchDocuments=byUrl.size;
  for(const doc of catalogEvidence.seedDocuments){const key=documentKey(doc.url);if(!byUrl.has(key))byUrl.set(key,doc);}
  if(catalogEvidence.seedDocuments.length)screened=screen();
@@ -196,13 +221,13 @@ async function runResearch(args={},io=portal){
   const pages=searches.filter(s=>s.q===q&&s.scope===scope),last=pages.at(-1),failure=failures.find(f=>f.q===q&&f.scope===scope);
   return {q,scope,pagesRead:pages.length,lastPage:last?.page||0,reportedDocuments:last?.total??null,status:failure?'failed':!last?'not_started':last.hasMore?(last.page>=100?'page_limit':'partial'):'exhausted',...(failure?{failedPage:failure.page}:{})};
  }));
- const coverage={queriedPages:searches.length,uniqueDocuments:byUrl.size,hasMore:nextSearches.length>0||pageLimitReached,pageLimitReached,progress,nextSearches,note:'전국 지자체를 검색 대상으로 하지만 일부 페이지의 결과입니다. 검색어별 총건수는 중복될 수 있어 합산하지 마세요. 후속 검색은 순서대로 실행하고 URL 중복을 제거하세요. 전국 전체 사업 수나 검색 완전성을 뜻하지 않습니다.'};
+ const coverage={continuationAttempts,continuationSucceeded,queriedPages:searches.length,uniqueDocuments:byUrl.size,hasMore:nextSearches.length>0||pageLimitReached,pageLimitReached,progress,nextSearches,note:'전국 지자체를 검색 대상으로 하지만 일부 페이지의 결과입니다. 검색어별 총건수는 중복될 수 있어 합산하지 마세요. 후속 검색은 순서대로 실행하고 URL 중복을 제거하세요. 전국 전체 사업 수나 검색 완전성을 뜻하지 않습니다.'};
  coverage.liveSearchDocuments=liveSearchDocuments;
  coverage.savedSeedDocuments=byUrl.size-liveSearchDocuments;
  timings.readingMs=Date.now()-readStart;timings.totalMs=Date.now()-started;
  return {automaticOcr:{enabled:args.autoOcr!==false,maxPages:3,attemptedPages:(args.autoOcr===false?0:3)-ocrBudget.remaining-ocrBudget.supplementRemaining,events:investigations.flatMap(x=>(x.result.automaticOcr||[]).map(e=>({...e,documentUrl:x.candidate.url})))},evidenceFollowups,catalogEvidence:{...catalogEvidence,liveSearchDocuments},timings,budgetScope,budgetCandidates,budgetSearches,budgetEvidenceLinks,evidenceMap,financialDocuments,possibleProjectLinks,coverage,request,projects,status:searches.length?(request.broad?'topic_overview':'research_draft'):'search_failed',searches,failures,candidates,reviewItems:screened.reviewItems,relatedDocuments:screened.relatedDocuments,investigations,
  searchOutcome:{metadataFallback,status:candidates.length?'candidates_found':failures.length?'incomplete':'not_found_in_searched_scope',note:'후보가 없어도 사업 부존재를 뜻하지 않습니다. 검색 기간·조회 페이지·실패 내역을 함께 확인하세요.'},
- limits:{maxQueries:3,maxSearchContinuationMs:12000,maxPagesPerQuery:40,maxMetadataFallbackPagesPerQuery:40,maxSearchRequests:242,maxPrimarySearchRequests:240,maxDocuments:8,maxSupplementalDocuments:2,maxSupplementalSearchRequests:2,targetReadableInstitutions:2,readableCriterion:'core_field_quotes_required_not_text_only',examinedDocuments:byUrl.size,complete:false},
+ limits:{maxQueries:3,maxSearchContinuationMs:20000,maxPagesPerQuery:40,maxMetadataFallbackPagesPerQuery:40,maxSearchRequests:254,maxPrimarySearchRequests:252,maxDocuments:8,maxSupplementalDocuments:2,maxSupplementalSearchRequests:2,targetReadableInstitutions:2,readableCriterion:'core_field_quotes_required_not_text_only',examinedDocuments:byUrl.size,complete:false},
  instruction:request.broad?'후보 제목에 실제로 나타난 사업 종류를 출처와 함께 먼저 제시하세요. 임의로 한 사업을 선택하지 마세요. 필요할 때만 관심 사업을 물으세요.':'제목이 요청 사업의 존재를 뒷받침하면 비공개·읽기 실패여도 사업 존재 추정 사례로 포함하고 제목과 출처를 제시하세요. 존재 추정과 본문 근거 확인을 별도로 구분하세요. 계획안은 현재 시행이나 예산 확정을 뜻하지 않습니다. 요청과 실제 본문이 같은 사업인지 먼저 판단하세요. 적합한 문서의 대상·내용·예산·기간을 근거와 함께 정리하고 미확인 항목은 명시하세요. 실패하거나 다른 사업이면 반환된 다음 후보를 research_open_document로 조사하세요. 부족한 사례를 만들어 채우지 마세요. 단계별 성공과 최종 관련성은 다릅니다.'};
 }
 async function research(args={},io=portal){

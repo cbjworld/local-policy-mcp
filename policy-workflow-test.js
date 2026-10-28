@@ -88,8 +88,8 @@ assert.equal(w.plan({question:'서울 산후조리비 지원 사업 찾아줘'},
 (async()=>{
  const empty={total:100,hasMore:true,items:[],reviewItems:[],relatedDocuments:[]};
  const r=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>empty});
- assert.deepEqual(r.coverage.nextSearches.map(x=>[x.arguments.scope,x.arguments.page]),[['original',41],['all',41]]);
- assert.equal(r.coverage.queriedPages,80);assert.equal(r.coverage.hasMore,true);
+ assert.deepEqual(r.coverage.nextSearches.map(x=>[x.arguments.scope,x.arguments.page]),[['original',47],['all',47]]);
+ assert.equal(r.coverage.queriedPages,92);assert.equal(r.coverage.continuationSucceeded,12);assert.equal(r.coverage.hasMore,true);
  const f=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>{throw Error('offline')}});
  assert.equal(f.coverage.nextSearches[0].arguments.page,1);assert.equal(f.coverage.nextSearches[0].reason,'실패한 페이지 재시도');
  const done=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>({...empty,hasMore:false})});
@@ -136,4 +136,9 @@ privateListingTest().catch(e=>{console.error(e);process.exitCode=1;});
  const r=await w.research({question:'청년',queries:['청년']},{search:async a=>{if(a.scope==='all'&&a.page===3)throw Error('test page 3 failure');return {...empty,url:(a.scope||'original')+a.page};}});
  assert.deepEqual(r.searches.filter(x=>x.scope==='all').map(x=>x.page),[1,2]);assert(r.coverage.nextSearches.some(x=>x.arguments.scope==='all'&&x.arguments.page===3));
  console.log('PASS: additional metadata page failures preserve earlier results and exact continuation page');
+})().catch(e=>{console.error(e);process.exitCode=1});
+(async()=>{
+ const calls=new Map();const r=await w.research({question:'산후조리비',queries:['산후조리비'],autoOcr:false},{search:async a=>{const key=(a.scope||'original')+':'+a.page,n=(calls.get(key)||0)+1;calls.set(key,n);if(a.page===2&&n===1)throw Error('transient');return {total:30,hasMore:a.page<3,items:[{title:'산후조리비 지원사업 계획',institution:'기관'+a.page,url:'https://www.open.go.kr/'+a.page}],reviewItems:[],relatedDocuments:[]}},research:async()=>({status:'unreadable'})});
+ assert.equal(calls.get('original:2'),2);assert.equal(calls.get('all:2'),2);assert.equal(r.coverage.continuationSucceeded,4);assert.equal(r.coverage.hasMore,false);assert.equal(r.failures.length,0);assert.equal(r.coverage.uniqueDocuments,3);assert(r.coverage.progress.every(x=>x.status==='exhausted'));
+ console.log('PASS: automatic retry and continuation recover failed pages, merge duplicates and finish both scopes');
 })().catch(e=>{console.error(e);process.exitCode=1});
