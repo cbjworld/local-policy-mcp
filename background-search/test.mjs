@@ -55,6 +55,7 @@ const fairStore=new Storage(),fairGate=new SearchGate({storage:fairStore}),now=D
 await fairStore.put('quota',{day:new Date(now).toISOString().slice(0,10),pages:1,jobs:2,lastPage:now-4000});
 await fairStore.put('pending:'+'b'.repeat(64),now-1000);
 assert.equal((await (await fairGate.fetch(new Request('https://gate/page?id='+'a'.repeat(64)))).json()).ok,false);
+assert.equal((await (await fairGate.fetch(new Request('https://gate/inspect?id='+'a'.repeat(64)))).json()).position,2);
 assert.equal((await (await fairGate.fetch(new Request('https://gate/page?id='+'b'.repeat(64)))).json()).ok,true);
 const liveStore=new Storage(),liveGate=new SearchGate({storage:liveStore});
 await liveStore.put('quota',{day:new Date(now).toISOString().slice(0,10),pages:1,jobs:2,lastPage:now-4000});

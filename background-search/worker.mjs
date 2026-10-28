@@ -28,7 +28,7 @@ export class SearchGate {
   constructor(ctx) { this.storage=ctx.storage; }
   async fetch(request) {
     const kind=new URL(request.url).pathname;
-    if (!['/admit','/page','/release'].includes(kind)) return new Response(null,{status:404});
+    if (!['/admit','/page','/release','/inspect'].includes(kind)) return new Response(null,{status:404});
     const id=new URL(request.url).searchParams.get('id');
     if(!validId(id||''))return new Response(null,{status:400});
     const result=await this.storage.transaction(async tx=>{
@@ -36,6 +36,12 @@ export class SearchGate {
       let data=await tx.get('quota'); if (!data || data.day!==day) data={day,jobs:0,pages:0,lastPage:0};
       const nextDay=Date.parse(day+'T00:00:00Z')+86400000+1000;
       const key='active:'+id,active=await tx.get(key);
+      if(kind==='/inspect'){
+        const entries=await tx.list({prefix:'pending:',limit:100});
+        const age=v=>typeof v==='number'?v:v.lastSeen,order=v=>typeof v==='number'?v:v.order;
+        const pending=[...entries].filter(([,v])=>now-age(v)<=180000).sort((a,b)=>order(a[1])-order(b[1])||a[0].localeCompare(b[0]));
+        return {ok:true,position:pending.findIndex(([name])=>name==='pending:'+id)+1,pending:pending.length,pagesToday:data.pages,secondsSinceLastPage:Math.floor((now-data.lastPage)/1000)};
+      }
       if(kind==='/release'){await tx.delete(key);await tx.delete('pending:'+id);return {ok:true};}
       if(kind==='/admit'&&!active){
         const entries=await tx.list({prefix:'active:',limit:100});
@@ -82,6 +88,9 @@ export class SearchJob {
     if (request.method === 'GET' && url.pathname === '/status') {
       const job=await this.storage.get('job');
       if (!job) return Response.json({error:'not_found'},{status:404});
+      if(job.status==='running'&&this.env?.GATE&&job.id){
+        try{const r=await this.env.GATE.get(this.env.GATE.idFromName('global')).fetch('https://gate.internal/inspect?id='+job.id);if(r.ok)job.cursors[0]={...job.cursors[0],gateStatus:await r.json()};}catch{}
+      }
       return Response.json(job);
     }
     if (request.method === 'GET' && url.pathname === '/pages') {
