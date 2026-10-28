@@ -40,10 +40,14 @@ assert.equal(split.length,2);assert.equal(split[0].startDate,cursor.startDate);a
 const gateStorage=new Storage(),gate=new SearchGate({storage:gateStorage});
 const gateURL='https://gate/page?id='+'a'.repeat(64);
 assert.equal((await (await gate.fetch(new Request(gateURL))).json()).ok,true);
-assert.equal((await (await gate.fetch(new Request(gateURL))).json()).ok,false);
+const retry=await (await gate.fetch(new Request(gateURL))).json();
+assert.equal(retry.ok,false);assert.ok(retry.retryAt-Date.now()<10000);
 await gateStorage.put('quota',{day:new Date().toISOString().slice(0,10),pages:1000,jobs:100,lastPage:0});
 const limited=await (await gate.fetch(new Request(gateURL))).json();
 assert.equal(limited.ok,false);assert.ok(limited.retryAt>Date.now());
+await gateStorage.put('quota',{day:new Date().toISOString().slice(0,10),pages:0,jobs:1,lastPage:0,attempts:8000});
+assert.equal((await (await gate.fetch(new Request(gateURL))).json()).reason,'daily_attempt_limit');
+await gateStorage.put('quota',{day:new Date().toISOString().slice(0,10),pages:1000,jobs:100,lastPage:0});
 assert.equal((await (await gate.fetch(new Request('https://gate/admit?id='+'b'.repeat(64)))).json()).ok,false);
 const fullStore=new Storage(),fullGate=new SearchGate({storage:fullStore});
 for(let i=0;i<20;i++)await fullStore.put('active:'+i.toString(16).padStart(64,'0'),Date.now());

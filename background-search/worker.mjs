@@ -48,6 +48,10 @@ export class SearchGate {
         for(const [name,stamp] of entries)if(now-stamp>14*86400000)await tx.delete(name);
         if([...entries.values()].filter(stamp=>now-stamp<=14*86400000).length>=20)return {ok:false,retryAt:now+300000,reason:'active_job_limit'};
       }
+      if(kind==='/page'){
+        if((data.attempts||0)>=8000)return {ok:false,retryAt:nextDay,reason:'daily_attempt_limit'};
+        data.attempts=(data.attempts||0)+1;await tx.put('quota',data);
+      }
       if ((kind==='/admit' && data.jobs>=100)||(kind==='/page' && data.pages>=1000)) return {ok:false,retryAt:nextDay};
       if (kind==='/page') {
         const pendingKey='pending:'+id;
@@ -57,8 +61,9 @@ export class SearchGate {
         const age=value=>typeof value==='number'?value:value.lastSeen;
         const sequence=value=>typeof value==='number'?value:value.order;
         for(const [name,value] of pending)if(now-age(value)>180000)await tx.delete(name);
-        const first=[...pending].filter(([,value])=>now-age(value)<=180000).sort((a,b)=>sequence(a[1])-sequence(b[1])||a[0].localeCompare(b[0]))[0];
-        if(first?.[0]!==pendingKey||now-data.lastPage<3000)return {ok:false,retryAt:now+60000+Math.floor(Math.random()*10000)};
+        const ordered=[...pending].filter(([,value])=>now-age(value)<=180000).sort((a,b)=>sequence(a[1])-sequence(b[1])||a[0].localeCompare(b[0]));
+        const position=ordered.findIndex(([name])=>name===pendingKey);
+        if(position!==0||now-data.lastPage<3000)return {ok:false,retryAt:Math.max(now+3000*(Math.max(position,0)+1),data.lastPage+3000)+Math.floor(Math.random()*1000)};
         await tx.delete(pendingKey);
       }
       if (kind==='/admit'&&!active) data.jobs++; else if(kind==='/page'){data.pages++;data.lastPage=now;}
