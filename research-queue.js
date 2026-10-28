@@ -1,4 +1,4 @@
-function createQueue({limit=20,waitMs=30000,concurrency=1}={}){
+function createQueue({limit=20,waitMs=90000,concurrency=1}={}){
  if(!Number.isInteger(concurrency)||concurrency<1||concurrency>4)throw Error('Invalid research concurrency');
  let active=0;const waiting=[];
  return async function run(task){
