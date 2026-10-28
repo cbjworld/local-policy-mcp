@@ -11,10 +11,11 @@ function build(directory=__dirname){
   data.contexts.forEach((r,i)=>context.run(i,JSON.stringify(r)));
   data.rows.forEach(([id,r],i)=>row.run(i,id,JSON.stringify(r)));
   const catalog=require('./policy-catalog').buildTables(db,data,directory);
-  db.prepare('INSERT INTO metadata VALUES (?)').run(JSON.stringify({format:1,sha256,scope:data.scope,rows:data.rows.length,catalog}));
   const keys={sha256,names:data.rows.map(([,r])=>normalize(r.name)),contextIds:data.rows.map(([id])=>id),institutions:data.contexts.map(r=>normalize((r.parent||'')+' '+r.institution))};
+  const packedKeys=zlib.gzipSync(JSON.stringify(keys)),keysSha256=crypto.createHash('sha256').update(packedKeys).digest('hex');
+  db.prepare('INSERT INTO metadata VALUES (?)').run(JSON.stringify({format:1,sha256,scope:data.scope,rows:data.rows.length,catalog,keysSha256}));
   db.exec('COMMIT;');db.close();
-  fs.writeFileSync(path.join(directory,'budget-search-keys.json.gz'),zlib.gzipSync(JSON.stringify(keys)));
+  fs.writeFileSync(path.join(directory,'budget-search-keys.json.gz'),packedKeys);
   fs.renameSync(temporary,target);
   return {rows:data.rows.length,catalog,bytes:fs.statSync(target).size};
  }catch(e){try{db.close();}catch{};fs.rmSync(temporary,{force:true});throw e;}
