@@ -2,7 +2,7 @@ const {documentKey}=require('./catalog-evidence');
 const generic=new Set(['지원','사업','지원사업','정책','사례','계획','계획서','예산','예산과','계획과','전국','전국의']);
 function regionScope(topic){
  const registry=require('./catalog-institutions.json').records;
- const aliases={서울:'서울특별시',부산:'부산광역시',대구:'대구광역시',인천:'인천광역시',광주:'광주광역시',대전:'대전광역시',울산:'울산광역시',세종:'세종특별자치시',경기:'경기도',강원:'강원특별자치도',충북:'충청북도',충남:'충청남도',전북:'전북특별자치도',전남:'전남광주통합특별시',경북:'경상북도',경남:'경상남도',제주:'제주특별자치도',전라남도:'전남광주통합특별시'};
+ const aliases={...require('./region-aliases').aliases,서울:'서울특별시',부산:'부산광역시',대구:'대구광역시',인천:'인천광역시',광주:'광주광역시',대전:'대전광역시',울산:'울산광역시',세종:'세종특별자치시',경기:'경기도',강원:'강원특별자치도',충북:'충청북도',충남:'충청남도',전북:'전북특별자치도',전남:'전남광주통합특별시',경북:'경상북도',경남:'경상남도',제주:'제주특별자치도',전라남도:'전남광주통합특별시'};
  const words=topic.split(/\s+/),prefix=words[0]?.replace(/(?:에서|의)$/,'');
  const province=aliases[prefix]||prefix;
  const district=registry.find(r=>(r.institution===words[1]||words[1]?.length>=2&&r.institution.replace(/[시군구]$/,'')===words[1])&&(r.parent===province||r.parent?.replace(/(?:특별자치도|특별자치시|특별시|광역시|도)$/,'')===province));

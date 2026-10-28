@@ -9,6 +9,8 @@ try{
  const links={formatVersion:1,links:[{projectId:id,status:'body_supported',basis:'name_year_institution',document,evidence:[{kind:'program_name',quote:'사업명: 산후조리비 지원',page:1}]},{projectId:catalog.projectId(contexts[1],rows[2][1]),status:'title_candidate',document,evidence:[{kind:'document_title',quote:document.title}]}]};
  fs.writeFileSync(path.join(dir,'budget-data.json.gz'),z.gzipSync(JSON.stringify(input)));fs.writeFileSync(path.join(dir,'project-document-links.json'),JSON.stringify(links));build(dir);store=catalog.open(dir);
  const result=store.search({q:'산후 조리비',institution:'부산 중구'});assert.equal(result.total,2);assert.equal(result.coverage.budgetRows,4);assert.equal(result.coverage.catalogProjects,3);assert.equal(result.coverage.linkedProjects,1);assert.equal(result.coverage.documentLinks,1);
+ assert.deepEqual(store.search({q:'산후 조리비',institution:'부산시 중구'}),result,'alias must preserve projects, amounts and source links');
+ assert.equal(store.search({q:'산후 조리비',institution:'울산시 중구'}).total,1);
  assert.equal(result.coverage.directLinkedProjects,1);assert.equal(result.coverage.budgetReferenceLinks,0);assert.equal(result.coverage.titleCandidateLinks,1);
  const snapshot=structuredClone(result);result.items[0].name='mutated';result.coverage.budgetRows=999;
  assert.deepEqual(store.search({q:'조리비 산후',institution:'부산 중구'}),snapshot,'cached public results must be isolated copies');

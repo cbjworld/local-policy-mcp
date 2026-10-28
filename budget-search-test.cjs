@@ -13,6 +13,12 @@ for(const [institution,parent,local] of [['부산 중구','부산광역시','중
  assert.deepEqual(result.items,search({q:'청년',institution:local+' '+parent,limit:20}).items);
 }
 assert.equal(search({q:'청년',institution:'부산 강남구'}).totalCandidateRows,0);
+for(const [short,full] of [['부산시 수영구','부산광역시 수영구'],['대구시 남구','대구광역시 남구'],['경남 김해시','경상남도 김해시'],['충남 천안시','충청남도 천안시']]){
+ const a=search({q:'청년',institution:short,limit:5}),b=search({q:'청년',institution:full,limit:5});
+ assert(a.totalCandidateRows>0,short);assert.deepEqual(a.items,b.items);assert.equal(a.totalCandidateRows,b.totalCandidateRows);assert.equal(a.nextOffset,b.nextOffset);
+ assert(a.items.every(x=>x.source&&Number.isFinite(x.budget)),'original budget and source must survive alias matching');
+}
+assert.deepEqual(require('./region-aliases').regionTerms('경기도 광주시'),['경기도','광주시'],'ambiguous city name must not be expanded');
 for(const args of [{q:''},{q:'청년',limit:21},{q:'청년',offset:-1},{q:3},{q:'청년',institution:[]}])assert.throws(()=>search(args));
 const {spawnSync}=require('node:child_process');
 const messages=[{jsonrpc:'2.0',id:0,method:'initialize',params:{protocolVersion:'2025-11-25',clientInfo:{name:'budget-test',version:'1'},capabilities:{}}},{jsonrpc:'2.0',method:'notifications/initialized'},{jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'search_budget_projects',arguments:{q:'산후'}}}];
@@ -52,3 +58,4 @@ for(const [short,full,wrong] of [['부산 수영구','부산광역시 수영구'
  assert.deepEqual(totals({institution:short}).items,totals({institution:full}).items);
  assert.notDeepEqual(totals({institution:short}).items,totals({institution:wrong}).items);
 }
+assert.deepEqual(require('./verified-budget-search').search({institution:'부산시 수영구'}),require('./verified-budget-search').search({institution:'부산광역시 수영구'}));

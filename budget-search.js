@@ -13,7 +13,7 @@ function search({q,institution,offset=0,limit=10}={}){
  if(institution!==undefined&&(typeof institution!=='string'||!institution.trim()||institution.length>80))throw Error('Invalid institution');
  if(!Number.isInteger(offset)||offset<0||offset>(indexed?indexed.length:data.rows.length)||!Number.isInteger(limit)||limit<1||limit>20)throw Error('Invalid pagination');
  const terms=q.trim().split(/\s+/).map(normalize);
- const region=institution?institution.trim().split(/\s+/).map(normalize):null;
+ const region=institution?require('./region-aliases').regionTerms(institution).map(normalize):null;
  const regionMatches=indexed||!region?null:institutions.map(name=>region.every(term=>name.includes(term)));
  const found=indexed?null:data.rows.filter((entry,i)=>(!regionMatches||regionMatches[data.formatVersion===1?entry[0]:i])&&terms.every(t=>names[i].includes(t)));
  const result=indexed?indexed.find(terms,region,offset,limit):{total:found.length,items:found.slice(offset,offset+limit).map(entry=>data.formatVersion===1?({...data.contexts[entry[0]],...entry[1]}):entry)};

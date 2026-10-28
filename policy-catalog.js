@@ -56,7 +56,7 @@ function open(directory=__dirname){
    const indexedTerm=terms(q).filter(t=>/^[\p{L}\p{N}]{3,}$/u.test(t)).sort((a,b)=>b.length-a.length)[0];
    if(substringIndex&&indexedTerm){where.push('rowid IN (SELECT rowid FROM catalog_search WHERE name_key MATCH ?)');params.push('"'+indexedTerm+'"');}
    const region=institution?.replace(/^전라남도(?=\s|.+[시군구]$)/,'전남광주통합특별시');
-   const regionTerms=region?.trim().split(/\s+/).map(normalize)||[];
+   const regionTerms=region?require('./region-aliases').regionTerms(region).map(normalize):[];
    if(regionTerms.length){const ids=regions.filter(r=>regionTerms.every(t=>r.key.includes(t))).map(r=>r.id);
     if(ids.length<=500){where.push(ids.length?'context_id IN ('+ids.map(()=>'?').join(',')+')':'0');params.push(...ids);}
     else for(const term of regionTerms){where.push('instr(institution_key,?)>0');params.push(term);}

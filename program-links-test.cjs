@@ -34,6 +34,11 @@ const flattened=mutate(lower,x=>{x.result.attempts[0].source.pages[0].text='수�
 assert.equal(links([upper,flattened]).length,1);
 for(const e of links([upper,flattened])[0].evidence)assert([upper,flattened].some(d=>d.result.attempts.some(a=>a.source.pages.some(p=>p.text.includes(e.quote)))));
 assert.equal(links([upper,mutate(flattened,x=>{x.result.attempts[0].source.pages[0].text=x.result.attempts[0].source.pages[0].text.replace('부산광역시장 수신자','부산광역시장의 처분에 따른다 수신자');})]).length,0);
+// The confirmed 부산시·수영구 relationship requires evidence from the selected subject, not a rejected attachment.
+const wrongTarget=mutate(lower,x=>{x.result.attempts[0].assessment='target_mismatch';x.result.attempts.push({status:'read',assessment:'plan_candidate',source:{sourceId:'other',url:'other',pages:[{page:2,text:'관련성이 확인된 문서이나 교부 근거 없음'}]}});});
+assert.equal(links([upper,wrongTarget]).length,0,'target-mismatched attachment must not prove a shared program');
+const wrongUpper=mutate(upper,x=>{x.result.attempts[0].assessment='target_mismatch';x.result.attempts.push({status:'read',assessment:'plan_candidate',source:{sourceId:'other',url:'other',pages:[{page:2,text:'관련성이 확인된 문서이나 교부 근거 없음'}]}});});
+assert.equal(links([wrongUpper,lower]).length,0,'target-mismatched upper document must not prove a shared program');
 const extra=mutate(lower,x=>{x.candidate.url='lower2';x.candidate.institution='부산광역시 중구';});
 const many=links([upper,lower,extra]);
 const kept=require('./program-links').retainedLinks(many,[{url:'upper'},{url:'lower'}]);
