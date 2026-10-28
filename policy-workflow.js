@@ -105,7 +105,7 @@ async function runResearch(args={},io=portal){
  for(const q of request.queries)for(const scope of ['original','all']){
   const failure=failures.find(f=>f.q===q&&f.scope===scope),last=searches.filter(x=>x.q===q&&x.scope===scope).at(-1);
   if(failure)continuation.push({q,scope,page:failure.page});
-  else if(last?.hasMore&&last.page<100)continuation.push({q,scope,page:last.page+1});
+  else if(last?.hasMore&&last.page<10000)continuation.push({q,scope,page:last.page+1});
  }
  let continuationAttempts=0,continuationSucceeded=0;
  while(continuation.length&&continuationAttempts<12&&Date.now()<continuationDeadline){
@@ -118,7 +118,7 @@ async function runResearch(args={},io=portal){
    searches.push({q:cursor.q,page:cursor.page,scope:cursor.scope,total:r.total,url:r.url,hasMore:r.hasMore});
    for(const item of [...r.items,...r.reviewItems,...r.relatedDocuments])if(!byUrl.has(documentKey(item.url)))byUrl.set(documentKey(item.url),item);
    if(cursor.scope==='original'&&!searches.some(x=>x.q===cursor.q&&x.scope==='all')&&!continuation.some(x=>x.q===cursor.q&&x.scope==='all'))continuation.push({q:cursor.q,scope:'all',page:1});
-   if(r.hasMore&&cursor.page<100)continuation.push({...cursor,page:cursor.page+1});
+   if(r.hasMore&&cursor.page<10000)continuation.push({...cursor,page:cursor.page+1});
   }catch(e){
    const failure=failures.find(f=>f.q===cursor.q&&f.scope===cursor.scope);
    if(!failure)failures.push({...cursor,message:e.message});else failure.message=e.message;
@@ -214,12 +214,12 @@ async function runResearch(args={},io=portal){
  const budgetEvidenceLinks=require('./budget-evidence-links').links(investigations,args=>require('./budget-search').search(args));
  const lastSearches=new Map();
  for(const search of searches)lastSearches.set(search.scope+'\n'+search.q,search);
- const nextSearches=[...lastSearches.values()].filter(s=>s.hasMore&&s.page<100&&!failures.some(f=>f.q===s.q&&f.scope===s.scope)).map(s=>({tool:'search_open_documents',arguments:{q:s.q,startDate:request.startDate,endDate:request.endDate,scope:s.scope,page:s.page+1},reason:'다음 페이지 미조회'}));
+ const nextSearches=[...lastSearches.values()].filter(s=>s.hasMore&&s.page<10000&&!failures.some(f=>f.q===s.q&&f.scope===s.scope)).map(s=>({tool:'search_open_documents',arguments:{q:s.q,startDate:request.startDate,endDate:request.endDate,scope:s.scope,page:s.page+1},reason:'다음 페이지 미조회'}));
  for(const f of failures)nextSearches.push({tool:'search_open_documents',arguments:{q:f.q,startDate:request.startDate,endDate:request.endDate,scope:f.scope,page:f.page},reason:'실패한 페이지 재시도'});
- const pageLimitReached=[...lastSearches.values()].some(s=>s.hasMore&&s.page>=100);
+ const pageLimitReached=[...lastSearches.values()].some(s=>s.hasMore&&s.page>=10000);
  const progress=request.queries.flatMap(q=>['original','all'].map(scope=>{
   const pages=searches.filter(s=>s.q===q&&s.scope===scope),last=pages.at(-1),failure=failures.find(f=>f.q===q&&f.scope===scope);
-  return {q,scope,pagesRead:pages.length,lastPage:last?.page||0,reportedDocuments:last?.total??null,status:failure?'failed':!last?'not_started':last.hasMore?(last.page>=100?'page_limit':'partial'):'exhausted',...(failure?{failedPage:failure.page}:{})};
+  return {q,scope,pagesRead:pages.length,lastPage:last?.page||0,reportedDocuments:last?.total??null,status:failure?'failed':!last?'not_started':last.hasMore?(last.page>=10000?'page_limit':'partial'):'exhausted',...(failure?{failedPage:failure.page}:{})};
  }));
  const coverage={continuationAttempts,continuationSucceeded,queriedPages:searches.length,uniqueDocuments:byUrl.size,hasMore:nextSearches.length>0||pageLimitReached,pageLimitReached,progress,nextSearches,note:'전국 지자체를 검색 대상으로 하지만 일부 페이지의 결과입니다. 검색어별 총건수는 중복될 수 있어 합산하지 마세요. 후속 검색은 순서대로 실행하고 URL 중복을 제거하세요. 전국 전체 사업 수나 검색 완전성을 뜻하지 않습니다.'};
  coverage.liveSearchDocuments=liveSearchDocuments;
