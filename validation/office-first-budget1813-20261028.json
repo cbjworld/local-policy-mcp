@@ -1,0 +1,1625 @@
+{
+  "version": "1.8.13",
+  "commit": "39281fd1478ef297e5f193949b5467cb9fa8a459",
+  "deployment": "https://dashboard.render.com/web/srv-dbal9hom7kps739a18r0/deploys/dep-dbgjqe4ipgvc73dop8tg",
+  "verify": "https://github.com/cbjworld/local-policy-mcp/actions/runs/40606911509",
+  "sync": "https://github.com/cbjworld/local-policy-mcp/actions/runs/40606911476",
+  "measurements": {
+    "before": {
+      "id": "deposit",
+      "question": "전세보증금 반환보증 보증료 지원사업의 다른 지자체 사례를 찾아 대상, 지원액, 사업예산과 계획을 비교해줘.",
+      "version": {
+        "name": "local-policy-mcp",
+        "title": "지자체 정책검색 MCP",
+        "version": "1.8.12"
+      },
+      "ms": 25560,
+      "briefMs": 1022,
+      "timings": {
+        "catalogMs": 1796,
+        "budgetMs": 3893,
+        "searchMs": 5335,
+        "readingMs": 14758,
+        "totalMs": 23986
+      },
+      "summary": {
+        "candidateDocuments": 47,
+        "listedNonpublicDocuments": 6,
+        "candidateProjectGroups": 46,
+        "projectGroups": 46,
+        "confirmedLinkedPrograms": 0,
+        "attemptedDocuments": 4,
+        "textReadDocuments": 2,
+        "unreadableDocuments": 2,
+        "projectsWithUnknownFields": 44,
+        "projectsWithRedactedFields": 0,
+        "searchOutcome": {
+          "metadataFallback": false,
+          "status": "candidates_found",
+          "note": "후보가 없어도 사업 부존재를 뜻하지 않습니다. 검색 기간·조회 페이지·실패 내역을 함께 확인하세요."
+        },
+        "note": "사업 묶음은 제목 기준 후보이며 확정된 사업 수가 아닙니다. 읽은 문서 수는 텍스트 추출 성공 수로, 본문 전체 이해·관련성 확인·정확도를 뜻하지 않습니다. 가림 처리와 미확인은 별개입니다.",
+        "producingInstitutions": 19,
+        "unknownInstitutionDocuments": 0,
+        "institutionNote": "기관별 문서 묶음이며 사업 수나 시행 지자체 수가 아닙니다. 동일 기관의 서로 다른 사업을 합치지 마세요."
+      },
+      "cases": [
+        {
+          "region": "경상북도 영주시",
+          "name": "2026년「전세보증금반환보증 보증료 지원사업」추진계획",
+          "fields": {
+            "target": {
+              "quote": "사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:07:57.590Z"
+            },
+            "benefit": {
+              "quote": "지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:07:57.590Z"
+            },
+            "budget": {
+              "quote": "사 업 비 : 1백만원(국 0.5, 도 0.15, 시 0.35) ◦ 사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦ 지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:07:57.590Z"
+            },
+            "period": {
+              "quote": "사업기간 : 2026. 3. ~ 12. ◦",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:07:57.590Z"
+            },
+            "operation": {
+              "quote": "지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:07:57.590Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "100만원",
+                "observations": [
+                  {
+                    "sourceId": "ac51ca1bac7ab455c9fc",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+                    "page": 1,
+                    "quote": "사 업 비 : 1백만원(국 0.5, 도 0.15, 시 0.35) ◦ 사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦ 지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+                    "basis": "stated",
+                    "sourceLabel": "사업비",
+                    "amountText": "1백만원",
+                    "valueKRW": 1000000
+                  }
+                ],
+                "valueKRW": 1000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        },
+        {
+          "region": "충청북도 영동군",
+          "name": "2026년 전세보증금반환보증 보증료 지원사업 추진 계획",
+          "fields": {
+            "target": {
+              "quote": "지원대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증 (HUG, HF, SGI)에 가입한 무주택 임차인 - ➊ 청 년 : 임차보증금 3억원 이하, 연소득 5천만원 이하 - ➋ 청년 외 : 임차보증금 3억원 이하, 연소득 6천만원 이하 - ➌ 신혼부부 : 임차보증금 3억원 이하, 연소득 7.5천만원 이하 <지원 제외 대상> ▪ 외국인 및 국내에 거주하지 않는 재외국민 ▪ 「민간임대주택에 관한 특별법」에 따른 등록임대사업자의 등록임대주택에 거주하는 임차인 ☞ 등록임대사업자는 임대보증금보증 가입이 의무이",
+              "sourceId": "8087dda07da1823a6778",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+              "page": 3,
+              "checkedAt": "2026-10-28T00:08:03.690Z"
+            },
+            "benefit": {
+              "quote": "지원방법 : 신청인이 기 납부한 보증료의 전부 또는 일부(최대 40만원)를 신청인 본인 계좌로 이체 ※ '25.3.31. 이후 보증 가입자만 해당('25.3.30. 이전 보증 가입자는 최대 30만원) 구분 지원금액 청년* 임차인 신청인이 기 납부한 보증료 (최대 40만원) 청년* 외 임차인 신청인이 기 납부한 보증료의 90% (최대 40만원) 신혼부부** 임차인 신청인이 기납부한 보증료 (최대 40만원) * 청년 : 만 19세 이상 만 39세 이하 ** 신혼부부 : 신청일 기준 혼인신고일이 7년 이내인 부부",
+              "sourceId": "8087dda07da1823a6778",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+              "page": 2,
+              "checkedAt": "2026-10-28T00:08:03.690Z"
+            },
+            "budget": {
+              "quote": "사 업 비 : 1,200천원(국비 600, 도비 300, 군비 300) ❍ 예산과목 : 농촌신활력과, 쾌적한 공동주거환경 조성, 공동주택환경 개선, 전세보증금반환보증 보증료 지원, 일반보전금, 사회보장적수혜금 ❍ 지원방법 : 신청인이 기 납부한 보증료의 전부 또는 일부(최대 40만원)를 신청인 본인 계좌로 이체 ※ '25.3.31. 이후 보증 가입자만 해당('25.3.30. 이전 보증 가입자는 최대 30만원) 구분 지원금액 청년* 임차인 신청인이 기 납부한 보증료 (최대 40만원) 청년* 외 임차인 신청인이 기 납부한 보증료의 90% (최대 4",
+              "sourceId": "8087dda07da1823a6778",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+              "page": 2,
+              "checkedAt": "2026-10-28T00:08:03.690Z"
+            },
+            "period": {
+              "quote": "신청기간 : 연중(사업비 소진 시 까지) ❍ 신청방법 - 온라인 : 정부24 또는 HUG안심전세포털 - 오프라인 : 농촌신활력과 주거지원팀 ❍ 지원절차 사업신청 ⇨ 심사 및 통지 ⇨ 지급 ▪ 모집공고 확인 ▪ 구비서류 제출 ▪ 신청서 접수 처리 및 적정성 확인 (무주택 여부 등) ▪ 결정통지(30일 이내) ＊필 요시통 지후15일연 장가 능 ▪ 결정 통 보 후 15일 이 내 대상자 → 군 군 → 대상자 군 → 대상자",
+              "sourceId": "8087dda07da1823a6778",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+              "page": 3,
+              "checkedAt": "2026-10-28T00:08:03.690Z"
+            },
+            "operation": {
+              "quote": "지원방법 : 신청인이 기 납부한 보증료의 전부 또는 일부(최대 40만원)를 신청인 본인 계좌로 이체 ※ '25.3.31. 이후 보증 가입자만 해당('25.3.30. 이전 보증 가입자는 최대 30만원) 구분 지원금액 청년* 임차인 신청인이 기 납부한 보증료 (최대 40만원) 청년* 외 임차인 신청인이 기 납부한 보증료의 90% (최대 40만원) 신혼부부** 임차인 신청인이 기납부한 보증료 (최대 40만원) * 청년 : 만 19세 이상 만 39세 이하 ** 신혼부부 : 신청일 기준 혼인신고일이 7년 이내인 부부",
+              "sourceId": "8087dda07da1823a6778",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+              "page": 2,
+              "checkedAt": "2026-10-28T00:08:03.690Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "120만원",
+                "observations": [
+                  {
+                    "sourceId": "8087dda07da1823a6778",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+                    "page": 2,
+                    "quote": "사 업 비 : 1,200천원(국비 600, 도비 300, 군비 300) ❍ 예산과목 : 농촌신활력과, 쾌적한 공동주거환경 조성, 공동주택환경 개선, 전세보증금반환보증 보증료 지원, 일반보전금, 사회보장적수혜금 ❍ 지원방법 : 신청인이 기 납부한 보증료의 전부 또는 일부(최대 40만원)를 신청인 본인 계좌로 이체 ※ '25.3.31. 이후 보증 가입자만 해당('25.3.30. 이전 보증 가입자는 최대 30만원) 구분 지원금액 청년* 임차인 신청인이 기 납부한 보증료 (최대 40만원) 청년* 외 임차인 신청인이 기 납부한 보증료의 90% (최대 4",
+                    "basis": "stated",
+                    "sourceLabel": "사업비",
+                    "amountText": "1,200천원",
+                    "valueKRW": 1200000
+                  }
+                ],
+                "valueKRW": 1200000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        }
+      ],
+      "candidateUrls": [
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT00C81C4FD6713A6AD3117ACBE69A4FF3&prdnDt=20260306091808&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT2F4959B79BBFBF48835B1F978B75CB16&prdnDt=20260129085413&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT31F28B803F9B204C80E15ACBAEB3C51E&prdnDt=20260311150753&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33DDE739D19D824C20959AB813D9009E&prdnDt=20260320181619&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT3C85D0831ECD7279E46DECD9AED7CFE2&prdnDt=20261006173855&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT3D80B0B05AD6989BE9E031BB7E06B4D5&prdnDt=20260619154131&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT3FC09A86AF1150A03FC917DD411A9920&prdnDt=20260519231913&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT4F505B2C5A93FC64E77E719A5E56A53F&prdnDt=20260715180215&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT5138C76C865810736C8F6AFA89C4AF25&prdnDt=20260406180648&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT5168869BCBC8EDBF1C5424754003E4D6&prdnDt=20260609144446&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT58BE0799C1F78BD371EDF2F6059A1C24&prdnDt=20260330081911&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT5ABF4CD6AE4E81FA1176969C0F456724&prdnDt=20261006173855&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT5BDBF72077642BB4C135012DB3CB5628&prdnDt=20260320175227&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT67C4F5AD17E5436E30D15AE865FBD598&prdnDt=20260122174350&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT7050357ABF01FED3C3CA16E4D7D7E6FA&prdnDt=20260129085413&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT77266F5ACC7ED78CBABECC2118A41D2E&prdnDt=20261023174926&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT780A7ED4CEB2727FCBFD5D362DC8C228&prdnDt=20260129094035&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT78F797BE29C015E209E76A6D68BA2C46&prdnDt=20260410080311&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT79AB4B18BFD08D019C72D3F51C7DDB4A&prdnDt=20260623142548&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT816B0DB209C12DD15775F268BD59BF36&prdnDt=20260220135508&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT8B37354BE16B9CAD4149C5AF2660531D&prdnDt=20260406180648&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT965A82C9F776EE80001E887B698B7206&prdnDt=20260220175953&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT97CFEC4EB47C24A669E30BBDB1DC0EC6&prdnDt=20260602104543&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA2FA162DFC33B6A5BE2FDB57C1658F40&prdnDt=20261015134927&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA4907A32B4CD15B7F9B0C733D13D418B&prdnDt=20260311150753&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA9557F5AC8EED096397F8293B71C70E2&prdnDt=20260122133630&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTC61345F5017068C6173AAC2F6BE9B440&prdnDt=20260205164606&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTC62680C976D5FB173DC71C7FAACFDA50&prdnDt=20260618164908&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTD18315BF1E3041BCBDB00FDA16AA217E&prdnDt=20260424091957&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTD31EF3CD0F56F39AB237E94742D489A2&prdnDt=20260209083905&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTD3B8B47CF5541BFB1419B7BF01F0368F&prdnDt=20260609144446&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE0A252B76F60B2DF10A19F5B1D3135DA&prdnDt=20261012085300&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE85B5235CB68ABAD1DB32FC51BCA5C5E&prdnDt=20260421110030&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE86CB4A7CF89617D2FD3C3D894F99333&prdnDt=20260618075808&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTEA24CFA897FC43A63123C703C56860F8&prdnDt=20260130083951&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTFCE41F0AB50C3DEC4DFE618491928AA9&prdnDt=20261026110832&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTFE1A6177EE2104DCD77FDE184D72E357&prdnDt=20260317144545&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTFEB9DE6447AF8AF5AE16DBFA92D2CE07&prdnDt=20260916084926&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT06CD91D788FE761D14D0C306F34B07C8&prdnDt=20261027165450&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT0F7FA2E793092F5E8BC4356E648461A6&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT3C0C023D06C288ECF9490297D710908A&prdnDt=20261027133638&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT772938D3ABEFF1B549E11AB5FD929964&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT8D65490843E5DC9149B1193ECF147319&prdnDt=20261027094512&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTA473AAC4B0910232574F19721DF3C10F&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTB2EA88B84AD2B7CE011D13C6FF7230EA&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTBFDA3A90BB2A66092D597A1460119BDC&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTD29E531D4654B26AA5DA138A2AE919B1&prdnDt=20261027100755&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTE841ED59A04D4DAEC7B4A2A5BA0519F8&prdnDt=20261027171055&nstSeCd=W"
+      ]
+    },
+    "first": {
+      "id": "deposit",
+      "question": "전세보증금 반환보증 보증료 지원사업의 다른 지자체 사례를 찾아 대상, 지원액, 사업예산과 계획을 비교해줘.",
+      "version": {
+        "name": "local-policy-mcp",
+        "title": "지자체 정책검색 MCP",
+        "version": "1.8.13"
+      },
+      "ms": 21845,
+      "briefMs": 1092,
+      "timings": {
+        "catalogMs": 1719,
+        "budgetMs": 1826,
+        "searchMs": 3506,
+        "readingMs": 14987,
+        "totalMs": 20319
+      },
+      "summary": {
+        "candidateDocuments": 47,
+        "listedNonpublicDocuments": 6,
+        "candidateProjectGroups": 46,
+        "projectGroups": 46,
+        "confirmedLinkedPrograms": 0,
+        "attemptedDocuments": 4,
+        "textReadDocuments": 2,
+        "unreadableDocuments": 2,
+        "projectsWithUnknownFields": 44,
+        "projectsWithRedactedFields": 0,
+        "searchOutcome": {
+          "metadataFallback": false,
+          "status": "candidates_found",
+          "note": "후보가 없어도 사업 부존재를 뜻하지 않습니다. 검색 기간·조회 페이지·실패 내역을 함께 확인하세요."
+        },
+        "note": "사업 묶음은 제목 기준 후보이며 확정된 사업 수가 아닙니다. 읽은 문서 수는 텍스트 추출 성공 수로, 본문 전체 이해·관련성 확인·정확도를 뜻하지 않습니다. 가림 처리와 미확인은 별개입니다.",
+        "producingInstitutions": 19,
+        "unknownInstitutionDocuments": 0,
+        "institutionNote": "기관별 문서 묶음이며 사업 수나 시행 지자체 수가 아닙니다. 동일 기관의 서로 다른 사업을 합치지 마세요."
+      },
+      "cases": [
+        {
+          "region": "경상북도 영주시",
+          "name": "2026년「전세보증금반환보증 보증료 지원사업」추진계획",
+          "fields": {
+            "target": {
+              "quote": "사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:10:59.995Z"
+            },
+            "benefit": {
+              "quote": "지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:10:59.995Z"
+            },
+            "budget": {
+              "quote": "사 업 비 : 1백만원(국 0.5, 도 0.15, 시 0.35) ◦ 사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦ 지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:10:59.995Z"
+            },
+            "period": {
+              "quote": "사업기간 : 2026. 3. ~ 12. ◦",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:10:59.995Z"
+            },
+            "operation": {
+              "quote": "지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:10:59.995Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "100만원",
+                "observations": [
+                  {
+                    "sourceId": "ac51ca1bac7ab455c9fc",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+                    "page": 1,
+                    "quote": "사 업 비 : 1백만원(국 0.5, 도 0.15, 시 0.35) ◦ 사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦ 지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+                    "basis": "stated",
+                    "sourceLabel": "사업비",
+                    "amountText": "1백만원",
+                    "valueKRW": 1000000
+                  }
+                ],
+                "valueKRW": 1000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        },
+        {
+          "region": "충청북도 영동군",
+          "name": "2026년 전세보증금반환보증 보증료 지원사업 추진 계획",
+          "fields": {
+            "target": {
+              "quote": "지원대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증 (HUG, HF, SGI)에 가입한 무주택 임차인 - ➊ 청 년 : 임차보증금 3억원 이하, 연소득 5천만원 이하 - ➋ 청년 외 : 임차보증금 3억원 이하, 연소득 6천만원 이하 - ➌ 신혼부부 : 임차보증금 3억원 이하, 연소득 7.5천만원 이하 <지원 제외 대상> ▪ 외국인 및 국내에 거주하지 않는 재외국민 ▪ 「민간임대주택에 관한 특별법」에 따른 등록임대사업자의 등록임대주택에 거주하는 임차인 ☞ 등록임대사업자는 임대보증금보증 가입이 의무이",
+              "sourceId": "8087dda07da1823a6778",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+              "page": 3,
+              "checkedAt": "2026-10-28T00:11:06.698Z"
+            },
+            "benefit": {
+              "quote": "지원방법 : 신청인이 기 납부한 보증료의 전부 또는 일부(최대 40만원)를 신청인 본인 계좌로 이체 ※ '25.3.31. 이후 보증 가입자만 해당('25.3.30. 이전 보증 가입자는 최대 30만원) 구분 지원금액 청년* 임차인 신청인이 기 납부한 보증료 (최대 40만원) 청년* 외 임차인 신청인이 기 납부한 보증료의 90% (최대 40만원) 신혼부부** 임차인 신청인이 기납부한 보증료 (최대 40만원) * 청년 : 만 19세 이상 만 39세 이하 ** 신혼부부 : 신청일 기준 혼인신고일이 7년 이내인 부부",
+              "sourceId": "8087dda07da1823a6778",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+              "page": 2,
+              "checkedAt": "2026-10-28T00:11:06.698Z"
+            },
+            "budget": {
+              "quote": "사 업 비 : 1,200천원(국비 600, 도비 300, 군비 300) ❍ 예산과목 : 농촌신활력과, 쾌적한 공동주거환경 조성, 공동주택환경 개선, 전세보증금반환보증 보증료 지원, 일반보전금, 사회보장적수혜금 ❍ 지원방법 : 신청인이 기 납부한 보증료의 전부 또는 일부(최대 40만원)를 신청인 본인 계좌로 이체 ※ '25.3.31. 이후 보증 가입자만 해당('25.3.30. 이전 보증 가입자는 최대 30만원) 구분 지원금액 청년* 임차인 신청인이 기 납부한 보증료 (최대 40만원) 청년* 외 임차인 신청인이 기 납부한 보증료의 90% (최대 4",
+              "sourceId": "8087dda07da1823a6778",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+              "page": 2,
+              "checkedAt": "2026-10-28T00:11:06.698Z"
+            },
+            "period": {
+              "quote": "신청기간 : 연중(사업비 소진 시 까지) ❍ 신청방법 - 온라인 : 정부24 또는 HUG안심전세포털 - 오프라인 : 농촌신활력과 주거지원팀 ❍ 지원절차 사업신청 ⇨ 심사 및 통지 ⇨ 지급 ▪ 모집공고 확인 ▪ 구비서류 제출 ▪ 신청서 접수 처리 및 적정성 확인 (무주택 여부 등) ▪ 결정통지(30일 이내) ＊필 요시통 지후15일연 장가 능 ▪ 결정 통 보 후 15일 이 내 대상자 → 군 군 → 대상자 군 → 대상자",
+              "sourceId": "8087dda07da1823a6778",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+              "page": 3,
+              "checkedAt": "2026-10-28T00:11:06.698Z"
+            },
+            "operation": {
+              "quote": "지원방법 : 신청인이 기 납부한 보증료의 전부 또는 일부(최대 40만원)를 신청인 본인 계좌로 이체 ※ '25.3.31. 이후 보증 가입자만 해당('25.3.30. 이전 보증 가입자는 최대 30만원) 구분 지원금액 청년* 임차인 신청인이 기 납부한 보증료 (최대 40만원) 청년* 외 임차인 신청인이 기 납부한 보증료의 90% (최대 40만원) 신혼부부** 임차인 신청인이 기납부한 보증료 (최대 40만원) * 청년 : 만 19세 이상 만 39세 이하 ** 신혼부부 : 신청일 기준 혼인신고일이 7년 이내인 부부",
+              "sourceId": "8087dda07da1823a6778",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+              "page": 2,
+              "checkedAt": "2026-10-28T00:11:06.698Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "120만원",
+                "observations": [
+                  {
+                    "sourceId": "8087dda07da1823a6778",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+                    "page": 2,
+                    "quote": "사 업 비 : 1,200천원(국비 600, 도비 300, 군비 300) ❍ 예산과목 : 농촌신활력과, 쾌적한 공동주거환경 조성, 공동주택환경 개선, 전세보증금반환보증 보증료 지원, 일반보전금, 사회보장적수혜금 ❍ 지원방법 : 신청인이 기 납부한 보증료의 전부 또는 일부(최대 40만원)를 신청인 본인 계좌로 이체 ※ '25.3.31. 이후 보증 가입자만 해당('25.3.30. 이전 보증 가입자는 최대 30만원) 구분 지원금액 청년* 임차인 신청인이 기 납부한 보증료 (최대 40만원) 청년* 외 임차인 신청인이 기 납부한 보증료의 90% (최대 4",
+                    "basis": "stated",
+                    "sourceLabel": "사업비",
+                    "amountText": "1,200천원",
+                    "valueKRW": 1200000
+                  }
+                ],
+                "valueKRW": 1200000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        }
+      ],
+      "candidateUrls": [
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT00C81C4FD6713A6AD3117ACBE69A4FF3&prdnDt=20260306091808&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT2F4959B79BBFBF48835B1F978B75CB16&prdnDt=20260129085413&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT31F28B803F9B204C80E15ACBAEB3C51E&prdnDt=20260311150753&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33DDE739D19D824C20959AB813D9009E&prdnDt=20260320181619&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT3C85D0831ECD7279E46DECD9AED7CFE2&prdnDt=20261006173855&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT3D80B0B05AD6989BE9E031BB7E06B4D5&prdnDt=20260619154131&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT3FC09A86AF1150A03FC917DD411A9920&prdnDt=20260519231913&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT4F505B2C5A93FC64E77E719A5E56A53F&prdnDt=20260715180215&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT5138C76C865810736C8F6AFA89C4AF25&prdnDt=20260406180648&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT5168869BCBC8EDBF1C5424754003E4D6&prdnDt=20260609144446&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT58BE0799C1F78BD371EDF2F6059A1C24&prdnDt=20260330081911&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT5ABF4CD6AE4E81FA1176969C0F456724&prdnDt=20261006173855&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT5BDBF72077642BB4C135012DB3CB5628&prdnDt=20260320175227&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT67C4F5AD17E5436E30D15AE865FBD598&prdnDt=20260122174350&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT7050357ABF01FED3C3CA16E4D7D7E6FA&prdnDt=20260129085413&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT77266F5ACC7ED78CBABECC2118A41D2E&prdnDt=20261023174926&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT780A7ED4CEB2727FCBFD5D362DC8C228&prdnDt=20260129094035&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT78F797BE29C015E209E76A6D68BA2C46&prdnDt=20260410080311&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT79AB4B18BFD08D019C72D3F51C7DDB4A&prdnDt=20260623142548&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT816B0DB209C12DD15775F268BD59BF36&prdnDt=20260220135508&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT8B37354BE16B9CAD4149C5AF2660531D&prdnDt=20260406180648&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT965A82C9F776EE80001E887B698B7206&prdnDt=20260220175953&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT97CFEC4EB47C24A669E30BBDB1DC0EC6&prdnDt=20260602104543&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA2FA162DFC33B6A5BE2FDB57C1658F40&prdnDt=20261015134927&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA4907A32B4CD15B7F9B0C733D13D418B&prdnDt=20260311150753&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA9557F5AC8EED096397F8293B71C70E2&prdnDt=20260122133630&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTC61345F5017068C6173AAC2F6BE9B440&prdnDt=20260205164606&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTC62680C976D5FB173DC71C7FAACFDA50&prdnDt=20260618164908&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTD18315BF1E3041BCBDB00FDA16AA217E&prdnDt=20260424091957&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTD31EF3CD0F56F39AB237E94742D489A2&prdnDt=20260209083905&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTD3B8B47CF5541BFB1419B7BF01F0368F&prdnDt=20260609144446&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE0A252B76F60B2DF10A19F5B1D3135DA&prdnDt=20261012085300&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE85B5235CB68ABAD1DB32FC51BCA5C5E&prdnDt=20260421110030&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE86CB4A7CF89617D2FD3C3D894F99333&prdnDt=20260618075808&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTEA24CFA897FC43A63123C703C56860F8&prdnDt=20260130083951&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTFCE41F0AB50C3DEC4DFE618491928AA9&prdnDt=20261026110832&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTFE1A6177EE2104DCD77FDE184D72E357&prdnDt=20260317144545&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTFEB9DE6447AF8AF5AE16DBFA92D2CE07&prdnDt=20260916084926&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT06CD91D788FE761D14D0C306F34B07C8&prdnDt=20261027165450&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT0F7FA2E793092F5E8BC4356E648461A6&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT3C0C023D06C288ECF9490297D710908A&prdnDt=20261027133638&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT772938D3ABEFF1B549E11AB5FD929964&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT8D65490843E5DC9149B1193ECF147319&prdnDt=20261027094512&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTA473AAC4B0910232574F19721DF3C10F&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTB2EA88B84AD2B7CE011D13C6FF7230EA&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTBFDA3A90BB2A66092D597A1460119BDC&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTD29E531D4654B26AA5DA138A2AE919B1&prdnDt=20261027100755&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTE841ED59A04D4DAEC7B4A2A5BA0519F8&prdnDt=20261027171055&nstSeCd=W"
+      ]
+    },
+    "repeat": {
+      "id": "deposit",
+      "question": "전세보증금 반환보증 보증료 지원사업의 다른 지자체 사례를 찾아 대상, 지원액, 사업예산과 계획을 비교해줘.",
+      "version": {
+        "name": "local-policy-mcp",
+        "title": "지자체 정책검색 MCP",
+        "version": "1.8.13"
+      },
+      "ms": 16506,
+      "briefMs": 966,
+      "timings": {
+        "catalogMs": 4,
+        "budgetMs": 8,
+        "searchMs": 4274,
+        "readingMs": 11214,
+        "totalMs": 15496
+      },
+      "summary": {
+        "candidateDocuments": 47,
+        "listedNonpublicDocuments": 6,
+        "candidateProjectGroups": 46,
+        "projectGroups": 46,
+        "confirmedLinkedPrograms": 0,
+        "attemptedDocuments": 2,
+        "textReadDocuments": 2,
+        "unreadableDocuments": 0,
+        "projectsWithUnknownFields": 44,
+        "projectsWithRedactedFields": 0,
+        "searchOutcome": {
+          "metadataFallback": false,
+          "status": "candidates_found",
+          "note": "후보가 없어도 사업 부존재를 뜻하지 않습니다. 검색 기간·조회 페이지·실패 내역을 함께 확인하세요."
+        },
+        "note": "사업 묶음은 제목 기준 후보이며 확정된 사업 수가 아닙니다. 읽은 문서 수는 텍스트 추출 성공 수로, 본문 전체 이해·관련성 확인·정확도를 뜻하지 않습니다. 가림 처리와 미확인은 별개입니다.",
+        "producingInstitutions": 19,
+        "unknownInstitutionDocuments": 0,
+        "institutionNote": "기관별 문서 묶음이며 사업 수나 시행 지자체 수가 아닙니다. 동일 기관의 서로 다른 사업을 합치지 마세요."
+      },
+      "cases": [
+        {
+          "region": "전라남도 고흥군",
+          "name": "2026년『전세보증금반환보증 보증료 지원사업』추진계획",
+          "fields": {
+            "target": {
+              "quote": "지원대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증 (HUG, HF, SGI)에 가입한 고흥군 거주 무주택 임차인 <지원 제외 대상> ▪ 외국인 및 국내에 거주하지 않는 재외국민 ▪ 「민간임대주택법」에 따른 등록임대사업자의 등록임대주택에 거주하는 임차인 ▪ 임차인이 법인인 경우(회사 지원 숙소 등) ▪ 보증료 지원을 받았던 보증과 동일한 보증서 번호로 재신청하는 경우 ▪ 그 밖에 해당 지자체장이 지원이 적합하지 않다고 판단하는 경우",
+              "sourceId": "1fe0cde106d7b4fe3341",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+              "page": 2,
+              "checkedAt": "2026-10-28T00:11:34.996Z"
+            },
+            "benefit": {
+              "quote": "지원 내용(1인 최대 40만원 한도) 구분 청년 신혼부부 신혼부부 ⑷연소득 5천만원 이하 7천5백만원 이하 7천5백만원 이하 지원내용 납부 보증료 전액 보증료의 90% ·보증기관 : 주택도시보증공사(HUG), 서울보증보험(SGI) 한국주택금용공사(HF) ·",
+              "sourceId": "1fe0cde106d7b4fe3341",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:34.996Z"
+            },
+            "budget": {
+              "quote": "총사업비 : 5,214천원(국 50%, 도 15%, 군 35%) 고 흥 군 (종합민원실) 문서번호 종합민원실-17815 기 안 자 건축관리팀장 종합민원실장 부군수 군수 2026. 3. 23.",
+              "sourceId": "1fe0cde106d7b4fe3341",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:34.996Z"
+            },
+            "period": {
+              "quote": "사업기간 : 2026. 1. ~ 예산소진 시까지 ·",
+              "sourceId": "1fe0cde106d7b4fe3341",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:34.996Z"
+            },
+            "operation": {
+              "quote": "지원 내용(1인 최대 40만원 한도) 구분 청년 신혼부부 신혼부부 ⑷연소득 5천만원 이하 7천5백만원 이하 7천5백만원 이하 지원내용 납부 보증료 전액 보증료의 90% ·보증기관 : 주택도시보증공사(HUG), 서울보증보험(SGI) 한국주택금용공사(HF) ·",
+              "sourceId": "1fe0cde106d7b4fe3341",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:34.996Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "521.4만원",
+                "observations": [
+                  {
+                    "sourceId": "1fe0cde106d7b4fe3341",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B#fileId=374ccfa64ca520014a51744fc2b8f7cf",
+                    "page": 1,
+                    "quote": "총사업비 : 5,214천원(국 50%, 도 15%, 군 35%) 고 흥 군 (종합민원실) 문서번호 종합민원실-17815 기 안 자 건축관리팀장 종합민원실장 부군수 군수 2026. 3. 23.",
+                    "basis": "stated",
+                    "sourceLabel": "총사업비",
+                    "amountText": "5,214천원",
+                    "valueKRW": 5214000
+                  }
+                ],
+                "valueKRW": 5214000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        },
+        {
+          "region": "경상북도 영주시",
+          "name": "2026년「전세보증금반환보증 보증료 지원사업」추진계획",
+          "fields": {
+            "target": {
+              "quote": "사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:38.199Z"
+            },
+            "benefit": {
+              "quote": "지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:38.199Z"
+            },
+            "budget": {
+              "quote": "사 업 비 : 1백만원(국 0.5, 도 0.15, 시 0.35) ◦ 사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦ 지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:38.199Z"
+            },
+            "period": {
+              "quote": "사업기간 : 2026. 3. ~ 12. ◦",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:38.199Z"
+            },
+            "operation": {
+              "quote": "지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+              "sourceId": "ac51ca1bac7ab455c9fc",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:38.199Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "100만원",
+                "observations": [
+                  {
+                    "sourceId": "ac51ca1bac7ab455c9fc",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B#fileId=e8c80a94f196f5edcd855aae4cdbd789",
+                    "page": 1,
+                    "quote": "사 업 비 : 1백만원(국 0.5, 도 0.15, 시 0.35) ◦ 사업대상 : 신청일 기준 보증 효력이 유효한 전세보증금반환보증에 가입한 무주택 임차인 ◦ 지원내용 : 전세보증금반환보증 보증료 최대 40만원 지원 ◦ 지원조건 : 임차보증금 3억원 이하이면서, 연소득 (청년) 5천만원, (청년 외) 6천만원, (신혼부부) 7.5천만원 이하 ◦ 신청방법 : ‘청년e끌림’ 홈페이지 온라인 신청 또는 영주시 지방시대정책실 방문 신청 영 주 시 (지방시대정책실)",
+                    "basis": "stated",
+                    "sourceLabel": "사업비",
+                    "amountText": "1백만원",
+                    "valueKRW": 1000000
+                  }
+                ],
+                "valueKRW": 1000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        }
+      ],
+      "candidateUrls": [
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT00C81C4FD6713A6AD3117ACBE69A4FF3&prdnDt=20260306091808&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT1FAA58ABEEB8C616189281824648F70C&prdnDt=20260323134047&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT2F4959B79BBFBF48835B1F978B75CB16&prdnDt=20260129085413&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT31F28B803F9B204C80E15ACBAEB3C51E&prdnDt=20260311150753&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33DDE739D19D824C20959AB813D9009E&prdnDt=20260320181619&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT3C85D0831ECD7279E46DECD9AED7CFE2&prdnDt=20261006173855&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT3D80B0B05AD6989BE9E031BB7E06B4D5&prdnDt=20260619154131&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT3FC09A86AF1150A03FC917DD411A9920&prdnDt=20260519231913&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT4F505B2C5A93FC64E77E719A5E56A53F&prdnDt=20260715180215&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT5138C76C865810736C8F6AFA89C4AF25&prdnDt=20260406180648&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT5168869BCBC8EDBF1C5424754003E4D6&prdnDt=20260609144446&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT58BE0799C1F78BD371EDF2F6059A1C24&prdnDt=20260330081911&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT5ABF4CD6AE4E81FA1176969C0F456724&prdnDt=20261006173855&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT5BDBF72077642BB4C135012DB3CB5628&prdnDt=20260320175227&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT67C4F5AD17E5436E30D15AE865FBD598&prdnDt=20260122174350&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT7050357ABF01FED3C3CA16E4D7D7E6FA&prdnDt=20260129085413&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT77266F5ACC7ED78CBABECC2118A41D2E&prdnDt=20261023174926&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT780A7ED4CEB2727FCBFD5D362DC8C228&prdnDt=20260129094035&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT78F797BE29C015E209E76A6D68BA2C46&prdnDt=20260410080311&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT79AB4B18BFD08D019C72D3F51C7DDB4A&prdnDt=20260623142548&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT816B0DB209C12DD15775F268BD59BF36&prdnDt=20260220135508&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT8B37354BE16B9CAD4149C5AF2660531D&prdnDt=20260406180648&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT965A82C9F776EE80001E887B698B7206&prdnDt=20260220175953&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT97CFEC4EB47C24A669E30BBDB1DC0EC6&prdnDt=20260602104543&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA2FA162DFC33B6A5BE2FDB57C1658F40&prdnDt=20261015134927&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA4907A32B4CD15B7F9B0C733D13D418B&prdnDt=20260311150753&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTA9557F5AC8EED096397F8293B71C70E2&prdnDt=20260122133630&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTC61345F5017068C6173AAC2F6BE9B440&prdnDt=20260205164606&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTC62680C976D5FB173DC71C7FAACFDA50&prdnDt=20260618164908&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTD18315BF1E3041BCBDB00FDA16AA217E&prdnDt=20260424091957&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTD31EF3CD0F56F39AB237E94742D489A2&prdnDt=20260209083905&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTD3B8B47CF5541BFB1419B7BF01F0368F&prdnDt=20260609144446&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE0A252B76F60B2DF10A19F5B1D3135DA&prdnDt=20261012085300&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE526B88264B20E53CFCC4E3CFCC8BDA3&prdnDt=20260312115355&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE85B5235CB68ABAD1DB32FC51BCA5C5E&prdnDt=20260421110030&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTE86CB4A7CF89617D2FD3C3D894F99333&prdnDt=20260618075808&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTEA24CFA897FC43A63123C703C56860F8&prdnDt=20260130083951&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTFCE41F0AB50C3DEC4DFE618491928AA9&prdnDt=20261026110832&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTFE1A6177EE2104DCD77FDE184D72E357&prdnDt=20260317144545&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTFEB9DE6447AF8AF5AE16DBFA92D2CE07&prdnDt=20260916084926&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT06CD91D788FE761D14D0C306F34B07C8&prdnDt=20261027165450&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT0F7FA2E793092F5E8BC4356E648461A6&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT3C0C023D06C288ECF9490297D710908A&prdnDt=20261027133638&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT772938D3ABEFF1B549E11AB5FD929964&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT8D65490843E5DC9149B1193ECF147319&prdnDt=20261027094512&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTA473AAC4B0910232574F19721DF3C10F&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTB2EA88B84AD2B7CE011D13C6FF7230EA&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTBFDA3A90BB2A66092D597A1460119BDC&prdnDt=20261027072828&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTD29E531D4654B26AA5DA138A2AE919B1&prdnDt=20261027100755&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTE841ED59A04D4DAEC7B4A2A5BA0519F8&prdnDt=20261027171055&nstSeCd=W"
+      ]
+    },
+    "bicycle": {
+      "id": "bicycle",
+      "question": "전기자전거 구입비 지원사업을 검토 중이야. 다른 지자체의 대상, 지원액, 사업예산과 계획을 비교해줘.",
+      "version": {
+        "name": "local-policy-mcp",
+        "title": "지자체 정책검색 MCP",
+        "version": "1.8.13"
+      },
+      "ms": 12955,
+      "briefMs": 570,
+      "timings": {
+        "catalogMs": 9,
+        "budgetMs": 11,
+        "searchMs": 2831,
+        "readingMs": 9501,
+        "totalMs": 12343
+      },
+      "summary": {
+        "candidateDocuments": 16,
+        "listedNonpublicDocuments": 4,
+        "candidateProjectGroups": 16,
+        "projectGroups": 16,
+        "confirmedLinkedPrograms": 0,
+        "attemptedDocuments": 3,
+        "textReadDocuments": 2,
+        "unreadableDocuments": 1,
+        "projectsWithUnknownFields": 14,
+        "projectsWithRedactedFields": 0,
+        "searchOutcome": {
+          "metadataFallback": false,
+          "status": "candidates_found",
+          "note": "후보가 없어도 사업 부존재를 뜻하지 않습니다. 검색 기간·조회 페이지·실패 내역을 함께 확인하세요."
+        },
+        "note": "사업 묶음은 제목 기준 후보이며 확정된 사업 수가 아닙니다. 읽은 문서 수는 텍스트 추출 성공 수로, 본문 전체 이해·관련성 확인·정확도를 뜻하지 않습니다. 가림 처리와 미확인은 별개입니다.",
+        "producingInstitutions": 6,
+        "unknownInstitutionDocuments": 0,
+        "institutionNote": "기관별 문서 묶음이며 사업 수나 시행 지자체 수가 아닙니다. 동일 기관의 서로 다른 사업을 합치지 마세요."
+      },
+      "cases": [
+        {
+          "region": "경기도 과천시",
+          "name": "2026년 전기자전거 구입 보조금 지원 계획",
+          "fields": {
+            "target": {
+              "quote": "지원자격 : 공고일 기준 30일 전부터 주민등록을 두고 거주하고 있는 만 19세 이상 과천시민 ",
+              "sourceId": "a375771ba8c264d36b59",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B#fileId=41265d1adc16fd474977baccb4a975de",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:18.000Z"
+            },
+            "benefit": {
+              "quote": "지원금액 : 1대당 구입 금액의 30% 이내 (최대 300천원/1인) □ 지원인원 : 80명 □ 지원기종 : 전기자전거 중 PAS전용 방식의 행정안전부령으로 정하는 안전 요건에 인증된 제품에 한하여 지원",
+              "sourceId": "a375771ba8c264d36b59",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B#fileId=41265d1adc16fd474977baccb4a975de",
+              "page": 3,
+              "checkedAt": "2026-10-28T00:11:18.000Z"
+            },
+            "budget": {
+              "quote": "소요예산 : 24,000천원(300천원×80명) 건설도시국 도로건설과 (도로시설팀)",
+              "sourceId": "a375771ba8c264d36b59",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B#fileId=41265d1adc16fd474977baccb4a975de",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:18.000Z"
+            },
+            "period": {
+              "quote": "사업기간 : 2026. 1월 ~ 6월 (예산 소진시 조기 종료) ",
+              "sourceId": "a375771ba8c264d36b59",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B#fileId=41265d1adc16fd474977baccb4a975de",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:18.000Z"
+            },
+            "operation": {
+              "quote": "지원금액 : 1대당 구입 금액의 30% 이내 (최대 300천원/1인) □ 지원인원 : 80명 □ 지원기종 : 전기자전거 중 PAS전용 방식의 행정안전부령으로 정하는 안전 요건에 인증된 제품에 한하여 지원",
+              "sourceId": "a375771ba8c264d36b59",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B#fileId=41265d1adc16fd474977baccb4a975de",
+              "page": 3,
+              "checkedAt": "2026-10-28T00:11:18.000Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "2,400만원",
+                "observations": [
+                  {
+                    "sourceId": "a375771ba8c264d36b59",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B#fileId=41265d1adc16fd474977baccb4a975de",
+                    "page": 1,
+                    "quote": "소요예산 : 24,000천원(300천원×80명) 건설도시국 도로건설과 (도로시설팀)",
+                    "basis": "stated",
+                    "sourceLabel": "소요예산",
+                    "amountText": "24,000천원",
+                    "valueKRW": 24000000
+                  }
+                ],
+                "valueKRW": 24000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        },
+        {
+          "region": "충청남도 공주시",
+          "name": "공주시 전기자전거(PAS전용) 구입 보조금 지원사업 추진계획",
+          "fields": {
+            "target": {
+              "quote": "지원대상 : 만19세 이상인 공주시민(공고일 기준 1년 이상 주민등록을 두고 거주하는 사람) ❍",
+              "sourceId": "d8f891953c490550ee34",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT4694312C68E07BEB1D2D714F43CD3897&prdnDt=20250306182015&nstSeCd=B#fileId=0b8db04ad88638567287ad89e18c2ca9",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:19.395Z"
+            },
+            "benefit": {
+              "quote": "지원내용 : 전기자전거(PAS전용) 구입비용 지원 ※1가구당 1대 최대 300,000원(구입금액의 50%) 도 로 과 (도로행정팀)",
+              "sourceId": "d8f891953c490550ee34",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT4694312C68E07BEB1D2D714F43CD3897&prdnDt=20250306182015&nstSeCd=B#fileId=0b8db04ad88638567287ad89e18c2ca9",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:19.395Z"
+            },
+            "budget": {
+              "quote": "총사업비 : 10백만원 ❍",
+              "sourceId": "d8f891953c490550ee34",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT4694312C68E07BEB1D2D714F43CD3897&prdnDt=20250306182015&nstSeCd=B#fileId=0b8db04ad88638567287ad89e18c2ca9",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:19.395Z"
+            },
+            "period": {
+              "quote": "사업기간 : 2025. 3. ~ 12. ❍",
+              "sourceId": "d8f891953c490550ee34",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT4694312C68E07BEB1D2D714F43CD3897&prdnDt=20250306182015&nstSeCd=B#fileId=0b8db04ad88638567287ad89e18c2ca9",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:19.395Z"
+            },
+            "operation": {
+              "quote": "지원내용 : 전기자전거(PAS전용) 구입비용 지원 ※1가구당 1대 최대 300,000원(구입금액의 50%) 도 로 과 (도로행정팀)",
+              "sourceId": "d8f891953c490550ee34",
+              "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT4694312C68E07BEB1D2D714F43CD3897&prdnDt=20250306182015&nstSeCd=B#fileId=0b8db04ad88638567287ad89e18c2ca9",
+              "page": 1,
+              "checkedAt": "2026-10-28T00:11:19.395Z"
+            },
+            "result": null
+          },
+          "financialSummary": {
+            "checks": [],
+            "rows": [
+              {
+                "key": "planBudget",
+                "label": "계획서 사업비",
+                "status": "stated",
+                "display": "1,000만원",
+                "observations": [
+                  {
+                    "sourceId": "d8f891953c490550ee34",
+                    "url": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT4694312C68E07BEB1D2D714F43CD3897&prdnDt=20250306182015&nstSeCd=B#fileId=0b8db04ad88638567287ad89e18c2ca9",
+                    "page": 1,
+                    "quote": "총사업비 : 10백만원 ❍",
+                    "basis": "stated",
+                    "sourceLabel": "총사업비",
+                    "amountText": "10백만원",
+                    "valueKRW": 10000000
+                  }
+                ],
+                "valueKRW": 10000000
+              },
+              {
+                "key": "supportBudget",
+                "label": "지원금 예산",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              },
+              {
+                "key": "promotionBudget",
+                "label": "홍보비",
+                "status": "not_stated",
+                "display": "읽은 범위 별도 표기 없음",
+                "observations": []
+              }
+            ],
+            "scope": "selected_budget_quote_only",
+            "completeTextRead": false,
+            "instruction": "계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요."
+          }
+        }
+      ],
+      "candidateUrls": [
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT0CEBF0959791409B2BBDBAE2EBE91A98&prdnDt=20251224093636&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT23BE72E3BEEB71ED4D8AB1686F061A99&prdnDt=20250114180556&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT24739B0926DE6976DAECF51A6CF86D91&prdnDt=20260805163152&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT30B03519D3C437E78A0D21C1C3D86A7C&prdnDt=20250206114516&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT31824D85AA34CA1D8DC977851D060831&prdnDt=20260303122120&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33E16E511D90D1385557901FABA1839F&prdnDt=20250423135405&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT3DFE35182485C015D5A40B835FFEC0B4&prdnDt=20250106091855&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT3EF6C76E2C189919B5673B43B69D2F76&prdnDt=20260303122120&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT4694312C68E07BEB1D2D714F43CD3897&prdnDt=20250306182015&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT57845D7BD73667C45D38A25F89388609&prdnDt=20250109083655&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT69914611A3DBE3C55D2EDDBBA50B4BEE&prdnDt=20260112162935&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT84D892DF1B8B7C2EB95E67F2DE8606A8&prdnDt=20250708160546&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT91FED0E2462CD21AFEA85F15BE998169&prdnDt=20251128142829&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTAE53A08FB20D43009FBF642F85E6029C&prdnDt=20251125135033&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTD8AAAA63B4E01796C0A13C801072D868&prdnDt=20250206114516&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCTDE7DB4C1EEF1B0C44B60E0DEC7452287&prdnDt=20260211163248&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT0499EEE2AAEB35B30CE51CA960493DB2&prdnDt=20261013172807&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT374A24A652965FEDC58AD7A4A5A5C368&prdnDt=20261026134951&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT3A82A800ABBE87F9884CA06074B3C45B&prdnDt=20261021155422&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT49D47B4353F5950B704ED89B38634818&prdnDt=20261018093548&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT5CD8D4EE9A27BA1548213C4CBB403E20&prdnDt=20261021145437&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT7D92965667699B6C4597B33ED272081E&prdnDt=20261015180615&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT7E118F109CB4FE45FCFF128707F8C9C2&prdnDt=20261015180615&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT867AB22A080F93569C3708BCB4B7DF18&prdnDt=20261021151839&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCT9FC0617B800F3B93F95607A3C0E35155&prdnDt=20261022131200&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTBD35D96B6048035F15292133CDB0C628&prdnDt=20261022111458&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTC266730638E8FF7D65D72D502BB51705&prdnDt=20261013172807&nstSeCd=W",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTF12E7A84D36A3459D200B64DBB4695A1&prdnDt=20261020130543&nstSeCd=B",
+        "https://www.open.go.kr/othicInfo/infoList/infoListDetl2.do?prdnNstRgstNo=DCTF28024842CF732FDC1C2A29D4DCF8ED1&prdnDt=20261021172557&nstSeCd=B"
+      ]
+    }
+  },
+  "sourcePreservation": {
+    "candidateUrls": 51,
+    "unchangedCandidates": true,
+    "unchangedCitedCases": true,
+    "beforeMs": 25560,
+    "afterMs": 21845,
+    "beforeTimings": {
+      "catalogMs": 1796,
+      "budgetMs": 3893,
+      "searchMs": 5335,
+      "readingMs": 14758,
+      "totalMs": 23986
+    },
+    "afterTimings": {
+      "catalogMs": 1719,
+      "budgetMs": 1826,
+      "searchMs": 3506,
+      "readingMs": 14987,
+      "totalMs": 20319
+    },
+    "cases": [
+      "경상북도 영주시",
+      "충청북도 영동군"
+    ]
+  },
+  "budgetParity": {
+    "scope": "326289 budget rows; same SQLite snapshot; complete output equality including row ordering, amounts, source, region, offsets and short-query fallback",
+    "oldOpenMs": 113.624,
+    "newOpenMs": 12.396899999999988,
+    "rows": [
+      {
+        "args": [
+          [
+            "반환보증",
+            "보증료"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 169,
+        "oldMs": 42.3184,
+        "newMs": 7.171600000000012
+      },
+      {
+        "args": [
+          [
+            "전세보증료",
+            "지원"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 0,
+        "oldMs": 15.04789999999997,
+        "newMs": 0.9528999999999996
+      },
+      {
+        "args": [
+          [
+            "청년"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 3922,
+        "oldMs": 18.70440000000002,
+        "newMs": 124.18459999999999
+      },
+      {
+        "args": [
+          [
+            "산후조리비"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 116,
+        "oldMs": 17.42180000000002,
+        "newMs": 3.282000000000039
+      },
+      {
+        "args": [
+          [
+            "전기자전거"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 8,
+        "oldMs": 14.618499999999983,
+        "newMs": 0.9542000000000144
+      },
+      {
+        "args": [
+          [
+            "운전면허"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 136,
+        "oldMs": 16.257799999999975,
+        "newMs": 3.888300000000072
+      },
+      {
+        "args": [
+          [
+            "입영지원금"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 17,
+        "oldMs": 18.31580000000008,
+        "newMs": 1.3153999999999542
+      },
+      {
+        "args": [
+          [
+            "면접수당"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 2,
+        "oldMs": 12.545799999999986,
+        "newMs": 0.5391999999999371
+      },
+      {
+        "args": [
+          [
+            "이사비"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 216,
+        "oldMs": 17.758199999999988,
+        "newMs": 5.190800000000081
+      },
+      {
+        "args": [
+          [
+            "음식물처리기"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 0,
+        "oldMs": 13.013199999999983,
+        "newMs": 0.7703999999999951
+      },
+      {
+        "args": [
+          [
+            "ai"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 730,
+        "oldMs": 13.767299999999977,
+        "newMs": 18.087999999999965
+      },
+      {
+        "args": [
+          [
+            "%_"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 0,
+        "oldMs": 12.220000000000027,
+        "newMs": 14.640499999999975
+      },
+      {
+        "args": [
+          [
+            "\"산후조리비\""
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 0,
+        "oldMs": 10.165300000000002,
+        "newMs": 10.78189999999995
+      },
+      {
+        "args": [
+          [
+            "'",
+            "OR",
+            "1=1",
+            "--"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 0,
+        "oldMs": 12.334600000000023,
+        "newMs": 14.217700000000036
+      },
+      {
+        "args": [
+          [
+            "특수문자 리터럴 검색"
+          ],
+          null,
+          0,
+          20
+        ],
+        "total": 0,
+        "oldMs": 12.699299999999994,
+        "newMs": 13.415099999999939
+      },
+      {
+        "args": [
+          [
+            "반환보증",
+            "보증료"
+          ],
+          null,
+          20,
+          20
+        ],
+        "total": 169,
+        "oldMs": 17.357700000000023,
+        "newMs": 6.5371000000000095
+      },
+      {
+        "args": [
+          [
+            "반환보증",
+            "보증료"
+          ],
+          null,
+          1000,
+          20
+        ],
+        "total": 169,
+        "oldMs": 16.682900000000018,
+        "newMs": 8.142299999999977
+      },
+      {
+        "args": [
+          [
+            "반환보증",
+            "보증료"
+          ],
+          [
+            "경기도"
+          ],
+          0,
+          20
+        ],
+        "total": 27,
+        "oldMs": 12.924999999999955,
+        "newMs": 84.91859999999997
+      },
+      {
+        "args": [
+          [
+            "산후조리비"
+          ],
+          [
+            "부산",
+            "중구"
+          ],
+          0,
+          20
+        ],
+        "total": 0,
+        "oldMs": 3.0458999999999605,
+        "newMs": 4.965900000000033
+      },
+      {
+        "args": [
+          [
+            "청년"
+          ],
+          [
+            "서울"
+          ],
+          0,
+          20
+        ],
+        "total": 284,
+        "oldMs": 7.448700000000031,
+        "newMs": 6.068899999999985
+      }
+    ]
+  },
+  "budgetOpen": {
+    "method": "six local open measurements per version, alternating execution order, same real budget index and OS cache; no portal/network time",
+    "oldMedianMs": 109.94460000000004,
+    "newMedianMs": 10.143550000000005,
+    "runs": [
+      {
+        "run": 0,
+        "name": "old",
+        "ms": 107.16890000000001
+      },
+      {
+        "run": 0,
+        "name": "new",
+        "ms": 10.020600000000002
+      },
+      {
+        "run": 1,
+        "name": "new",
+        "ms": 9.676500000000004
+      },
+      {
+        "run": 1,
+        "name": "old",
+        "ms": 123.83009999999999
+      },
+      {
+        "run": 2,
+        "name": "old",
+        "ms": 108.68330000000003
+      },
+      {
+        "run": 2,
+        "name": "new",
+        "ms": 10.266500000000008
+      },
+      {
+        "run": 3,
+        "name": "new",
+        "ms": 20.619999999999948
+      },
+      {
+        "run": 3,
+        "name": "old",
+        "ms": 115.94720000000007
+      },
+      {
+        "run": 4,
+        "name": "old",
+        "ms": 100.64260000000002
+      },
+      {
+        "run": 4,
+        "name": "new",
+        "ms": 9.36239999999998
+      },
+      {
+        "run": 5,
+        "name": "new",
+        "ms": 17.848299999999995
+      },
+      {
+        "run": 5,
+        "name": "old",
+        "ms": 111.20590000000004
+      }
+    ]
+  },
+  "rowMapping": {
+    "rows": 326289,
+    "matched": 326289,
+    "method": "every budget row maps to the same normalized catalog name in the actual built index"
+  },
+  "selectedFactChecks": {
+    "summary": {
+      "version": "1.8.13",
+      "questions": 2,
+      "rows": 4,
+      "checked": 15,
+      "correct": 15,
+      "scope": "AI source-selected fact audit; PDF visual review and one HWP original-text review, not full-document or independent human accuracy",
+      "timings": [
+        {
+          "id": "deposit",
+          "ms": 21845,
+          "briefMs": 1092,
+          "ocrPages": 0,
+          "cases": [
+            "경상북도 영주시",
+            "충청북도 영동군"
+          ]
+        },
+        {
+          "id": "bicycle",
+          "ms": 12955,
+          "briefMs": 570,
+          "ocrPages": 0,
+          "cases": [
+            "경기도 과천시",
+            "충청남도 공주시"
+          ]
+        }
+      ]
+    },
+    "evaluations": [
+      {
+        "topic": "deposit",
+        "institution": "경상북도 영주시",
+        "basis": "deposit-2-p1.png",
+        "checks": [
+          {
+            "field": "target",
+            "correct": true
+          },
+          {
+            "field": "budget",
+            "correct": true
+          },
+          {
+            "field": "benefit_ceiling",
+            "correct": true
+          },
+          {
+            "field": "period",
+            "correct": true
+          }
+        ]
+      },
+      {
+        "topic": "deposit",
+        "institution": "충청북도 영동군",
+        "basis": "yeongdong1810.pdf pages2–3 visually reviewed; general budget1200thousand KRW and conditional benefit40/30만원 distinguished",
+        "checks": [
+          {
+            "field": "target",
+            "correct": true
+          },
+          {
+            "field": "budget",
+            "correct": true
+          },
+          {
+            "field": "benefit_conditions",
+            "correct": true
+          }
+        ]
+      },
+      {
+        "topic": "bicycle",
+        "institution": "경기도 과천시",
+        "basis": "bicycle-checked-1-p1.png",
+        "checks": [
+          {
+            "field": "target",
+            "correct": true
+          },
+          {
+            "field": "budget",
+            "correct": true
+          },
+          {
+            "field": "benefit_ceiling",
+            "correct": true
+          },
+          {
+            "field": "period",
+            "correct": true
+          }
+        ]
+      },
+      {
+        "topic": "bicycle",
+        "institution": "충청남도 공주시",
+        "basis": "bicycle-2.pdf page 2; source quote",
+        "checks": [
+          {
+            "field": "target",
+            "correct": true
+          },
+          {
+            "field": "budget",
+            "correct": true
+          },
+          {
+            "field": "benefit_ceiling",
+            "correct": true
+          },
+          {
+            "field": "period",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "repeatFactChecks": {
+    "summary": {
+      "version": "1.8.13",
+      "questions": 1,
+      "rows": 2,
+      "checked": 8,
+      "correct": 8,
+      "scope": "AI source-selected fact audit; PDF visual review and one HWP original-text review, not full-document or independent human accuracy",
+      "timings": [
+        {
+          "id": "deposit",
+          "ms": 16506,
+          "briefMs": 966,
+          "ocrPages": 0,
+          "cases": [
+            "전라남도 고흥군",
+            "경상북도 영주시"
+          ]
+        }
+      ]
+    },
+    "evaluations": [
+      {
+        "topic": "deposit",
+        "institution": "전라남도 고흥군",
+        "basis": "deposit-1-p1.png",
+        "checks": [
+          {
+            "field": "target",
+            "correct": true
+          },
+          {
+            "field": "budget",
+            "correct": true
+          },
+          {
+            "field": "benefit_ceiling",
+            "correct": true
+          },
+          {
+            "field": "period",
+            "correct": true
+          }
+        ]
+      },
+      {
+        "topic": "deposit",
+        "institution": "경상북도 영주시",
+        "basis": "deposit-2-p1.png",
+        "checks": [
+          {
+            "field": "target",
+            "correct": true
+          },
+          {
+            "field": "budget",
+            "correct": true
+          },
+          {
+            "field": "benefit_ceiling",
+            "correct": true
+          },
+          {
+            "field": "period",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "cachedFacts": {
+    "checked": 24,
+    "correct": 24,
+    "method": "Latest evidence/financial/presentation code applied to previously downloaded real document transcripts. This is extraction regression, not a fresh upstream availability claim."
+  },
+  "ocr": {
+    "checked": 5,
+    "correct": 5,
+    "ms": 35869,
+    "values": [
+      "36,800",
+      "30%",
+      "70%",
+      "70만원",
+      "68,000원"
+    ]
+  },
+  "tests": {
+    "scripts": 47,
+    "status": "passed"
+  },
+  "limits": [
+    "Server warm-up and connection initialization are excluded; the first budget-index load is included in the first call.",
+    "One run per condition; provider status and network vary. Both primary comparisons read the same two source files.",
+    "The tested deposit source documents had extractable text, so OCR speed is measured separately.",
+    "Saved-transcript regression is not a fresh upstream availability or whole-document accuracy measure."
+  ]
+}
