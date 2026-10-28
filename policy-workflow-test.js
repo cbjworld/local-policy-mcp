@@ -92,6 +92,7 @@ assert.equal(w.plan({question:'서울 산후조리비 지원 사업 찾아줘'},
  assert.equal(r.coverage.queriedPages,92);assert.equal(r.coverage.continuationSucceeded,12);assert.equal(r.coverage.hasMore,true);
  const f=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>{throw Error('offline')}});
  assert.equal(f.coverage.nextSearches[0].arguments.page,1);assert.equal(f.coverage.nextSearches[0].reason,'실패한 페이지 재시도');
+ assert(f.coverage.nextSearches.some(x=>x.arguments.scope==='all'&&x.arguments.page===1),'unstarted metadata scope must remain in the continuation');
  const done=await w.research({question:'산후조리비',queries:['산후조리비']},{search:async()=>({...empty,hasMore:false})});
  assert.equal(done.coverage.hasMore,false);
  console.log('PASS: continuation pages, exhausted results and retry after search failure');

@@ -216,6 +216,7 @@ async function runResearch(args={},io=portal){
  for(const search of searches)lastSearches.set(search.scope+'\n'+search.q,search);
  const nextSearches=[...lastSearches.values()].filter(s=>s.hasMore&&s.page<10000&&!failures.some(f=>f.q===s.q&&f.scope===s.scope)).map(s=>({tool:'search_open_documents',arguments:{q:s.q,startDate:request.startDate,endDate:request.endDate,scope:s.scope,page:s.page+1},reason:'다음 페이지 미조회'}));
  for(const f of failures)nextSearches.push({tool:'search_open_documents',arguments:{q:f.q,startDate:request.startDate,endDate:request.endDate,scope:f.scope,page:f.page},reason:'실패한 페이지 재시도'});
+ for(const q of request.queries)for(const scope of ['original','all'])if(!lastSearches.has(scope+'\n'+q)&&!failures.some(f=>f.q===q&&f.scope===scope))nextSearches.push({tool:'search_open_documents',arguments:{q,startDate:request.startDate,endDate:request.endDate,scope,page:1},reason:'미조회 범위'});
  const pageLimitReached=[...lastSearches.values()].some(s=>s.hasMore&&s.page>=10000);
  const progress=request.queries.flatMap(q=>['original','all'].map(scope=>{
   const pages=searches.filter(s=>s.q===q&&s.scope===scope),last=pages.at(-1),failure=failures.find(f=>f.q===q&&f.scope===scope);

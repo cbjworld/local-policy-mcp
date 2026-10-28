@@ -1,0 +1,7 @@
+{
+  "name": "local-policy-background-search",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-08-18",
+  "durable_objects": { "bindings": [{ "name": "JOBS", "class_name": "SearchJob" }, { "name": "GATE", "class_name": "SearchGate" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["SearchJob", "SearchGate"] }]
+}

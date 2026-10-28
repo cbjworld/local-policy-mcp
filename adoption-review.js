@@ -9,6 +9,7 @@ async function review({question,institution,queries,startDate,endDate}={},io={})
  if(institution!==undefined&&(typeof institution!=='string'||!institution.trim()||institution.length>80))throw Error('검토 지자체는 1~80자여야 합니다.');
  const args={question,queries,startDate,endDate};
  const raw=await (io.research||require('./policy-workflow').research)(args);
+ if(io.saveSources)raw.researchSources=await io.saveSources(raw);
  const research=require('./presentation').present('research_policy',raw);
  let localBudgetCheck;
  if(institution){
@@ -24,6 +25,6 @@ async function review({question,institution,queries,startDate,endDate}={},io={})
   }
   localBudgetCheck={status:rows.size?'budget_name_candidates_found':searches.some(s=>s.status==='failed')?'lookup_incomplete':'no_match_in_index',institution:institution.trim(),scope,searches,items:[...rows.values()].slice(0,5),note:'수록 예산의 사업명 후보입니다. 같은 사업인지 대조해야 하며 검색 결과가 없다고 우리 지역에 해당 사업이 없다는 뜻은 아닙니다. 편성액은 천원, 시나리오 계산 입력은 원입니다.'};
  }
- return build(research,{institution:institution?.trim(),localBudgetCheck});
+ return {...build(research,{institution:institution?.trim(),localBudgetCheck}),...(raw.researchSources?{researchSources:raw.researchSources}:{})};
 }
 module.exports={review,build};

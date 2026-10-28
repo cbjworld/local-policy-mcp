@@ -22,6 +22,13 @@ const {createArchive}=require('./source-archive');
  await assert.rejects(()=>createStore({archive}).list({researchId:saved.researchId}),/복호화/);data.set(key,original);
  const fail=createStore({archive:{put:async()=>{throw Error('failed')},get:async()=>{throw Error('missing')}}});
  const temp=await fail.save({candidates:items});assert.equal(temp.storage,'temporary');assert.match(temp.warning,/임시/);
+ const calls=[],background={start:async(id,cursors)=>calls.push({id,cursors}),status:async()=>({status:'running',pages:1,cursors:[]}),pages:async()=>({pages:[{page:2,items:[]}],nextCursor:null})};
+ const withBackground=createStore({archive,background}),cursor={q:'산후조리비',scope:'all',page:2,startDate:'20241028',endDate:'20261028'};
+ const auto=await withBackground.save({candidates:[],coverage:{nextSearches:[{arguments:cursor}]}});
+ assert.equal(auto.backgroundSearch.status,'running');assert.deepEqual(calls[0].cursors,[cursor]);
+ assert.equal((await withBackground.backgroundList({researchId:auto.researchId})).pagesRead,1);
+ const broken=createStore({archive,background:{start:async()=>{throw Error('quota')}}});
+ assert.equal((await broken.save({coverage:{nextSearches:[{arguments:cursor}]}})).backgroundSearch.status,'not_started');
  const clock=Date.now;try{Date.now=()=>clock()+86401000;assert.equal((await b.list({researchId:saved.researchId})).total,75);await assert.rejects(()=>fail.list({researchId:temp.researchId}),/missing/);}finally{Date.now=clock;}
  console.log('PASS: encrypted archival, pagination, restart, eviction, expiry, tampering and failure handling');
 })().catch(e=>{console.error(e);process.exitCode=1});
