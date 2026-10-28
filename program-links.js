@@ -21,7 +21,7 @@ function links(investigations=[]){
   const name=upper.candidate.title.match(new RegExp('('+region+'(?:형|도)?\\s*[^\\n「」\\[\\]()]{1,70}?지원\\s*사업)'))?.[1];
   if(!name||/자체|추가\s*지원|별도\s*지원|확대\s*지원/.test(upper.candidate.title))continue;
   const up=pages(upper),year=period(up);
-  const distribution=up.map(p=>({p,m:p.text.match(/(?:구\s*[·ㆍ・‧]?\s*군|시\s*[·ㆍ・‧]?\s*군)[^\n]{0,80}?(?:보조금\s*교부|보조사업자|시행)|보조\s*사업자\s*[:：]\s*\d+개\s*(?:구\s*[·ㆍ・‧]?\s*군|시\s*[·ㆍ・‧]?\s*군)/)})).find(x=>x.m);
+  const distribution=up.map(p=>({p,m:p.text.match(/(?:구\s*[·ㆍ・‧]?\s*군|시\s*[·ㆍ・‧]?\s*군)[^\n]{0,80}?(?:보\s*조\s*금\s*교\s*부|보\s*조\s*사\s*업\s*자|시\s*행)|보조\s*사업자\s*[:：]\s*\d+개\s*(?:구\s*[·ㆍ・‧]?\s*군|시\s*[·ㆍ・‧]?\s*군)/)})).find(x=>x.m);
   if(!year||!distribution||!up.some(p=>normalize(p.text).includes(normalize(name))))continue;
   const members=[];
   for(const lower of read){
@@ -77,7 +77,7 @@ function catalogLinks(context,candidates=[],investigations=[],existing=[]){
    if(!matched.some(m=>documentKey(m.document.url)===key))matched.push({document:{url:candidate.url,institution:candidate.institution},evidence:link.evidence});
   }
   if(matched.length<2)continue;
-  result.push({name:item.name,year:String(item.year),status:'same_budget_project_saved_body_supported',basis:'같은 기관·부서·연도·회계·사업 식별번호에 직접 연결된 저장 본문 근거',catalogProjectId:item.projectId,coordinatingInstitution:(item.parent||'')+' '+item.institution,primaryUrl:matched[0].document.url,documents:matched.map(m=>m.document),evidence:matched.flatMap(m=>m.evidence.map(e=>({...e,url:e.sourceUrl}))),countAsOneCase:true,budgetRule:'같은 사업의 원안·수정안·단계별 문서입니다. 문서별 금액과 조건을 보존하며 합산하지 않습니다. 최신 문서가 이전 문서를 대체했는지와 현재 효력은 별도 확인합니다.'});
+  result.push({name:item.name,year:String(item.year),status:'same_budget_project_saved_body_supported',basis:'같은 기관·부서·연도·회계·사업 식별번호에 직접 연결된 저장 본문 근거',catalogProjectId:item.projectId,coordinatingInstitution:[...new Set([item.parent,item.institution].filter(Boolean))].join(' '),primaryUrl:matched[0].document.url,documents:matched.map(m=>m.document),evidence:matched.flatMap(m=>m.evidence.map(e=>({...e,url:e.sourceUrl}))),countAsOneCase:true,budgetRule:'같은 사업의 원안·수정안·단계별 문서입니다. 문서별 금액과 조건을 보존하며 합산하지 않습니다. 최신 문서가 이전 문서를 대체했는지와 현재 효력은 별도 확인합니다.'});
  }
  return result;
 }

@@ -61,3 +61,10 @@ const revisionValue={catalogEvidence:catalog,candidates:revisionCandidates.map(d
 const revisionOutput=require('./presentation').present('research_policy',revisionValue);assert.equal(revisionOutput.summary.projectGroups,1);assert.equal(revisionOutput.summary.textReadDocuments,0);assert.equal(revisionOutput.quickBrief.length,1);assert.equal(revisionOutput.caseComparison.length,1);assert.equal(revisionOutput.caseComparison[0].documents.length,2);assert.equal(require('./presentation').present('research_policy',revisionValue,'full').presentation.projects.length,1);
 
 const splitCatalog={items:catalog.items[0].documents.map((d,i)=>({...catalog.items[0],projectId:"separate"+i,documents:[d]}))};assert.equal(catalogLinks(splitCatalog,revisionCandidates).length,0);
+const spacedUpper=mutate(upper,x=>{x.result.attempts[0].source.pages[0].text=x.result.attempts[0].source.pages[0].text.replace('구·군 보건소 보조금 교부','구 ·군 보 건 소 보 조 금 교 부');});
+assert.equal(links([spacedUpper,lower]).length,1);
+assert.equal(links([spacedUpper,mutate(lower,x=>{x.result.attempts[0].source.pages[0].text=x.result.attempts[0].source.pages[0].text.replace('부산광역시장','울산광역시장');})]).length,0);
+const pressure=Array.from({length:250},(_,i)=>({url:'https://www.open.go.kr/noise/'+i,institution:'기관'+i,title:'검토 문서 '.repeat(4)+i,relevance:{kind:'project_candidate'}}));
+const crowded=require('./presentation').present('research_policy',{...value,candidates:[upper.candidate,lower.candidate,...pressure],projects:[...value.projects,...pressure.map(d=>({institution:d.institution,name:d.title,documents:[d],fields:{}}))]});
+assert.equal(crowded.confirmedProgramSummaries.length,1);assert.equal(crowded.confirmedProgramSummaries[0].documents.length,2);assert.equal(crowded.confirmedProgramSummaries[0].countAsOneCase,true);assert(JSON.stringify(crowded).length<=24000);assert(crowded.responseSize.omittedDocuments>0);
+console.log('PASS: spaced grant text and confirmed grouping survive large compact outputs');

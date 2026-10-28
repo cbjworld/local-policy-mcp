@@ -191,7 +191,12 @@ async function runResearch(args={},io=portal){
  for(const search of searches)lastSearches.set(search.scope+'\n'+search.q,search);
  const nextSearches=[...lastSearches.values()].filter(s=>s.hasMore&&s.page<100&&!failures.some(f=>f.q===s.q&&f.scope===s.scope)).map(s=>({tool:'search_open_documents',arguments:{q:s.q,startDate:request.startDate,endDate:request.endDate,scope:s.scope,page:s.page+1},reason:'다음 페이지 미조회'}));
  for(const f of failures)nextSearches.push({tool:'search_open_documents',arguments:{q:f.q,startDate:request.startDate,endDate:request.endDate,scope:f.scope,page:f.page},reason:'실패한 페이지 재시도'});
- const coverage={queriedPages:searches.length,uniqueDocuments:byUrl.size,hasMore:nextSearches.length>0,pageLimitReached:[...lastSearches.values()].some(s=>s.hasMore&&s.page>=100),nextSearches,note:'전국 지자체를 검색 대상으로 하지만 일부 페이지의 결과입니다. 검색어별 총건수는 중복될 수 있어 합산하지 마세요. 후속 검색은 순서대로 실행하고 URL 중복을 제거하세요. 전국 전체 사업 수나 검색 완전성을 뜻하지 않습니다.'};
+ const pageLimitReached=[...lastSearches.values()].some(s=>s.hasMore&&s.page>=100);
+ const progress=request.queries.flatMap(q=>['original','all'].map(scope=>{
+  const pages=searches.filter(s=>s.q===q&&s.scope===scope),last=pages.at(-1),failure=failures.find(f=>f.q===q&&f.scope===scope);
+  return {q,scope,pagesRead:pages.length,lastPage:last?.page||0,reportedDocuments:last?.total??null,status:failure?'failed':!last?'not_started':last.hasMore?(last.page>=100?'page_limit':'partial'):'exhausted',...(failure?{failedPage:failure.page}:{})};
+ }));
+ const coverage={queriedPages:searches.length,uniqueDocuments:byUrl.size,hasMore:nextSearches.length>0||pageLimitReached,pageLimitReached,progress,nextSearches,note:'전국 지자체를 검색 대상으로 하지만 일부 페이지의 결과입니다. 검색어별 총건수는 중복될 수 있어 합산하지 마세요. 후속 검색은 순서대로 실행하고 URL 중복을 제거하세요. 전국 전체 사업 수나 검색 완전성을 뜻하지 않습니다.'};
  coverage.liveSearchDocuments=liveSearchDocuments;
  coverage.savedSeedDocuments=byUrl.size-liveSearchDocuments;
  timings.readingMs=Date.now()-readStart;timings.totalMs=Date.now()-started;
