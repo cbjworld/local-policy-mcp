@@ -45,14 +45,14 @@ export class SearchGate {
       if(kind==='/release'){
         const ticket=await tx.get('ticket:'+id);
         if(new URL(request.url).searchParams.get('rollback')==='1'&&ticket?.day===day){data.jobs=Math.max(0,data.jobs-1);await tx.put('quota',data);}
-        await tx.delete('ticket:'+id);await tx.delete(key);await tx.delete('waiting:'+id);await tx.delete('pending:'+id);return {ok:true};
+        await tx.delete('ticket:'+id);await tx.delete(key);await tx.delete('waiting:'+id);await tx.delete('pending:'+id);await tx.delete('turn:'+id);return {ok:true};
       }
       if(kind==='/yield'){
         // Keep the admission ticket and saved job; a full waiting list is retried later.
         if(!await tx.get('ticket:'+id))await tx.put('ticket:'+id,{day:null});
         const waitingKey='waiting:'+id;
         if(!await tx.get(waitingKey)&&(await tx.list({prefix:'waiting:',limit:51})).size<50)await tx.put(waitingKey,{order:now,lastSeen:now});
-        await tx.delete(key);await tx.delete('pending:'+id);return {ok:true};
+        await tx.delete(key);await tx.delete('pending:'+id);await tx.delete('turn:'+id);return {ok:true};
       }
       if(kind==='/admit'&&!active){
         const waitingKey='waiting:'+id;
@@ -67,16 +67,26 @@ export class SearchGate {
         }
         else{queued.lastSeen=now;await tx.put(waitingKey,queued);}
         const entries=await tx.list({prefix:'active:',limit:100});
-        for(const [name,stamp] of entries)if(now-stamp>14*86400000)await tx.delete(name);
+        for(const [name,stamp] of entries)if(now-stamp>14*86400000){await tx.delete(name);await tx.delete('turn:'+name.slice(7));}
         const waiting=await tx.list({prefix:'waiting:',limit:51});
         const first=[...waiting].filter(([,v])=>now-v.lastSeen<=2400000).sort((a,b)=>a[1].order-b[1].order||a[0].localeCompare(b[0]))[0]?.[0];
         if([...entries.values()].filter(stamp=>now-stamp<=14*86400000).length>=20||first!==waitingKey)return {ok:true,waiting:true,retryAt:now+1800000,isNew};
-        await tx.delete(waitingKey);await tx.put(key,now);
+        await tx.delete(waitingKey);await tx.put(key,now);await tx.delete('turn:'+id);
         return {ok:true,waiting:false,isNew};
       }
       if(kind==='/admit')return {ok:true,waiting:false,isNew:false};
       if(kind==='/page'){
         if(!active)return {ok:false,retryAt:now+1800000,reason:'not_admitted'};
+        const rawPages=new URL(request.url).searchParams.get('pages');
+        if(rawPages!==null){
+          if(!/^\d+$/.test(rawPages)||!Number.isSafeInteger(Number(rawPages)))return {ok:false,reason:'invalid_progress'};
+          const pages=Number(rawPages),turnKey='turn:'+id;let first=await tx.get(turnKey);
+          if(first===undefined){first=pages;await tx.put(turnKey,first);}
+          if(pages-first>=10){
+            const waiting=await tx.list({prefix:'waiting:',limit:51});
+            if([...waiting.values()].some(v=>now-v.lastSeen<=2400000))return {ok:false,reason:'yield_turn'};
+          }
+        }
         if((data.attempts||0)>=8000)return {ok:false,retryAt:nextDay,reason:'daily_attempt_limit'};
         data.attempts=(data.attempts||0)+1;await tx.put('quota',data);
       }
@@ -169,8 +179,8 @@ export class SearchJob {
     try {
       const gate=this.env?.GATE?.get(this.env.GATE.idFromName('global'));
       if (gate) {
-        const permit=await (await gate.fetch('https://gate.internal/page?id='+job.id)).json();
-        if(permit.reason==='not_admitted'){await this.deferForAdmission(job);return;}
+        const permit=await (await gate.fetch('https://gate.internal/page?id='+job.id+'&pages='+job.pages)).json();
+        if(['not_admitted','yield_turn'].includes(permit.reason)){await this.deferForAdmission(job);return;}
         if (!permit.ok) {job.waitingUntil=permit.retryAt;await this.storage.put('job',job);await this.storage.setAlarm(permit.retryAt);return;}
       }
       const result=await portalPage(c);

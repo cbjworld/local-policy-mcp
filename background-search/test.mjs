@@ -141,5 +141,40 @@ try{
  await recovery.deferForAdmission(interrupted);assert.equal((await recoveryStorage.get('job')).needsYield,true);assert(recoveryStorage.alarmAt>time);
  recovery=new SearchJob({storage:recoveryStorage},gateEnv);globalThis.fetch=async()=>mockResponse(cursor,10);
  time+=1800000;await recovery.alarm();assert.equal((await recoveryStorage.get('job')).status,'complete');
+ // A long successful search keeps running without waiters, then yields at a completed-page boundary.
+ const turnStore=new Storage(),turnGate=new SearchGate({storage:turnStore}),turnId='a'.repeat(64),nextId='b'.repeat(64);
+ const turnEnv={GATE:{idFromName:()=>'',get:()=>({fetch:url=>turnGate.fetch(new Request(url))})}};
+ assert.equal((await (await turnGate.fetch(new Request('https://gate/admit?id='+turnId))).json()).waiting,false);
+ const turnJobStore=new Storage();let turnJob=new SearchJob({storage:turnJobStore},turnEnv);
+ await turnJob.fetch(new Request('https://job.internal/start',{method:'POST',headers:{'x-job-id':turnId},body:JSON.stringify({cursors:[cursor]})}));
+ globalThis.fetch=async url=>mockResponse({...cursor,page:Number(new URL(url).searchParams.get('viewPage'))},130);
+ for(let i=0;i<12;i++){time+=4000;await turnJob.alarm();}
+ assert.equal((await turnJobStore.get('job')).pages,12,'no waiting job means no artificial 10-page stop');
+ for(let i=0;i<19;i++)await turnStore.put('active:'+i.toString(16).padStart(64,'0'),time);
+ assert.equal((await (await turnGate.fetch(new Request('https://gate/admit?id='+nextId))).json()).waiting,true);
+ time+=4000;await turnJob.alarm();let turnState=await turnJobStore.get('job');
+ assert.equal(turnState.status,'waiting_admission');assert.equal(turnState.pages,12);assert.equal(turnState.cursors[0].page,13);
+ assert.equal((await turnJobStore.list({prefix:'page:',limit:100})).size,12);assert.equal((await turnStore.get('quota')).pages,12,'yield does not spend a page');
+ assert.equal(await turnStore.get('active:'+turnId),undefined);assert(await turnStore.get('ticket:'+turnId));
+ assert.equal((await (await turnGate.fetch(new Request('https://gate/admit?id='+nextId))).json()).waiting,false,'waiting search gets the released slot');
+ await turnGate.fetch(new Request('https://gate/release?id='+('0'.repeat(64))));
+ const admittedJobs=(await turnStore.get('quota')).jobs;time+=1800000;
+ turnJob=new SearchJob({storage:turnJobStore},turnEnv);await turnJob.alarm();turnState=await turnJobStore.get('job');
+ assert.equal(turnState.status,'complete');assert.equal(turnState.pages,13);assert.equal((await turnJobStore.get('page:00000013')).page,13);
+ assert.equal((await turnStore.get('quota')).jobs,admittedJobs,'turn rotation does not consume an extra daily job');
+ assert.equal((await turnStore.get('quota')).pages,13);
+ const boundaryStore=new Storage(),boundaryGate=new SearchGate({storage:boundaryStore});
+ await boundaryStore.put('active:'+turnId,time);await boundaryStore.put('waiting:'+nextId,{order:time,lastSeen:time});
+ for(let p=0;p<10;p++){time+=4000;assert.equal((await (await boundaryGate.fetch(new Request('https://gate/page?id='+turnId+'&pages='+p))).json()).ok,true);}
+ time+=4000;assert.equal((await (await boundaryGate.fetch(new Request('https://gate/page?id='+turnId+'&pages=10'))).json()).reason,'yield_turn');
+ assert.equal((await boundaryStore.get('quota')).pages,10,'the next unvisited page is not charged before yielding');
+ const oldStore=new Storage(),oldGate=new SearchGate({storage:oldStore});
+ await oldStore.put('active:'+turnId,time);await oldStore.put('waiting:'+nextId,{order:time,lastSeen:time});
+ for(let p=333;p<343;p++){time+=4000;assert.equal((await (await oldGate.fetch(new Request('https://gate/page?id='+turnId+'&pages='+p))).json()).ok,true);}
+ time+=4000;assert.equal((await (await oldGate.fetch(new Request('https://gate/page?id='+turnId+'&pages=343'))).json()).reason,'yield_turn','existing jobs start a new turn at their current saved page');
+ const staleTurnStore=new Storage(),staleTurnGate=new SearchGate({storage:staleTurnStore});
+ await staleTurnStore.put('active:'+turnId,time);await staleTurnStore.put('turn:'+turnId,0);
+ await staleTurnStore.put('waiting:'+nextId,{order:time-3600000,lastSeen:time-3600000});
+ assert.equal((await (await staleTurnGate.fetch(new Request('https://gate/page?id='+turnId+'&pages=10'))).json()).ok,true,'stale waiters do not interrupt active searches');
 }finally{Date.now=originalNow;globalThis.fetch=originalFetch;}
 console.log('background-search: retry, restart, page validation and completion passed');
