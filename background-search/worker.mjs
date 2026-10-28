@@ -45,10 +45,13 @@ export class SearchGate {
       if ((kind==='/admit' && data.jobs>=100)||(kind==='/page' && data.pages>=1000)) return {ok:false,retryAt:nextDay};
       if (kind==='/page') {
         const pendingKey='pending:'+id;
-        if(!await tx.get(pendingKey))await tx.put(pendingKey,now);
+        const queued=await tx.get(pendingKey),order=typeof queued==='number'?queued:queued?.order;
+        await tx.put(pendingKey,{order:order||now,lastSeen:now});
         const pending=await tx.list({prefix:'pending:',limit:100});
-        for(const [name,stamp] of pending)if(now-stamp>180000)await tx.delete(name);
-        const first=[...pending].filter(([,stamp])=>now-stamp<=180000).sort((a,b)=>a[1]-b[1]||a[0].localeCompare(b[0]))[0];
+        const age=value=>typeof value==='number'?value:value.lastSeen;
+        const sequence=value=>typeof value==='number'?value:value.order;
+        for(const [name,value] of pending)if(now-age(value)>180000)await tx.delete(name);
+        const first=[...pending].filter(([,value])=>now-age(value)<=180000).sort((a,b)=>sequence(a[1])-sequence(b[1])||a[0].localeCompare(b[0]))[0];
         if(first?.[0]!==pendingKey||now-data.lastPage<3000)return {ok:false,retryAt:now+60000+Math.floor(Math.random()*10000)};
         await tx.delete(pendingKey);
       }
