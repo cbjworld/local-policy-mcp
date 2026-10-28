@@ -10,6 +10,7 @@ class Storage {
   async get(k){return structuredClone(this.map.get(k));}
   async put(k,v){this.map.set(k,structuredClone(v));}
   async delete(k){this.map.delete(k);}
+  async getAlarm(){return this.alarmAt;}
   async setAlarm(t){this.alarmAt=t;}
   async transaction(fn){return fn(this);}
   async list({prefix,startAfter='',limit}){return new Map([...this.map].filter(([k])=>k.startsWith(prefix)&&k>startAfter).sort().slice(0,limit));}
@@ -68,6 +69,7 @@ assert.equal(next.waiting,false,'an offline waiting job must not block another j
 assert(await staleStore.get('waiting:'+'a'.repeat(64)),'offline job remains available to resume');
 const badStorage=new Storage(),badGate=new SearchGate({storage:badStorage});
 const env={SEARCH_SECRET:'test',GATE:{idFromName:()=>'',get:()=>({fetch:url=>badGate.fetch(new Request(url))})},JOBS:{idFromName:()=>'',get:()=>({fetch:async()=>new Response(null,{status:400})})}};
+assert.equal((await app.fetch(new Request('https://worker/jobs/'+('e'.repeat(64))+'/wake',{method:'POST',headers:{authorization:'Bearer test'}}),env)).status,404,'wake is not exposed through the external worker route');
 const badRequest=new Request('https://worker/jobs/'+('e'.repeat(64))+'/start',{method:'POST',headers:{authorization:'Bearer test'},body:'{}'});
 assert.equal((await app.fetch(badRequest,env)).status,400);assert.equal((await badStorage.list({prefix:'active:',limit:100})).size,0,'invalid requests cannot reserve a slot');
 const rejected=new Request('https://worker/jobs/'+('e'.repeat(64))+'/start',{method:'POST',headers:{authorization:'Bearer test'},body:JSON.stringify({cursors:[cursor]})});
@@ -163,6 +165,39 @@ try{
  assert.equal(turnState.status,'complete');assert.equal(turnState.pages,13);assert.equal((await turnJobStore.get('page:00000013')).page,13);
  assert.equal((await turnStore.get('quota')).jobs,admittedJobs,'turn rotation does not consume an extra daily job');
  assert.equal((await turnStore.get('quota')).pages,13);
+ // Releasing a slot wakes the oldest different waiting job without synchronously waiting for it.
+ const notifyStore=new Storage(),wakes=[],wakeA='c'.repeat(64),wakeB='d'.repeat(64),wakeSelf='a'.repeat(64);
+ const wakeBStorage=new Storage(),wakeAStorage=new Storage(),wakeBJob=new SearchJob({storage:wakeBStorage}),wakeAJob=new SearchJob({storage:wakeAStorage});
+ for(const [id,worker] of [[wakeA,wakeAJob],[wakeB,wakeBJob]])await worker.fetch(new Request('https://job.internal/start',{method:'POST',headers:{'x-job-id':id,'x-admission-waiting':'1'},body:JSON.stringify({cursors:[cursor]})}));
+ const wakeWorkers=new Map([[wakeA,wakeAJob],[wakeB,wakeBJob]]);
+ const notifyGate=new SearchGate({storage:notifyStore,waitUntil:p=>wakes.push(p)},{JOBS:{idFromName:id=>id,get:id=>({fetch:(url,opts)=>wakeWorkers.get(id).fetch(new Request(url,opts))})}});
+ await notifyStore.put('active:'+wakeSelf,time);await notifyStore.put('waiting:'+wakeSelf,{order:time-3000,lastSeen:time});
+ await notifyStore.put('waiting:'+wakeA,{order:time-2000,lastSeen:time});await notifyStore.put('waiting:'+wakeB,{order:time-1000,lastSeen:time});
+ await notifyGate.fetch(new Request('https://gate/yield?id='+wakeSelf));await Promise.all(wakes.splice(0));
+ assert.equal(wakeAStorage.alarmAt,time+1000,'oldest other waiter wakes promptly');assert.equal(wakeBStorage.alarmAt,time+1800000,'later waiter keeps its fallback alarm');
+ assert.equal((await wakeAStorage.get('job')).status,'waiting_admission');
+ const delayedStore=new Storage(),delayedCalls=[];let resolveWake;
+ const delayedGate=new SearchGate({storage:delayedStore,waitUntil:p=>delayedCalls.push(p)},{JOBS:{idFromName:id=>id,get:()=>({fetch:()=>new Promise(resolve=>{resolveWake=resolve;})})}});
+ await delayedStore.put('active:'+wakeSelf,time);await delayedStore.put('waiting:'+wakeA,{order:time,lastSeen:time});
+ const response=await Promise.race([delayedGate.fetch(new Request('https://gate/release?id='+wakeSelf)),new Promise((_,reject)=>setTimeout(()=>reject(Error('synchronous wake deadlock')),1000))]);
+ assert.equal(response.status,200,'slot release does not wait for another object');
+ await Promise.resolve();resolveWake(new Response(null,{status:500}));await Promise.all(delayedCalls);
+ assert.equal(wakeBStorage.alarmAt,time+1800000,'failed notification never deletes fallback alarms');
+ await notifyStore.delete('waiting:'+wakeSelf);const anotherActive='e'.repeat(64);await notifyStore.put('active:'+anotherActive,time);
+ await notifyGate.fetch(new Request('https://gate/release?id='+anotherActive));await Promise.all(wakes.splice(0));
+ assert.equal(wakeBStorage.alarmAt,time+1000,'a recent wake is suppressed so another waiting job is notified');
+ await wakeAJob.fetch(new Request('https://job.internal/wake',{method:'POST'}));assert.equal(wakeAStorage.alarmAt,time+1000,'an earlier existing alarm is not delayed');
+ const wakeBState=await wakeBStorage.get('job');wakeBState.waitingUntil=time-1000;await wakeBStorage.put('job',wakeBState);wakeBStorage.alarmAt=null;
+ await wakeBJob.fetch(new Request('https://job.internal/wake',{method:'POST'}));assert.equal(wakeBStorage.alarmAt,time+1000,'a missing alarm is restored');
+ // A wake arriving during an in-flight admission check must not be overwritten by its 30-minute retry.
+ const racingStore=new Storage();let resolveAdmission,admissionStarted;
+ const started=new Promise(resolve=>{admissionStarted=resolve;});
+ const racingJob=new SearchJob({storage:racingStore},{GATE:{idFromName:()=>'',get:()=>({fetch:()=>{admissionStarted();return new Promise(resolve=>{resolveAdmission=resolve;});}})}});
+ await racingJob.fetch(new Request('https://job.internal/start',{method:'POST',headers:{'x-job-id':wakeB,'x-admission-waiting':'1'},body:JSON.stringify({cursors:[cursor]})}));
+ racingStore.alarmAt=null;const processing=racingJob.alarm();await started;
+ await racingJob.fetch(new Request('https://job.internal/wake',{method:'POST'}));
+ resolveAdmission(Response.json({ok:true,waiting:true,retryAt:time+1800000}));await processing;
+ assert.equal(racingStore.alarmAt,time+1000,'admission retry preserves a concurrent earlier wake');
  const boundaryStore=new Storage(),boundaryGate=new SearchGate({storage:boundaryStore});
  await boundaryStore.put('active:'+turnId,time);await boundaryStore.put('waiting:'+nextId,{order:time,lastSeen:time});
  for(let p=0;p<10;p++){time+=4000;assert.equal((await (await boundaryGate.fetch(new Request('https://gate/page?id='+turnId+'&pages='+p))).json()).ok,true);}
