@@ -8,6 +8,7 @@ async function main(){
  for(const args of [{q:'x',startDate:'20260230',endDate:'20261013'},{q:'',startDate:'20260101',endDate:'20261013'},{q:'x',startDate:'20261013',endDate:'20260101'}])await assert.rejects(p.search(args,()=>assert.fail('invalid input requested')));
  const args={q:'청년',startDate:'20260101',endDate:'20261013',scope:'all',purpose:'documents'};
  const r=await p.search(args,async()=>html({code:200,rtnTotal:11,parameterVO:{...args,kwd:args.q},rtnList:[{INFO_SJ:'계획',PRDCTN_INSTT_REGIST_NO:'id',PRDCTN_DT:'20260716',INSTT_SE_CD:'B',OTHBC_SE_CD:'3'}]}));assert.equal(r.hasMore,true);assert.equal(r.items[0].disclosure,'비공개');assert.match(r.items[0].url,/infoListDetl2/);
+ const deadline=Date.now()+1234;let passedDeadline;await p.search({...args,deadline},async(_url,_hops,d)=>{passedDeadline=d;return html({code:200,rtnTotal:0,parameterVO:{...args,kwd:args.q},rtnList:[]})});assert.equal(passedDeadline,deadline);
  await assert.rejects(p.search(args,async()=>html({code:491,rtnList:[],rtnTotal:0})));
  await assert.rejects(p.search(args,async()=>html({code:200,rtnList:[],rtnTotal:0,parameterVO:{...args,q:undefined,kwd:'wrong'}})));
  const v={infoSj:'추진계획',oppSeCd:'1',fileYn:'Y',nstSeCd:'B',urtxtYn:'Y',fileList:[{fileId:'f',fileNm:'plan.hwpx',fileSeDc:'첨부'}]};

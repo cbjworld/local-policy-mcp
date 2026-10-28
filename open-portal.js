@@ -8,10 +8,10 @@ function embedded(bytes){
 }
 function detailUrl(id,date,type,scope){return base+'/othicInfo/infoList/'+(scope==='all'?'infoListDetl2.do':'infoListDetl.do')+'?'+new URLSearchParams({prdnNstRgstNo:id,prdnDt:date,nstSeCd:type});}
 function dateValue(s){if(typeof s!=='string'||!/^\d{8}$/.test(s))return false;const iso=s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6);const d=new Date(iso);return !isNaN(d)&&d.toISOString().slice(0,10)===iso;}
-async function rawSearch({q,startDate,endDate,page=1,scope='original'}={},get=download){
+async function rawSearch({q,startDate,endDate,page=1,scope='original',deadline}={},get=download){
  if(typeof q!=='string'||!q.trim()||q.length>300||!dateValue(startDate)||!dateValue(endDate)||startDate>endDate||!Number.isInteger(page)||page<1||page>100||!['original','all'].includes(scope))throw Error('검색어, YYYYMMDD 시작·종료일, 페이지 1~100, scope original/all을 확인하세요.');
  const url=base+'/othicInfo/infoList/'+(scope==='original'?'orginlInfoList.do':'infoList.do')+'?'+new URLSearchParams({kwd:q,startDate,endDate,insttSeCd:'W,B',rowPage:'10',viewPage:String(page),sort:'s'});
- const r=embedded((await get(url)).bytes);
+ const r=embedded((await get(url,0,deadline)).bytes);
  if(String(r.code)!=='200'||!Array.isArray(r.rtnList)||!Number.isFinite(Number(r.rtnTotal)))throw Error('포털 검색 실패: 결과 없음으로 해석하지 마세요.');
  if(r.parameterVO?.kwd!==q||r.parameterVO?.startDate!==startDate||r.parameterVO?.endDate!==endDate)throw Error('포털이 요청한 검색 조건을 반영하지 않았습니다.');
  return {status:'ok',mode:'live-open-portal',url,checkedAt:new Date().toISOString(),q,startDate,endDate,scope,page,total:Number(r.rtnTotal),hasMore:page*10<Number(r.rtnTotal),items:r.rtnList.map(x=>({title:x.INFO_SJ,institution:x.ALL_PROC_INSTT_NM||x.PROC_INSTT_NM,department:x.CHRG_DEPT_NM,date:x.PRDCTN_DT,documentNumber:x.DOC_NO,disclosure:({'1':'공개','2':'부분공개','3':'비공개','5':'열람제한'})[x.OTHBC_SE_CD]||'미확인',url:detailUrl(x.PRDCTN_INSTT_REGIST_NO,x.PRDCTN_DT,x.INSTT_SE_CD,scope)})),warning:'문서 건수이며 사업 건수가 아닙니다. 제목은 본문 근거가 아닙니다. 검색 기간과 공개 범위 밖 문서는 포함되지 않습니다.'};

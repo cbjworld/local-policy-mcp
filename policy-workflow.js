@@ -111,7 +111,7 @@ async function runResearch(args={},io=portal){
  while(continuation.length&&continuationAttempts<12&&Date.now()<continuationDeadline){
   const cursor=continuation.shift();continuationAttempts++;
   try{
-   const r=await io.search({q:cursor.q,startDate:request.startDate,endDate:request.endDate,page:cursor.page,...(cursor.scope==='all'?{scope:'all'}:{})});
+   const r=await io.search({q:cursor.q,startDate:request.startDate,endDate:request.endDate,page:cursor.page,deadline:continuationDeadline,...(cursor.scope==='all'?{scope:'all'}:{})});
    continuationSucceeded++;
    const failureIndex=failures.findIndex(f=>f.q===cursor.q&&f.scope===cursor.scope&&f.page===cursor.page);
    if(failureIndex>=0)failures.splice(failureIndex,1);
