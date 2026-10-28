@@ -69,6 +69,8 @@ assert.equal(next.waiting,false,'an offline waiting job must not block another j
 assert(await staleStore.get('waiting:'+'a'.repeat(64)),'offline job remains available to resume');
 const badStorage=new Storage(),badGate=new SearchGate({storage:badStorage});
 const env={SEARCH_SECRET:'test',GATE:{idFromName:()=>'',get:()=>({fetch:url=>badGate.fetch(new Request(url))})},JOBS:{idFromName:()=>'',get:()=>({fetch:async()=>new Response(null,{status:400})})}};
+assert.equal((await app.fetch(new Request('https://worker/jobs/'+('e'.repeat(64))+'/status'),env)).status,401,'status requires worker authentication');
+assert.equal((await app.fetch(new Request('https://worker/inspect?id='+('e'.repeat(64)),{headers:{authorization:'Bearer test'}}),env)).status,404,'global gate is not exposed externally');
 assert.equal((await app.fetch(new Request('https://worker/jobs/'+('e'.repeat(64))+'/wake',{method:'POST',headers:{authorization:'Bearer test'}}),env)).status,404,'wake is not exposed through the external worker route');
 const badRequest=new Request('https://worker/jobs/'+('e'.repeat(64))+'/start',{method:'POST',headers:{authorization:'Bearer test'},body:'{}'});
 assert.equal((await app.fetch(badRequest,env)).status,400);assert.equal((await badStorage.list({prefix:'active:',limit:100})).size,0,'invalid requests cannot reserve a slot');
@@ -92,6 +94,21 @@ await liveStore.put('quota',{day:new Date(now).toISOString().slice(0,10),pages:1
 await liveStore.put('pending:'+'b'.repeat(64),{order:now-240000,lastSeen:now-1000});
 assert.equal((await (await liveGate.fetch(new Request('https://gate/page?id='+'a'.repeat(64)))).json()).ok,false);
 assert.equal((await (await liveGate.fetch(new Request('https://gate/page?id='+'b'.repeat(64)))).json()).ok,true);
+const summaryStore=new Storage(),summaryGate=new SearchGate({storage:summaryStore}),otherId='d'.repeat(64);
+await summaryStore.put('quota',{day:new Date(now).toISOString().slice(0,10),jobs:4,pages:71,attempts:123,lastPage:now-4000});
+await summaryStore.put('active:'+('a'.repeat(64)),now);await summaryStore.put('active:'+otherId,now-15*86400000);
+await summaryStore.put('waiting:'+('b'.repeat(64)),{order:now,lastSeen:now});await summaryStore.put('waiting:'+otherId,{order:now-3600000,lastSeen:now-3600000});
+const gateView=await (await summaryGate.fetch(new Request('https://gate/inspect?id='+('a'.repeat(64))))).json();
+assert.deepEqual(gateView.gateSummary,{activeJobs:1,waitingJobs:2,eligibleWaitingJobs:1,pagesToday:71,attemptsToday:123});assert(!JSON.stringify(gateView).includes(otherId));
+const statusStore=new Storage(),statusEnv={GATE:{idFromName:()=>'',get:()=>({fetch:async()=>Response.json({...gateView,privateOtherId:otherId,gateSummary:{...gateView.gateSummary,privateOtherId:otherId}})})}};
+const statusJob=new SearchJob({storage:statusStore},statusEnv);
+await statusJob.fetch(new Request('https://job.internal/start',{method:'POST',headers:{'x-job-id':'a'.repeat(64),'x-admission-waiting':'1'},body:JSON.stringify({cursors:[cursor]})}));
+let statusView=await (await statusJob.fetch(new Request('https://job.internal/status'))).json();
+assert.deepEqual(statusView.gateSummary,gateView.gateSummary);assert(!JSON.stringify(statusView).includes(otherId));
+let statusRecord=await statusStore.get('job');statusRecord.status='running';await statusStore.put('job',statusRecord);
+statusView=await (await statusJob.fetch(new Request('https://job.internal/status'))).json();assert.deepEqual(statusView.gateSummary,gateView.gateSummary);assert(!JSON.stringify(statusView).includes(otherId));
+const unavailable=new SearchJob({storage:statusStore},{GATE:{idFromName:()=>'',get:()=>({fetch:async()=>{throw Error('offline')}})}});
+statusView=await (await unavailable.fetch(new Request('https://job.internal/status'))).json();assert.equal(statusView.gateSummaryStatus,'unavailable');assert.equal(statusView.gateSummary,undefined);
 // Repeated portal failures must release capacity without losing already stored results.
 const originalNow=Date.now,originalFetch=globalThis.fetch;let time=Date.parse('2026-10-28T04:00:00Z');
 try{

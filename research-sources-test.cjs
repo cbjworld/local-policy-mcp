@@ -32,6 +32,12 @@ const {createArchive}=require('./source-archive');
  const concurrent=createStore({archive:{put:async()=>{await new Promise(r=>setTimeout(r,30));assert(startCalled,'background starts while archive is being stored');}},background:{start:async()=>{startCalled=true;}}});
  assert.equal((await concurrent.save({coverage:{nextSearches:[{arguments:cursor}]}})).backgroundSearch.status,'running');
  assert.equal((await withBackground.backgroundList({researchId:auto.researchId})).pagesRead,1);
+ const counts={activeJobs:20,waitingJobs:8,eligibleWaitingJobs:7,pagesToday:71,attemptsToday:100};
+ const countsStore=createStore({background:{status:async()=>({status:'waiting_admission',pages:0,cursors:[],gateSummary:{...counts,otherId:'must-not-leak'}}),pages:async()=>({pages:[]})}});
+ const countsResult=await countsStore.backgroundList({researchId:'a'.repeat(64)});
+ assert.deepEqual(countsResult.gateSummary,counts);assert(!JSON.stringify(countsResult).includes('must-not-leak'));
+ const badCounts=createStore({background:{status:async()=>({status:'waiting_admission',gateSummary:{...counts,activeJobs:'20'},gateSummaryStatus:'unavailable'}),pages:async()=>({pages:[]})}});
+ const unavailableCounts=await badCounts.backgroundList({researchId:'a'.repeat(64)});assert.equal(unavailableCounts.gateSummary,undefined);assert.equal(unavailableCounts.gateSummaryStatus,'unavailable');
  const broken=createStore({archive,background:{start:async()=>{throw Error('quota')}}});
  assert.equal((await broken.save({coverage:{nextSearches:[{arguments:cursor}]}})).backgroundSearch.status,'not_started');
  const clock=Date.now;try{Date.now=()=>clock()+86401000;assert.equal((await b.list({researchId:saved.researchId})).total,75);await assert.rejects(()=>fail.list({researchId:temp.researchId}),/missing/);}finally{Date.now=clock;}

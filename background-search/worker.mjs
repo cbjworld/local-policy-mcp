@@ -46,7 +46,9 @@ export class SearchGate {
         const entries=await tx.list({prefix:'pending:',limit:100});
         const age=v=>typeof v==='number'?v:v.lastSeen,order=v=>typeof v==='number'?v:v.order;
         const pending=[...entries].filter(([,v])=>now-age(v)<=180000).sort((a,b)=>order(a[1])-order(b[1])||a[0].localeCompare(b[0]));
-        return {ok:true,position:pending.findIndex(([name])=>name==='pending:'+id)+1,pending:pending.length,pagesToday:data.pages,secondsSinceLastPage:Math.floor((now-data.lastPage)/1000)};
+        const activeEntries=await tx.list({prefix:'active:',limit:100}),waitingEntries=await tx.list({prefix:'waiting:',limit:51});
+        const gateSummary={activeJobs:[...activeEntries.values()].filter(stamp=>now-stamp<=14*86400000).length,waitingJobs:waitingEntries.size,eligibleWaitingJobs:[...waitingEntries.values()].filter(v=>now-v.lastSeen<=2400000).length,pagesToday:data.pages,attemptsToday:data.attempts||0};
+        return {ok:true,position:pending.findIndex(([name])=>name==='pending:'+id)+1,pending:pending.length,pagesToday:data.pages,secondsSinceLastPage:Math.floor((now-data.lastPage)/1000),gateSummary};
       }
       if(kind==='/release'){
         const ticket=await tx.get('ticket:'+id);
@@ -168,8 +170,19 @@ export class SearchJob {
     if (request.method === 'GET' && url.pathname === '/status') {
       const job=await this.storage.get('job');
       if (!job) return Response.json({error:'not_found'},{status:404});
-      if(job.status==='running'&&this.env?.GATE&&job.id){
-        try{const r=await this.env.GATE.get(this.env.GATE.idFromName('global')).fetch('https://gate.internal/inspect?id='+job.id);if(r.ok)job.cursors[0]={...job.cursors[0],gateStatus:await r.json()};}catch{}
+      if(['running','waiting_admission'].includes(job.status)&&this.env?.GATE&&job.id){
+        try{
+          const r=await this.env.GATE.get(this.env.GATE.idFromName('global')).fetch('https://gate.internal/inspect?id='+job.id);
+          if(!r.ok)throw Error('inspect_failed');
+          const view=await r.json(),s=view.gateSummary;
+          if(s&&['activeJobs','waitingJobs','eligibleWaitingJobs','pagesToday','attemptsToday'].every(k=>Number.isSafeInteger(s[k])&&s[k]>=0))job.gateSummary=Object.fromEntries(['activeJobs','waitingJobs','eligibleWaitingJobs','pagesToday','attemptsToday'].map(k=>[k,s[k]]));
+          else job.gateSummaryStatus='unavailable';
+          if(job.status==='running'){
+            const gateStatus={ok:view.ok===true};
+            for(const k of ['position','pending','pagesToday','secondsSinceLastPage'])if(Number.isSafeInteger(view[k])&&view[k]>=0)gateStatus[k]=view[k];
+            job.cursors[0]={...job.cursors[0],gateStatus};
+          }
+        }catch{job.gateSummaryStatus='unavailable';}
       }
       return Response.json(job);
     }

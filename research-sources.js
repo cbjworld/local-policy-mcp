@@ -35,7 +35,9 @@ function createStore({archive=null,background=null}={}){
   if(!background)throw Error('백그라운드 검색이 연결되지 않았습니다.');
   if(typeof researchId!=='string'||!/^[a-f0-9]{64}$/.test(researchId)||cursor!==undefined&&!/^page:\d{8}$/.test(cursor))throw Error('검색 ID와 목록 위치를 확인하세요.');
   const [status,result]=await Promise.all([background.status(researchId),background.pages(researchId,cursor)]);
-  return {researchId,status:status.status,pagesRead:status.pages,remainingSearches:status.cursors,waitingUntil:status.waitingUntil||null,lastError:status.lastError||null,pages:result.pages,nextCursor:result.nextCursor,note:'문서 제목 검색 결과입니다. 검색 표현·페이지의 중복을 제거하고 원문 확인 여부를 구분하세요.'};
+  const keys=['activeJobs','waitingJobs','eligibleWaitingJobs','pagesToday','attemptsToday'],s=status.gateSummary;
+  const gateSummary=s&&keys.every(k=>Number.isSafeInteger(s[k])&&s[k]>=0)?Object.fromEntries(keys.map(k=>[k,s[k]])):undefined;
+  return {researchId,status:status.status,pagesRead:status.pages,remainingSearches:status.cursors,waitingUntil:status.waitingUntil||null,lastError:status.lastError||null,...(gateSummary?{gateSummary}:status.gateSummaryStatus==='unavailable'?{gateSummaryStatus:'unavailable'}:{}),pages:result.pages,nextCursor:result.nextCursor,note:'문서 제목 검색 결과입니다. 검색 표현·페이지의 중복을 제거하고 원문 확인 여부를 구분하세요.'};
  }
  return {save,list,backgroundList};
 }
