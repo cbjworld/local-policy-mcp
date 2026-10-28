@@ -20,6 +20,7 @@ export async function portalPage(c, fetcher = fetch) {
   if (!match) throw Error('portal_response_invalid');
   const data = JSON.parse(match[1]);
   if (String(data.code) !== '200' || !Array.isArray(data.rtnList) || !Number.isFinite(Number(data.rtnTotal)) || data.parameterVO?.kwd !== c.q || data.parameterVO?.startDate !== c.startDate || data.parameterVO?.endDate !== c.endDate || (data.parameterVO?.viewPage != null && Number(data.parameterVO.viewPage) !== c.page)) throw Error('portal_response_mismatch');
+  if ((Number(data.rtnTotal) > (c.page-1)*10 && !data.rtnList.length) || data.rtnList.some(x=>!x.PRDCTN_INSTT_REGIST_NO||!x.PRDCTN_DT||!x.INSTT_SE_CD)) throw Error('portal_page_incomplete');
   return {total:Number(data.rtnTotal),items:data.rtnList.map(x => ({title:x.INFO_SJ,institution:x.ALL_PROC_INSTT_NM||x.PROC_INSTT_NM,date:x.PRDCTN_DT,disclosure:({'1':'공개','2':'부분공개','3':'비공개','5':'열람제한'})[x.OTHBC_SE_CD]||'미확인',url:'https://www.open.go.kr/othicInfo/infoList/'+(c.scope==='all'?'infoListDetl2.do':'infoListDetl.do')+'?'+new URLSearchParams({prdnNstRgstNo:x.PRDCTN_INSTT_REGIST_NO,prdnDt:x.PRDCTN_DT,nstSeCd:x.INSTT_SE_CD})}))};
 }
 // The shared gate bounds free-tier traffic across jobs, not merely per process.
@@ -42,7 +43,7 @@ export class SearchGate {
         if([...entries.values()].filter(stamp=>now-stamp<=14*86400000).length>=20)return {ok:false,retryAt:now+300000,reason:'active_job_limit'};
       }
       if ((kind==='/admit' && data.jobs>=100)||(kind==='/page' && data.pages>=1000)) return {ok:false,retryAt:nextDay};
-      if (kind==='/page' && now-data.lastPage<3000) return {ok:false,retryAt:now+300000+Math.floor(Math.random()*30000)};
+      if (kind==='/page' && now-data.lastPage<3000) return {ok:false,retryAt:now+60000+Math.floor(Math.random()*10000)};
       if (kind==='/admit'&&!active) data.jobs++; else if(kind==='/page'){data.pages++;data.lastPage=now;}
       await tx.put(key,now);
       await tx.put('quota',data); return {ok:true};
