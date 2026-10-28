@@ -51,4 +51,9 @@ const refused=await (await fullGate.fetch(new Request('https://gate/admit?id='+'
 assert.equal(refused.reason,'active_job_limit');
 await fullGate.fetch(new Request('https://gate/release?id='+('0'.repeat(64))));
 assert.equal((await (await fullGate.fetch(new Request('https://gate/admit?id='+'f'.repeat(64)))).json()).ok,true);
+const fairStore=new Storage(),fairGate=new SearchGate({storage:fairStore}),now=Date.now();
+await fairStore.put('quota',{day:new Date(now).toISOString().slice(0,10),pages:1,jobs:2,lastPage:now-4000});
+await fairStore.put('pending:'+'b'.repeat(64),now-1000);
+assert.equal((await (await fairGate.fetch(new Request('https://gate/page?id='+'a'.repeat(64)))).json()).ok,false);
+assert.equal((await (await fairGate.fetch(new Request('https://gate/page?id='+'b'.repeat(64)))).json()).ok,true);
 console.log('background-search: retry, restart, page validation and completion passed');

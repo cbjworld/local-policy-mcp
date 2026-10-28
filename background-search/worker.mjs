@@ -36,14 +36,22 @@ export class SearchGate {
       let data=await tx.get('quota'); if (!data || data.day!==day) data={day,jobs:0,pages:0,lastPage:0};
       const nextDay=Date.parse(day+'T00:00:00Z')+86400000+1000;
       const key='active:'+id,active=await tx.get(key);
-      if(kind==='/release'){await tx.delete(key);return {ok:true};}
+      if(kind==='/release'){await tx.delete(key);await tx.delete('pending:'+id);return {ok:true};}
       if(kind==='/admit'&&!active){
         const entries=await tx.list({prefix:'active:',limit:100});
         for(const [name,stamp] of entries)if(now-stamp>14*86400000)await tx.delete(name);
         if([...entries.values()].filter(stamp=>now-stamp<=14*86400000).length>=20)return {ok:false,retryAt:now+300000,reason:'active_job_limit'};
       }
       if ((kind==='/admit' && data.jobs>=100)||(kind==='/page' && data.pages>=1000)) return {ok:false,retryAt:nextDay};
-      if (kind==='/page' && now-data.lastPage<3000) return {ok:false,retryAt:now+60000+Math.floor(Math.random()*10000)};
+      if (kind==='/page') {
+        const pendingKey='pending:'+id;
+        if(!await tx.get(pendingKey))await tx.put(pendingKey,now);
+        const pending=await tx.list({prefix:'pending:',limit:100});
+        for(const [name,stamp] of pending)if(now-stamp>180000)await tx.delete(name);
+        const first=[...pending].filter(([,stamp])=>now-stamp<=180000).sort((a,b)=>a[1]-b[1]||a[0].localeCompare(b[0]))[0];
+        if(first?.[0]!==pendingKey||now-data.lastPage<3000)return {ok:false,retryAt:now+60000+Math.floor(Math.random()*10000)};
+        await tx.delete(pendingKey);
+      }
       if (kind==='/admit'&&!active) data.jobs++; else if(kind==='/page'){data.pages++;data.lastPage=now;}
       await tx.put(key,now);
       await tx.put('quota',data); return {ok:true};
