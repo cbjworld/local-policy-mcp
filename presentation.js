@@ -14,7 +14,7 @@ function targetDifferences(attempts){
 }
 function answerSummary(financialSummary,differences){
  const text=['| 항목 | 금액 | 근거 쪽 |','| --- | --- | --- |',...financialSummary.rows.map(r=>'| '+r.label+' | '+r.display+' | '+([...new Set(r.observations.map(e=>e.page==null?'쪽 번호 없음':e.page+'쪽'))].join(', ')||'별도 표기 없음')+' |')].join('\n');
- return {text,instruction:'이 표를 우선 제시하세요. 사업비·소요예산·총사업비는 계획서 사업비 한 행으로 표시하고 원문 명칭의 차이만으로 미기재라고 하지 마세요. 산식 계산값은 금액 옆에 표시하세요. 별도 표기 없음은 0원이 아닙니다. 원문 표기 차이는 해당 항목 옆에 한 번만 설명하세요. 재원이 달라도 계획서 사업비는 비교할 수 있으며 합산만 하지 않습니다. 내부 추출 상태와 일반적인 주의 문구는 나열하지 마세요. 실제 불일치·읽기 실패·가림은 구체적으로 표시하세요.'};
+ return {text,instruction:'이 표를 우선 제시하세요. 사업비·소요예산·총사업비는 문서의 사업비 한 행으로 표시하고 원문 명칭의 차이만으로 미기재라고 하지 마세요. 산식 계산값은 금액 옆에 표시하세요. 별도 표기 없음은 0원이 아닙니다. 원문 표기 차이는 해당 항목 옆에 한 번만 설명하세요. 재원이 달라도 문서의 사업비는 비교할 수 있으며 합산만 하지 않습니다. 내부 추출 상태와 일반적인 주의 문구는 나열하지 마세요. 실제 불일치·읽기 실패·가림은 구체적으로 표시하세요.'};
 }
 function institutionGroups(value){
  const groups=new Map(),seen=new Set(),states=new Map((value.investigations||[]).map(x=>[x.candidate.url,x.result.status]));

@@ -1,4 +1,4 @@
-const labels={planBudget:'계획서 사업비',documentBudget:'문서 예산액',supportBudget:'지원금 예산',promotionBudget:'홍보비',benefit:'지원액',perPayment:'회당 지원액',annualLimit:'연간 지원 한도',currentAllocation:'금회 교부액',previousAllocation:'기교부액',allocation:'교부액'};
+const labels={planBudget:'문서의 사업비',documentBudget:'문서 예산액',supportBudget:'지원금 예산',promotionBudget:'홍보비',benefit:'지원액',perPayment:'회당 지원액',annualLimit:'연간 지원 한도',currentAllocation:'금회 교부액',previousAllocation:'기교부액',allocation:'교부액'};
 function money(text){
  const m=String(text).replace(/\s+/g,'').match(/^(\d+|\d{1,3}(?:,\d{3})+)(?:\.(\d{1,6}))?(천만|백만|억|만|천|백)?원$/);
  if(!m)return null;
@@ -74,7 +74,7 @@ function summarize(attempts,existingAmounts){
   if(r.status==='not_stated'&&attempts.some(a=>a.source?.ocr?.status==='read'))r.display='OCR 읽은 범위에서 추출되지 않음';
  }
  if(Object.values(rows).some(r=>r.ocrReviewRequired))for(const c of checks){c.verification='ocr_arithmetic_only';c.ocrReviewRequired=true;}
- return {checks,rows:Object.values(rows).filter(r=>['planBudget','supportBudget','promotionBudget'].includes(r.key)||r.status!=='not_stated'),scope:'one_document_only',completeTextRead:complete,instruction:'계획서 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요.'};
+ return {checks,rows:Object.values(rows).filter(r=>['planBudget','supportBudget','promotionBudget'].includes(r.key)||r.status!=='not_stated'),scope:'one_document_only',completeTextRead:complete,instruction:'문서의 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요.'};
 }
 function requestedGaps(result,question=''){
  if(result?.status!=='read'||result.relevanceStatus==='supporting_document'||result.targetFit?.status==='mismatch')return [];

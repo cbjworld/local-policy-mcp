@@ -9,18 +9,18 @@ function createStore({archive=null,background=null}={}){
    unique.set(key,{institution:d.institution||null,title:d.title||'',url:d.url,disclosure:d.disclosure||null,classification:d.relevance?.kind||'unclassified',role:d.documentRole||'other',readingStatus:read.get(key)||'not_attempted'});
   }
   const researchId=archive?randomBytes(32).toString('hex'):randomUUID(),items=[...unique.values()],snapshot={items,createdAt:Date.now(),question:value.request?.question||null};
+  const cursors=(value.coverage?.nextSearches||[]).map(x=>x.arguments);
+  const backgroundPending=cursors.length&&background&&researchId.length===64?(async()=>{
+   try{await background.start(researchId,cursors);return {status:'running',tool:'list_background_sources',arguments:{researchId}};}
+   catch(e){
+    try{const state=await background.status(researchId);return {status:state.status,tool:'list_background_sources',arguments:{researchId}};}
+    catch{return {status:'not_started',reason:e.message};}
+   }
+  })():Promise.resolve(undefined);
   let storage=archive?'archived':'temporary',warning;
   if(archive)try{await archive.put(researchId,snapshot)}catch{storage='temporary';warning='출처 저장 실패: 이 목록은 임시 보관되며 서버 재시작 시 사라질 수 있습니다.';}
   snapshots.set(researchId,{...snapshot,storage});while(snapshots.size>128)snapshots.delete(snapshots.keys().next().value);
-  let backgroundSearch;
-  const cursors=(value.coverage?.nextSearches||[]).map(x=>x.arguments);
-  if(cursors.length&&background&&researchId.length===64){
-   try{await background.start(researchId,cursors);backgroundSearch={status:'running',tool:'list_background_sources',arguments:{researchId}};}
-   catch(e){
-    try{const state=await background.status(researchId);backgroundSearch={status:state.status,tool:'list_background_sources',arguments:{researchId}};}
-    catch{backgroundSearch={status:'not_started',reason:e.message};}
-   }
-  }
+  const backgroundSearch=await backgroundPending;
   return {researchId,total:items.length,storage,warning,backgroundSearch,tool:'list_research_sources',arguments:{researchId,offset:0,limit:30},note:storage==='archived'?'암호화해 보관했습니다. 검색 ID를 가진 사람은 목록을 볼 수 있으므로 안전하게 보관하세요.':'임시 보관입니다. 서버 재시작이나 보관 한도에 따라 목록이 사라질 수 있습니다.'};
  }
  async function list({researchId,offset=0,limit=30}={}){

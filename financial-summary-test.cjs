@@ -5,7 +5,7 @@ assert.equal(money('5,000천원'),5000000);assert.equal(money('1.15억원'),1150
 for(const bad of ['1,,000원','1.5원','-100원','9007199254740992원','1억2천만원','100원×2'])assert.equal(money(bad),null,bad);
 for(const heading of ['사업비','총사업비','소요예산','사업예산']){
  const result=summarize(make(heading+': 금5,000천원(청년기금)'));
- assert.equal(row(result,'planBudget').valueKRW,5000000);assert.equal(row(result,'planBudget').label,'계획서 사업비');assert.equal(row(result,'planBudget').observations[0].sourceLabel,heading);
+ assert.equal(row(result,'planBudget').valueKRW,5000000);assert.equal(row(result,'planBudget').label,'문서의 사업비');assert.equal(row(result,'planBudget').observations[0].sourceLabel,heading);
 }
 const yeongdo='사 업 비 : 금5,000천원(금오백만원)\n면접수당 지원금 : 50천원×100회\n지원내용: 1회 면접수당 5만원 지원';
 const y=summarize(make(yeongdo));assert.equal(row(y,'supportBudget').valueKRW,5000000);assert.equal(row(y,'supportBudget').status,'calculated');assert.equal(row(y,'perPayment').valueKRW,50000);assert.equal(row(y,'promotionBudget').status,'not_stated');
@@ -49,7 +49,7 @@ assert.equal(view.fields.find(f=>f.key==='target').state,'원문 표기 차이')
 assert.equal(require('./presentation').documentView({attempts:[...different.map(a=>({...a,evidenceScope:'attachment_reference'}))]}).documentDifferences.length,0);
 const compactRow=require('./research-brief')([{classification:'project_candidate',readingStatus:'read',reading:view}])[0];
 assert.equal(compactRow.fields.target.documentDifferences[0].evidence.length,2);
-assert(direct.presentation.answerSummary.text.includes('계획서 사업비 | 1,050만원'));
+assert(direct.presentation.answerSummary.text.includes('문서의 사업비 | 1,050만원'));
 assert.equal(Object.keys(direct)[0],'presentation');
 const quote='사업비: 5,000천원',source={sourceId:'budget',url:'https://a.go.kr/plan',checkedAt:'2026-10-23',pages:[{page:1,text:quote}]};
 require('./discovery').withSources(new Map([['budget',source]]),()=>{
