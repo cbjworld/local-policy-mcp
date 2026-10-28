@@ -42,17 +42,35 @@ export class SearchGate {
         const pending=[...entries].filter(([,v])=>now-age(v)<=180000).sort((a,b)=>order(a[1])-order(b[1])||a[0].localeCompare(b[0]));
         return {ok:true,position:pending.findIndex(([name])=>name==='pending:'+id)+1,pending:pending.length,pagesToday:data.pages,secondsSinceLastPage:Math.floor((now-data.lastPage)/1000)};
       }
-      if(kind==='/release'){await tx.delete(key);await tx.delete('pending:'+id);return {ok:true};}
+      if(kind==='/release'){
+        const ticket=await tx.get('ticket:'+id);
+        if(new URL(request.url).searchParams.get('rollback')==='1'&&ticket?.day===day){data.jobs=Math.max(0,data.jobs-1);await tx.put('quota',data);}
+        await tx.delete('ticket:'+id);await tx.delete(key);await tx.delete('waiting:'+id);await tx.delete('pending:'+id);return {ok:true};
+      }
       if(kind==='/admit'&&!active){
+        const waitingKey='waiting:'+id;
+        let queued=await tx.get(waitingKey),isNew=false;
+        if(!queued){
+          if(data.jobs>=100)return {ok:false,retryAt:nextDay,reason:'daily_job_limit'};
+          const backlog=await tx.list({prefix:'waiting:',limit:51});
+          if(backlog.size>=50)return {ok:false,retryAt:now+1800000,reason:'backlog_limit'};
+          queued={order:now,lastSeen:now};isNew=true;await tx.put(waitingKey,queued);await tx.put('ticket:'+id,{day});data.jobs++;await tx.put('quota',data);
+        }
+        else{queued.lastSeen=now;await tx.put(waitingKey,queued);}
         const entries=await tx.list({prefix:'active:',limit:100});
         for(const [name,stamp] of entries)if(now-stamp>14*86400000)await tx.delete(name);
-        if([...entries.values()].filter(stamp=>now-stamp<=14*86400000).length>=20)return {ok:false,retryAt:now+300000,reason:'active_job_limit'};
+        const waiting=await tx.list({prefix:'waiting:',limit:51});
+        const first=[...waiting].filter(([,v])=>now-v.lastSeen<=2400000).sort((a,b)=>a[1].order-b[1].order||a[0].localeCompare(b[0]))[0]?.[0];
+        if([...entries.values()].filter(stamp=>now-stamp<=14*86400000).length>=20||first!==waitingKey)return {ok:true,waiting:true,retryAt:now+1800000,isNew};
+        await tx.delete(waitingKey);await tx.put(key,now);
+        return {ok:true,waiting:false,isNew};
       }
+      if(kind==='/admit')return {ok:true,waiting:false,isNew:false};
       if(kind==='/page'){
         if((data.attempts||0)>=8000)return {ok:false,retryAt:nextDay,reason:'daily_attempt_limit'};
         data.attempts=(data.attempts||0)+1;await tx.put('quota',data);
       }
-      if ((kind==='/admit' && data.jobs>=100)||(kind==='/page' && data.pages>=1000)) return {ok:false,retryAt:nextDay};
+      if (kind==='/page' && data.pages>=1000) return {ok:false,retryAt:nextDay};
       if (kind==='/page') {
         const pendingKey='pending:'+id;
         const queued=await tx.get(pendingKey),order=typeof queued==='number'?queued:queued?.order;
@@ -66,7 +84,7 @@ export class SearchGate {
         if(position!==0||now-data.lastPage<3000)return {ok:false,retryAt:Math.max(now+3000*(Math.max(position,0)+1),data.lastPage+3000)+Math.floor(Math.random()*1000)};
         await tx.delete(pendingKey);
       }
-      if (kind==='/admit'&&!active) data.jobs++; else if(kind==='/page'){data.pages++;data.lastPage=now;}
+      if(kind==='/page'){data.pages++;data.lastPage=now;}
       await tx.put(key,now);
       await tx.put('quota',data); return {ok:true};
     });
@@ -85,10 +103,12 @@ export class SearchJob {
       const id=request.headers.get('x-job-id');if(!validId(id||''))return Response.json({error:'invalid_id'},{status:400});
       await this.storage.transaction(async tx => {
         if (await tx.get('job')) throw Error('already_started');
-        await tx.put('job',{id,cursors:input.cursors,status:'running',pages:0,failures:0,createdAt:Date.now(),updatedAt:Date.now()});
-        await tx.setAlarm(Date.now()+1000);
+        const waiting=request.headers.get('x-admission-waiting')==='1';
+        const waitingUntil=waiting?Date.now()+1800000:null;
+        await tx.put('job',{id,cursors:input.cursors,status:waiting?'waiting_admission':'running',...(waiting?{waitingUntil}:{}),pages:0,failures:0,createdAt:Date.now(),updatedAt:Date.now()});
+        await tx.setAlarm(waitingUntil||Date.now()+1000);
       });
-      return Response.json({status:'running'},{status:202});
+      return Response.json({status:request.headers.get('x-admission-waiting')==='1'?'waiting_admission':'running'},{status:202});
     }
     if (request.method === 'GET' && url.pathname === '/status') {
       const job=await this.storage.get('job');
@@ -109,6 +129,14 @@ export class SearchJob {
   async alarm() {
     const job=await this.storage.get('job');
     if (!job) return;
+    if(job.status==='waiting_admission'){
+      try{
+        const gate=this.env.GATE.get(this.env.GATE.idFromName('global'));
+        const permit=await (await gate.fetch('https://gate.internal/admit?id='+job.id)).json();
+        if(!permit.ok||permit.waiting){job.waitingUntil=permit.retryAt||Date.now()+1800000;await this.storage.put('job',job);await this.storage.setAlarm(job.waitingUntil);return;}
+        job.status='running';delete job.waitingUntil;await this.storage.put('job',job);
+      }catch{await this.storage.setAlarm(Date.now()+1800000);return;}
+    }
     if(job.status!=='running'){
       if(this.env?.GATE&&job.id){try{const r=await this.env.GATE.get(this.env.GATE.idFromName('global')).fetch('https://gate.internal/release?id='+job.id);if(!r.ok)throw Error('release_failed');}catch{await this.storage.setAlarm(Date.now()+300000);}}
       return;
@@ -150,9 +178,21 @@ export default { async fetch(request, env) {
   const url=new URL(request.url), match=url.pathname.match(/^\/jobs\/([a-f0-9]{64})\/(start|status|pages)$/);
   if (!match || !validId(match[1])) return Response.json({error:'not_found'},{status:404});
   if (match[2]==='start' && request.method==='POST') {
+    let input;try{input=await request.clone().json();}catch{return Response.json({error:'invalid_json'},{status:400});}
+    if(!validate(input.cursors))return Response.json({error:'invalid_cursors'},{status:400});
     const gate=env.GATE.get(env.GATE.idFromName('global'));
     const admission=await (await gate.fetch('https://gate.internal/admit?id='+match[1])).json();
     if (!admission.ok) return Response.json({error:admission.reason||'daily_job_limit',retryAt:admission.retryAt},{status:429});
+    const stub=env.JOBS.get(env.JOBS.idFromName(match[1]));
+    const headers=new Headers(request.headers);headers.set('x-job-id',match[1]);headers.set('x-admission-waiting',admission.waiting?'1':'0');
+    let result;
+    try{result=await stub.fetch(new Request('https://job.internal/start',{method:'POST',headers,body:JSON.stringify(input)}));}
+    catch(error){
+      if(admission.isNew)try{const status=await stub.fetch('https://job.internal/status');if(status.status===404)await gate.fetch('https://gate.internal/release?id='+match[1]+'&rollback=1');}catch{}
+      throw error;
+    }
+    if(!result.ok&&admission.isNew)await gate.fetch('https://gate.internal/release?id='+match[1]+'&rollback=1');
+    return result;
   }
   const stub=env.JOBS.get(env.JOBS.idFromName(match[1]));
   const headers=new Headers(request.headers);headers.set('x-job-id',match[1]);

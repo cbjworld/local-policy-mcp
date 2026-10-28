@@ -11,7 +11,7 @@ function createStore({archive=null,background=null}={}){
   const researchId=archive?randomBytes(32).toString('hex'):randomUUID(),items=[...unique.values()],snapshot={items,createdAt:Date.now(),question:value.request?.question||null};
   const cursors=(value.coverage?.nextSearches||[]).map(x=>x.arguments);
   const backgroundPending=cursors.length&&background&&researchId.length===64?(async()=>{
-   try{await background.start(researchId,cursors);return {status:'running',tool:'list_background_sources',arguments:{researchId}};}
+   try{const result=await background.start(researchId,cursors);return {status:result?.status==='waiting_admission'?'waiting_admission':'running',tool:'list_background_sources',arguments:{researchId}};}
    catch(e){
     try{const state=await background.status(researchId);return {status:state.status,tool:'list_background_sources',arguments:{researchId}};}
     catch{return {status:'not_started',reason:e.message};}

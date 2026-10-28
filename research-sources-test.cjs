@@ -26,6 +26,8 @@ const {createArchive}=require('./source-archive');
  const withBackground=createStore({archive,background}),cursor={q:'산후조리비',scope:'all',page:2,startDate:'20241028',endDate:'20261028'};
  const auto=await withBackground.save({candidates:[],coverage:{nextSearches:[{arguments:cursor}]}});
  assert.equal(auto.backgroundSearch.status,'running');assert.deepEqual(calls[0].cursors,[cursor]);
+ const queued=createStore({archive,background:{start:async()=>({status:'waiting_admission'})}});
+ assert.equal((await queued.save({coverage:{nextSearches:[{arguments:cursor}]}})).backgroundSearch.status,'waiting_admission');
  let startCalled=false;
  const concurrent=createStore({archive:{put:async()=>{await new Promise(r=>setTimeout(r,30));assert(startCalled,'background starts while archive is being stored');}},background:{start:async()=>{startCalled=true;}}});
  assert.equal((await concurrent.save({coverage:{nextSearches:[{arguments:cursor}]}})).backgroundSearch.status,'running');

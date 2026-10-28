@@ -20,6 +20,11 @@ assert.equal(row(summarize(make('사업비: ***** 시비30천원')),'planBudget'
 assert.equal(row(summarize(make('홍보비:0원')),'promotionBudget').valueKRW,0);
 assert.equal(row(summarize(make('지원금:1인당 50만원')),'supportBudget').status,'not_stated');
 assert.equal(row(summarize(make('지원금:1인당 50만원')),'benefit').valueKRW,500000);
+const busan=' 내 용: 출생아 1인당 산후조리비 최대 100만원 지원';
+const busanBenefit=row(summarize(make(busan)),'benefit');
+assert.equal(busanBenefit.valueKRW,1000000);assert.equal(busanBenefit.display,'최대 100만원');assert(busan.includes(busanBenefit.observations[0].quote));assert.equal(busanBenefit.observations[0].page,5);
+assert(!requestedGaps({status:'read',attempts:make(busan)},'산후조리비 지원액').includes('benefit'));
+for(const text of ['내용: 1인당 대출 원금 최대 1억원 지원','내용: 1인당 사업비 최대 100만원 지원','내용: 1인당 기존 50만원에서 최대 100만원 지원','내용: 1인당 최대 50만원 또는 최대 100만원 지원','내용: 1인당 최대 100만원 지원 또는 200만원 지원','내용: 1인당 최대 100만원 융자'])assert(!row(summarize(make(text)),'benefit'),text);
 assert.equal(row(summarize(make('예산액:100만원')),'planBudget').status,'not_stated');
 assert.equal(row(summarize(make('예산액:100만원')),'documentBudget').valueKRW,1000000);
 assert.equal(row(summarize(make('지원금:50천원×100명(50%)')),'supportBudget').status,'not_stated');
