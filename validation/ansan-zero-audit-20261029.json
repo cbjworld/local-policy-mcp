@@ -1,0 +1,11 @@
+{
+  "sourceSha256": "cdbda6709cf9a2f77e198d0158e1c3fb71111641669461efe76cee28c3e4ac5a",
+  "pages": 1069,
+  "indexedProjectRows": 2492,
+  "candidateLabelLines": 21506,
+  "zeroOrDashCurrentAmountCandidates": 0,
+  "blankCurrentAmountCandidates": 1069,
+  "blankCandidatesIdentifiedAsPageHeaders": 1069,
+  "allCurrentAmountColumnZeroOrDashTokens": 0,
+  "scope": "PDF text layer and specified budget-table coordinates; does not rule out rows in other locations or raster-only content."
+}
