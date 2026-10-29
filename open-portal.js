@@ -28,8 +28,8 @@ function check(r){
 }
 function createReader(io={}){
  io={get:download,post,extract:readResponse,...io};
- const details=new Map(),files=new Map();
- return args=>read(args,{...io,files,get:async url=>{
+ const details=new Map(),files=new Map(),headers=new Map();
+ return args=>read(args,{...io,files,headers,get:async url=>{
   if(details.has(url))return details.get(url);
   const response=await io.get(url);details.set(url,response);return response;
  }});
@@ -49,6 +49,10 @@ async function read({url,fileId,q='',page=1,scanEmptyPdf=false,ocr=false}={},io=
  if(fileId===undefined)return out;
  const f=files.find(x=>x.fileId===fileId),a=attachments.find(x=>x.fileId===fileId);
  if(!f||!a.available)return {...out,status:'unavailable',message:'공개 다운로드 대상 첨부가 아닙니다. 포털에서 공개 범위를 확인하세요.'};
+ const conflict=require('./disclosure-conflict');
+ const withheld=()=>({...out,status:'disclosure_conflict',fileId:f.fileId,fileName:f.fileNm,message:'목록과 첨부의 공개 여부 표시가 달라 원문을 보류합니다.'});
+ const unchecked=()=>({...out,status:'disclosure_unverified',fileId:f.fileId,fileName:f.fileNm,message:'첫 쪽의 공개 여부 표시를 확인할 수 없어 후속 쪽 원문을 보류합니다. 첫 쪽 OCR을 확인하세요.'});
+ if(conflict.knownConflict(u.href,f.fileId))return withheld();
  let stage='download',phase='request',retryCount=0;
  const timings=[];
  const transfer=async(step,params)=>{
@@ -76,9 +80,30 @@ async function read({url,fileId,q='',page=1,scanEmptyPdf=false,ocr=false}={},io=
   }
   const citation=new URL(u);citation.hash=new URLSearchParams({fileId:f.fileId}).toString();
   stage='extract';
+  let coverCheck=io.headers?.get(cacheKey);
+  if((q||page!==1)&&!io.headers?.has(cacheKey)){
+   let first=await io.extract({...response,url:citation.href},{q:'',page:1,scanEmptyPdf:false,ocr:false});
+   if(conflict.markedPrivate(first)){require('./discovery').discardSource(first.sourceId);io.files?.delete(cacheKey);return withheld();}
+   if(!first.pages?.some(p=>(p.page===1||p.page===null)&&p.text?.trim())&&ocr&&first.format==='pdf'){
+    require('./discovery').discardSource(first.sourceId);
+    const start=Date.now();first=await io.extract({...response,url:citation.href},{q:'',page:1,scanEmptyPdf:false,ocr:true});timings.push({phase:'cover_ocr',ms:Date.now()-start});
+    if(conflict.markedPrivate(first)){require('./discovery').discardSource(first.sourceId);io.files?.delete(cacheKey);return withheld();}
+    if(first.ocr?.status!=='read'){require('./discovery').discardSource(first.sourceId);return unchecked();}
+    coverCheck='ocr';
+   }
+   if(!first.pages?.some(p=>(p.page===1||p.page===null)&&p.text?.trim())){require('./discovery').discardSource(first.sourceId);return unchecked();}
+   require('./discovery').discardSource(first.sourceId);
+   coverCheck??='text';io.headers?.set(cacheKey,coverCheck);
+  }
   const extractStart=Date.now(),source=await io.extract({...response,url:citation.href},{q,page,scanEmptyPdf,ocr});timings.push({phase:'extract',ms:Date.now()-extractStart});
+  if(conflict.markedPrivate(source)){require('./discovery').discardSource(source.sourceId);io.files?.delete(cacheKey);return withheld();}
+  if(!q&&page===1&&!source.pages?.some(p=>(p.page===1||p.page===null)&&p.text?.trim())){
+   require('./discovery').discardSource(source.sourceId);
+   return {...out,status:'no_text',fileId:f.fileId,fileName:f.fileNm,source:{sourceId:source.sourceId,url:source.url,format:source.format,totalPages:source.totalPages,scannedThroughPage:1,scanComplete:false,pages:[{page:1,text:'',truncated:false}]},message:'첫 쪽의 공개 여부 표기를 확인할 수 없어 다른 쪽을 보류합니다. 첫 쪽 OCR을 확인하세요.',retryCount,timings};
+  }
+  if(!q&&page===1&&source.pages?.some(p=>p.text?.trim()))io.headers?.set(cacheKey,source.ocr?.status==='read'?'ocr':'text');
   const hasText=source.pages.some(p=>p.text.trim());
-  return {...out,status:hasText?'read':'no_text',fileId:f.fileId,fileName:f.fileNm,source,retryCount,timings,...(hasText?{}:{message:'파일은 내려받았지만 이 범위에서 텍스트를 추출하지 못했습니다. 이미지 문서는 OCR이 필요하며 검색어 미일치일 수도 있습니다.'})};
+  return {...out,status:hasText?'read':'no_text',fileId:f.fileId,fileName:f.fileNm,source,retryCount,timings,...(coverCheck==='ocr'?{coverDisclosureCheck:{status:'ocr_no_explicit_private_marker',note:'첫 쪽 OCR 전사에서 비공개 표기를 찾지 못했습니다. 표기 누락 가능성이 있어 원본 확인을 대체하지 않습니다.'}}:{}),...(hasText?{}:{message:'파일은 내려받았지만 이 범위에서 텍스트를 추출하지 못했습니다. 이미지 문서는 OCR이 필요하며 검색어 미일치일 수도 있습니다.'})};
  }catch(e){return {...out,status:stage==='extract'?'extraction_failed':'download_failed',fileId:f.fileId,message:e.message,phase:stage==='extract'?'extract':phase,errorCode:e.code||'PORTAL_ERROR',retryable:!!e.retryable,retryCount,timings};}
 }
 function isForm(name){return /표지/.test(name)||(/서식|신청서|동의서|서약서|양식/.test(name)&&!/지침/.test(name));}

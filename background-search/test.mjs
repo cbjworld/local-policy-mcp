@@ -66,11 +66,14 @@ const staleStore=new Storage(),staleGate=new SearchGate({storage:staleStore});
 await staleStore.put('waiting:'+'a'.repeat(64),{order:Date.now()-3600000,lastSeen:Date.now()-3600000});
 const next=await (await staleGate.fetch(new Request('https://gate/admit?id='+'b'.repeat(64)))).json();
 assert.equal(next.waiting,false,'an offline waiting job must not block another job');
-assert(await staleStore.get('waiting:'+'a'.repeat(64)),'offline job remains available to resume');
+assert.equal(await staleStore.get('waiting:'+'a'.repeat(64)),undefined,'stale wait entries no longer exhaust the backlog');
+assert(await staleStore.get('ticket:'+'a'.repeat(64)),'offline job retains admission and can resume');
+assert.equal((await (await staleGate.fetch(new Request('https://gate/admit?id='+'a'.repeat(64)))).json()).waiting,false,'offline search can rejoin');
 const badStorage=new Storage(),badGate=new SearchGate({storage:badStorage});
 const env={SEARCH_SECRET:'test',GATE:{idFromName:()=>'',get:()=>({fetch:url=>badGate.fetch(new Request(url))})},JOBS:{idFromName:()=>'',get:()=>({fetch:async()=>new Response(null,{status:400})})}};
 assert.equal((await app.fetch(new Request('https://worker/jobs/'+('e'.repeat(64))+'/status'),env)).status,401,'status requires worker authentication');
 assert.equal((await app.fetch(new Request('https://worker/inspect?id='+('e'.repeat(64)),{headers:{authorization:'Bearer test'}}),env)).status,404,'global gate is not exposed externally');
+assert.equal((await app.fetch(new Request('https://worker/kick',{method:'POST',headers:{authorization:'Bearer test'}}),env)).status,404,'watchdog is not exposed externally');
 assert.equal((await app.fetch(new Request('https://worker/jobs/'+('e'.repeat(64))+'/wake',{method:'POST',headers:{authorization:'Bearer test'}}),env)).status,404,'wake is not exposed through the external worker route');
 const badRequest=new Request('https://worker/jobs/'+('e'.repeat(64))+'/start',{method:'POST',headers:{authorization:'Bearer test'},body:'{}'});
 assert.equal((await app.fetch(badRequest,env)).status,400);assert.equal((await badStorage.list({prefix:'active:',limit:100})).size,0,'invalid requests cannot reserve a slot');
@@ -99,7 +102,7 @@ await summaryStore.put('quota',{day:new Date(now).toISOString().slice(0,10),jobs
 await summaryStore.put('active:'+('a'.repeat(64)),now);await summaryStore.put('active:'+otherId,now-15*86400000);
 await summaryStore.put('waiting:'+('b'.repeat(64)),{order:now,lastSeen:now});await summaryStore.put('waiting:'+otherId,{order:now-3600000,lastSeen:now-3600000});
 const gateView=await (await summaryGate.fetch(new Request('https://gate/inspect?id='+('a'.repeat(64))))).json();
-assert.deepEqual(gateView.gateSummary,{activeJobs:1,waitingJobs:2,eligibleWaitingJobs:1,pagesToday:71,attemptsToday:123});assert(!JSON.stringify(gateView).includes(otherId));
+assert.deepEqual(gateView.gateSummary,{activeJobs:2,waitingJobs:2,eligibleWaitingJobs:1,pagesToday:71,attemptsToday:123});assert(!JSON.stringify(gateView).includes(otherId));
 const statusStore=new Storage(),statusEnv={GATE:{idFromName:()=>'',get:()=>({fetch:async()=>Response.json({...gateView,privateOtherId:otherId,gateSummary:{...gateView.gateSummary,privateOtherId:otherId}})})}};
 const statusJob=new SearchJob({storage:statusStore},statusEnv);
 await statusJob.fetch(new Request('https://job.internal/start',{method:'POST',headers:{'x-job-id':'a'.repeat(64),'x-admission-waiting':'1'},body:JSON.stringify({cursors:[cursor]})}));
@@ -139,6 +142,7 @@ try{
  const legacyStorage=new Storage(),legacy=new SearchJob({storage:legacyStorage},gateEnv);
  await legacy.fetch(new Request('https://job.internal/start',{method:'POST',headers:{'x-job-id':missing},body:JSON.stringify({cursors:[cursor]})}));
  await legacy.alarm();assert.equal((await legacyStorage.get('job')).status,'waiting_admission');assert(await failGateStorage.get('ticket:'+missing));
+ assert.equal(legacyStorage.alarmAt,time+1000,'missing reservation is retried promptly');
  await failGate.fetch(new Request('https://gate/release?id='+missing));
  // An accepted job yields even when the waiting list is full, retaining its ticket.
  const congestedStorage=new Storage(),congested=new SearchGate({storage:congestedStorage}),congestedId='a'.repeat(64);
@@ -228,5 +232,129 @@ try{
  await staleTurnStore.put('active:'+turnId,time);await staleTurnStore.put('turn:'+turnId,0);
  await staleTurnStore.put('waiting:'+nextId,{order:time-3600000,lastSeen:time-3600000});
  assert.equal((await (await staleTurnGate.fetch(new Request('https://gate/page?id='+turnId+'&pages=10'))).json()).ok,true,'stale waiters do not interrupt active searches');
+ // A search stopped by the daily cap resumes its next page after UTC midnight and a restart.
+ time=Date.parse('2026-10-28T23:59:00Z');
+ const dailyGateStore=new Storage(),dailyGate=new SearchGate({storage:dailyGateStore});
+ const dailyEnv={GATE:{idFromName:()=>'',get:()=>({fetch:url=>dailyGate.fetch(new Request(url))})}};
+ const dailyId='a'.repeat(64),dailyJobStore=new Storage();
+ await dailyGateStore.put('active:'+dailyId,time);
+ await dailyGateStore.put('quota',{day:'2026-10-28',jobs:1,pages:1000,lastPage:time-4000});
+ let dailyJob=new SearchJob({storage:dailyJobStore},dailyEnv);
+ await dailyJob.fetch(new Request('https://job.internal/start',{method:'POST',headers:{'x-job-id':dailyId},body:JSON.stringify({cursors:[{...cursor,page:2}]})}));
+ let dailyState=await dailyJobStore.get('job');dailyState.pages=1;await dailyJobStore.put('job',dailyState);
+ await dailyJobStore.put('page:00000001',{items:['preserved']});
+ globalThis.fetch=async()=>mockResponse({...cursor,page:2},20);
+ await dailyJob.alarm();dailyState=await dailyJobStore.get('job');
+ assert.equal(dailyState.cursors[0].page,2);assert.equal(dailyState.pages,1);
+ assert.equal(dailyState.status,'waiting_admission');assert.equal(await dailyGateStore.get('active:'+dailyId),undefined,'daily quota wait must release the active slot');
+ assert.equal(dailyJobStore.alarmAt,Date.parse('2026-10-29T00:00:01Z'));
+ time=dailyJobStore.alarmAt;dailyJob=new SearchJob({storage:dailyJobStore},dailyEnv);
+ await dailyJob.alarm();dailyState=await dailyJobStore.get('job');
+ assert.equal(dailyState.status,'complete');assert.equal(dailyState.pages,2);
+ assert.deepEqual((await dailyJobStore.get('page:00000001')).items,['preserved']);
+ assert.equal((await dailyJobStore.get('page:00000002')).page,2);
+ assert.equal((await dailyGateStore.get('quota')).pages,1,'only the new day is charged');
+
+ // A failed quota-yield is retried early without reading another page before the daily reset.
+ time=Date.parse('2026-10-28T20:00:00Z');
+ const quotaHoldStore=new Storage(),quotaHoldGate=new SearchGate({storage:quotaHoldStore}),quotaHoldId='c'.repeat(64);
+ await quotaHoldStore.put('active:'+quotaHoldId,time);await quotaHoldStore.put('quota',{day:'2026-10-28',jobs:1,pages:1000,lastPage:time-4000});
+ let failYield=true,admissions=0;const quotaHoldEnv={GATE:{idFromName:()=>'',get:()=>({fetch:async url=>{
+   if(url.includes('/yield')&&failYield){failYield=false;throw Error('gate_unavailable');}
+   if(url.includes('/admit'))admissions++;
+   return quotaHoldGate.fetch(new Request(url));
+ }})}};
+ const quotaHoldJobStore=new Storage(),quotaHoldJob=new SearchJob({storage:quotaHoldJobStore},quotaHoldEnv);
+ await quotaHoldJob.fetch(new Request('https://job.internal/start',{method:'POST',headers:{'x-job-id':quotaHoldId},body:JSON.stringify({cursors:[cursor]})}));
+ await quotaHoldJob.alarm();let hold=await quotaHoldJobStore.get('job');
+ assert.equal(hold.needsYield,true);const quotaReset=hold.quotaRetryAt;assert(quotaReset>time+3600000);
+ time+=600000;await quotaHoldJob.fetch(new Request('https://job.internal/recover',{method:'POST'}));assert.equal(quotaHoldJobStore.alarmAt,time+1000);
+ time+=1000;quotaHoldJobStore.alarmAt=null;await quotaHoldJob.alarm();hold=await quotaHoldJobStore.get('job');
+ assert.equal(hold.needsYield,undefined);assert.equal(await quotaHoldStore.get('active:'+quotaHoldId),undefined);
+ assert.equal(quotaHoldJobStore.alarmAt,quotaReset);assert.equal(admissions,0,'only the slot is released before the reset');assert.equal(hold.pages,0);
+
+ // Starting an already-waiting search must not strand an active slot until the quota reset.
+ const duplicateStore=new Storage(),duplicateGateStore=new Storage(),duplicateId='d'.repeat(64);
+ const duplicateGate=new SearchGate({storage:duplicateGateStore});
+ const duplicateJob=new SearchJob({storage:duplicateStore},{GATE:{idFromName:()=>'',get:()=>({fetch:url=>duplicateGate.fetch(new Request(url))})}});
+ await duplicateJob.fetch(new Request('https://job.internal/start',{method:'POST',headers:{'x-job-id':duplicateId,'x-admission-waiting':'1'},body:JSON.stringify({cursors:[cursor]})}));
+ let duplicateState=await duplicateStore.get('job');duplicateState.quotaRetryAt=quotaReset;duplicateState.waitingUntil=quotaReset;await duplicateStore.put('job',duplicateState);duplicateStore.alarmAt=quotaReset;
+ await duplicateGateStore.put('ticket:'+duplicateId,{day:null,order:time-600000});
+ const duplicateEnv={SEARCH_SECRET:'test',GATE:{idFromName:()=>'',get:()=>({fetch:url=>duplicateGate.fetch(new Request(url))})},JOBS:{idFromName:()=>'',get:()=>({fetch:(request,opts)=>duplicateJob.fetch(typeof request==='string'?new Request(request,opts):request)})}};
+ const duplicateStart=new Request('https://worker/jobs/'+duplicateId+'/start',{method:'POST',headers:{authorization:'Bearer test'},body:JSON.stringify({cursors:[cursor]})});
+ assert.equal((await app.fetch(duplicateStart,duplicateEnv)).status,409);
+ assert.equal((await duplicateStore.get('job')).needsYield,true);assert.equal(duplicateStore.alarmAt,time+1000);
+ time+=1000;duplicateStore.alarmAt=null;await duplicateJob.alarm();duplicateState=await duplicateStore.get('job');
+ assert.equal(await duplicateGateStore.get('active:'+duplicateId),undefined,'duplicate start returns slot while job remains asleep');
+ assert.equal(duplicateState.status,'waiting_admission');assert.equal(duplicateStore.alarmAt,quotaReset);assert.equal(duplicateState.pages,0);
+ await duplicateGateStore.put('active:'+duplicateId,time-600000);
+ await duplicateJob.fetch(new Request('https://job.internal/recover?held=1',{method:'POST'}));
+ assert.equal((await duplicateStore.get('job')).needsYield,true);assert.equal(duplicateStore.alarmAt,time+1000,'watchdog repairs a missed duplicate-start wake');
+ time+=1000;duplicateStore.alarmAt=null;await duplicateJob.alarm();
+ assert.equal(await duplicateGateStore.get('active:'+duplicateId),undefined);assert.equal(duplicateStore.alarmAt,quotaReset);
+ duplicateStore.alarmAt=time+500;
+ await duplicateJob.fetch(new Request('https://job.internal/wake?held=1',{method:'POST'}));
+ assert.equal(duplicateStore.alarmAt,time+500,'already earlier alarm is kept');
+ assert.equal((await duplicateStore.get('job')).needsYield,true,'held-slot signal is saved even with an earlier alarm');
+
+ // Stale waiting entries must not fill the queue, and admitted jobs keep their ticket/order.
+ const staleBacklogStore=new Storage(),staleBacklog=new SearchGate({storage:staleBacklogStore});
+ for(let i=0;i<50;i++)await staleBacklogStore.put('waiting:'+i.toString(16).padStart(64,'0'),{order:time-3600000+i,lastSeen:time-3600000});
+ const newId='f'.repeat(64),oldId='0'.repeat(64);
+ assert.equal((await (await staleBacklog.fetch(new Request('https://gate/admit?id='+newId))).json()).waiting,false);
+ assert.equal((await staleBacklogStore.get('ticket:'+oldId)).order,time-3600000);
+ const oldRejoin=await (await staleBacklog.fetch(new Request('https://gate/admit?id='+oldId))).json();
+ assert.equal(oldRejoin.ok,true);assert.equal((await staleBacklogStore.get('quota')).jobs,1,'accepted old search does not consume a new daily ticket');
+
+ // Only confirmed missing/finished jobs are released; old running jobs get their alarm back.
+ const probeStore=new Storage(),probePromises=[],probeIds=Array.from({length:20},(_,i)=>i.toString(16).padStart(64,'0'));
+ const recoveredStore=new Storage();let recovered=new SearchJob({storage:recoveredStore});
+ await recovered.fetch(new Request('https://job.internal/start',{method:'POST',headers:{'x-job-id':probeIds[0]},body:JSON.stringify({cursors:[{...cursor,page:2}]})}));
+ const recoveredJob=await recoveredStore.get('job');recoveredJob.updatedAt=time-600000;recoveredJob.pages=1;await recoveredStore.put('job',recoveredJob);
+ await recoveredStore.put('page:00000001',{items:['preserved']});recoveredStore.alarmAt=null;
+ const finishedStore=new Storage(),finished=new SearchJob({storage:finishedStore});await finishedStore.put('job',{status:'complete',updatedAt:time-600000});
+ const missingJob=new SearchJob({storage:new Storage()});
+ const probeWorkers=new Map([[probeIds[0],recovered],[probeIds[1],finished],[probeIds[2],missingJob]]);
+ const probeGate=new SearchGate({storage:probeStore,waitUntil:p=>probePromises.push(p)},{JOBS:{idFromName:id=>id,get:id=>({fetch:(url,opts)=>probeWorkers.has(id)?probeWorkers.get(id).fetch(new Request(url,opts)):Promise.reject(Error('offline'))})}});
+ for(const id of probeIds)await probeStore.put('active:'+id,time-600000);
+ assert.equal((await (await probeGate.fetch(new Request('https://gate/admit?id='+newId))).json()).waiting,true);
+ await Promise.all(probePromises);
+ assert.equal(recoveredStore.alarmAt,time+1000,'lost running alarm is restored');
+ assert(await probeStore.get('active:'+probeIds[0]),'recoverable job keeps its slot');
+ assert.equal(await probeStore.get('active:'+probeIds[1]),undefined,'finished job releases slot');
+ assert.equal(await probeStore.get('active:'+probeIds[2]),undefined,'missing job releases slot');
+ assert(await probeStore.get('active:'+probeIds[3]),'inaccessible job is not assumed dead');
+ const restoredEnv={GATE:{idFromName:()=>'',get:()=>({fetch:url=>probeGate.fetch(new Request(url))})}};
+ recovered=new SearchJob({storage:recoveredStore},restoredEnv);globalThis.fetch=async()=>mockResponse({...cursor,page:2},20);
+ time+=4000;await recovered.alarm();assert.equal((await recoveredStore.get('job')).status,'complete');
+ assert.deepEqual((await recoveredStore.get('page:00000001')).items,['preserved']);
+ assert.equal((await recoveredStore.get('page:00000002')).page,2);
+ const changedId=probeIds[4],oldStamp=await probeStore.get('active:'+changedId);
+ await probeGate.fetch(new Request('https://gate/admit?id='+changedId));
+ await probeGate.fetch(new Request('https://gate/release?id='+changedId+'&expected='+oldStamp));
+ assert.equal(await probeStore.get('active:'+changedId),time,'a stale probe cannot release a renewed slot');
+
+ // The shared gate's alarm finds suspended jobs even when nobody issues another request.
+ const autoStore=new Storage(),autoJobStore=new Storage(),autoId='9'.repeat(64);
+ const autoJob=new SearchJob({storage:autoJobStore});
+ await autoJob.fetch(new Request('https://job.internal/start',{method:'POST',headers:{'x-job-id':autoId,'x-admission-waiting':'1'},body:JSON.stringify({cursors:[cursor]})}));
+ let autoState=await autoJobStore.get('job');autoState.updatedAt=time-3600000;await autoJobStore.put('job',autoState);autoJobStore.alarmAt=null;
+ await autoStore.put('ticket:'+autoId,{day:null,order:time-3600000});
+ const autoGate=new SearchGate({storage:autoStore,waitUntil:()=>{}},{JOBS:{idFromName:id=>id,get:()=>({fetch:(url,opts)=>autoJob.fetch(new Request(url,opts))})}});
+ await autoGate.alarm();assert.equal(autoJobStore.alarmAt,time+1000,'lost alarm for suspended job is restored without client traffic');
+ assert.equal(autoStore.alarmAt,time+300000,'watchdog continues while an accepted job remains');
+ assert(await autoStore.get('ticket:'+autoId),'recovery preserves the suspended job admission ticket');
+ autoStore.alarmAt=null;const cronTasks=[];
+ await app.scheduled({}, {GATE:{idFromName:()=>'',get:()=>({fetch:(url,opts)=>autoGate.fetch(new Request(url,opts))})}}, {waitUntil:p=>cronTasks.push(p)});
+ await Promise.all(cronTasks);assert.equal(autoStore.alarmAt,time+1000,'scheduled watchdog restores a lost gate alarm');
+
+ // An older failed request must not roll back a later successful page.
+ const raceStore=new Storage(),raceJob=new SearchJob({storage:raceStore});
+ await raceJob.fetch(new Request('https://job.internal/start',{method:'POST',headers:{'x-job-id':newId},body:JSON.stringify({cursors:[cursor]})}));
+ let rejectOld,oldStarted;const startedOld=new Promise(resolve=>{oldStarted=resolve;});let reads=0;
+ globalThis.fetch=async()=>{if(++reads===1){oldStarted();return new Promise((_,reject)=>{rejectOld=reject;});}return mockResponse(cursor,10);};
+ const oldCall=raceJob.alarm();await startedOld;await raceJob.alarm();rejectOld(Error('late failure'));await oldCall;
+ const raceState=await raceStore.get('job');assert.equal(raceState.status,'complete');assert.equal(raceState.pages,1);assert.equal(raceState.failures,0);
+
 }finally{Date.now=originalNow;globalThis.fetch=originalFetch;}
 console.log('background-search: retry, restart, page validation and completion passed');

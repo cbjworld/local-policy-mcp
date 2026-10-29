@@ -80,7 +80,7 @@ async function main(){
  await reader({url});
  assert.equal((await reader({url,fileId:'f',page:1,q:'first'})).source.pages[0].text,'first');
  assert.equal((await reader({url,fileId:'f',page:7,q:'second'})).source.pages[0].page,7);
- assert.equal(gets,1);assert.equal(posts,3);assert.equal(extracts,2);
+ assert.equal(gets,1);assert.equal(posts,3);assert.equal(extracts,3); // The unfiltered first page is checked once per document.
  const independent=p.createReader(cachedIO);await independent({url,fileId:'f'});
  assert.equal(gets,2);assert.equal(posts,6);
  let retries=0;

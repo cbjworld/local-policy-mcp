@@ -16,11 +16,12 @@ function open(directory=__dirname){
   const substringIndex=!!db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='catalog_search'").get();
   const normalize=s=>String(s??'').normalize('NFKC').replace(/\s+/g,'').toLowerCase();
   let contexts;
+  const enrich=require('./policy-catalog').enrich;
   const read=db.prepare('SELECT p.raw AS row,c.raw AS context FROM projects p JOIN contexts c ON p.context_id=c.id WHERE p.id=?');
   return {scope:meta.scope,length:meta.rows,find(terms,region,offset,limit){
    const regionTerms=region?(Array.isArray(region)?region:[region]):null;
    const indexedTerm=terms.filter(t=>/^[\p{L}\p{N}]{3,}$/u.test(t)).sort((a,b)=>b.length-a.length)[0];
-   const regionIds=regionTerms?(contexts??=db.prepare('SELECT id,raw FROM contexts').all().map(r=>{const c=JSON.parse(r.raw);return {id:r.id,key:normalize((c.parent||'')+' '+c.institution)};})).filter(c=>regionTerms.every(t=>c.key.includes(t))).map(c=>c.id):null;
+   const regionIds=regionTerms?(contexts??=db.prepare('SELECT id,raw FROM contexts').all().map(r=>({id:r.id,entry:enrich(JSON.parse(r.raw),directory)}))).filter(c=>require('./region-aliases').matchesRegion(regionTerms,c.entry)).map(c=>c.id):null;
    if(substringIndex&&indexedTerm&&(!regionIds||regionIds.length<=500)){
     const where=['x.rowid IN (SELECT rowid FROM catalog_search WHERE name_key MATCH ?)'],params=['"'+indexedTerm+'"'];
     for(const term of terms){where.push('instr(x.name_key,?)>0');params.push(term);}
@@ -28,12 +29,12 @@ function open(directory=__dirname){
     const from=' FROM catalog x JOIN catalog_rows r ON r.project_id=x.id JOIN projects p ON p.id=r.row_id JOIN contexts c ON c.id=p.context_id WHERE '+where.join(' AND ');
     const rows=db.prepare('SELECT p.raw AS row,c.raw AS context,count(*) OVER() AS total'+from+' ORDER BY p.id LIMIT ? OFFSET ?').all(...params,limit,offset);
     const total=rows[0]?.total??(offset?db.prepare('SELECT count(*) AS n'+from).get(...params).n:0);
-    return {total,items:rows.map(r=>({...JSON.parse(r.context),...JSON.parse(r.row)}))};
+    return {total,items:rows.map(r=>({...enrich(JSON.parse(r.context),directory),...JSON.parse(r.row)}))};
    }
-   const loaded=loadKeys(),regionMatches=regionTerms?loaded.institutions.map(name=>regionTerms.every(term=>name.includes(term))):null;
+   const loaded=loadKeys(),regionMatches=regionTerms?new Set(regionIds):null;
    let total=0;const rows=[];
-   for(let i=0;i<loaded.names.length;i++)if((!regionMatches||regionMatches[loaded.contextIds[i]])&&terms.every(t=>loaded.names[i].includes(t))){if(total>=offset&&rows.length<limit)rows.push(read.get(i));total++;}
-   return {total,items:rows.map(r=>({...JSON.parse(r.context),...JSON.parse(r.row)}))};
+   for(let i=0;i<loaded.names.length;i++)if((!regionMatches||regionMatches.has(loaded.contextIds[i]))&&terms.every(t=>loaded.names[i].includes(t))){if(total>=offset&&rows.length<limit)rows.push(read.get(i));total++;}
+   return {total,items:rows.map(r=>({...enrich(JSON.parse(r.context),directory),...JSON.parse(r.row)}))};
   },close(){db.close();}};
  }catch(e){db.close();throw e;}
 }

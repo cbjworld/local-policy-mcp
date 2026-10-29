@@ -7,6 +7,9 @@ const found=lookup(request,search);assert.equal(found.seedDocuments.length,1);as
 const beyondPage=lookup(request,args=>({total:21,nextOffset:args.linkedOnly?null:20,items:args.linkedOnly?[entry]:Array.from({length:20},(_,i)=>({...entry,projectId:'unlinked'+i,documents:[],documentCandidates:[]}))}));
 assert.equal(beyondPage.seedDocuments.length,1,'linked evidence beyond the ordinary first page must survive');assert.equal(beyondPage.items[0].projectId,'one');
 assert.equal(compact(found).items[0].documents[0].status,'saved_body_supported_link');assert.equal(compact(found).items[0].documentCandidates[0].status,'title_candidate');
+const multiRow=lookup(request,()=>({total:1,items:[{...entry,budgetRowCount:2,identityStatus:'multiple_rows_identity_unconfirmed'}]}));
+assert.equal(multiRow.seedDocuments.length,1,'retain the document for reading');assert.equal(multiRow.seedDocuments[0].discovery,'saved_catalog_identity_unconfirmed');assert.equal(multiRow.seedDocuments[0].savedCatalogProjectId,undefined);
+assert.equal(compact(multiRow).items[0].documents[0].status,'saved_body_supported_link_budget_row_unresolved');
 assert.equal(lookup({...request,startDate:'20270101',endDate:'20271231'},search).seedDocuments.length,0);
 assert.equal(lookup({...request,broad:true},search).seedDocuments.length,0);
 assert.equal(lookup(request,()=>({items:[{...entry,documents:entry.documents.map(d=>({...d,relationship:'explicit_budget_line_reference'}))}],total:1})).seedDocuments.length,0);

@@ -64,6 +64,7 @@ assert.equal(catalogLinks(catalog,[revisionCandidates[0],{...revisionCandidates[
 const futureRevision={candidate:revisionCandidates[1],result:{status:'read',attempts:[{status:'read',source:{pages:[{page:1,text:'사업기간: 2027년'}]}}]}};assert.equal(catalogLinks(catalog,revisionCandidates,[futureRevision]).length,0);
 const revisionValue={catalogEvidence:catalog,candidates:revisionCandidates.map(d=>({...d,relevance:{kind:'project_candidate'},documentRole:'plan'})),investigations:[],projects:revisionCandidates.map(d=>({institution:d.institution,name:d.title,documents:[d],fields:{}}))};
 const revisionOutput=require('./presentation').present('research_policy',revisionValue);assert.equal(revisionOutput.summary.projectGroups,1);assert.equal(revisionOutput.summary.textReadDocuments,0);assert.equal(revisionOutput.quickBrief.length,1);assert.equal(revisionOutput.caseComparison.length,1);assert.equal(revisionOutput.caseComparison[0].documents.length,2);assert.equal(require('./presentation').present('research_policy',revisionValue,'full').presentation.projects.length,1);
+const collision=structuredClone(catalog);collision.items[0].budgetRowCount=2;assert.equal(catalogLinks(collision,revisionCandidates).length,0,'same-name budget rows cannot automatically bind both documents');
 
 const splitCatalog={items:catalog.items[0].documents.map((d,i)=>({...catalog.items[0],projectId:"separate"+i,documents:[d]}))};assert.equal(catalogLinks(splitCatalog,revisionCandidates).length,0);
 const spacedUpper=mutate(upper,x=>{x.result.attempts[0].source.pages[0].text=x.result.attempts[0].source.pages[0].text.replace('구·군 보건소 보조금 교부','구 ·군 보 건 소 보 조 금 교 부');});
@@ -89,3 +90,39 @@ assert.equal(require('./program-links').combineLinks([body[0],{...catalogGroups[
 const unrelated={...catalogGroups[0],documents:catalogGroups[0].documents.map((d,i)=>({...d,url:'https://www.open.go.kr/other/'+i}))};
 assert.equal(require('./program-links').combineLinks([body[0],unrelated]).length,2,'similar names without a shared source do not bridge');
 console.log('PASS: actual 부산 plan and 수영구 grant linked with both saved 부산 grant documents; different years and unrelated documents remain separate');
+
+// The actual 광명 plan discusses both low-income and universal programs in one document.
+const shared='https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT030C337F241515A943F70B2303D4B4B6&prdnDt=20260306174447&nstSeCd=B';
+const sharedDoc={url:shared,institution:'경기도 광명시',title:'2026년 여성청소년 생리용품 지원 사업 추진계획(안)',relevance:{kind:'project_candidate'}};
+const low={url:'https://www.open.go.kr/low',institution:'경기도 광명시',title:'2026년 생리용품 저소득층 지원 계획',relevance:{kind:'project_candidate'}};
+const universal={url:'https://www.open.go.kr/universal',institution:'경기도 광명시',title:'2026년 생리용품 보편지원 계획',relevance:{kind:'project_candidate'}};
+const direct=d=>({status:'body_supported',relationship:'same_named_budget_program',document:d,evidence:[{quote:'2026년 사업',url:d.url}]});
+const multiple={items:[
+ {projectId:'low',name:'여성청소년 생리용품 지원(저소득층)',institution:'광명시',parent:'경기도',year:2026,account:'일반회계',budgetVariants:[{amount:122152,unit:'천원'}],budgetRecords:[],documentCandidates:[],documents:[direct(sharedDoc),direct(low)]},
+ {projectId:'universal',name:'여성청소년 생리용품 보편지원',institution:'광명시',parent:'경기도',year:2026,account:'일반회계',budgetVariants:[{amount:1186248,unit:'천원'}],budgetRecords:[],documentCandidates:[],documents:[direct(sharedDoc),direct(universal)]}
+]};
+const competing=catalogLinks(multiple,[sharedDoc,low,universal]);
+assert.equal(competing.length,2);
+assert.equal(require('./program-links').combineLinks(competing).length,2,'one document is not evidence the programs are identical');
+const differentId={...competing[1],name:competing[0].name};
+assert.equal(require('./program-links').combineLinks([competing[0],differentId]).length,2,'different budget project IDs must remain separate');
+const multipleValue={catalogEvidence:multiple,candidates:[sharedDoc,low,universal],investigations:[],projects:[sharedDoc,low,universal].map(d=>({institution:d.institution,name:d.title,documents:[d],fields:{}}))};
+const mFull=require('./presentation').present('research_policy',multipleValue,'full');
+assert.equal(mFull.confirmedProgramLinks.length,0,'ambiguous shared source cannot establish one case');
+assert.equal(mFull.summary.projectGroups,3);assert.equal(mFull.presentation.projects.length,3);
+const mCompact=require('./presentation').present('research_policy',multipleValue);
+assert.equal(mCompact.confirmedProgramLinks.length,0);assert.equal(mCompact.comparison.length,3);assert.equal(mCompact.quickBrief.length,3);
+const sharedComparison=mCompact.caseComparison.find(x=>x.documents.some(d=>d.url===shared));
+assert.equal(sharedComparison.documents[0].appropriations.length,0);assert.equal(sharedComparison.documents[0].appropriationStatus,'multiple_budget_projects_document_attribution_unresolved');
+const duplicateProjects=[{name:'저소득층',documents:[sharedDoc]},{name:'보편지원',documents:[sharedDoc]},{name:'다른 문서',documents:[low]}];
+assert.equal(require('./program-links').caseCounts(duplicateProjects,[competing[0]]).projectGroups,3,'shared source in two project rows remains separate');
+const saved=require('./project-document-links.json').links;
+try{
+ saved.push({...direct(sharedDoc),projectId:'low'},{...direct(sharedDoc),projectId:'universal'});
+ const partial={...multipleValue,catalogEvidence:{items:[multiple.items[0]]},candidates:[sharedDoc,low],projects:multipleValue.projects.slice(0,2)};
+ const p=require('./presentation').present('research_policy',partial);
+ assert.equal(p.confirmedProgramLinks.length,0,'conflict omitted from a partial catalog must still block merging');
+ const doc=p.caseComparison.find(x=>x.documents.some(d=>d.url===shared)).documents[0];
+ assert.equal(doc.appropriations.length,0);assert.equal(doc.appropriationStatus,'multiple_budget_projects_document_attribution_unresolved');
+}finally{saved.splice(-2);}
+console.log('PASS: actual multi-program 광명 source does not merge programs or assign both budgets to one document');

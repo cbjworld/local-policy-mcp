@@ -51,7 +51,7 @@ function links(investigations=[]){
 }
 function caseCounts(projects=[],confirmed=[]){
  const parents=projects.map((_,i)=>i),root=i=>parents[i]===i?i:(parents[i]=root(parents[i]));
- for(const link of confirmed){
+ for(const link of safeLinks(confirmed,undefined,projects)){
   const urls=new Set(link.documents.map(d=>d.url));
   const members=projects.flatMap((p,i)=>p.documents.some(d=>urls.has(d.url))?[i]:[]);
   for(const i of members.slice(1))parents[root(i)]=root(members[0]);
@@ -66,6 +66,7 @@ function catalogLinks(context,candidates=[],investigations=[],existing=[]){
  const {documentKey,institutionKey}=require('./catalog-evidence'),present=new Map(candidates.map(d=>[documentKey(d.url),d])),read=new Map(investigations.map(d=>[documentKey(d.candidate.url),d]));
  const result=[];
  for(const item of context?.items||[]){
+  if(item.budgetRowCount>1)continue;
   const matched=[];
   for(const link of item.documents||[]){
    if(link.status!=='body_supported'||link.relationship!=='same_named_budget_program'||!link.evidence?.some(e=>e.quote))continue;
@@ -80,21 +81,35 @@ function catalogLinks(context,candidates=[],investigations=[],existing=[]){
  }
  return result;
 }
-// Links from independently confirmed body and budget evidence may share a source.
-// Only that exact source and matching year can bridge them; names alone never do.
+// A shared document can describe distinct projects; it is not proof of identity.
 function combineLinks(links){
  const {documentKey}=require('./catalog-evidence'),groups=[];
  for(const link of links){
   const keys=new Set(link.documents.map(d=>documentKey(d.url)));
-  const overlaps=groups.filter(g=>String(g.year)===String(link.year)&&g.documents.some(d=>keys.has(documentKey(d.url))));
+  const overlaps=groups.filter(g=>String(g.year)===String(link.year)&&normalize(g.name)===normalize(link.name)&&(!g.catalogProjectId||!link.catalogProjectId||g.catalogProjectId===link.catalogProjectId)&&g.documents.some(d=>keys.has(documentKey(d.url))));
   if(!overlaps.length){groups.push({...link,documents:[...link.documents],evidence:[...link.evidence]});continue;}
   const target=overlaps[0];
   for(const other of [...overlaps.slice(1),link]){
    target.documents=[...new Map([...target.documents,...other.documents].map(d=>[documentKey(d.url),d])).values()];
    target.evidence.push(...other.evidence);
+   if(other.catalogProjectId)target.catalogProjectId=other.catalogProjectId;
    const i=groups.indexOf(other);if(i>=0)groups.splice(i,1);
   }
  }
  return groups;
 }
-module.exports={links,caseCounts,retainedLinks,catalogLinks,combineLinks};
+function safeLinks(links,catalog,projects=[]){
+ const {documentKey}=require('./catalog-evidence'),owners=new Map(),ambiguous=new Set();
+ const add=(url,id)=>{const key=documentKey(url);if(!key)return;if(!owners.has(key))owners.set(key,new Set());owners.get(key).add(id);};
+ for(const d of require('./project-document-links.json').links)if(d.status==='body_supported'&&d.relationship==='same_named_budget_program')add(d.document?.url,d.projectId);
+ for(const item of catalog?.items||[])for(const d of item.documents||[])if(d.status==='body_supported'&&d.relationship==='same_named_budget_program')add(d.document?.url,item.projectId);
+ for(const [key,ids] of owners)if(ids.size>1)ambiguous.add(key);
+ owners.clear();
+ for(const [i,p] of projects.entries())for(const d of p.documents||[])add(d.url,i);
+ for(const [key,ids] of owners)if(ids.size>1)ambiguous.add(key);
+ owners.clear();
+ for(const [i,l] of links.entries())for(const d of l.documents)add(d.url,i);
+ for(const [key,ids] of owners)if(ids.size>1)ambiguous.add(key);
+ return links.filter(l=>!l.documents.some(d=>ambiguous.has(documentKey(d.url))));
+}
+module.exports={links,caseCounts,retainedLinks,catalogLinks,combineLinks,safeLinks};

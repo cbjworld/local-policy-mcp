@@ -10,18 +10,19 @@ const normalize=s=>s.normalize('NFKC').replace(/\s+/g,'').toLowerCase();
 // Expansions are candidate searches, not a claim that every matching business is identical.
 const shorthandTerms={'음식물처리기':['음식물','처리기'],'전세보증료':['전세','보증료']};
 const names=indexed?null:data.rows.map(entry=>normalize(data.formatVersion===1?entry[1].name:entry.name));
-const institutions=indexed?null:(data.formatVersion===1?data.contexts:data.rows).map(r=>normalize((r.parent||'')+' '+r.institution));
+const enrich=require('./policy-catalog').enrich;
+const contexts=indexed?null:(data.formatVersion===1?data.contexts:data.rows).map(r=>enrich(r,__dirname));
 function search({q,institution,offset=0,limit=10}={}){
  if(typeof q!=='string'||!q.trim()||q.length>100)throw Error('q must contain 1–100 characters');
  if(institution!==undefined&&(typeof institution!=='string'||!institution.trim()||institution.length>80))throw Error('Invalid institution');
  if(!Number.isInteger(offset)||offset<0||offset>(indexed?indexed.length:data.rows.length)||!Number.isInteger(limit)||limit<1||limit>20)throw Error('Invalid pagination');
  const terms=q.trim().split(/\s+/).map(normalize);
  const region=institution?require('./region-aliases').regionTerms(institution).map(normalize):null;
- const regionMatches=indexed||!region?null:institutions.map(name=>region.every(term=>name.includes(term)));
+ const regionMatches=indexed||!region?null:contexts.map(entry=>require('./region-aliases').matchesRegion(region,entry));
  function find(searchTerms){
   if(indexed)return indexed.find(searchTerms,region,offset,limit);
   const found=data.rows.filter((entry,i)=>(!regionMatches||regionMatches[data.formatVersion===1?entry[0]:i])&&searchTerms.every(t=>names[i].includes(t)));
-  return {total:found.length,items:found.slice(offset,offset+limit).map(entry=>data.formatVersion===1?({...data.contexts[entry[0]],...entry[1]}):entry)};
+  return {total:found.length,items:found.slice(offset,offset+limit).map(entry=>data.formatVersion===1?({...contexts[entry[0]],...entry[1]}):enrich(entry,__dirname))};
  }
  let result=find(terms),expandedTerms;
  if(!result.total&&Object.hasOwn(shorthandTerms,normalize(q))){expandedTerms=shorthandTerms[normalize(q)];result=find(expandedTerms);}

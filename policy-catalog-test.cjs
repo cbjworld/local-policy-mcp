@@ -20,7 +20,8 @@ try{
  assert.equal(store.search({q:'산후 조리비',institution:'부산 중구',offset:2}).items.length,0);
  assert.equal(store.search({q:'산후 조리비',institution:'울산 중구'}).total,1);
  const empty=store.search({q:'없음'});empty.total=99;assert.equal(store.search({q:'없음'}).total,0);
- const project=store.search({projectId:id}).items[0];assert.equal(project.budgetRowCount,2);assert.deepEqual(project.budgetVariants,[{amount:100,unit:'천원'},{amount:200,unit:'천원'}]);assert.match(project.budgetStatus,/do_not_sum/);assert.equal(project.documents.length,1);assert.equal(project.budgetRecords[1].page,2);
+ const project=store.search({projectId:id}).items[0];assert.equal(project.budgetRowCount,2);assert.deepEqual(project.budgetVariants,[{amount:100,unit:'천원'},{amount:200,unit:'천원'}]);assert.match(project.budgetStatus,/do_not_sum/);assert.equal(project.identityStatus,'multiple_rows_identity_unconfirmed');assert.equal(project.documents.length,1);assert.equal(project.budgetRecords[1].page,2);
+ const compactProject=require('./catalog-context').compact({items:[project]}).items[0];assert.equal(compactProject.identityStatus,project.identityStatus);assert.equal(compactProject.budgetRowCount,2);
  const other=store.search({institution:'울산 중구'}).items[0];assert.equal(other.documentStatus,'title_candidates_only');assert.equal(other.documents.length,0);assert.equal(other.documentCandidates.length,1);
  assert.equal(store.search({q:'%_'}).total,0);assert.throws(()=>store.search({projectId:'invalid'}));assert.throws(()=>store.search({limit:100}));assert.equal(store.search({limit:1}).nextOffset,1);
  const queries=[{q:'산후 조리비'},{q:'후조리'},{q:'산후'},{q:'산후조리비',institution:'울산 중구'},{q:'산후조리비',linkedOnly:true},{q:'산후조리비',offset:1,limit:1},{q:'산후조리비',offset:3},{q:'%_산후'},{q:'"산후조리비"'},{q:'산후\0조리비'},{q:'ＡＩ'},{q:"' OR 1=1 --"},{projectId:id}];
@@ -30,3 +31,8 @@ try{
  store.close();store=null;fs.appendFileSync(path.join(dir,'project-document-links.json'),' ');assert.throws(()=>catalog.open(dir),/Rebuild/);
  console.log('PASS: stable source-backed catalog identities, region/department/year separation, exact row preservation, unsummed budget variants, body/title link separation, literal search, pagination and stale evidence detection');
 }finally{store?.close();fs.rmSync(dir,{recursive:true,force:true});}
+// Official 남양주시 budget PDF pages 404 and 413 are separate budget rows with different economic purposes.
+const actual=JSON.parse(z.gunzipSync(fs.readFileSync(path.join(__dirname,'budget-data.json.gz'))));
+const namyangju=actual.rows.flatMap(([i,r])=>{const c=actual.contexts[i];return c.institution==='남양주시'&&c.department==='기후에너지과'&&/^전기자동차\s*구매\s*지원$/.test(r.name)?[{c,r}]:[];});
+assert.equal(namyangju.length,2);assert.deepEqual(namyangju.map(x=>[x.r.budget,x.r.page]),[[19686070,404],[18000,413]]);
+assert.equal(catalog.projectId(namyangju[0].c,namyangju[0].r),catalog.projectId(namyangju[1].c,namyangju[1].r));

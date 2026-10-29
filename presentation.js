@@ -47,7 +47,7 @@ function documentView(result){
 function present(name,value,detail='compact'){
  if(name==='research_policy'){
   const programLinks=require('./program-links'),bodyLinks=programLinks.links(value.investigations);
-  value={...value,confirmedProgramLinks:programLinks.combineLinks([...bodyLinks,...programLinks.catalogLinks(value.catalogEvidence,value.candidates,value.investigations,bodyLinks)])};
+  value={...value,confirmedProgramLinks:programLinks.safeLinks(programLinks.combineLinks([...bodyLinks,...programLinks.catalogLinks(value.catalogEvidence,value.candidates,value.investigations,bodyLinks)]),value.catalogEvidence,value.projects)};
   const institutions=institutionGroups(value);
   value={...value,institutions,summary:{...researchSummary(value),producingInstitutions:institutions.filter(g=>g.institution).length,unknownInstitutionDocuments:institutions.find(g=>!g.institution)?.documentCount||0,institutionNote:'기관별 문서 묶음이며 사업 수나 시행 지자체 수가 아닙니다. 동일 기관의 서로 다른 사업을 합치지 마세요.'}};
  }

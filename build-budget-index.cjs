@@ -15,8 +15,10 @@ function build(directory=__dirname){
   const packedKeys=zlib.gzipSync(JSON.stringify(keys)),keysSha256=crypto.createHash('sha256').update(packedKeys).digest('hex');
   db.prepare('INSERT INTO metadata VALUES (?)').run(JSON.stringify({format:1,sha256,scope:data.scope,rows:data.rows.length,catalog,keysSha256}));
   db.exec('COMMIT;');db.close();
-  fs.writeFileSync(path.join(directory,'budget-search-keys.json.gz'),packedKeys);
-  fs.renameSync(temporary,target);
+  const keysFile=path.join(directory,'budget-search-keys.json.gz');
+  const previousKeys=fs.existsSync(keysFile)?fs.readFileSync(keysFile):null;
+  try{fs.writeFileSync(keysFile,packedKeys);fs.renameSync(temporary,target);}
+  catch(error){if(previousKeys)fs.writeFileSync(keysFile,previousKeys);else fs.rmSync(keysFile,{force:true});throw error;}
   return {rows:data.rows.length,catalog,bytes:fs.statSync(target).size};
  }catch(e){try{db.close();}catch{};fs.rmSync(temporary,{force:true});throw e;}
 }

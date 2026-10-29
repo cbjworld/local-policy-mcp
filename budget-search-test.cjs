@@ -11,6 +11,22 @@ for(const [shorthand,expanded] of [['음식물처리기','음식물 처리기'],
 }
 const food=search({q:'음식물처리기',institution:'부산 금정구'});
 assert.equal(food.totalCandidateRows,1);assert.equal(food.items[0].name,'가정용 음식물쓰레기 처리기 구입 지원');assert.ok(food.items[0].source);assert.equal(food.items[0].page,102);
+const yongin=search({q:'청년참여 활성화',institution:'경기 용인시'});
+assert.equal(yongin.totalCandidateRows,1);assert.equal(yongin.items[0].budget,105400);assert.equal(yongin.items[0].page,23);assert.ok(yongin.items[0].source.includes('yongin.go.kr'));
+const iksan=search({q:'익산형 근로청년수당',institution:'익산시'});
+assert.equal(iksan.totalCandidateRows,1);assert.equal(iksan.items[0].budget,3642740);assert.equal(iksan.items[0].page,1);assert.ok(iksan.items[0].source.includes('iksan.go.kr'));
+const suseong=search({q:'청년센터 운영',institution:'대구 수성구'});
+assert.equal(suseong.totalCandidateRows,1);assert.equal(suseong.items[0].budget,129619);assert.equal(suseong.items[0].page,16);assert.ok(suseong.items[0].source.includes('suseong.kr'));
+const gyeyangRent=search({q:'청년월세 한시 특별지원',institution:'인천 계양구',limit:10});
+assert.equal(gyeyangRent.totalCandidateRows,2);assert.deepEqual(gyeyangRent.items.map(x=>x.budget).sort((a,b)=>a-b),[72000,735000]);assert.ok(gyeyangRent.items.every(x=>x.page===6&&x.source.includes('/2026_0/')));
+const dalseo=search({q:'달서청년 자격증 응시료',institution:'대구 달서구'});
+assert.equal(dalseo.totalCandidateRows,1);assert.equal(dalseo.items[0].budget,56000);assert.equal(dalseo.items[0].page,4);assert.ok(dalseo.items[0].source.includes('dalseo.daegu.kr'));
+const gangwon=search({q:'도정시책 및 현안사업의 전략적 추진',institution:'강원특별자치도'});
+assert.equal(gangwon.totalCandidateRows,1);assert.equal(gangwon.items[0].budget,193000);assert.equal(gangwon.items[0].page,1);assert.ok(gangwon.items[0].source.includes('gwd.go.kr'));
+const dalseong=search({q:'출산축하금 지원',institution:'대구 달성군'});
+assert.equal(dalseong.totalCandidateRows,1);assert.equal(dalseong.items[0].budget,2500000);assert.equal(dalseong.items[0].page,18);assert.ok(dalseong.items[0].source.includes('dalseong.daegu.kr'));
+assert.equal(search({q:'산후',institution:'경남 거제시'}).totalCandidateRows,search({q:'산후',institution:'거제시'}).totalCandidateRows);
+assert.equal(search({q:'산후',institution:'경기도 거제시'}).totalCandidateRows,0);
 assert.equal(search({q:'산후조리비'}).expandedSearchTerms,undefined);
 assert.equal(search({q:'120미추홀콜센터'}).items[0].budget,229409);
 assert.equal(search({q:'합천호 노후관광지',institution:'합천'}).items[0].budget,1500000);
@@ -44,6 +60,33 @@ const jeonnam=search({q:'소통도정 운영',institution:'전라남도'}).items
 const yeosu=require("./verified-budget-search").search({institution:"여수시"}).items[0];
 assert.equal(yeosu.amount,1354528942);assert.equal(yeosu.matchedDepartments,0);
 assert.ok(yeosu.sources.every(url=>!url.includes("yeosu.go.kr/contents/12808/2026.pdf")));
+const gyeyang=require('./verified-budget-search').search({institution:'계양구'}).items[0];
+assert.equal(gyeyang.amount,732739805);assert.ok(gyeyang.sources.some(url=>url.includes('/2026_0/general_all02.pdf')));
+const pohang=require('./verified-budget-search').search({institution:'포항시'}).items[0];
+assert.equal(pohang.amount,2718000000);assert.ok(pohang.sources.some(url=>url.includes('VGEEEEEaCCIEGEEEEdGG')));
+const geumcheon=require('./verified-budget-search').search({institution:'금천구'}).items[0];
+assert.equal(geumcheon.amount,733143381);assert.ok(geumcheon.sources.some(url=>url.includes('nttNo=267459')));
+for(const name of ['중랑구','광주시'])assert.equal(require('./verified-budget-search').search({institution:name}).items[0].amountStatus,'approximate');
+const sokcho=require('./verified-budget-search').search({institution:'속초시'}).items[0];
+assert.equal(sokcho.amount,468250973);assert.equal(sokcho.amountStatus,'official_database_with_vote');
+assert(sokcho.sources.includes('https://www.sokchocl.go.kr/kr/assembly/details.do'));
+assert(sokcho.sources.includes('https://www.sokchocl.go.kr/kr/assembly/five.do'));
+assert(sokcho.sourceAccessNote.includes('제349회 예산결산특별위원회 제1차(2025.12.01.)'));
+assert(sokcho.sourceAccessNote.includes('제349회 본회의 제3차(2025.12.19.)'));
+for(const name of ['당진시','인천 동구(편성 당시)']){
+ const result=require('./verified-budget-search').search({institution:name}),row=result.items[0];
+ assert.equal(row.amountStatus,'source_conflict');assert.equal(row.amount,null);assert.equal(row.conflictCandidates.length,2);
+ assert.equal(result.amountStatusCounts.unconfirmed,1);
+}
+const totals=require('./verified-budget-search').search;
+assert.deepEqual(totals({institution:'인천 동구'}).items.map(x=>x.institution),['인천 동구(편성 당시)']);
+assert.deepEqual(totals({institution:'인천동구'}).items.map(x=>x.institution),['인천 동구(편성 당시)']);
+assert.deepEqual(totals({institution:'인천 남동구'}).items.map(x=>x.institution),['남동구']);
+assert.deepEqual(totals({institution:'양주시'}).items.map(x=>x.institution),['양주시']);
+assert.deepEqual(totals({institution:'남양주시'}).items.map(x=>x.institution),['남양주시']);
+assert.deepEqual(totals({institution:'양주'}).items.map(x=>x.institution),['양주시']);
+assert(totals({institution:'동구',limit:20}).items.every(x=>x.institution==='동구'||x.institution==='인천 동구(편성 당시)'));
+assert(totals({institution:'대구',limit:20}).items.every(x=>x.parent==='대구광역시'));
 
 // Recovered sources, shifted table labels, and general-account transfers stay searchable.
 for(const [institution,q,department,budget,page] of [
