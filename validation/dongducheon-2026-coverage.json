@@ -1,0 +1,199 @@
+{
+  "officialList": "https://www.ddc.go.kr/ddc/contents.do?key=2328",
+  "basis": "2026년 본예산 목차의 일반회계 세출(본청·직속기관·사업소·동·의회). 특별회계·기금·세입·추경은 제외. 일부 사업 누락 여부는 별도 검증 필요.",
+  "indexedDepartments": 13,
+  "remainingDepartments": 23,
+  "groups": {
+    "세출 (본청)": [
+      {
+        "department": "기획감사담당관",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/3-1.기획감사담당관.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "홍보미래담당관",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/3-2.홍보미래담당관.pdf",
+        "status": "indexed"
+      },
+      {
+        "department": "자치행정과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/4-1.자치행정과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "세무과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/4-2.세무과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "회계과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/4-3.회계과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "민원봉사과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/4-4.민원봉사과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "정보통신과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/4-5.정보통신과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "복지정책과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/5-1-1.복지정책과.pdf",
+        "status": "indexed"
+      },
+      {
+        "department": "사회복지과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/5-2.사회복지과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "가족지원과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/5-3.가족지원과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "문화예술과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/5-4.문화예술과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "체육관광과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/5-5.체육관광과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "일자리경제과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/6-1.일자리경제과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "환경보호과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/6-2.환경보호과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "농업축산위생과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/6-3.농업축산위생과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "공원녹지과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/6-4.공원녹지과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "안전총괄과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/7-1.안전총괄과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "교통행정과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/7-2-1.교통행정과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "도로과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/7-3.도로과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "도시재생과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/7-4-1.도시재생과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "건축과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/7-5.건축과.pdf",
+        "status": "indexed"
+      },
+      {
+        "department": "공공사업과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/7-6-1.공공사업과.pdf",
+        "status": "not_indexed"
+      }
+    ],
+    "세출 (직속기관)": [
+      {
+        "department": "보건행정과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/8-1.보건행정과.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "건강증진과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/8-2.건강증진과.pdf",
+        "status": "not_indexed"
+      }
+    ],
+    "세출 (사업소)": [
+      {
+        "department": "시설사업소",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/9-1.시설사업소.pdf",
+        "status": "indexed"
+      },
+      {
+        "department": "도서문화사업소",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/9-2.도서문화사업소.pdf",
+        "status": "not_indexed"
+      },
+      {
+        "department": "미래교육진흥원",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/9-3.미래교육진흥원.pdf",
+        "status": "not_indexed"
+      }
+    ],
+    "세출 (동행정복지센터)": [
+      {
+        "department": "생연1동",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/10-1.생연1동.pdf",
+        "status": "indexed"
+      },
+      {
+        "department": "생연2동",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/10-2.생연2동.pdf",
+        "status": "indexed"
+      },
+      {
+        "department": "중앙동",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/10-3.중앙동.pdf",
+        "status": "indexed"
+      },
+      {
+        "department": "보산동",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/10-4.보산동.pdf",
+        "status": "indexed"
+      },
+      {
+        "department": "불현동",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/10-5.불현동.pdf",
+        "status": "indexed"
+      },
+      {
+        "department": "송내동",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/10-6.송내동.pdf",
+        "status": "indexed"
+      },
+      {
+        "department": "소요동",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/10-7.소요동.pdf",
+        "status": "indexed"
+      },
+      {
+        "department": "상패동",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/10-8.상패동.pdf",
+        "status": "indexed"
+      }
+    ],
+    "의회": [
+      {
+        "department": "의회사무과",
+        "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/11.의회사무과.pdf",
+        "status": "indexed"
+      }
+    ]
+  },
+  "limitation": "부서별 원문 대조 여부 기준이며 0원 사업 등 개별 사업의 완전성을 뜻하지 않음."
+}
