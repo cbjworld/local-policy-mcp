@@ -1,0 +1,15 @@
+const assert = require('node:assert/strict'), fs = require('node:fs'), zlib = require('node:zlib');
+const data = JSON.parse(zlib.gunzipSync(fs.readFileSync(require('node:path').join(__dirname,'budget-data.json.gz'))));
+const rows = data.rows.filter(([i]) => data.contexts[i].institutionId === 'gov-268aa4681e');
+assert.equal(rows.length, 7);
+assert.equal(rows.reduce((n,[,r]) => n + r.budget, 0), 334130);
+assert.equal(rows.reduce((n,[,r]) => n + r.previous, 0), 353010);
+assert(rows.every(([i,r]) => r.budget-r.previous === r.delta && data.contexts[i].institutionAggregateVerified === false && r.page));
+const partial = data.scope.partialInstitutionCoverage['동두천시'];
+assert.equal(partial.status, 'partial'); assert.equal(partial.verifiedDepartments, 1); assert.equal(partial.budgetRows, 7);
+const result = require('./budget-search').search({q:'주민자치센터 운영',institution:'동두천시'});
+const item = result.items.find(x => x.institutionId === 'gov-268aa4681e' && x.name === '주민자치센터 운영');
+assert(item); assert.equal(item.budget,89310); assert.equal(item.previous,89310); assert.equal(item.page,1);
+assert.equal(new URL(item.source).hostname,'www.ddc.go.kr');
+assert.match(item.limitation,/1개 부서/);
+console.log('PASS: 동두천시 생연1동 일반회계 부분 범위·합계·원문');
