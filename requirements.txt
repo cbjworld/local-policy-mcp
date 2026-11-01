@@ -1,4 +1,4 @@
-pypdf==6.21.2
+pypdf==6.21.4
 Pillow==13.0.0
 numpy==2.3.5
 tesserocr==2.12.0

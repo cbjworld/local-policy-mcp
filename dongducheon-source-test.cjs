@@ -6,7 +6,7 @@ assert.equal(rows.reduce((n,[,r]) => n + r.budget, 0), 334130);
 assert.equal(rows.reduce((n,[,r]) => n + r.previous, 0), 353010);
 assert(rows.every(([i,r]) => r.budget-r.previous === r.delta && data.contexts[i].institutionAggregateVerified === false && r.page));
 const partial = data.scope.partialInstitutionCoverage['동두천시'];
-assert.equal(partial.status, 'partial'); assert.equal(partial.verifiedDepartments, 13); assert.equal(partial.budgetRows, 189);
+assert.equal(partial.status, 'partial'); assert.equal(partial.verifiedDepartments, 15); assert.equal(partial.budgetRows, 203);
 const result = require('./budget-search').search({q:'주민자치센터 운영',institution:'동두천시'});
 const item = result.items.find(x => x.institutionId === 'gov-268aa4681e' && x.name === '주민자치센터 운영');
 assert(item); assert.equal(item.budget,89310); assert.equal(item.previous,89310); assert.equal(item.page,1);

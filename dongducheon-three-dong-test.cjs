@@ -10,5 +10,5 @@ for(const [department,count,total,previous] of expected){
  assert(found);assert.equal(found.budget,row.budget);assert.equal(found.page,row.page);assert.equal(found.source,ctx.source);assert.match(found.limitation,/8개 동/);
  if(department==='보산동'||department==='소요동')assert.match(found.limitation,/전년도액 합계/);
 }
-const scope=data.scope.partialInstitutionCoverage['동두천시'];assert.equal(scope.verifiedDepartments,13);assert.equal(scope.budgetRows,189);
+const scope=data.scope.partialInstitutionCoverage['동두천시'];assert.equal(scope.verifiedDepartments,15);assert.equal(scope.budgetRows,203);
 console.log('PASS: 동두천시 보산·불현·송내·소요 31행, 합계·부분 범위·원문');

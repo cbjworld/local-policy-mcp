@@ -1,8 +1,8 @@
 {
   "officialList": "https://www.ddc.go.kr/ddc/contents.do?key=2328",
   "basis": "2026년 본예산 목차의 일반회계 세출(본청·직속기관·사업소·동·의회). 특별회계·기금·세입·추경은 제외. 일부 사업 누락 여부는 별도 검증 필요.",
-  "indexedDepartments": 13,
-  "remainingDepartments": 23,
+  "indexedDepartments": 15,
+  "remainingDepartments": 21,
   "groups": {
     "세출 (본청)": [
       {
@@ -23,7 +23,7 @@
       {
         "department": "세무과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/4-2.세무과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "회계과",
@@ -113,7 +113,7 @@
       {
         "department": "공공사업과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/7-6-1.공공사업과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       }
     ],
     "세출 (직속기관)": [
