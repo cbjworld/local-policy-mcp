@@ -20,4 +20,18 @@ assert.ok(find('bp-72a3ac3c8c771e31ab705492','DCT15D5F3F2792476E19D2E951386E8857
 const gangwonGrant=find('bp-d683e10be0fcdca12ba4b816','DCT5168869BCBC8EDBF1C5424754003E4D6');
 assert.ok(gangwonGrant.evidence.some(e=>e.kind==='allocation_budget'&&e.quote.includes('200,200,000원')));
 assert.ok(gangwonGrant.evidence.some(e=>e.kind==='allocation_amount'&&e.quote.includes('31,100,000원')));
+const raw=JSON.parse(require('node:zlib').gunzipSync(require('node:fs').readFileSync(require('node:path').join(__dirname,'budget-data.json.gz'))));
+const {projectId}=require('./policy-catalog');
+for(const [id,department,amount,doc] of [
+ ['bp-b1389e9c86ffe22e1194f288','농촌신활력과',1200,'DCT33741CA7E774FF086E552E6EBAAC2DA7'],
+ ['bp-caeae18f37abd401e8b96712','교육청소년과',122152,'DCT030C337F241515A943F70B2303D4B4B6'],
+ ['bp-412394705424fd04b7ae3456','교육청소년과',1186248,'DCT030C337F241515A943F70B2303D4B4B6']
+]){
+ const matches=raw.rows.filter(([i,r])=>raw.contexts[i].department===department&&r.budget===amount&&projectId(raw.contexts[i],r)===id);
+ assert.equal(matches.length,1,'verified budget identity and exact amount');
+ const link=find(id,doc);assert.equal(link?.status,'body_supported');assert.equal(link.relationship,'same_named_budget_program');
+ assert(link.evidence.some(e=>e.quote.includes(amount.toLocaleString('en-US')+'천원')),'original amount appears in document');
+ assert(link.evidence.every(e=>e.quote&&e.sourceUrl.includes(doc)),'all citations preserve attachment');
+}
+assert.notEqual('bp-caeae18f37abd401e8b96712','bp-412394705424fd04b7ae3456','two different support programs remain separate');
 console.log('PASS: verified budget-source links preserve actual attachments and exclude conflicting disclosure and different budget programs');

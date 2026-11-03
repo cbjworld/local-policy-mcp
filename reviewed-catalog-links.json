@@ -1,6 +1,6 @@
 {
   "formatVersion": 1,
-  "checkedDate": "2026-10-22",
+  "checkedDate": "2026-11-03",
   "reviews": [
     {
       "projectId": "bp-99e3a605f071cecffc8ba1e8",
@@ -202,6 +202,102 @@
       "expected": {
         "name": "여성결혼이민자 지원",
         "department": "주민행복과",
+        "year": 2026,
+        "account": "일반회계"
+      }
+    },
+    {
+      "projectId": "bp-b1389e9c86ffe22e1194f288",
+      "documentKey": "DCT33741CA7E774FF086E552E6EBAAC2DA7:20260210180423:B",
+      "institution": "충청북도 영동군",
+      "year": 2026,
+      "relationship": "same_named_budget_program",
+      "sourceUrl": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT33741CA7E774FF086E552E6EBAAC2DA7&prdnDt=20260210180423&nstSeCd=B#fileId=90d87d875536bdef52dee0e03d53f682",
+      "evidence": [
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": 2,
+          "quote": "사 업 명 : 전세보증금반환보증 보증료 지원"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": 2,
+          "quote": "사 업 비 : 1,200천원(국비 600, 도비 300, 군비 300)"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": 2,
+          "quote": "예산과목 : 농촌신활력과, 쾌적한 공동주거환경 조성, 공동주택환경 개선, 전세보증금반환보증 보증료 지원"
+        }
+      ],
+      "note": "원문 사업명·연도·기관·부서와 예산액 대조; 해당 사업 기준이며 시행 완료를 뜻하지 않음 계획서 지원대상과 예산사업을 구분합니다.",
+      "expected": {
+        "name": "전세보증금반환보증 보증료 지원",
+        "department": "농촌신활력과",
+        "year": 2026,
+        "account": "일반회계"
+      }
+    },
+    {
+      "projectId": "bp-caeae18f37abd401e8b96712",
+      "documentKey": "DCT030C337F241515A943F70B2303D4B4B6:20260306174447:B",
+      "institution": "경기도 광명시",
+      "year": 2026,
+      "relationship": "same_named_budget_program",
+      "sourceUrl": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT030C337F241515A943F70B2303D4B4B6&prdnDt=20260306174447&nstSeCd=B#fileId=062cd1249c70d7dd6e192efac8dc3784",
+      "evidence": [
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "여성청소년 생리용품 저소득층 지원 사업"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "사업기간 : 2026. 1. \\~ 12."
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "사 업 비 : 122,152천원 (국비 50%, 도비 25%, 시비 25%)"
+        }
+      ],
+      "note": "원문 사업명·연도·기관·부서와 예산액 대조; 해당 사업 기준이며 시행 완료를 뜻하지 않음 계획서 지원대상과 예산사업을 구분합니다.",
+      "expected": {
+        "name": "여성청소년 생리용품 지원(저소득층)",
+        "department": "교육청소년과",
+        "year": 2026,
+        "account": "일반회계"
+      }
+    },
+    {
+      "projectId": "bp-412394705424fd04b7ae3456",
+      "documentKey": "DCT030C337F241515A943F70B2303D4B4B6:20260306174447:B",
+      "institution": "경기도 광명시",
+      "year": 2026,
+      "relationship": "same_named_budget_program",
+      "sourceUrl": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT030C337F241515A943F70B2303D4B4B6&prdnDt=20260306174447&nstSeCd=B#fileId=062cd1249c70d7dd6e192efac8dc3784",
+      "evidence": [
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "여성청소년 생리용품 보편지원 사업"
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "사업기간 : 2026. 3. \\~ 12."
+        },
+        {
+          "kind": "reviewed_identity_anchor",
+          "page": null,
+          "quote": "사 업 비 : 1,186,248천원 (26년 본예산 기준, 도비 30%, 시비 70%)"
+        }
+      ],
+      "note": "원문 사업명·연도·기관·부서와 예산액 대조; 해당 사업 기준이며 시행 완료를 뜻하지 않음 계획서 지원대상과 예산사업을 구분합니다.",
+      "expected": {
+        "name": "여성청소년 생리용품 보편지원",
+        "department": "교육청소년과",
         "year": 2026,
         "account": "일반회계"
       }

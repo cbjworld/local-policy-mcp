@@ -1,8 +1,8 @@
 {
   "officialList": "https://www.ddc.go.kr/ddc/contents.do?key=2328",
   "basis": "2026년 본예산 목차의 일반회계 세출(본청·직속기관·사업소·동·의회). 특별회계·기금·세입·추경은 제외. 일부 사업 누락 여부는 별도 검증 필요.",
-  "indexedDepartments": 19,
-  "remainingDepartments": 17,
+  "indexedDepartments": 36,
+  "remainingDepartments": 0,
   "groups": {
     "세출 (본청)": [
       {
@@ -18,7 +18,7 @@
       {
         "department": "자치행정과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/4-1.자치행정과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "세무과",
@@ -48,62 +48,62 @@
       {
         "department": "사회복지과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/5-2.사회복지과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "가족지원과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/5-3.가족지원과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "문화예술과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/5-4.문화예술과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "체육관광과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/5-5.체육관광과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "일자리경제과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/6-1.일자리경제과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "환경보호과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/6-2.환경보호과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "농업축산위생과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/6-3.농업축산위생과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "공원녹지과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/6-4.공원녹지과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "안전총괄과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/7-1.안전총괄과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "교통행정과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/7-2-1.교통행정과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "도로과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/7-3.도로과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "도시재생과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/7-4-1.도시재생과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "건축과",
@@ -120,12 +120,12 @@
       {
         "department": "보건행정과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/8-1.보건행정과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "건강증진과",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/8-2.건강증진과.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       }
     ],
     "세출 (사업소)": [
@@ -137,12 +137,12 @@
       {
         "department": "도서문화사업소",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/9-2.도서문화사업소.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       },
       {
         "department": "미래교육진흥원",
         "source": "https://www.ddc.go.kr/site/ddc/download/file_2026/9-3.미래교육진흥원.pdf",
-        "status": "not_indexed"
+        "status": "indexed"
       }
     ],
     "세출 (동행정복지센터)": [

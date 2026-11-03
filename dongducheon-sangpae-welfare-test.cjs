@@ -14,5 +14,5 @@ for(const [department,count,total] of cases){
 const hit=require('./budget-search').search({q:'청년월세 지원사업',institution:'동두천시'}).items.find(x=>x.department==='복지정책과');
 assert(hit);assert.equal(hit.budget,306948);assert.equal(hit.page,6);assert.match(hit.limitation,/8개 동/);
 const late=require('./budget-search').search({q:'자활성공지원금 지원',institution:'동두천시'}).items.find(x=>x.department==='복지정책과');assert(late);assert.equal(late.budget,3700);assert.equal(late.page,9);
-const scope=data.scope.partialInstitutionCoverage['동두천시'];assert.equal(scope.verifiedDepartments,19);assert.equal(scope.budgetRows,286);
+const scope=data.scope.partialInstitutionCoverage['동두천시'];assert.equal(scope.verifiedDepartments,36);assert.equal(scope.budgetRows,1357);
 console.log('PASS: 동두천 상패동·복지정책과 97행과 출처·수록 범위');
