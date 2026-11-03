@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path'),z=require('node:zlib');
 const root=__dirname,{projectId,enrich}=require(path.join(root,'policy-catalog'));
-const {nameKey,anchors,budgetReferences,institutionKey,documentKey}=require(path.join(root,'catalog-evidence'));
+const {nameKey,anchors,budgetReferences,institutionKey,documentKey,mergeBasis}=require(path.join(root,'catalog-evidence'));
 const data=JSON.parse(z.gunzipSync(fs.readFileSync(path.join(root,'budget-data.json.gz'))));
 const normalized=s=>String(s||'').normalize('NFKC').replace(/\*\*/g,'').replace(/\s+/g,'').toLowerCase();
 const program=s=>normalized(s).replace(/사업$/,'');
@@ -19,13 +19,13 @@ function thousand(text){const m=text.match(/^(\d[\d,]*)\s*(천|백만)?\s*원$/)
 function sameInstitution(row,candidate){return institutionKey(row.institution)===institutionKey(candidate.institution)||institutionKey((row.parent||'')+row.institution)===institutionKey(candidate.institution);}
 function save(id,candidate,source,evidence,strength,relationship='same_named_budget_program'){
  for(const e of evidence)if(!source.pages.some(p=>p.page===e.page&&p.text.includes(e.quote)))throw Error('Quote not present in retained source');
- const key=id+'\n'+documentKey(candidate.url);let item=output.get(key);if(!item){item={projectId:id,status:'body_supported',basis:strength,relationship,document:{title:candidate.title,url:candidate.url,institution:candidate.institution,department:candidate.department,date:candidate.date,role:require(path.join(root,'relevance')).documentRole(candidate.title)},evidence:[]};output.set(key,item);}else if(relationship==='same_named_budget_program'){item.relationship=relationship;if(item.basis!=='name_year_institution_amount')item.basis=strength;}
- if(strength==='name_year_institution_amount')item.basis=strength;
+ const key=id+'\n'+documentKey(candidate.url);let item=output.get(key);if(!item){item={projectId:id,status:'body_supported',basis:strength,relationship,document:{title:candidate.title,url:candidate.url,institution:candidate.institution,department:candidate.department,date:candidate.date,role:require(path.join(root,'relevance')).documentRole(candidate.title)},evidence:[]};output.set(key,item);}else if(relationship==='same_named_budget_program'){item.relationship=relationship;item.basis=mergeBasis(item.basis,strength);}
+ if(strength==='reviewed_identity_budget_conflict'||strength==='name_year_institution_amount')item.basis=mergeBasis(item.basis,strength);
  item.status='body_supported';item.relationship??=relationship;
  for(const e of evidence)if(!item.evidence.some(x=>x.quote===e.quote&&x.page===e.page&&x.sourceUrl===(source.url||candidate.url)))item.evidence.push({...e,sourceId:source.sourceId,sourceUrl:source.url||candidate.url});
 }
 for(const entry of investigations){const {candidate,result}=entry;
- for(const attempt of result.attempts||[])for(const match of require(path.join(root,'catalog-evidence')).reviewedLinks(candidate,attempt,institutionGroups(candidate),JSON.parse(fs.readFileSync(path.join(root,'reviewed-catalog-links.json'))).reviews)){save(match.projectId,candidate,attempt.source,match.evidence,'reviewed_name_department_year_budget',match.relationship);output.get(match.projectId+'\n'+documentKey(candidate.url)).note=match.note;}
+ for(const attempt of result.attempts||[])for(const match of require(path.join(root,'catalog-evidence')).reviewedLinks(candidate,attempt,institutionGroups(candidate),JSON.parse(fs.readFileSync(path.join(root,'reviewed-catalog-links.json'))).reviews)){save(match.projectId,candidate,attempt.source,match.evidence,match.basis,match.relationship);const item=output.get(match.projectId+'\n'+documentKey(candidate.url));item.note=match.note;if(match.budgetComparison)item.budgetComparison=match.budgetComparison;}
 
  for(const attempt of result.attempts||[])for(const match of anchors(candidate,attempt,institutionGroups(candidate)))save(match.projectId,candidate,attempt.source,match.evidence,'name_year_institution');
  for(const attempt of result.attempts||[])for(const match of budgetReferences(candidate,attempt,institutionGroups(candidate)))save(match.projectId,candidate,attempt.source,match.evidence,'explicit_budget_line_name_year_institution','explicit_budget_line_reference');

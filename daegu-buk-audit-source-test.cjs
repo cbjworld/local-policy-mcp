@@ -8,11 +8,18 @@ try{
  assert(rows.every(([i,r])=>r.budget-r.previous===r.delta&&r.page&&data.contexts[i].institutionAggregateVerified===false));
  const result=require(path.join(tmp,'budget-search')).search({q:'부패방지업무추진',institution:'대구 북구'});
  const item=result.items.find(x=>x.department==='감사실');assert(item);assert.equal(item.budget,15420);assert.equal(item.previous,20420);assert.equal(item.page,2);assert.match(item.source,/\/6\.pdf$/);
- assert.match(item.limitation,/3개 부서/);assert.equal(result.scope.partialInstitutionCoverage['대구광역시 북구'].budgetRows,31);
+ assert.match(item.limitation,/5개 부서/);assert.equal(result.scope.partialInstitutionCoverage['대구광역시 북구'].budgetRows,63);
  const innovation=data.rows.filter(([i])=>data.contexts[i].institutionId==='gov-6f5ddb540e'&&data.contexts[i].department==='혁신전략과');
  assert.equal(innovation.length,13);assert.equal(innovation.reduce((n,[,r])=>n+r.budget,0),6676835);assert.equal(innovation.reduce((n,[,r])=>n+r.previous,0),5643886);
  assert(innovation.every(([i,r])=>r.budget-r.previous===r.delta&&r.page>=20&&r.page<=24&&data.contexts[i].account==='일반회계'));
  const found=require(path.join(tmp,'budget-search')).search({q:'도청터 및 주변 지역 개발 추진',institution:'대구 북구'}).items.find(x=>x.department==='혁신전략과');
  assert(found);assert.equal(found.budget,4800);assert.equal(found.page,20);assert.match(found.source,/\/7\.pdf$/);assert.match(found.limitation,/전년도액 합계/);
+ for(const [department,count,total,previous,pageMin,pageMax] of [['정책소통과',13,1042558,1220533,12,19],['정보통신과',19,4153766,3780909,25,33]]){
+  const list=data.rows.filter(([i])=>data.contexts[i].institutionId==='gov-6f5ddb540e'&&data.contexts[i].department===department);
+  assert.equal(list.length,count);assert.equal(list.reduce((s,[,r])=>s+r.budget,0),total);assert.equal(list.reduce((s,[,r])=>s+r.previous,0),previous);
+  assert(list.every(([i,r])=>r.budget-r.previous===r.delta&&r.page>=pageMin&&r.page<=pageMax&&data.contexts[i].account==='일반회계'));
+  const [i,row]=list[0],hit=require(path.join(tmp,'budget-search')).search({q:row.name,institution:'대구 북구'}).items.find(x=>x.department===department);
+  assert(hit);assert.equal(hit.budget,row.budget);assert.equal(hit.page,row.page);assert.equal(hit.source,data.contexts[i].source);
+ }
  console.log('PASS: 대구 북구 감사실 7행 합계·부분 범위·출처 확인');
 }finally{fs.rmSync(tmp,{recursive:true,force:true});}

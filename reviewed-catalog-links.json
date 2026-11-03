@@ -301,6 +301,56 @@
         "year": 2026,
         "account": "일반회계"
       }
+    },
+    {
+      "projectId": "bp-047c3992da1bbbb118dbfea9",
+      "documentKey": "DCT9BF8233591917F755DF0FFC875049120:20260331144409:B",
+      "institution": "대구광역시 서구",
+      "year": 2026,
+      "relationship": "same_named_budget_program",
+      "basis": "reviewed_identity_budget_conflict",
+      "sourceUrl": "https://www.open.go.kr/othicInfo/infoList/infoListDetl.do?prdnNstRgstNo=DCT9BF8233591917F755DF0FFC875049120&prdnDt=20260331144409&nstSeCd=B#fileId=e1f66f9d7971006f1312361fdcf12e64",
+      "budgetComparison": {
+        "unit": "천원",
+        "budgetAmount": 684000,
+        "documentAmount": 722000,
+        "documentAmountQuote": "722백만원",
+        "documentPage": 4
+      },
+      "evidence": [
+        {
+          "kind": "document_year",
+          "page": 3,
+          "quote": "2026년청년월세지원사업추진계획"
+        },
+        {
+          "kind": "program_continuity",
+          "page": 3,
+          "quote": "‘청년월세 한시 특별지원 사업’을 계속사업으로 전환함에 따라"
+        },
+        {
+          "kind": "plan_budget",
+          "page": 4,
+          "quote": "사 업 비 : 722백만원(국비 50%, 시비50%)"
+        },
+        {
+          "kind": "age_range_one",
+          "page": 4,
+          "quote": "만19~34세"
+        },
+        {
+          "kind": "age_range_two",
+          "page": 5,
+          "quote": "19세 되 는 해 의 1.1. ~ 39세 되 는 해 의 12.31."
+        }
+      ],
+      "note": "본예산 684,000천원과 계획서 722백만원은 서로 다르며 차이 원인과 추경 승인 여부는 미확인입니다. 계획서 4쪽 만19~34세와 5쪽 19세~39세 문구도 다르므로 두 원문을 함께 확인하세요.",
+      "expected": {
+        "name": "청년월세 한시 특별지원",
+        "department": "교육지원과",
+        "year": 2026,
+        "account": "일반회계"
+      }
     }
   ]
 }

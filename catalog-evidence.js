@@ -44,6 +44,14 @@ function budgetReferences(candidate,attempt,projects){
 }
 module.exports.budgetReferences=budgetReferences;
 
+// A reviewed discrepancy must survive subsequent weaker automatic matches.
+function mergeBasis(current,next){
+ if(current==='reviewed_identity_budget_conflict'||next==='reviewed_identity_budget_conflict')return 'reviewed_identity_budget_conflict';
+ if(current==='name_year_institution_amount'||next==='name_year_institution_amount')return 'name_year_institution_amount';
+ return next;
+}
+module.exports.mergeBasis=mergeBasis;
+
 // Reviewed aliases stay tied to one retained source and one budget identity; no global fuzzy matching.
 function reviewedLinks(candidate,attempt,projects,reviews){
  if(attempt.status!=='read'||attempt.assessment==='form_or_cover')return [];
@@ -51,7 +59,16 @@ function reviewedLinks(candidate,attempt,projects,reviews){
   const project=projects.find(p=>p.id===r.projectId);
   if(!project||Object.entries(r.expected).some(([key,value])=>project[key]!==value)||!['same_named_budget_program','explicit_budget_line_reference'].includes(r.relationship))return [];
   if(!r.evidence.length||!r.evidence.every(e=>e.quote&&attempt.source.pages.some(p=>p.page===e.page&&p.text.includes(e.quote))))return [];
-  return [{projectId:r.projectId,evidence:r.evidence,relationship:r.relationship,note:r.note}];
+  const basis=r.basis||'reviewed_name_department_year_budget';
+  if(!['reviewed_name_department_year_budget','reviewed_identity_budget_conflict'].includes(basis))return [];
+  if(basis==='reviewed_identity_budget_conflict'){
+   const b=r.budgetComparison,amount=/^(\d{1,3}(?:,\d{3})+|\d+)\s*(천|백만)원$/.exec(b?.documentAmountQuote||'');
+   const numeric=amount?Number(amount[1].replaceAll(',',''))*(amount[2]==='백만'?1000:1):NaN;
+   if(!b||b.unit!=='천원'||!Number.isSafeInteger(b.budgetAmount)||!Number.isSafeInteger(b.documentAmount)||b.budgetAmount<0||b.documentAmount<0||b.budgetAmount===b.documentAmount||numeric!==b.documentAmount)return [];
+   if(project.records?.length!==1||project.records[0].unit!==b.unit||project.records[0].budget!==b.budgetAmount)return [];
+   if(!r.evidence.some(e=>e.page===b.documentPage&&e.quote.includes(b.documentAmountQuote)))return [];
+  }
+  return [{projectId:r.projectId,evidence:r.evidence,relationship:r.relationship,note:r.note,basis,...(basis==='reviewed_identity_budget_conflict'?{budgetComparison:r.budgetComparison}:{})}];
  });
 }
 module.exports.reviewedLinks=reviewedLinks;

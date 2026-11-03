@@ -7,6 +7,9 @@ const found=lookup(request,search);assert.equal(found.seedDocuments.length,1);as
 const beyondPage=lookup(request,args=>({total:21,nextOffset:args.linkedOnly?null:20,items:args.linkedOnly?[entry]:Array.from({length:20},(_,i)=>({...entry,projectId:'unlinked'+i,documents:[],documentCandidates:[]}))}));
 assert.equal(beyondPage.seedDocuments.length,1,'linked evidence beyond the ordinary first page must survive');assert.equal(beyondPage.items[0].projectId,'one');
 assert.equal(compact(found).items[0].documents[0].status,'saved_body_supported_link');assert.equal(compact(found).items[0].documentCandidates[0].status,'title_candidate');
+const conflict={...entry,budgetRowCount:1,documents:[{...entry.documents[0],basis:'reviewed_identity_budget_conflict',budgetComparison:{unit:'천원',budgetAmount:684000,documentAmount:722000,documentAmountQuote:'722백만원',documentPage:4},note:'예산과 계획 금액 및 대상 연령을 각각 확인',evidence:Array.from({length:5},(_,i)=>({page:i+1,quote:'근거 '+i,sourceUrl:url+'#fileId=one'}))}]};
+const conflictView=compact(lookup(request,()=>({total:1,items:[conflict]}))).items[0].documents[0];
+assert.equal(conflictView.basis,'reviewed_identity_budget_conflict');assert.deepEqual(conflictView.budgetComparison,conflict.documents[0].budgetComparison);assert.equal(conflictView.evidence.length,5);assert.match(conflictView.note,/대상 연령/);
 const multiRow=lookup(request,()=>({total:1,items:[{...entry,budgetRowCount:2,identityStatus:'multiple_rows_identity_unconfirmed'}]}));
 assert.equal(multiRow.seedDocuments.length,1,'retain the document for reading');assert.equal(multiRow.seedDocuments[0].discovery,'saved_catalog_identity_unconfirmed');assert.equal(multiRow.seedDocuments[0].savedCatalogProjectId,undefined);
 assert.equal(compact(multiRow).items[0].documents[0].status,'saved_body_supported_link_budget_row_unresolved');
