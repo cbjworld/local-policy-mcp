@@ -27,7 +27,7 @@ for(const [prefix,province] of [['충남','충청남도'],['경남','경상남�
 assert.equal(require('./catalog-context').regionScope('경기 중구 산후조리비').institution,'경기도');
 assert.equal(require('./catalog-context').regionScope('부산 중구 산후조리비').institution,'부산광역시 중구');
 assert.equal(require('./catalog-context').regionScope('부산시 수영구 청년 이사비').institution,'부산광역시 수영구');
-assert.deepEqual(workflow.plan({question:'부산시 수영구 청년 이사비 지원 사업 찾아줘'}).queries,['청년 이사비 지원 사업','청년 이사비']);
+assert.deepEqual(workflow.plan({question:'부산시 수영구 청년 이사비 지원 사업 찾아줘'}).queries,['청년 이사비 지원 사업','청년 이사비','청년 이사비용']);
 assert.deepEqual(workflow.plan({question:'충남 임산부 교통비',queries:['충남 맞춤 표현']}).queries,['충남 맞춤 표현'],'explicit host expressions stay intact');
 // Saved references are always present, but a fresh body read still goes through the existing reader.
 (async()=>{

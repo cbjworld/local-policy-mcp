@@ -13,6 +13,9 @@ async function main(){
  assert.equal(events.at(-1).status,'read');assert.deepEqual(events.at(-1).remainingFields,[]);assert.equal(investigations[0].candidate.url,'primary');assert.equal(investigations[1].purpose,'fill_missing_evidence');
  assert(!docs.some(d=>['wrong','old'].includes(d.url)));assert(docs.find(d=>d.url==='private').readingDecision);
  const failed=[];const more=await supplement({request,investigations:[{candidate:base,result:value('본문')}],allDocuments:[base],byUrl:new Map([[base.url,base]]),candidates:[base],financialDocuments:[],stageDocuments:[base],io:{search:async()=>{failed.push(1);throw Error('provider timeout');}}});assert.equal(failed.length,1);assert.equal(more[0].status,'search_failed');
+ const shortBase={...base},shortNext={...extra,url:'short-extra'},shortInvestigations=[{candidate:shortBase,result:value('지원대상: 청년\n지원내용: 면접 지원\n사업비:500만원\n사업기간:2026년')}],shortRead=[];
+ const shortEvents=await supplement({request:{...request,question:'청년 면접비 찾아줘'},investigations:shortInvestigations,allDocuments:[shortBase,shortNext],byUrl:new Map(),candidates:[shortBase],financialDocuments:[],stageDocuments:[],io:{search:async()=>({items:[],reviewItems:[],relatedDocuments:[],total:0}),research:async args=>{shortRead.push(args.url);return value('지원금액: 1인당 최대 5만원');}}});
+ assert.deepEqual(shortRead,['short-extra']);assert(shortEvents[0].missingFields.includes('benefit'));assert(!shortEvents[0].remainingFields.includes('benefit'));assert.equal(shortInvestigations[1].relationshipStatus,'same_business_evidence');
  const known=value('지원대상: 무주택 임차인\n지원내용: 보증료 지원\n사업비:308백만원\n사업기간:2026년');
  const source={sourceId:'ocr',url:'https://a.go.kr/plan',format:'pdf',ocr:{status:'read'},pages:[{page:2,text:'사업비:308백만원'}]};
  known.attempts.push({status:'no_text',fileId:'scan',source:{...source,ocr:undefined,pages:[{page:3,text:''}]}});

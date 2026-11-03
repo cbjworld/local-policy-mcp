@@ -69,3 +69,5 @@ for(const quote of ['지원내용 : 10만원 충전 교통카드 1매 지원(실
 }
 for(const quote of ['지원내용 : 1인 대출 원금 1억원','지원내용 : 운전면허 반납 지원. 예산 : 1인 50만원','지원내용 : 교부금 1인 50만원'])assert(require('./financial-summary').requestedGaps(conditional(quote),'지원액과 예산').includes('benefit'));
 const reference=conditional('지원내용: 1인 50만원');reference.evidence.fields.activity.excerpts[0].sourceScope='attachment_reference';assert(require('./financial-summary').requestedGaps(reference,'지원액').includes('benefit'));
+
+for(const q of ['청년 이사비 찾아줘','청년 면접비 찾아줘','전세보증료 알려줘']){const gaps=requestedGaps({status:'read',attempts:[]},q);assert(gaps.includes('planBudget'),q);assert(gaps.includes('benefit'),q);}

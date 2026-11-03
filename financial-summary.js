@@ -84,8 +84,8 @@ function summarize(attempts,existingAmounts){
 function requestedGaps(result,question=''){
  if(result?.status!=='read'||result.relevanceStatus==='supporting_document'||result.targetFit?.status==='mismatch')return [];
  const requested=[];
- if(/예산|사업비|지원|수당|조리비|교통비/.test(question))requested.push('planBudget');
- if(/지원|수당|조리비|교통비/.test(question))requested.push('benefit');
+ if(/예산|사업비|지원|수당|조리비|교통비|이사\s*(?:비용|비)|면접\s*(?:비|활동비)|보증료/.test(question))requested.push('planBudget');
+ if(/지원|수당|조리비|교통비|이사\s*(?:비용|비)|면접\s*(?:비|활동비)|보증료/.test(question))requested.push('benefit');
  if(/지원금\s*(?:총액|예산)|사업비\s*구성|예산\s*구성|지원금[·ㆍ과\s]+홍보비/.test(question))requested.push('supportBudget');
  if(/홍보비/.test(question))requested.push('promotionBudget');
  const summary=summarize(result.attempts||[],result.evidence?.fields?.budget?.amounts);

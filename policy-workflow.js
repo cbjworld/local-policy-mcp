@@ -13,6 +13,10 @@ function plan({question,queries,startDate,endDate}={},now=new Date()){
  if(/청년/.test(searchTopic)&&/면접\s*(?:수당|비|활동비)/.test(searchTopic)){
   derived.splice(0,derived.length,'청년 면접수당','청년 면접비','청년 면접활동비');
  }
+ if(/이사\s*(?:비용|비)/.test(searchTopic)){
+  const subject=words.filter(w=>!['지원','사업','정책'].includes(w)).join(' ');
+  derived.splice(0,derived.length,...[...new Set([searchTopic,subject.replace(/이사\s*(?:비용|비)/,'이사비'),subject.replace(/이사\s*(?:비용|비)/,'이사비용'),subject.replace(/이사\s*(?:비용|비)/,'이사 지원')])].slice(0,3));
+ }
  if(/음식물\s*처리기/.test(searchTopic)){
   const subject=words.filter(w=>!['지원','사업','정책'].includes(w)).join(' ');
   derived.splice(1,derived.length,subject.replace(/음식물\s*처리기/,'음식물쓰레기 처리기'),subject.replace(/음식물\s*처리기/,'음식물 감량기'));

@@ -7,6 +7,9 @@ const metadata=original.replace('infoListDetl.do','infoListDetl2.do')+'&kwd=anyt
 assert.equal(documentKey(original),documentKey(metadata));
 assert.notEqual(documentKey(original),documentKey(metadata.replace('20260101','20260102')));
 assert.notEqual(documentKey(original),documentKey(metadata.replace('www.open.go.kr','example.go.kr')));
+const sameDoc=[{title:'2026년 산후조리비 지원사업 추진계획',institution:'A',url:original},{title:'2026년 산후조리비 지원사업 추진계획',institution:'A',url:metadata}];
+const bundled=require('./project-bundles').bundle(sameDoc,[{candidate:sameDoc[0],result:{status:'read',evidence:{fields:{budget:{excerpts:[{status:'evidence_candidate',quote:'사업비 100만원'}]}}}}}]);
+assert.equal(bundled.length,1);assert.equal(bundled[0].documents.length,1);assert.equal(bundled[0].fields.budget.excerpts.length,1);
 const dual=evidenceMap([{title:'2026년 산후조리비 지원계획',institution:'A',url:original},{title:'2026년 산후조리비 지원계획',institution:'A',url:metadata}],[{candidate:{url:metadata},result:{status:'read'}}]);
 assert.equal(dual[0].stages[0].documents.length,1);
 assert.equal(dual[0].stages[0].documents[0].readingStatus,'read');

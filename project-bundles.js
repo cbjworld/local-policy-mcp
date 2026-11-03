@@ -11,11 +11,11 @@ function identity(doc){
 function bundle(documents,investigations=[]){
  const groups=new Map();
  const titleCounts=new Map();
- for(const doc of [...new Map(documents.map(d=>[d.url,d])).values()]){const k=identity(doc).key+'|'+String(doc.title).replace(/\s+/g,'');titleCounts.set(k,(titleCounts.get(k)||0)+1);}
- for(const doc of documents){const id=identity(doc);const ambiguous=titleCounts.get(id.key+'|'+String(doc.title).replace(/\s+/g,''))>1;const key=ambiguous?doc.url:id.key;if(!groups.has(key))groups.set(key,{institution:doc.institution,name:id.name,titleYear:id.year,grouping:ambiguous?'identical-title-different-documents-kept-separate':'same-institution-department-explicit-title-year-normalized-name-only',documents:[]});const g=groups.get(key);if(!g.documents.some(x=>x.url===doc.url))g.documents.push({...doc,role:require('./relevance').documentRole(doc.title)});}
+ for(const doc of [...new Map(documents.map(d=>[documentKey(d.url),d])).values()]){const k=identity(doc).key+'|'+String(doc.title).replace(/\s+/g,'');titleCounts.set(k,(titleCounts.get(k)||0)+1);}
+ for(const doc of new Map(documents.map(d=>[documentKey(d.url),d])).values()){const id=identity(doc);const ambiguous=titleCounts.get(id.key+'|'+String(doc.title).replace(/\s+/g,''))>1;const key=ambiguous?doc.url:id.key;if(!groups.has(key))groups.set(key,{institution:doc.institution,name:id.name,titleYear:id.year,grouping:ambiguous?'identical-title-different-documents-kept-separate':'same-institution-department-explicit-title-year-normalized-name-only',documents:[]});const g=groups.get(key);if(!g.documents.some(x=>documentKey(x.url)===documentKey(doc.url)))g.documents.push({...doc,role:require('./relevance').documentRole(doc.title)});}
  return [...groups.values()].map(g=>{
   g.documents.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
-  const read=g.documents.map(d=>investigations.find(x=>x.candidate.url===d.url)).filter(Boolean);
+  const read=g.documents.map(d=>investigations.find(x=>documentKey(x.candidate.url)===documentKey(d.url))).filter(Boolean);
   const titleSources=g.documents.filter(d=>(d.relevance||require('./relevance').classify(d.title)).kind==='project_candidate');
   const existence={status:titleSources.length?'title_inferred':'undetermined',label:titleSources.length?'사업 존재 추정 · 제목 근거':'사업 존재 판단 유보',sources:titleSources.map(d=>({title:d.title,url:d.url})),note:'비공개·읽기 실패여도 제목이 요청 사업을 뒷받침하면 존재 추정 사례로 포함하세요. 계획안은 추진 구상이며 현재 시행·예산 확정을 뜻하지 않습니다. 본문을 읽지 못한 대상·금액·기간은 미확인으로 유지하세요.'};
   g.existence=existence;
@@ -24,7 +24,7 @@ function bundle(documents,investigations=[]){
    fields[key]={status:entries.some(e=>e.status==='evidence_candidate')?'needs_review':entries.some(e=>e.status==='redacted')?'redacted':'unconfirmed',excerpts:entries};
   }
   const missing=Object.entries(fields).filter(([,v])=>v.status!=='needs_review').map(([k])=>k);
-  const unread=g.documents.filter(d=>!investigations.some(x=>x.candidate.url===d.url));
+  const unread=g.documents.filter(d=>!investigations.some(x=>documentKey(x.candidate.url)===documentKey(d.url)));
   const organizations=read.flatMap(x=>(x.result.evidence?.organizations||[]).map(e=>({...e,documentTitle:x.candidate.title})));
   const budgetNotes=read.flatMap(x=>x.result.evidence?.budgetNotes||[]);
   const reviewFlags=[];
