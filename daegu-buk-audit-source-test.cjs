@@ -8,7 +8,7 @@ try{
  assert(rows.every(([i,r])=>r.budget-r.previous===r.delta&&r.page&&data.contexts[i].institutionAggregateVerified===false));
  const result=require(path.join(tmp,'budget-search')).search({q:'부패방지업무추진',institution:'대구 북구'});
  const item=result.items.find(x=>x.department==='감사실');assert(item);assert.equal(item.budget,15420);assert.equal(item.previous,20420);assert.equal(item.page,2);assert.match(item.source,/\/6\.pdf$/);
- assert.match(item.limitation,/27개 부서/);assert.equal(result.scope.partialInstitutionCoverage['대구광역시 북구'].budgetRows,940);
+ assert.match(item.limitation,/30개 부서/);assert.equal(result.scope.partialInstitutionCoverage['대구광역시 북구'].budgetRows,1088);
  const innovation=data.rows.filter(([i])=>data.contexts[i].institutionId==='gov-6f5ddb540e'&&data.contexts[i].department==='혁신전략과');
  assert.equal(innovation.length,13);assert.equal(innovation.reduce((n,[,r])=>n+r.budget,0),6676835);assert.equal(innovation.reduce((n,[,r])=>n+r.previous,0),5643886);
  assert(innovation.every(([i,r])=>r.budget-r.previous===r.delta&&r.page>=20&&r.page<=24&&data.contexts[i].account==='일반회계'));
@@ -30,6 +30,10 @@ try{
  for(const [department,count,total,previous,first,last] of [["고성동", 6, 980056, 950262, 1, 4], ["칠성동", 6, 1320205, 1370444, 5, 9], ["침산1동", 6, 807695, 897224, 10, 14], ["침산2동", 6, 1027516, 965988, 15, 19], ["침산3동", 7, 1041804, 1077510, 20, 24], ["노원동", 6, 1104523, 1076412, 25, 29], ["산격1동", 6, 1204917, 1308642, 30, 34], ["산격2동", 6, 927254, 921126, 35, 39], ["산격3동", 6, 934938, 946706, 40, 44], ["산격4동", 6, 909204, 946860, 45, 49], ["복현1동", 6, 884400, 838405, 50, 54], ["복현2동", 8, 1293250, 1300758, 55, 59], ["대현동", 6, 1260897, 1224627, 60, 64], ["검단동", 6, 848687, 833887, 65, 69], ["무태조야동", 6, 1715306, 1762497, 70, 74], ["관문동", 6, 1860908, 1891622, 75, 79], ["태전1동", 6, 1199641, 1207912, 80, 84], ["태전2동", 6, 1308141, 1219046, 85, 89], ["구암동", 7, 1458320, 1418649, 90, 94], ["관음동", 6, 1243659, 1246830, 95, 99], ["읍내동", 6, 1365079, 1371368, 100, 104], ["동천동", 6, 1279481, 1329386, 105, 109], ["국우동", 6, 1487669, 1523798, 110, 114], ["복지정책과", 84, 286526583, 264291983, 1, 25]] ){
   const list=data.rows.filter(([i])=>data.contexts[i].institutionId==='gov-6f5ddb540e'&&data.contexts[i].department===department);assert.equal(list.length,count);assert.equal(list.reduce((n,[,r])=>n+r.budget,0),total);assert.equal(list.reduce((n,[,r])=>n+r.previous,0),previous);assert(list.every(([i,r])=>r.budget-r.previous===r.delta&&r.page>=first&&r.page<=last&&data.contexts[i].account==='일반회계'));
  }
+ for(const [department,count,total,previous,first,last] of [["희망복지과", 61, 86065369, 78316839, 35, 55], ["여성아동과", 83, 162754883, 153613026, 56, 87], ["징수과", 4, 784357, 771587, 49, 52]] ){
+  const list=data.rows.filter(([i])=>data.contexts[i].institutionId==='gov-6f5ddb540e'&&data.contexts[i].department===department);assert.equal(list.length,count);assert.equal(list.reduce((n,[,r])=>n+r.budget,0),total);assert.equal(list.reduce((n,[,r])=>n+r.previous,0),previous);assert(list.every(([i,r])=>r.budget-r.previous===r.delta&&r.page>=first&&r.page<=last&&data.contexts[i].account==='일반회계'));
+ }
+ const withheld=data.rows.filter(([i,r])=>data.contexts[i].institutionId==='gov-6f5ddb540e'&&data.contexts[i].department==='징수과'&&['세외수입징수관리','과태료징수시스템 운영관리'].includes(r.name));assert.equal(withheld.length,0);
  const planning=data.rows.filter(([i])=>data.contexts[i].institutionId==='gov-6f5ddb540e'&&data.contexts[i].department==='기획예산과');
  assert.equal(planning.length,25);assert.equal(planning.reduce((n,[,r])=>n+r.budget,0),4518393);assert.equal(planning.reduce((n,[,r])=>n+r.previous,0),5302162);
  assert(planning.every(([i,r])=>r.budget-r.previous===r.delta&&r.page>=1&&r.page<=11&&data.contexts[i].account==='일반회계'));
