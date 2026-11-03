@@ -8,7 +8,7 @@ try{
  assert(rows.every(([i,r])=>r.budget-r.previous===r.delta&&r.page&&data.contexts[i].institutionAggregateVerified===false));
  const result=require(path.join(tmp,'budget-search')).search({q:'부패방지업무추진',institution:'대구 북구'});
  const item=result.items.find(x=>x.department==='감사실');assert(item);assert.equal(item.budget,15420);assert.equal(item.previous,20420);assert.equal(item.page,2);assert.match(item.source,/\/6\.pdf$/);
- assert.match(item.limitation,/5개 부서/);assert.equal(result.scope.partialInstitutionCoverage['대구광역시 북구'].budgetRows,63);
+ assert.match(item.limitation,/6개 부서/);assert.equal(result.scope.partialInstitutionCoverage['대구광역시 북구'].budgetRows,88);
  const innovation=data.rows.filter(([i])=>data.contexts[i].institutionId==='gov-6f5ddb540e'&&data.contexts[i].department==='혁신전략과');
  assert.equal(innovation.length,13);assert.equal(innovation.reduce((n,[,r])=>n+r.budget,0),6676835);assert.equal(innovation.reduce((n,[,r])=>n+r.previous,0),5643886);
  assert(innovation.every(([i,r])=>r.budget-r.previous===r.delta&&r.page>=20&&r.page<=24&&data.contexts[i].account==='일반회계'));
@@ -21,5 +21,11 @@ try{
   const [i,row]=list[0],hit=require(path.join(tmp,'budget-search')).search({q:row.name,institution:'대구 북구'}).items.find(x=>x.department===department);
   assert(hit);assert.equal(hit.budget,row.budget);assert.equal(hit.page,row.page);assert.equal(hit.source,data.contexts[i].source);
  }
+ const planning=data.rows.filter(([i])=>data.contexts[i].institutionId==='gov-6f5ddb540e'&&data.contexts[i].department==='기획예산과');
+ assert.equal(planning.length,25);assert.equal(planning.reduce((n,[,r])=>n+r.budget,0),4518393);assert.equal(planning.reduce((n,[,r])=>n+r.previous,0),5302162);
+ assert(planning.every(([i,r])=>r.budget-r.previous===r.delta&&r.page>=1&&r.page<=11&&data.contexts[i].account==='일반회계'));
+ const planned=require(path.join(tmp,'budget-search')).search({q:'민선9기 북구청장직 인수위원회 운영',institution:'대구 북구'}).items.find(x=>x.department==='기획예산과');assert(planned);assert.equal(planned.budget,30350);assert.equal(planned.page,1);assert.match(planned.source,/\/7\.pdf$/);
+ const personnel=planning.filter(([,r])=>r.name==='인력운영비');assert.deepEqual(personnel.map(([,r])=>r.budget).sort((a,b)=>a-b),[70000,324565]);
+ assert.equal(require(path.join(tmp,'policy-catalog')).projectId(data.contexts[personnel[0][0]],personnel[0][1]),require(path.join(tmp,'policy-catalog')).projectId(data.contexts[personnel[1][0]],personnel[1][1]));
  console.log('PASS: 대구 북구 감사실 7행 합계·부분 범위·출처 확인');
 }finally{fs.rmSync(tmp,{recursive:true,force:true});}
