@@ -8,7 +8,7 @@ function gaps(base,investigations,question){
  return [...core,...financial];
 }
 async function supplement({request,investigations,allDocuments,io,byUrl,candidates,financialDocuments,stageDocuments,ocrBudget={remaining:2},focusUrls}){
- const events=[],searched=new Set();
+ const events=[],searched=new Set(),retryBroad=new Set();
  const tried=d=>investigations.some(x=>documentKey(x.candidate.url)===documentKey(d.url));
  const inFocus=x=>!focusUrls||focusUrls.has(x.candidate.url);
  const bases=()=>investigations.filter(x=>inFocus(x)&&!x.purpose&&!(x.result.status!=='read'&&investigations.filter(y=>y.candidate.institution===x.candidate.institution).length>=2)&&gaps(x,investigations,request.question).length).sort((a,b)=>Number(b.result.status==='read')-Number(a.result.status==='read'));
@@ -30,11 +30,12 @@ async function supplement({request,investigations,allDocuments,io,byUrl,candidat
    }
   }
   if(!item){
-   anchor=bases().find(x=>!searched.has(x.candidate.institution));
+   anchor=bases().find(x=>!searched.has(x.candidate.institution)||retryBroad.has(x.candidate.institution));
    if(!anchor)break;
+   const broadRetry=retryBroad.delete(anchor.candidate.institution);
    searched.add(anchor.candidate.institution);
    const missing=gaps(anchor,investigations,request.question);
-   const q=missing.includes('benefit')&&!missing.some(k=>['budget','planBudget'].includes(k))?anchor.candidate.title.replace(/20\d{2}년?/g,'').replace(/(?:추진|시행)계획.*$/,'').replace(/[「」『』]/g,'').trim()+' 시행계획':request.queries[0]+' '+(missing.some(k=>['budget','planBudget','supportBudget','promotionBudget'].includes(k))?'예산':'계획');
+   const q=broadRetry?request.queries[0]:missing.includes('benefit')&&!missing.some(k=>['budget','planBudget'].includes(k))?anchor.candidate.title.replace(/20\d{2}년?/g,'').replace(/(?:추진|시행)계획.*$/,'').replace(/[「」『』]/g,'').trim()+' 시행계획':request.queries[0]+' '+(missing.some(k=>['budget','planBudget','supportBudget','promotionBudget'].includes(k))?'예산':'계획');
    // Search dates are production dates; a next-year plan may be written in the preceding year.
    const args={q,scope:'all',page:1,startDate:request.startDate,endDate:request.endDate};
    const event={fromUrl:anchor.candidate.url,missingFields:missing,search:args,status:'no_matching_document',candidates:[]};events.push(event);
@@ -48,6 +49,7 @@ async function supplement({request,investigations,allDocuments,io,byUrl,candidat
      if(!byUrl.has(documentKey(d.url))){byUrl.set(documentKey(d.url),d);allDocuments.push(d);stageDocuments.push(d);if(['budget','allocation_or_deposit','execution_or_settlement'].includes(d.documentRole))financialDocuments.push(d);else candidates.push(d);}
     }
     item=allDocuments.find(d=>!d.readingDecision&&!tried(d)&&sameBusinessCandidate(anchor.candidate,d));
+    if(!item&&!broadRetry&&q!==request.queries[0])retryBroad.add(anchor.candidate.institution);
    }catch(error){event.status='search_failed';event.message=error.message;}
    if(!item)continue;
   }
