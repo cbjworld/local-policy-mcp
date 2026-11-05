@@ -90,6 +90,8 @@
 
 이후 `주요내용`으로 기재된 청년 주거급여 분리지급도 대상과 본문을 확인해 추가했다. 기존 25개 항목은 그대로 유지되며, 대상이 명시되지 않은 계획 수립 안내 1개는 검토 대상으로 남는다.
 
+[진주시 귀농 창업·주택구입](https://www.jinju.go.kr/00134/04991/05055.web), 사천시의 [인공관절 수술비](https://www.sacheon.go.kr/life/00327/03933.web), [귀농 창업·주택구입](https://www.sacheon.go.kr/agriculture/04092/04094.web), [청년농업인 영농정착](https://www.sacheon.go.kr/agriculture/04092/04097.web), [남동구 청년농업인 영농정착](https://www.namdong.go.kr/main/area/youth/business/farming.jsp) 안내를 원문 본문 및 지역 검색과 대조했다. 브라우저 제목이 기관명만 표시되는 경우 화면의 고유한 사업 제목을 추가로 확인한다.
+
 ## 의왕시·사상구·해운대구 추가 페이지
 
 - [의왕시 생애주기별 인구정책](https://www.uiwang.go.kr/UWKORWEL1901): 150행의 각 열을 원문과 대조했다. 같은 사업명이 반복되는 행이 있으므로 독립 사업 수로 세지 않는다.

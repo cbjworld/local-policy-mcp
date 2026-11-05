@@ -19,7 +19,7 @@ const search=require('./municipal-homepage-search.cjs').search;
  const combined=search({q:'동행 5,000원'});assert.equal(combined.total,1);assert.equal(combined.items[0].institution,'과천시');assert.equal(combined.items[0].links[0],'https://www.gccity.go.kr/apply');assert.equal(combined.scope.sources.length,2);
  const section=search({q:'청년 월세'});assert.equal(section.total,1);assert.equal(section.items[0].status,'source_section_candidate');assert.equal(section.items[0].location.section,2);
  const detail=search({q:'반려동물 의료비'});assert.equal(detail.total,1);assert.equal(detail.items[0].status,'source_detail_candidate');assert.equal(detail.items[0].location.elementId,'contents');
- for(const id of ['conts','content']){second.items[2].location.elementId=id;fs.writeFileSync(file,JSON.stringify({sources:[first,second]}));assert.equal(search({q:'반려동물 의료비'}).items[0].location.elementId,id);}
+ for(const id of ['conts','content','body_content']){second.items[2].location.elementId=id;fs.writeFileSync(file,JSON.stringify({sources:[first,second]}));assert.equal(search({q:'반려동물 의료비'}).items[0].location.elementId,id);}
  assert.equal(search({q:'동행',institution:'노원구'}).total,0);
  fs.writeFileSync(file,JSON.stringify({sources:[first,first]}));assert.throws(()=>search({q:'청년'}),/형식/);fs.writeFileSync(file,JSON.stringify(first));
  const handler=require('./mcp').createHandler();
