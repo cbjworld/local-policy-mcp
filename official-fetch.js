@@ -1,8 +1,9 @@
 const https=require('node:https'),dns=require('node:dns'),net=require('node:net');
+const registeredMunicipalHosts=new Set(require('./catalog-institutions.json').records.flatMap(record=>{try{const u=new URL(record.url);return u.protocol==='https:'&&!u.username&&!u.password&&!u.port?[u.hostname]:[];}catch{return [];}}));
 function validateUrl(value){
  if(typeof value!=='string'||value.length>3000)throw new Error('공식 원문 URL이 올바르지 않습니다.');
  const u=new URL(value);
- if(u.protocol!=='https:'||!(u.hostname.endsWith('.go.kr')||['www.gov.kr','gov.kr'].includes(u.hostname))||u.username||u.password||(u.port&&u.port!=='443'))throw new Error('HTTPS .go.kr 또는 정부24 공식 주소만 조회할 수 있습니다.');
+ if(u.protocol!=='https:'||!(u.hostname.endsWith('.go.kr')||['www.gov.kr','gov.kr'].includes(u.hostname)||registeredMunicipalHosts.has(u.hostname))||u.username||u.password||(u.port&&u.port!=='443'))throw new Error('HTTPS 정부 공식 주소 또는 등록된 지자체 홈페이지 주소만 조회할 수 있습니다.');
  u.hash='';return u;
 }
 function publicIP(ip){

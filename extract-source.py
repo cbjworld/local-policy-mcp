@@ -21,7 +21,7 @@ class Page(HTMLParser):
         if tag == 'a' and self.anchor:
             url, parts = self.anchor
             p = urlparse(url)
-            if p.scheme == 'https' and ((p.hostname or '').endswith('.go.kr') or p.hostname in ('gov.kr','www.gov.kr')) and not p.username:
+            if p.scheme == 'https' and ((p.hostname or '').endswith('.go.kr') or p.hostname in ('gov.kr','www.gov.kr') or p.hostname == urlparse(self.base).hostname) and not p.username:
                 self.links.append({'url':url,'title':' '.join(parts).strip()[:200]})
             self.anchor = None
     def handle_data(self, data):

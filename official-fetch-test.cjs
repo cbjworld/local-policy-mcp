@@ -1,6 +1,10 @@
-const assert=require('node:assert/strict'),https=require('node:https'),{EventEmitter}=require('node:events'),{download}=require('./official-fetch');
+const assert=require('node:assert/strict'),https=require('node:https'),{EventEmitter}=require('node:events'),{download,validateUrl}=require('./official-fetch');
 const original=https.request;
 (async()=>{try{
+ assert.equal(validateUrl('https://www.nowon.kr/path').hostname,'www.nowon.kr');
+ for(const url of ['https://not-nowon.kr/path','https://evil.nowon.kr/path','https://www.nowon.kr.evil.com/','http://www.nowon.kr/','https://user@www.nowon.kr/','https://www.nowon.kr:8443/'])assert.throws(()=>validateUrl(url));
+ const parsed=await require('./discovery').extract(Buffer.from('<html><a href="/file.pdf">첨부</a><a href="https://evil.nowon.kr/file.pdf">가짜</a></html>'),{url:'https://www.nowon.kr/notice',type:'text/html',page:1});
+ assert.deepEqual(parsed.links.map(x=>x.url),['https://www.nowon.kr/file.pdf']);
  for(const [code,retryable] of [['ECONNRESET',true],['EAI_AGAIN',true],['CERT_HAS_EXPIRED',false]]){
   https.request=()=>{const req=new EventEmitter();req.end=()=>queueMicrotask(()=>{req.emit('error',Object.assign(Error('private network detail'),{code}));req.emit('close');});return req;};
   await assert.rejects(download('https://www.open.go.kr/a'),e=>e.code===code&&e.retryable===retryable&&!e.message.includes('private network detail'));
