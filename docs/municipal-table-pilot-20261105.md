@@ -76,6 +76,8 @@
 
 추가로 [관악구 장애인 의료비](https://www.gwanak.go.kr/site/gwanak/04/10404050600002016051205.jsp), [순창군 백내장 의료비](https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac948ebb749f0), [칠곡군 청년 이사비](https://www.chilgok.go.kr/portal/contents.do?mId=0912040000) 원문을 확인했다. 각 홈페이지의 본문 영역 식별자(contents, content, conts)를 출처 위치로 보존하며 세 지역 검색에서 반환된다. 칠곡군 안내에 기재된 지원 대상과 신청기간은 해당 원문 기준이다.
 
+[영등포구 주차장 개방 지원](https://www.ydp.go.kr/www/contents.do?key=6058), [사하구 1인가구 지원](https://www.saha.go.kr/portal/contents.do?mId=0509020000), [연제구 면접사진 촬영비](https://www.yeonje.go.kr/portal/contents.do?mId=0608110000)도 원문 본문 위치와 지역 검색 결과를 확인했다. 25개 페이지에서 389개 후보를 로컬로 보관한다. 홈페이지 안내의 대상·기간과 현재 운영 여부는 별도로 구분한다.
+
 ## 의왕시·사상구·해운대구 추가 페이지
 
 - [의왕시 생애주기별 인구정책](https://www.uiwang.go.kr/UWKORWEL1901): 150행의 각 열을 원문과 대조했다. 같은 사업명이 반복되는 행이 있으므로 독립 사업 수로 세지 않는다.
