@@ -164,13 +164,16 @@ class HeadingSections(HTMLParser):
         self.serial, self.skip = 0, 0
         self.table_mode, self.has_table, self.containers = table_mode, False, 0
         self.table_depth, self.table_done, self.outer = None, False, None
+        self.row_depth, self.cell_depth, self.cell_kind = None, None, None
+        self.cell_text, self.row_keys, self.row_values, self.table_fields = [], [], [], []
 
     def finish(self):
         if self.heading is None:
             return
         name, content = clean(''.join(self.heading)), clean(''.join(self.text))
         content_label = r'(?:지원|사업|주요)내용|지원(?:조건|금액)|(?:^|\s)내용(?:\s|:)' if self.table_mode else r'(?:지원|사업|주요)내용|지원조건'
-        if name and (not self.table_mode or self.has_table) and re.search(r'대상', content) and re.search(content_label, content):
+        valid_fields = not self.table_mode or (any('대상' in k and v for k, v in self.table_fields) and any(re.search(r'내용|지원조건|지원금액', k) and v for k, v in self.table_fields))
+        if name and (not self.table_mode or self.has_table) and valid_fields and re.search(r'대상', content) and re.search(content_label, content):
             self.items.append({'name': name, 'content': content, 'contentColumn': '사업별 안내', 'department': None,
                                'fields': {}, 'links': list(dict.fromkeys(self.links)), 'source': self.source,
                                'location': {'section': self.serial}, 'status': 'source_section_candidate'})
@@ -178,6 +181,8 @@ class HeadingSections(HTMLParser):
             self.skipped.append({'section': self.serial, 'reason': 'missing_policy_labels'})
         self.heading, self.text, self.links, self.has_table = None, [], [], False
         self.table_depth, self.table_done = None, False
+        self.row_depth, self.cell_depth, self.cell_kind = None, None, None
+        self.cell_text, self.row_keys, self.row_values, self.table_fields = [], [], [], []
 
     def handle_starttag(self, tag, attrs):
         if tag in ('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'):
@@ -205,6 +210,10 @@ class HeadingSections(HTMLParser):
             if tag == 'table' and self.table_depth is None:
                 self.has_table = True
                 self.table_depth = self.depth
+            elif self.table_mode and self.table_depth is not None and tag == 'tr' and self.row_depth is None:
+                self.row_depth, self.row_keys, self.row_values = self.depth, [], []
+            elif self.table_mode and self.row_depth is not None and tag in ('th', 'td') and self.cell_depth is None:
+                self.cell_depth, self.cell_kind, self.cell_text = self.depth, tag, []
             if tag in ('div', 'li', 'p', 'h5', 'tr', 'td', 'th'):
                 self.text.append(' ')
             if tag == 'a' and attrs.get('href'):
@@ -219,7 +228,13 @@ class HeadingSections(HTMLParser):
         if tag in ('script', 'style', 'noscript'):
             self.skip = max(0, self.skip - 1)
         elif not self.skip:
-            if self.table_mode and tag == 'table' and self.depth == self.table_depth:
+            if self.table_mode and tag in ('th', 'td') and self.depth == self.cell_depth:
+                (self.row_keys if self.cell_kind == 'th' else self.row_values).append(clean(''.join(self.cell_text)))
+                self.cell_depth, self.cell_kind = None, None
+            elif self.table_mode and tag == 'tr' and self.depth == self.row_depth:
+                self.table_fields.extend((key, ' '.join(self.row_values)) for key in self.row_keys)
+                self.row_depth = None
+            elif self.table_mode and tag == 'table' and self.depth == self.table_depth:
                 self.table_done = True
                 self.table_depth = None
             elif tag == ('h3' if self.table_mode else 'h4') and self.depth == self.heading_depth:
@@ -237,6 +252,8 @@ class HeadingSections(HTMLParser):
             self.handle_endtag(tag)
 
     def handle_data(self, data):
+        if not self.skip and self.cell_depth is not None:
+            self.cell_text.append(data)
         if not self.skip and self.heading_depth is not None:
             self.heading.append(data)
         elif not self.skip and self.heading is not None and not self.table_done:

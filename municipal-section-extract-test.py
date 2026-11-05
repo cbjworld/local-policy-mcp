@@ -84,6 +84,13 @@ class SectionTest(unittest.TestCase):
         self.assertEqual([i['name'] for i in x['items']], ['난방비', '연금'])
         self.assertNotIn('바닥글', x['items'][1]['content'])
 
+    def test_caption_does_not_create_missing_table_values(self):
+        html = '''<div id="content"><h3>사업 안내</h3><table><caption>대상 내용 안내</caption>
+        <tr><th>대상</th><td></td></tr><tr><th>내용</th><td>안내</td></tr></table></div>'''.encode()
+        x = m.extract(html, 'https://www.jangheung.go.kr/test')
+        self.assertEqual(x['items'], [])
+        self.assertEqual(x['skipped'][0]['section'], 1)
+
 
 if __name__ == '__main__':
     unittest.main()
