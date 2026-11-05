@@ -31,3 +31,7 @@ const failedFirst=[...Array.from({length:5},(_,i)=>({candidate:{title:'사업 �
 const preserved=require('./presentation').present('research_policy',{candidates:failedFirst.map(x=>x.candidate),investigations:failedFirst,projects:[]});
 assert.equal(preserved.documents.filter(d=>d.readingStatus==='read').length,2,'successful sources must survive before large unreadable candidates');
 assert(JSON.stringify(preserved).length<=24000);
+
+const manyOther=Array.from({length:180},(_,i)=>({title:'청년 지원 계획 '+('가'.repeat(140)),institution:'기관'+i,url:'https://www.open.go.kr/item/'+i+'x'.repeat(80),relevance:{kind:'project_candidate'}}));
+const twoCases=crowdedReads.slice(0,2),large=require('./presentation').present('research_policy',{candidates:[...twoCases.map(x=>x.candidate),...manyOther],investigations:twoCases,projects:[]});
+assert(large.responseSize.omittedInstitutionSources>0);assert.equal(large.caseComparison.length,2,'retain two read cases before adding optional directory links');assert(JSON.stringify(large).length<=24000);

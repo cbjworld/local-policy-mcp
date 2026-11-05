@@ -81,7 +81,7 @@ module.exports=function compactResearch(value){
  while(oversized()&&output.catalogEvidence?.items.length){output.catalogEvidence.items.pop();output.responseSize.omittedCatalogItems++;refreshComparison();}
  for(let i=Math.min(39,output.institutionDirectory.rows.length-1);i>=0&&oversized();i--){output.institutionDirectory.rows[i].splice(3);output.responseSize.omittedInstitutionSources++;}
  while(oversized()&&output.confirmedProgramSummaries.length>10){output.confirmedProgramSummaries.pop();output.responseSize.omittedConfirmedPrograms=(output.responseSize.omittedConfirmedPrograms||0)+1;}
- if(output.responseSize.omittedInstitutionSources&&output.caseComparison?.length>1){output.caseComparison=output.caseComparison.slice(0,1);output.responseSize.omittedCaseComparison=true;}
+ if(oversized()&&output.caseComparison?.length>1){output.caseComparison=output.caseComparison.slice(0,1);output.responseSize.omittedCaseComparison=true;}
  for(const row of output.institutionDirectory.rows){
   if(row.length>=5)continue;
   const values=[...(institutionMap.get(row[0])?.values()||[])],representative=values.find(d=>d.read)||values[0];
