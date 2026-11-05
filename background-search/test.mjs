@@ -3,6 +3,8 @@ import app,{SearchJob,SearchGate,portalPage} from './worker.mjs';
 const cursor={q:'산후조리비',startDate:'20241028',endDate:'20261028',scope:'all',page:1};
 const mockResponse=(c,total=20)=>new Response('var result = '+JSON.stringify({code:'200',parameterVO:{kwd:c.q,startDate:c.startDate,endDate:c.endDate,viewPage:c.page},rtnTotal:total,rtnList:[{INFO_SJ:'산후조리비 지원 계획',PRDCTN_INSTT_REGIST_NO:'DCT1',PRDCTN_DT:'20260101000000',INSTT_SE_CD:'B'}]})+';');
 assert.equal((await portalPage(cursor,async()=>mockResponse(cursor))).items.length,1);
+await assert.rejects(()=>portalPage(cursor,async()=>new Response('var result = {"code":"429"};')),/portal_http_429/);
+await assert.rejects(()=>portalPage(cursor,async()=>new Response('',{status:429})),/portal_http_429/);
 await assert.rejects(()=>portalPage(cursor,async()=>mockResponse({...cursor,page:2})),/mismatch/);
 await assert.rejects(()=>portalPage(cursor,async()=>new Response('var result = '+JSON.stringify({code:'200',parameterVO:{kwd:cursor.q,startDate:cursor.startDate,endDate:cursor.endDate,viewPage:1},rtnTotal:20,rtnList:[]})+';')),/incomplete/);
 class Storage {
@@ -39,6 +41,14 @@ assert.equal((await holdStart.json()).status,'waiting_admission');
 const holdJob=await holdStore.get('job');assert.equal(holdJob.cursors[0].page,1);assert(holdJob.quotaRetryAt-Date.now()>299000);assert.equal(holdStore.alarmAt,holdJob.quotaRetryAt);
 await holdWorker.alarm();assert.equal((await holdStore.get('job')).pages,0);assert(!holdCalls.includes('/page'),'portal must not be contacted during rate-limit hold');
 const realNow=Date.now;try{Date.now=()=>holdJob.quotaRetryAt+1;await holdWorker.alarm();assert.equal((await holdStore.get('job')).pages,1);assert.equal((await holdStore.get('job')).cursors[0].page,2);}finally{Date.now=realNow;}
+const limitedStorage=new Storage(),limitedCalls=[];
+const limitedWorker=new SearchJob({storage:limitedStorage},{GATE:{idFromName:()=>'',get:()=>({fetch:async url=>{limitedCalls.push(new URL(url).pathname);return Response.json({ok:true});}})}});
+await limitedWorker.fetch(req('start',{cursors:[cursor]}));
+let portalCalls=0;globalThis.fetch=async()=>{portalCalls++;return new Response('var result = {"code":"429"};');};
+await limitedWorker.alarm();let limitedJob=await limitedStorage.get('job');
+assert.equal(limitedJob.status,'waiting_admission');assert.equal(limitedJob.cursors[0].page,1);assert.equal(limitedJob.lastError,'portal_http_429');assert(limitedJob.quotaRetryAt-Date.now()>299000);assert(limitedCalls.includes('/yield'));
+await limitedWorker.alarm();assert.equal(portalCalls,1,'rate-limited portal is not retried during the hold');
+try{Date.now=()=>limitedJob.quotaRetryAt+1;globalThis.fetch=async()=>{portalCalls++;return mockResponse(cursor,1);};await limitedWorker.alarm();limitedJob=await limitedStorage.get('job');assert.equal(limitedJob.status,'complete');assert.equal(limitedJob.pages,1);assert.equal(portalCalls,2);}finally{Date.now=realNow;}
 const splitStorage=new Storage(),splitWorker=new SearchJob({storage:splitStorage});
 await splitWorker.fetch(req('start',{cursors:[cursor]}));
 globalThis.fetch=async()=>mockResponse(cursor,100001);
