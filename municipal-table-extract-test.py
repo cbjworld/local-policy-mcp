@@ -23,7 +23,7 @@ class TestMunicipalTable(unittest.TestCase):
         data = '<table><tr><th>사업명</th><th>사업내용</th></tr><tr><td rowspan="2">A</td><td>B</td></tr></table>'.encode()
         result = module.extract(data, 'https://example.go.kr/notice')
         self.assertEqual(result['items'], [])
-        self.assertEqual(result['skipped'][0]['reason'], 'merged_or_duplicate_headers')
+        self.assertEqual(result['skipped'][0]['reason'], 'rowspan')
         with self.assertRaises(ValueError):
             module.extract(data, 'http://example.go.kr/')
 
@@ -39,6 +39,12 @@ class TestMunicipalTable(unittest.TestCase):
         self.assertEqual(result['items'][0]['contentColumn'], '지원내용')
         self.assertEqual(result['items'][0]['content'], 'B')
         self.assertEqual(result['skipped'], [{'table': 2, 'reason': 'unrecognized_content_header'}])
+
+    def test_colspan_alignment_and_rowspan_block(self):
+        data = '<table><tr><th>사업명</th><th colspan="4">사업내용</th></tr><tr><th>A</th><td colspan="4">first</td></tr><tr><th rowspan="2">B</th><td colspan="4">incomplete</td></tr><tr><td colspan="4">continued</td></tr><tr><th>C</th><td colspan="4">third</td></tr></table>'.encode()
+        result = module.extract(data, 'https://www.haeundae.go.kr/test')
+        self.assertEqual([x['name'] for x in result['items']], ['A', 'C'])
+        self.assertEqual([x['row'] for x in result['skipped']], [3, 4])
 
 
 if __name__ == '__main__':

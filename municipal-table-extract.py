@@ -30,15 +30,16 @@ class Tables(HTMLParser):
         if tag == 'table':
             self.depth += 1
             if self.depth == 1:
-                self.table = {'rows': [], 'merged': False}
+                self.table = {'rows': [], 'nested': False}
             else:
-                self.table['merged'] = True
+                self.table['nested'] = True
         elif self.depth == 1 and tag == 'tr':
             self.row = []
         elif self.depth == 1 and tag in ('th', 'td') and self.row is not None:
-            self.cell = {'kind': tag, 'scope': attrs.get('scope'), 'text': [], 'links': []}
-            if attrs.get('rowspan', '1') != '1' or attrs.get('colspan', '1') != '1':
-                self.table['merged'] = True
+            def span(name):
+                raw = attrs.get(name, '1')
+                return int(raw) if isinstance(raw, str) and raw.isdigit() and 1 <= int(raw) <= 100 else 0
+            self.cell = {'kind': tag, 'scope': attrs.get('scope'), 'colspan': span('colspan'), 'rowspan': span('rowspan'), 'text': [], 'links': []}
         elif self.cell is not None and tag in ('br', 'p', 'div', 'li'):
             self.cell['text'].append(' ')
         elif self.cell is not None and tag == 'a' and attrs.get('href'):
@@ -92,11 +93,17 @@ def extract(data, source):
             skipped.append({'table': table_no, 'reason': 'unrecognized_content_header'})
             continue
         content_header = content_headers[0]
-        if table['merged'] or len(set(headers)) != len(headers):
-            skipped.append({'table': table_no, 'reason': 'merged_or_duplicate_headers'})
+        if table['nested'] or len(set(headers)) != len(headers) or any(c['rowspan'] != 1 or c['colspan'] == 0 for c in rows[0]):
+            skipped.append({'table': table_no, 'reason': 'nested_or_irregular_headers'})
             continue
+        widths = [c['colspan'] for c in rows[0]]
+        remaining = 0
         for row_no, row in enumerate(rows[1:], 2):
-            if len(row) != len(headers) or not all(c['kind'] == 'td' or (c['kind'] == 'th' and c['scope'] == 'row') for c in row):
+            if remaining or any(c['rowspan'] != 1 for c in row):
+                remaining = max(remaining - 1, max((c['rowspan'] - 1 for c in row), default=0))
+                skipped.append({'table': table_no, 'row': row_no, 'reason': 'rowspan'})
+                continue
+            if len(row) != len(headers) or [c['colspan'] for c in row] != widths or not all(c['kind'] == 'td' or (c['kind'] == 'th' and (c['scope'] == 'row' or (c['scope'] is None and headers[index] == '사업명'))) for index, c in enumerate(row)):
                 skipped.append({'table': table_no, 'row': row_no, 'reason': 'irregular_row'})
                 continue
             fields = dict(zip(headers, (c['text'] for c in row)))
