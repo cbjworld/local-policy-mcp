@@ -17,7 +17,7 @@ function lookup(host,options,cb){dns.lookup(host,options,(err,address,family)=>{
  if(!ips.length||!ips.every(publicIP))return cb(new Error('Non-public address blocked'));
  cb(null,address,family);
 });}
-async function download(value,hops=0,deadline=Date.now()+25000,body,signal){
+async function download(value,hops=0,deadline=Date.now()+25000,body,signal,sameHostOnly=false){
  const u=validateUrl(value);if(hops>3||Date.now()>=deadline)throw new Error('공식 원문 연결 시간 또는 이동 횟수 제한에 도달했습니다.');
  if(hops===0&&body===undefined&&u.hostname==='opengov.seoul.go.kr'&&process.env.POLICY_SEOUL_RELAY_URL)return require('./seoul-relay-client').read(u.href,{deadline,signal});
  let phase='dns';
@@ -46,7 +46,8 @@ async function download(value,hops=0,deadline=Date.now()+25000,body,signal){
  if(Object.hasOwn(response,'redirect')){
   if(body!==undefined)throw new Error('POST 이동 응답: 포털에서 직접 확인하세요.');
   if(!response.redirect)throw new Error('원문 이동 주소가 없습니다.');
-  return download(new URL(response.redirect,u).href,hops+1,deadline,undefined,signal);
+  const next=new URL(response.redirect,u);if(sameHostOnly&&next.hostname!==u.hostname)throw new Error('다른 호스트로 이동하는 원문은 별도 확인이 필요합니다.');
+  return download(next.href,hops+1,deadline,undefined,signal,sameHostOnly);
  }
  return response;
 }

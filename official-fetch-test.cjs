@@ -13,6 +13,9 @@ const original=https.request;
   https.request=(url,options,callback)=>{const req=new EventEmitter();req.end=()=>queueMicrotask(()=>{callback({statusCode:status,resume(){}});req.emit('close');});return req;};
   await assert.rejects(download('https://www.open.go.kr/a'),e=>e.code==='HTTP_'+status&&e.retryable===retryable);
  }
+ let redirectCalls=0;
+ https.request=(url,options,callback)=>{redirectCalls++;const req=new EventEmitter();req.end=()=>queueMicrotask(()=>{callback({statusCode:302,headers:{location:'https://www.gccity.go.kr/next'},resume(){}});req.emit('close');});return req;};
+ await assert.rejects(download('https://www.nowon.kr/first',0,Date.now()+25000,undefined,undefined,true),/다른 호스트/);assert.equal(redirectCalls,1);
  const controller=new AbortController(),seen=[];
  https.request=(url,options,callback)=>{
   seen.push({url:url.href,signal:options.signal});const req=new EventEmitter();
