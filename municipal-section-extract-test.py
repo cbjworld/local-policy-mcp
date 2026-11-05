@@ -50,6 +50,18 @@ class SectionTest(unittest.TestCase):
         self.assertEqual(x['items'][1]['location'], {'section': 2})
         self.assertEqual(x['skipped'], [{'section': 3, 'reason': 'missing_policy_labels'}])
 
+    def test_sibling_headings_do_not_merge_policies(self):
+        html = '''<div class="contentStyle"><h4>청소년 지원</h4><h5>대상</h5><p>청소년</p>
+        <h5>지원내용</h5><p>생활비 <a href="/apply">신청</a></p><h4>청소년 물품</h4>
+        <h5>지원대상</h5><p>여성 청소년</p><h5>지원내용</h5><p>물품 지원</p>
+        <h4>청소년증</h4><p>발급 안내</p></div>'''.encode()
+        x = m.extract(html, 'https://www.suncheon.go.kr/test')
+        self.assertEqual([i['name'] for i in x['items']], ['청소년 지원', '청소년 물품'])
+        self.assertNotIn('물품', x['items'][0]['content'])
+        self.assertEqual(x['items'][0]['links'], ['https://www.suncheon.go.kr/apply'])
+        self.assertEqual(x['items'][1]['location'], {'section': 2})
+        self.assertEqual(x['skipped'], [{'section': 3, 'reason': 'missing_policy_labels'}])
+
 
 if __name__ == '__main__':
     unittest.main()

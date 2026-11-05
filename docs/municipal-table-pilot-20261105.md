@@ -98,6 +98,8 @@
 
 [제물포구 교육경비 보조](https://www.jemulpo.go.kr/main/area/education/support_expenses.jsp), [옹진군 여객운임](https://www.ongjin.go.kr/open_content/main/environment/ship/ship_support.jsp), [동두천시 자활근로](https://www.ddc.go.kr/ddc/contents.do?key=429)의 원문 본문과 지역 검색 결과를 확인했다. 순천시 청소년 안내는 한 페이지에 여러 사업이 있어 단일 사업으로 추가하지 않고 분리 검토한다.
 
+이후 [순천시 청소년 안내](https://www.suncheon.go.kr/kr/welfare/0007/0006/)의 제목별 경계를 확인해 청소년 특별지원과 보건위생물품 지원을 분리했다. 두 사업의 원문 본문과 검색 결과를 각각 대조했으며, 청소년증 발급은 사업 후보에서 제외했다.
+
 ## 의왕시·사상구·해운대구 추가 페이지
 
 - [의왕시 생애주기별 인구정책](https://www.uiwang.go.kr/UWKORWEL1901): 150행의 각 열을 원문과 대조했다. 같은 사업명이 반복되는 행이 있으므로 독립 사업 수로 세지 않는다.

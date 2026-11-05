@@ -156,6 +156,76 @@ class Accordion(HTMLParser):
             self.body.append(data)
 
 
+class HeadingSections(HTMLParser):
+    def __init__(self, source):
+        super().__init__(convert_charrefs=True)
+        self.source, self.depth, self.container, self.heading_depth = source, 0, None, None
+        self.heading, self.text, self.links, self.items, self.skipped = None, [], [], [], []
+        self.serial, self.skip = 0, 0
+
+    def finish(self):
+        if self.heading is None:
+            return
+        name, content = clean(''.join(self.heading)), clean(''.join(self.text))
+        if name and re.search(r'대상', content) and re.search(r'(?:지원|사업|주요)내용|지원조건', content):
+            self.items.append({'name': name, 'content': content, 'contentColumn': '사업별 안내', 'department': None,
+                               'fields': {}, 'links': list(dict.fromkeys(self.links)), 'source': self.source,
+                               'location': {'section': self.serial}, 'status': 'source_section_candidate'})
+        else:
+            self.skipped.append({'section': self.serial, 'reason': 'missing_policy_labels'})
+        self.heading, self.text, self.links = None, [], []
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'):
+            if tag == 'br' and self.heading is not None and self.heading_depth is None:
+                self.text.append(' ')
+            return
+        self.depth += 1
+        if tag in ('script', 'style', 'noscript'):
+            self.skip += 1
+        if self.skip:
+            return
+        attrs = dict(attrs)
+        if tag == 'div' and self.container is None and 'contentStyle' in (attrs.get('class') or '').split():
+            self.container = self.depth
+        elif self.container is not None and self.depth == self.container + 1 and tag == 'h4':
+            self.finish()
+            self.serial += 1
+            self.heading, self.heading_depth = [], self.depth
+        elif self.heading is not None and self.heading_depth is None:
+            if tag in ('div', 'li', 'p', 'h5', 'tr', 'td', 'th'):
+                self.text.append(' ')
+            if tag == 'a' and attrs.get('href'):
+                url = urljoin(self.source, attrs['href'])
+                parsed = urlparse(url)
+                if parsed.scheme == 'https' and parsed.hostname and not parsed.username and not parsed.password:
+                    self.links.append(url)
+
+    def handle_endtag(self, tag):
+        if tag in ('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'):
+            return
+        if tag in ('script', 'style', 'noscript'):
+            self.skip = max(0, self.skip - 1)
+        elif not self.skip:
+            if tag == 'h4' and self.depth == self.heading_depth:
+                self.heading_depth = None
+            elif tag == 'div' and self.depth == self.container:
+                self.finish()
+                self.container = None
+        self.depth -= 1
+
+    def handle_startendtag(self, tag, attrs):
+        self.handle_starttag(tag, attrs)
+        if tag not in ('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'):
+            self.handle_endtag(tag)
+
+    def handle_data(self, data):
+        if not self.skip and self.heading_depth is not None:
+            self.heading.append(data)
+        elif not self.skip and self.heading is not None:
+            self.text.append(data)
+
+
 def extract(data, source):
     u = urlparse(source)
     if u.scheme != 'https' or not u.hostname or u.username:
@@ -165,6 +235,9 @@ def extract(data, source):
     parser.feed(html)
     if not parser.items and not parser.skipped:
         parser = Accordion(source)
+        parser.feed(html)
+    if not parser.items and not parser.skipped:
+        parser = HeadingSections(source)
         parser.feed(html)
     return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'extractedAt': datetime.now(timezone.utc).isoformat(),
             'items': parser.items, 'skipped': parser.skipped}
