@@ -74,6 +74,16 @@ class SectionTest(unittest.TestCase):
         ambiguous = m.extract((html + html).encode(), 'https://www.jangheung.go.kr/test')
         self.assertEqual(ambiguous['items'], [])
 
+    def test_nested_table_sections_preserve_boundaries(self):
+        html = '''<div id="content"><div class="content-body"><div class="container">
+        <h3>난방비</h3><div><table><tr><th>대상</th><td>노인</td></tr>
+        <tr><th>지원금액</th><td>5만원</td></tr></table></div><h3>연금</h3>
+        <div><table><tr><th>대상</th><td>노인</td></tr><tr><th>지원내용</th><td>연금</td></tr></table></div>
+        </div></div><div class="container">바닥글</div></div>'''.encode()
+        x = m.extract(html, 'https://www.paju.go.kr/test')
+        self.assertEqual([i['name'] for i in x['items']], ['난방비', '연금'])
+        self.assertNotIn('바닥글', x['items'][1]['content'])
+
 
 if __name__ == '__main__':
     unittest.main()

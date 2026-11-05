@@ -163,13 +163,13 @@ class HeadingSections(HTMLParser):
         self.heading, self.text, self.links, self.items, self.skipped = None, [], [], [], []
         self.serial, self.skip = 0, 0
         self.table_mode, self.has_table, self.containers = table_mode, False, 0
-        self.table_depth, self.table_done = None, False
+        self.table_depth, self.table_done, self.outer = None, False, None
 
     def finish(self):
         if self.heading is None:
             return
         name, content = clean(''.join(self.heading)), clean(''.join(self.text))
-        content_label = r'(?:지원|사업|주요)내용|지원조건|(?:^|\s)내용(?:\s|:)' if self.table_mode else r'(?:지원|사업|주요)내용|지원조건'
+        content_label = r'(?:지원|사업|주요)내용|지원(?:조건|금액)|(?:^|\s)내용(?:\s|:)' if self.table_mode else r'(?:지원|사업|주요)내용|지원조건'
         if name and (not self.table_mode or self.has_table) and re.search(r'대상', content) and re.search(content_label, content):
             self.items.append({'name': name, 'content': content, 'contentColumn': '사업별 안내', 'department': None,
                                'fields': {}, 'links': list(dict.fromkeys(self.links)), 'source': self.source,
@@ -190,7 +190,10 @@ class HeadingSections(HTMLParser):
         if self.skip:
             return
         attrs = dict(attrs)
-        is_container = attrs.get('id') == 'content' if self.table_mode else 'contentStyle' in (attrs.get('class') or '').split()
+        classes = (attrs.get('class') or '').split()
+        if self.table_mode == 'nested' and tag == 'div' and self.outer is None and 'content-body' in classes:
+            self.outer = self.depth
+        is_container = (self.outer is not None and self.depth == self.outer + 1 and 'container' in classes) if self.table_mode == 'nested' else attrs.get('id') == 'content' if self.table_mode else 'contentStyle' in classes
         if tag == 'div' and self.container is None and is_container:
             self.container = self.depth
             self.containers += 1
@@ -224,6 +227,8 @@ class HeadingSections(HTMLParser):
             elif tag == 'div' and self.depth == self.container:
                 self.finish()
                 self.container = None
+            elif tag == 'div' and self.depth == self.outer:
+                self.outer = None
         self.depth -= 1
 
     def handle_startendtag(self, tag, attrs):
@@ -254,7 +259,13 @@ def extract(data, source):
     if not parser.items and not parser.skipped:
         parser = HeadingSections(source, table_mode=True)
         parser.feed(html)
-        if parser.containers != 1:
+        if parser.containers > 1:
+            parser.items = []
+            parser.skipped = [{'reason': 'ambiguous_content_container'}]
+    if not parser.items and not parser.skipped:
+        parser = HeadingSections(source, table_mode='nested')
+        parser.feed(html)
+        if parser.containers > 1:
             parser.items = []
             parser.skipped = [{'reason': 'ambiguous_content_container'}]
     return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'extractedAt': datetime.now(timezone.utc).isoformat(),
