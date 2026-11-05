@@ -38,16 +38,25 @@ function bundle(documents,investigations=[]){
    const entries=read.flatMap(x=>(x.result.evidence?.fields[key]?.excerpts||[]).map(e=>({...e,documentTitle:x.candidate.title,documentUrl:x.candidate.url})));
    fields[key]={status:entries.some(e=>e.status==='evidence_candidate')?'needs_review':entries.some(e=>e.status==='redacted')?'redacted':'unconfirmed',excerpts:entries};
   }
+  const periodYears=fields.period.excerpts.flatMap(e=>{
+   if(e.status!=='evidence_candidate'||e.sourceScope==='attachment_reference'||!/^\s*사\s*업\s*기\s*간\s*[:：)]/.test(e.quote||''))return [];
+   const years=[...new Set((e.quote||'').match(/20\d{2}/g)||[])];
+   const quote=e.quote.match(/^\s*사\s*업\s*기\s*간\s*[:：)]\s*20\d{2}(?:년|\.)?/)?.[0];
+   return years.length===1&&quote?[{year:years[0],documentUrl:e.documentUrl,page:e.page,quote}]:[];
+  });
+  const distinctYears=[...new Set(periodYears.map(e=>e.year))],businessYear=distinctYears.length===1?distinctYears[0]:null;
   const missing=Object.entries(fields).filter(([,v])=>v.status!=='needs_review').map(([k])=>k);
   const unread=g.documents.filter(d=>!investigations.some(x=>documentKey(x.candidate.url)===documentKey(d.url)));
   const organizations=read.flatMap(x=>(x.result.evidence?.organizations||[]).map(e=>({...e,documentTitle:x.candidate.title})));
   const budgetNotes=read.flatMap(x=>x.result.evidence?.budgetNotes||[]);
   const reviewFlags=[];
+  if(distinctYears.length>1)reviewFlags.push('conflicting_business_years');
+  if(g.titleYear&&businessYear&&g.titleYear!==businessYear)reviewFlags.push('title_year_differs_from_business_year');
   for(const key of ['target','activity','period'])if(new Set(fields[key].excerpts.map(x=>x.documentUrl)).size>1&&new Set(fields[key].excerpts.map(x=>x.quote.replace(/\s+/g,''))).size>1)reviewFlags.push('multiple_'+key+'_excerpts_compare_context_not_latest_value');
   if(new Set(organizations.filter(x=>x.label==='도서관명').map(x=>x.value)).size>1)reviewFlags.push('different_implementing_libraries');
   if(budgetNotes.some(x=>/비예산/.test(x.quote))&&fields.budget.excerpts.some(x=>x.status==='redacted'))reviewFlags.push('nonbudget_checkbox_with_redacted_budget_do_not_infer_zero');
   if(new Set(fields.budget.excerpts.map(x=>x.quote.replace(/\s+/g,''))).size>1)reviewFlags.push('multiple_budget_excerpts_compare_context_not_latest_value');
-  return {...g,fields,referenceExcerpts:read.flatMap(x=>x.result.evidence?.referenceExcerpts||[]),organizations,budgetNotes,reviewFlags,missingFields:missing,nextDocuments:missing.length?unread:[],warning:'제목의 연도로 묶은 후보입니다. 같은 사업인지 본문 확인이 필요합니다. 생산일자가 최신이라고 변경계획의 확정·시행을 뜻하지 않습니다. 예산과 사업기간의 기준연도를 별도로 확인하세요.'};
+  return {...g,businessYear,businessYearEvidence:businessYear?periodYears.filter(e=>e.year===businessYear).slice(0,2):[],fields,referenceExcerpts:read.flatMap(x=>x.result.evidence?.referenceExcerpts||[]),organizations,budgetNotes,reviewFlags,missingFields:missing,nextDocuments:missing.length?unread:[],warning:'제목의 연도로 묶은 후보입니다. 같은 사업인지 본문 확인이 필요합니다. 생산일자가 최신이라고 변경계획의 확정·시행을 뜻하지 않습니다. 예산과 사업기간의 기준연도를 별도로 확인하세요.'};
  });
 }
 // Group for investigation only: institution/year does not establish a shared project identity.

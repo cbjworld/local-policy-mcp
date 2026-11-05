@@ -14,6 +14,11 @@ const distinctDocs=[{title:'2026년 독서 사업 추진계획',institution:'A�
 const different=distinctDocs.map((candidate,i)=>({candidate,result:{status:'read',evidence:{organizations:[{label:'도서관명',value:i?'나 도서관':'가 도서관'}],fields:{budget:{excerpts:[{status:'evidence_candidate',quote:i?'사업비 20만원':'사업비 10만원'}]}}}}}));
 const split=require('./project-bundles').bundle(distinctDocs,different);assert.equal(split.length,2);assert(split.every(x=>x.grouping==='different_implementing_entities_kept_separate'));assert.deepEqual(split.map(x=>x.fields.budget.excerpts[0].quote),['사업비 10만원','사업비 20만원']);
 const same=different.map(x=>({...x,result:{...x.result,evidence:{...x.result.evidence,organizations:[{label:'도서관명',value:'가 도서관'}]}}}));assert.equal(require('./project-bundles').bundle(distinctDocs,same).length,1);
+const annualDoc={title:'청년 부동산 중개보수 및 이사비 지원사업 추진계획',institution:'대구광역시 남구',url:'annual-plan'};
+const annualRead={candidate:annualDoc,result:{status:'read',evidence:{fields:{period:{excerpts:[{status:'evidence_candidate',quote:'사업기간 : 2027년 1월 ∼ 12월',page:2}]}}}}};
+const annual=require('./project-bundles').bundle([annualDoc],[annualRead])[0];assert.equal(annual.titleYear,null);assert.equal(annual.businessYear,'2027');assert.equal(annual.businessYearEvidence[0].page,2);
+const dated={...annualDoc,title:'2026년 청년 부동산 중개보수 및 이사비 지원사업 추진계획'};const datedResult=require('./project-bundles').bundle([dated],[{...annualRead,candidate:dated}])[0];assert.equal(datedResult.titleYear,'2026');assert.equal(datedResult.businessYear,'2027');assert(datedResult.reviewFlags.includes('title_year_differs_from_business_year'));
+const multi={...annualRead,result:{...annualRead.result,evidence:{fields:{period:{excerpts:[{status:'evidence_candidate',quote:'사업기간 : 2026년부터 2027년까지'}]}}}}};assert.equal(require('./project-bundles').bundle([annualDoc],[multi])[0].businessYear,null);
 const dual=evidenceMap([{title:'2026년 산후조리비 지원계획',institution:'A',url:original},{title:'2026년 산후조리비 지원계획',institution:'A',url:metadata}],[{candidate:{url:metadata},result:{status:'read'}}]);
 assert.equal(dual[0].stages[0].documents.length,1);
 assert.equal(dual[0].stages[0].documents[0].readingStatus,'read');

@@ -2,9 +2,9 @@ const normalize=s=>String(s||'').normalize('NFKC').replace(/\s+/g,'');
 function links(investigations,search){
  const found=[];
  for(const {candidate,result} of investigations){
-  if(result.status!=='read')continue;
+  if(result.status!=='read'||result.relevanceStatus==='supporting_document'||result.targetFit?.status==='mismatch')continue;
   for(const attempt of result.attempts||[])for(const p of attempt.source?.pages||[]){
-   if(attempt.status!=='read'||attempt.assessment==='form_or_cover'||attempt.evidenceScope==='attachment_reference')continue;
+   if(attempt.status!=='read'||['form_or_cover','target_mismatch'].includes(attempt.assessment)||attempt.evidenceScope==='attachment_reference')continue;
    const name=p.text.match(/(?:보\s*조\s*)?사\s*업\s*명\s*[:：)]\s*([^\n|○□❍▢※]{2,160}?)(?=\n|[|○□❍▢※]|$)/);
    const period=p.text.match(/사\s*업\s*기\s*간\s*[:：)]\s*(20\d{2})(?:\.|년)/);
    if(!name||!period)continue;

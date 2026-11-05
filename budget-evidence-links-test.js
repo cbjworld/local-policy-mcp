@@ -4,6 +4,10 @@ const make=t=>[{candidate:{institution:'울산광역시',url:'https://www.open.g
 const row={institution:'울산광역시',name:'산후조리비 지원',year:2026,budget:2337500,unit:'천원',source:'https://www.ulsan.go.kr/b',page:12};
 const search=()=>({items:[row]});
 assert.equal(links(make(text),search).length,1);
+const wrongTarget=make(text);wrongTarget[0].result.attempts[0].assessment='target_mismatch';assert.equal(links(wrongTarget,search).length,0,'do not link a rejected target attachment');
+const wrongQuestion=make(text);wrongQuestion[0].result.targetFit={status:'mismatch'};assert.equal(links(wrongQuestion,search).length,0,'do not link documents incompatible with requested target');
+const supporting=make(text);supporting[0].result.relevanceStatus='supporting_document';assert.equal(links(supporting,search).length,0,'do not promote supporting documents into direct budget links');
+
 for(const changes of [{year:2025},{unit:'원'},{budget:940500},{institution:'울산광역시 중구'},{name:'공공산후조리원 운영'}])assert.equal(links(make(text),()=>({items:[{...row,...changes}]})).length,0);
 for(const changed of [text.replace('2026.','2025.'),text.replace('천원','명'),text.replace('보조사업명','일반제목')])assert.equal(links(make(changed),search).length,0);
 assert.equal(links(make(text),search)[0].document.tableQuote,text.slice(text.indexOf('|')));
