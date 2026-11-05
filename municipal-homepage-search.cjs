@@ -1,7 +1,9 @@
 const fs=require('node:fs');
 const {validateUrl}=require('./official-fetch');
+const {temporaryUrl}=require('./municipal-stage-download.cjs');
 const records=require('./catalog-institutions.json').records;
 const normalize=x=>String(x||'').normalize('NFKC').replace(/\s+/g,'').toLowerCase();
+function safeLink(value){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password&&!temporaryUrl(u)}catch{return false}}
 function search({q,institution,offset=0,limit=10}={},file=process.env.POLICY_MUNICIPAL_CATALOG){
  if(typeof q!=='string'||!q.trim()||q.length>100||institution!==undefined&&(typeof institution!=='string'||!institution.trim()||institution.length>80)||!Number.isInteger(offset)||offset<0||!Number.isInteger(limit)||limit<1||limit>20)throw Error('검색어, 지자체 또는 결과 범위를 확인하세요.');
  if(!file)throw Error('홈페이지 사업자료가 설정되지 않았습니다.');
@@ -11,7 +13,8 @@ function search({q,institution,offset=0,limit=10}={},file=process.env.POLICY_MUN
  const targetTerms=terms.filter(t=>/^(청년|어르신|노인|고령자)$/.test(t)),subjectTerms=terms.filter(t=>!targetTerms.includes(t));
  for(const source of sources){
   if(!Array.isArray(source.items)||typeof source.source!=='string'||!/^[a-f0-9]{64}$/.test(source.sha256||'')||seen.has(source.source))throw Error('홈페이지 자료 형식이 올바르지 않습니다.');seen.add(source.source);
-  const host=validateUrl(source.source).hostname,municipalities=records.filter(x=>{try{return new URL(x.url).hostname===host&&!x.institution.includes('(편성 당시)')}catch{return false}}),identity=municipalities.length===1?municipalities[0]:null;
+  const sourceUrl=validateUrl(source.source);if(temporaryUrl(sourceUrl))throw Error('임시 접속 정보가 포함된 출처는 사용할 수 없습니다.');
+  const host=sourceUrl.hostname,municipalities=records.filter(x=>{try{return new URL(x.url).hostname===host&&!x.institution.includes('(편성 당시)')}catch{return false}}),identity=municipalities.length===1?municipalities[0]:null;
   if(!identity)throw Error('홈페이지의 지자체를 주소록에서 유일하게 확인할 수 없습니다.');
   const region=normalize(identity.parent+' '+identity.institution);coverage.push({institution:identity.institution,parent:identity.parent,source:source.source,sourceSha256:source.sha256,extractedAt:typeof source.extractedAt==='string'?source.extractedAt:null,skippedEntries:source.skipped?.length||0});
   for(const row of source.items){
@@ -20,7 +23,7 @@ function search({q,institution,offset=0,limit=10}={},file=process.env.POLICY_MUN
    const text=row.name+' '+row.content+' '+rawFields.map(([,v])=>v).join(' '),normalized=normalize(text),exact=terms.every(t=>normalized.includes(t));
    const fallback=targetTerms.length===1&&subjectTerms.length>0&&subjectTerms.every(t=>normalize(row.name).includes(t))&&!normalized.includes(targetTerms[0])&&require('./relevance').targetFit(text,q).status==='unspecified';
    if(!exact&&!fallback)continue;
-   const item={name:row.name,content:row.content.slice(0,2000),contentColumn:typeof row.contentColumn==='string'?row.contentColumn:null,contentTruncated:row.content.length>2000,department:row.department,fields,fieldsTruncated:rawFields.length>20||rawFields.some(([k,v])=>k.length>100||v.length>2000),links:Array.isArray(row.links)?row.links.filter(x=>typeof x==='string'&&/^https:\/\//.test(x)).slice(0,20):[],institution:identity.institution,parent:identity.parent,source:row.source,sourceSha256:source.sha256,location:row.location,status:row.location.elementId?'source_detail_candidate':row.location.section?'source_section_candidate':'source_row_candidate',queryMatch:exact?'all_terms':'target_unconfirmed',...(!exact?{missingTerms:targetTerms,note:'사업명은 검색 주제와 맞지만 요청한 대상이 원문 행에서 확인되지 않습니다.'}:{})};
+   const item={name:row.name,content:row.content.slice(0,2000),contentColumn:typeof row.contentColumn==='string'?row.contentColumn:null,contentTruncated:row.content.length>2000,department:row.department,fields,fieldsTruncated:rawFields.length>20||rawFields.some(([k,v])=>k.length>100||v.length>2000),links:Array.isArray(row.links)?row.links.filter(x=>typeof x==='string'&&safeLink(x)).slice(0,20):[],institution:identity.institution,parent:identity.parent,source:row.source,sourceSha256:source.sha256,location:row.location,status:row.location.elementId?'source_detail_candidate':row.location.section?'source_section_candidate':'source_row_candidate',queryMatch:exact?'all_terms':'target_unconfirmed',...(!exact?{missingTerms:targetTerms,note:'사업명은 검색 주제와 맞지만 요청한 대상이 원문 행에서 확인되지 않습니다.'}:{})};
    (exact?rows:partial).push(item);
   }
  }
