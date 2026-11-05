@@ -45,6 +45,16 @@ class CatalogMergeTest(unittest.TestCase):
         self.assertEqual(report[0]['status'], 'invalid')
         self.assertEqual(result['sources'], [])
 
+    def test_section_locations_are_valid_and_mixed_locations_rejected(self):
+        source = snapshot(1)
+        source['items'][0]['location'] = {'section': 2}
+        result, report = m.merge({'sources': []}, [('section', source)], {'www.nowon.kr'})
+        self.assertEqual(report[0]['status'], 'added')
+        mixed = copy.deepcopy(source)
+        mixed['items'][0]['location']['table'] = 1
+        _, report = m.merge(result, [('mixed', mixed)], {'www.nowon.kr'})
+        self.assertEqual(report[0]['status'], 'invalid')
+
 
 if __name__ == '__main__':
     unittest.main()
