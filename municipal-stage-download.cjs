@@ -25,7 +25,9 @@ async function run(items,{fetcher=download,rule=robotsRule,save,sleep=ms=>new Pr
    const delay=Math.max(3000,Math.ceil(permission.delay*1000));if(delay>60000)throw Error('crawl_delay_exceeds_batch_limit');
    await sleep(delay);first=false;
    const response=await fetcher(url.href,0,Date.now()+25000,undefined,undefined,true);
-   if(new URL(response.url).hostname!==url.hostname||!/text\/html/i.test(response.type)||response.bytes.length<500)throw Error('unexpected_page');
+   const returned=new URL(response.url);
+   if(/;jsessionid=/i.test(returned.pathname)||[...returned.searchParams.keys()].some(k=>/^(?:jsessionid|sessionid|session_id|token|access_token)$/i.test(k)))throw Error('temporary_redirect');
+   if(returned.hostname!==url.hostname||!/text\/html/i.test(response.type)||response.bytes.length<500)throw Error('unexpected_page');
    const file=await save(response.bytes,url.href);manifest.push({source:response.url,file,parser:item.parser,...(item.parser==='detail'?{title:item.title}:{})});results.push({source:url.href,status:'downloaded',bytes:response.bytes.length});
   }catch(e){results.push({source:typeof item?.source==='string'?item.source:null,status:'failed',reason:String(e.code||e.message||'unknown').slice(0,100)});}
  }

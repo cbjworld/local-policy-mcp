@@ -78,6 +78,8 @@
 
 [영등포구 주차장 개방 지원](https://www.ydp.go.kr/www/contents.do?key=6058), [사하구 1인가구 지원](https://www.saha.go.kr/portal/contents.do?mId=0509020000), [연제구 면접사진 촬영비](https://www.yeonje.go.kr/portal/contents.do?mId=0608110000)도 원문 본문 위치와 지역 검색 결과를 확인했다. 25개 페이지에서 389개 후보를 로컬로 보관한다. 홈페이지 안내의 대상·기간과 현재 운영 여부는 별도로 구분한다.
 
+[달성군 신혼부부 목표달성적금](https://www.dalseong.daegu.kr/index.do?menu_id=00005777)과 [남동구 청년자격증 응시료](https://www.namdong.go.kr/main/area/youth/business/certificate.jsp)는 각 지역 검색에서 원문과 본문 위치를 확인했다. 임시 세션 정보가 붙은 이동 주소는 출처로 저장하지 않고 재확인 대상으로 남긴다.
+
 ## 의왕시·사상구·해운대구 추가 페이지
 
 - [의왕시 생애주기별 인구정책](https://www.uiwang.go.kr/UWKORWEL1901): 150행의 각 열을 원문과 대조했다. 같은 사업명이 반복되는 행이 있으므로 독립 사업 수로 세지 않는다.
