@@ -10,8 +10,8 @@ function safeLink(value){try{const u=new URL(value);return u.protocol==='https:'
 function search({q,institution,offset=0,limit=10,sourceOffset=0,sourceLimit=20,contentOffset=0,contentLimit=2000,snapshot}={},file=process.env.POLICY_MUNICIPAL_CATALOG){
  if(typeof q!=='string'||!q.trim()||q.length>100||institution!==undefined&&(typeof institution!=='string'||!institution.trim()||institution.length>80)||!Number.isInteger(offset)||offset<0||!Number.isInteger(limit)||limit<1||limit>20||!Number.isInteger(sourceOffset)||sourceOffset<0||!Number.isInteger(sourceLimit)||sourceLimit<1||sourceLimit>100||!Number.isInteger(contentOffset)||contentOffset<0||!Number.isInteger(contentLimit)||contentLimit<1||contentLimit>2000)throw Error('검색어, 지자체 또는 결과 범위를 확인하세요.');
  if(!file)throw Error('홈페이지 사업자료가 설정되지 않았습니다.');
- let data,version;try{if(fs.statSync(file).size>20*1024*1024)throw Error('too_large');const bytes=fs.readFileSync(file);if(bytes.length>20*1024*1024)throw Error('too_large');version=crypto.createHash('sha256').update(bytes).digest('hex');data=JSON.parse(bytes.toString('utf8'));}catch{throw Error('홈페이지 자료를 읽을 수 없습니다. 파일과 크기 제한을 확인하세요.');}
- if(snapshot!==undefined&&(typeof snapshot!=='string'||snapshot!==version))throw Error('홈페이지 자료가 변경되어 이어볼 수 없습니다. 처음부터 다시 검색하세요.');
+ let data,version;try{if(fs.statSync(file).size>20*1024*1024)throw Error('too_large');const bytes=fs.readFileSync(file);if(bytes.length>20*1024*1024)throw Error('too_large');version=crypto.createHash('sha256').update(JSON.stringify([q,institution??null])).update('\0').update(bytes).digest('hex');data=JSON.parse(bytes.toString('utf8'));}catch{throw Error('홈페이지 자료를 읽을 수 없습니다. 파일과 크기 제한을 확인하세요.');}
+ if(snapshot!==undefined&&(typeof snapshot!=='string'||snapshot!==version))throw Error('질문·지자체 또는 홈페이지 자료가 변경되어 이어볼 수 없습니다. 처음부터 다시 검색하세요.');
  const sources=Array.isArray(data.sources)?data.sources:[data];if(!sources.length||sources.length>5000)throw Error('홈페이지 자료 형식이 올바르지 않습니다.');
  const effectiveQuery=require('./region-aliases').queryWithoutRegion(q,institution);
  const terms=effectiveQuery.trim().split(/\s+/).map(normalize),rows=[],equivalent=[],partial=[],coverage=[],seen=new Set();
