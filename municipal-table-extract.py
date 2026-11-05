@@ -103,7 +103,10 @@ def extract(data, source):
             continue
         widths = [c['colspan'] for c in rows[0]]
         remaining = 0
+        processed_through = 0
         for row_no, row in enumerate(rows[1:], 2):
+            if row_no <= processed_through:
+                continue
             if len(row) > 1 and all(c['kind'] == 'th' for c in row) and not remaining:
                 replacement = [re.sub(r'\s+', '', c['text']) for c in row]
                 name_candidates = [h for h in replacement if h in ('사업명', '사업명/서비스명')]
@@ -120,6 +123,31 @@ def extract(data, source):
             if content_header is None:
                 skipped.append({'table': table_no, 'row': row_no, 'reason': 'unrecognized_repeated_header'})
                 continue
+            # A category in the first column may cover several independent rows;
+            # the name and content cells must each be present in every row.
+            if (not remaining and headers[0] in ('분야', '구분') and widths == [1] * len(headers)
+                    and len(row) == len(headers) and row[0]['rowspan'] > 1 and row[0]['colspan'] == 1
+                    and row[0]['text'] and all(c['rowspan'] == 1 and c['colspan'] == 1 for c in row[1:])):
+                count = row[0]['rowspan']
+                following = rows[row_no:row_no + count - 1]
+                group = [row[1:]] + following
+                if (len(following) == count - 1 and all(len(r) == len(headers) - 1 and
+                        all(c['kind'] == 'td' and c['rowspan'] == 1 and c['colspan'] == 1 for c in r) for r in group)):
+                    prepared = []
+                    for index, cells in enumerate(group):
+                        fields = dict(zip(headers, [row[0]['text']] + [c['text'] for c in cells]))
+                        if not fields[name_header] or not fields[content_header]:
+                            break
+                        prepared.append({'name': fields[name_header], 'nameColumn': name_header,
+                                         'content': fields[content_header], 'contentColumn': content_header,
+                                         'department': fields.get('담당부서'), 'fields': fields,
+                                         'links': list(dict.fromkeys(link for cell in [row[0]] + cells for link in cell['links'])),
+                                         'source': source, 'location': {'table': table_no, 'row': row_no + index},
+                                         'status': 'source_row_candidate'})
+                    if len(prepared) == count:
+                        results.extend(prepared)
+                        processed_through = row_no + count - 1
+                        continue
             if remaining or any(c['rowspan'] != 1 for c in row):
                 remaining = max(remaining - 1, max((c['rowspan'] - 1 for c in row), default=0))
                 skipped.append({'table': table_no, 'row': row_no, 'reason': 'rowspan'})

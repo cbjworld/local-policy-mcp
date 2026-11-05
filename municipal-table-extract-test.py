@@ -8,6 +8,20 @@ spec.loader.exec_module(module)
 
 
 class TestMunicipalTable(unittest.TestCase):
+    def test_shared_category_preserves_independent_program_rows(self):
+        data = '<table><tr><th>분야</th><th>사업명</th><th>지원내용</th><th>비고</th></tr><tr><td rowspan="2">근무환경</td><td>병가</td><td>60일</td><td>도 공통</td></tr><tr><td>휴가</td><td>5일</td><td>시</td></tr></table>'.encode()
+        result = module.extract(data, 'https://www.nyj.go.kr/test')
+        self.assertEqual([x['name'] for x in result['items']], ['병가', '휴가'])
+        self.assertEqual([x['fields']['분야'] for x in result['items']], ['근무환경', '근무환경'])
+        self.assertEqual([x['location']['row'] for x in result['items']], [2, 3])
+        self.assertEqual(result['skipped'], [])
+
+    def test_shared_category_does_not_guess_missing_cells(self):
+        data = '<table><tr><th>분야</th><th>사업명</th><th>지원내용</th></tr><tr><td rowspan="2">A</td><td>병가</td><td>60일</td></tr><tr><td colspan="2">불완전</td></tr></table>'.encode()
+        result = module.extract(data, 'https://www.nyj.go.kr/test')
+        self.assertEqual(result['items'], [])
+        self.assertEqual([x['reason'] for x in result['skipped']], ['rowspan', 'rowspan'])
+
     def test_rows_preserve_origin_and_do_not_mix_programs(self):
         data = b'''<html><table><tr><th>ignore</th></tr></table>
         <table><tr><th>\xec\x82\xac\xec\x97\x85\xeb\xaa\x85</th><th>\xec\x82\xac\xec\x97\x85\xeb\x82\xb4\xec\x9a\xa9</th><th>\xeb\x8b\xb4\xeb\x8b\xb9\xeb\xb6\x80\xec\x84\x9c</th></tr>
