@@ -10,6 +10,6 @@ function configured(env=process.env,fetcher=fetch){
   if(!r.ok)throw Error(result.error==='daily_job_limit'?'백그라운드 검색 일일 작업 한도에 도달했습니다.':result.error==='active_job_limit'?'백그라운드 검색이 혼잡하여 작업을 시작하지 못했습니다.':`백그라운드 검색 응답 오류 (${r.status})`);
   return result;
  };
- return {start:(id,cursors)=>call(id,'start',{body:{cursors}}),status:id=>call(id,'status'),pages:(id,cursor)=>call(id,'pages',{cursor})};
+ return {start:(id,cursors,options={})=>call(id,'start',{body:{cursors,...(options.deferForRateLimit?{deferForRateLimit:true}:{})}}),status:id=>call(id,'status'),pages:(id,cursor)=>call(id,'pages',{cursor})};
 }
 module.exports={configured};

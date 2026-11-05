@@ -237,6 +237,7 @@ export class SearchJob {
         await tx.put('job',{id,cursors:input.cursors,status:waiting?'waiting_admission':'running',...(waiting?{waitingUntil}:{}),pages:0,failures:0,createdAt:Date.now(),updatedAt:Date.now()});
         await tx.setAlarm(waitingUntil||Date.now()+1000);
       });
+      if(input.deferForRateLimit===true){const job=await this.storage.get('job');await this.deferForAdmission(job,Date.now()+300000,true);return Response.json({status:'waiting_admission'},{status:202});}
       return Response.json({status:request.headers.get('x-admission-waiting')==='1'?'waiting_admission':'running'},{status:202});
     }
     if (request.method === 'GET' && url.pathname === '/status') {

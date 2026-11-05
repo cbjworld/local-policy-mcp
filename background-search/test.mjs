@@ -32,6 +32,13 @@ await worker.alarm();
 assert.equal((await store.get('job')).status,'complete');
 assert.equal((await (await worker.fetch(req('pages'))).json()).pages.length,2);
 assert.equal((await worker.fetch(req('start',{cursors:[cursor]}))).status,409);
+const holdStore=new Storage(),holdCalls=[];
+const holdWorker=new SearchJob({storage:holdStore},{GATE:{idFromName:()=>'',get:()=>({fetch:async url=>{holdCalls.push(new URL(url).pathname);return Response.json({ok:true});}})}});
+const holdStart=await holdWorker.fetch(req('start',{cursors:[cursor],deferForRateLimit:true}));
+assert.equal((await holdStart.json()).status,'waiting_admission');
+const holdJob=await holdStore.get('job');assert.equal(holdJob.cursors[0].page,1);assert(holdJob.quotaRetryAt-Date.now()>299000);assert.equal(holdStore.alarmAt,holdJob.quotaRetryAt);
+await holdWorker.alarm();assert.equal((await holdStore.get('job')).pages,0);assert(!holdCalls.includes('/page'),'portal must not be contacted during rate-limit hold');
+const realNow=Date.now;try{Date.now=()=>holdJob.quotaRetryAt+1;await holdWorker.alarm();assert.equal((await holdStore.get('job')).pages,1);assert.equal((await holdStore.get('job')).cursors[0].page,2);}finally{Date.now=realNow;}
 const splitStorage=new Storage(),splitWorker=new SearchJob({storage:splitStorage});
 await splitWorker.fetch(req('start',{cursors:[cursor]}));
 globalThis.fetch=async()=>mockResponse(cursor,100001);
