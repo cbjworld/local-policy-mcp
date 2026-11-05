@@ -99,6 +99,21 @@ def extract(data, source):
         widths = [c['colspan'] for c in rows[0]]
         remaining = 0
         for row_no, row in enumerate(rows[1:], 2):
+            if len(row) > 1 and all(c['kind'] == 'th' for c in row) and not remaining:
+                replacement = [re.sub(r'\s+', '', c['text']) for c in row]
+                candidates = [h for h in replacement if h == '사업내용' or h.startswith('사업내용(')]
+                if not candidates and '지원내용' in replacement:
+                    candidates = ['지원내용']
+                if ('사업명' in replacement and len(candidates) == 1 and len(set(replacement)) == len(replacement)
+                        and all(c['rowspan'] == 1 and c['colspan'] > 0 for c in row)):
+                    headers, widths, content_header = replacement, [c['colspan'] for c in row], candidates[0]
+                else:
+                    headers, widths, content_header = [], [], None
+                    skipped.append({'table': table_no, 'row': row_no, 'reason': 'unrecognized_repeated_header'})
+                continue
+            if content_header is None:
+                skipped.append({'table': table_no, 'row': row_no, 'reason': 'unrecognized_repeated_header'})
+                continue
             if remaining or any(c['rowspan'] != 1 for c in row):
                 remaining = max(remaining - 1, max((c['rowspan'] - 1 for c in row), default=0))
                 skipped.append({'table': table_no, 'row': row_no, 'reason': 'rowspan'})

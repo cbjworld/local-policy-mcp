@@ -46,6 +46,14 @@ class TestMunicipalTable(unittest.TestCase):
         self.assertEqual([x['name'] for x in result['items']], ['A', 'C'])
         self.assertEqual([x['row'] for x in result['skipped']], [3, 4])
 
+    def test_mid_table_header_replaces_columns(self):
+        data = '<table><tr><th>사업명</th><th>지원내용</th><th>지원조건</th></tr><tr><td>A</td><td>money</td><td>youth</td></tr><tr><th>사업명</th><th>사업위치</th><th>사업내용</th></tr><tr><td>B</td><td>north</td><td>housing</td></tr></table>'.encode()
+        result = module.extract(data, 'https://www.inje.go.kr/test')
+        self.assertEqual(result['items'][0]['content'], 'money')
+        self.assertEqual(result['items'][1]['content'], 'housing')
+        self.assertEqual(result['items'][1]['fields']['사업위치'], 'north')
+        self.assertEqual(result['items'][1]['contentColumn'], '사업내용')
+
 
 if __name__ == '__main__':
     unittest.main()
