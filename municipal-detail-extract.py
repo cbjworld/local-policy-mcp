@@ -93,8 +93,8 @@ def extract(data, source, expected_title):
     normalize = lambda x: re.sub(r'\s+', '', x)
     if (page.blocks != 1 or normalize(expected_title) not in normalize(title)
             or len(content) < 40 or len(content) > 30000
-            or not re.search(r'(?:지원|신청)대상|대상', content)
-            or not re.search(r'(?:지원|사업)내용', content)):
+            or not re.search(r'(?:지원|신청)대상|지원자격|대상', content)
+            or not re.search(r'(?:지원|사업)(?:내용|금액|규모|한도)|이자지원금리', content)):
         return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'items': [],
                 'skipped': [{'elementId': page.element_id, 'reason': 'detail_page_unverified'}]}
     return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'extractedAt': datetime.now(timezone.utc).isoformat(),

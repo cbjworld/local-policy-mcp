@@ -84,6 +84,8 @@
 
 [김제시 공동주택 지원](https://www.gimje.go.kr/index.gimje?menuCd=DOM_000000106003005000), 순창군의 [임신지원금](https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac93f6a5448dc), [신중년 취업지원](https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac946825649a8), [난청노인 보청기 지원](https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac948510449dc)도 본문과 지역 검색을 대조했다. 33개 페이지의 397개 후보가 로컬 검색에 포함된다.
 
+칠곡군 [청년월세](https://www.chilgok.go.kr/portal/contents.do?mId=0912030000), [운전면허 반납](https://www.chilgok.go.kr/portal/contents.do?mId=1101070000), [생애최초 주택구입](https://www.chilgok.go.kr/portal/contents.do?mId=1210000000), [신혼부부 임차보증금 이자](https://www.chilgok.go.kr/portal/contents.do?mId=1208000000) 안내도 본문과 검색을 대조했다. `지원자격`, `이자지원금리` 표현을 인식하도록 보완하고, 이전 33개 출처가 변경되지 않았는지 확인했다.
+
 ## 의왕시·사상구·해운대구 추가 페이지
 
 - [의왕시 생애주기별 인구정책](https://www.uiwang.go.kr/UWKORWEL1901): 150행의 각 열을 원문과 대조했다. 같은 사업명이 반복되는 행이 있으므로 독립 사업 수로 세지 않는다.

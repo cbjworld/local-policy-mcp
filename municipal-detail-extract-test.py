@@ -31,6 +31,10 @@ class DetailTest(unittest.TestCase):
         self.assertEqual(result['location'], {'elementId': 'conts'})
         self.assertNotIn('바깥', result['content'])
 
+    def test_support_eligibility_and_amount_labels(self):
+        html = '<title>면허 반납 지원</title><div id="conts">지원자격 만 70세 이상 주민 지원내용 상품권 10만원 또는 20만원을 지급합니다. 자세한 신청 절차를 확인하세요.</div>'.encode()
+        self.assertEqual(len(m.extract(html, 'https://www.nowon.kr/test', '면허 반납 지원')['items']), 1)
+
 
 if __name__ == '__main__':
     unittest.main()
