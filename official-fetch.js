@@ -39,7 +39,7 @@ async function download(value,hops=0,deadline=Date.now()+25000,body,signal){
   });
   const timer=setTimeout(()=>req.destroy(new Error('timeout')),Math.max(1,deadline-Date.now()));
   req.on('close',()=>clearTimeout(timer));
-  req.on('error',e=>reject(Object.assign(new Error(e.message==='size'?'원문 15MB 제한 초과':e.message==='timeout'?'원문 연결 25초 제한 초과':'원문 연결 실패. 인증서 검증은 유지됩니다.'),{phase,code:e.message==='size'?'FILE_TOO_LARGE':e.message==='timeout'?'ETIMEDOUT':String(e.code||'NETWORK_ERROR').slice(0,60),retryable:['ECONNRESET','EPIPE','EAI_AGAIN','ECONNREFUSED'].includes(e.code)})));
+  req.on('error',e=>reject(Object.assign(new Error(e.message==='size'?'원문 15MB 제한 초과':e.message==='timeout'?'원문 연결 시간 제한 초과':'원문 연결 실패. 인증서 검증은 유지됩니다.'),{phase,code:e.message==='size'?'FILE_TOO_LARGE':e.message==='timeout'?'ETIMEDOUT':String(e.code||'NETWORK_ERROR').slice(0,60),retryable:['ECONNRESET','EPIPE','EAI_AGAIN','ECONNREFUSED'].includes(e.code)})));
   req.end(body);
  });
  if(Object.hasOwn(response,'redirect')){

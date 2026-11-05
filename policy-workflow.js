@@ -43,7 +43,7 @@ async function runResearch(args={},io=portal){
   const pages=[],errors=[];
   for(let page=1;page<=40;page++){
    if(page>1&&Date.now()-started>=12000)break;
-   try{const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page});pages.push({q,page,r});firstSearch(true);if(!r.hasMore)break;}
+   try{const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page,deadline:started+12000});pages.push({q,page,r});firstSearch(true);if(!r.hasMore)break;}
    catch(e){errors.push({q,page,scope:'original',message:e.message});break;}
   }
   return {pages,errors};
@@ -53,7 +53,7 @@ async function runResearch(args={},io=portal){
    const pages=[],errors=[];
    for(let page=1;page<=40;page++){
     if(page>1&&Date.now()-started>=12000)break;
-    try{const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page,scope:'all'});pages.push({q,page,r});if(!r.hasMore)break;}
+    try{const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page,scope:'all',deadline:started+12000});pages.push({q,page,r});if(!r.hasMore)break;}
     catch(e){errors.push({q,page,scope:'all',message:e.message});break;}
    }
    return {pages,errors};
