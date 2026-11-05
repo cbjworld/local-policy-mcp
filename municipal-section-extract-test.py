@@ -29,6 +29,12 @@ class SectionTest(unittest.TestCase):
         self.assertIn('지원조건: 실비 최대 100만원', x['items'][0]['content'])
         self.assertNotIn('지원내용:', x['items'][0]['content'])
 
+    def test_main_content_requires_target(self):
+        html = '<div class="spotWrap"><h4>주거급여</h4><div class="div"><p>사업대상: 청년</p><p>주요내용: 주거급여 지급</p></div><h4>계획</h4><div class="div">주요내용: 계획 수립</div></div>'.encode()
+        x = m.extract(html, 'https://www.uiwang.go.kr/test')
+        self.assertEqual([i['name'] for i in x['items']], ['주거급여'])
+        self.assertEqual(x['skipped'][0]['section'], 2)
+
     def test_accordion_sections_keep_each_body_and_link(self):
         html = '''<div class="temp_board"><ul>
         <li><div class="title"><div class="tit_text">청년 지원</div></div><div class="cont_text"><ul>

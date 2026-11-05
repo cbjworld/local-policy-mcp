@@ -59,7 +59,7 @@ class Sections(HTMLParser):
                 self.heading_depth = None
             elif tag == 'div' and self.depth == self.body_depth:
                 name, content = clean(''.join(self.heading)), clean(''.join(self.text))
-                if name and re.search(r'(?:지원|사업)대상', content) and re.search(r'(?:지원|사업)내용|지원조건', content):
+                if name and re.search(r'(?:지원|사업)대상', content) and re.search(r'(?:지원|사업|주요)내용|지원조건', content):
                     self.items.append({'name': name, 'content': content, 'contentColumn': '사업별 안내', 'department': None,
                                        'fields': {}, 'links': list(dict.fromkeys(self.links)), 'source': self.source,
                                        'location': {'section': self.serial}, 'status': 'source_section_candidate'})
@@ -133,7 +133,7 @@ class Accordion(HTMLParser):
                 self.body_depth = None
             elif tag == 'li' and self.depth == self.item:
                 name, content = clean(''.join(self.title)), clean(''.join(self.body))
-                if name and re.search(r'(?:지원|사업)대상', content) and re.search(r'(?:지원|사업)내용|지원조건', content):
+                if name and re.search(r'(?:지원|사업)대상', content) and re.search(r'(?:지원|사업|주요)내용|지원조건', content):
                     self.items.append({'name': name, 'content': content, 'contentColumn': '사업별 안내', 'department': None,
                                        'fields': {}, 'links': list(dict.fromkeys(self.links)), 'source': self.source,
                                        'location': {'section': self.serial}, 'status': 'source_section_candidate'})
