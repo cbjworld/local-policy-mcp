@@ -82,6 +82,8 @@
 
 [경기도 여성청소년 생리용품 지원](https://www.gg.go.kr/contents/contents.do?ciIdx=987253&menuId=1534092)과 [경기도 빈집정비 지원](https://www.gg.go.kr/contents/contents.do?ciIdx=987027&menuId=265934)은 원문 본문과 추출 결과를 대조하고 경기도 검색으로 확인했다.
 
+[김제시 공동주택 지원](https://www.gimje.go.kr/index.gimje?menuCd=DOM_000000106003005000), 순창군의 [임신지원금](https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac93f6a5448dc), [신중년 취업지원](https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac946825649a8), [난청노인 보청기 지원](https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac948510449dc)도 본문과 지역 검색을 대조했다. 33개 페이지의 397개 후보가 로컬 검색에 포함된다.
+
 ## 의왕시·사상구·해운대구 추가 페이지
 
 - [의왕시 생애주기별 인구정책](https://www.uiwang.go.kr/UWKORWEL1901): 150행의 각 열을 원문과 대조했다. 같은 사업명이 반복되는 행이 있으므로 독립 사업 수로 세지 않는다.

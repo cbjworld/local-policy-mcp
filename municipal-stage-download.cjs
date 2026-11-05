@@ -3,6 +3,7 @@ const {download,validateUrl}=require('./official-fetch');
 const registry=require('./catalog-institutions.json').records;
 const hosts=new Set(registry.flatMap(r=>{try{return [new URL(r.url).hostname]}catch{return []}}));
 const userAgent='PolicyResearchPrototype/0.2';
+function temporaryUrl(url){return /;jsessionid=/i.test(url.pathname)||[...url.searchParams.keys()].some(k=>/^(?:jsessionid|sessionid|session_id|token|access_token)$/i.test(k));}
 function robotsRule(text,url,python=process.env.POLICY_PYTHON||(process.platform==='win32'?'python':'python3')){
  const code='import json,sys,urllib.robotparser\np=urllib.robotparser.RobotFileParser();p.parse(sys.stdin.read().splitlines());u=sys.argv[1];a=sys.argv[2];r=p.request_rate(a);print(json.dumps({"allowed":p.can_fetch(a,u),"delay":max(p.crawl_delay(a) or 0,(r.seconds/r.requests) if r and r.requests else 0)}))';
  const child=spawnSync(python,['-c',code,url,userAgent],{input:text,encoding:'utf8',timeout:5000,maxBuffer:100000,windowsHide:true});
@@ -15,7 +16,7 @@ async function run(items,{fetcher=download,rule=robotsRule,save,sleep=ms=>new Pr
  for(const item of selected){
   try{
    if(!item||typeof item.source!=='string'||!['table','section','detail'].includes(item.parser)||(item.parser==='detail'&&(typeof item.title!=='string'||!item.title.trim()||item.title.length>200)))throw Error('invalid_entry');
-   const url=validateUrl(item.source);if(!hosts.has(url.hostname))throw Error('unregistered_host');
+   const url=validateUrl(item.source);if(temporaryUrl(url))throw Error('temporary_source');if(!hosts.has(url.hostname))throw Error('unregistered_host');
    if(!cache.has(url.origin)){
     if(!first)await sleep(3000);first=false;
     try{const r=await fetcher(url.origin+'/robots.txt',0,Date.now()+25000,undefined,undefined,true);if(r.bytes.length>1000000||/text\/html/i.test(r.type))throw Error('robots_invalid');cache.set(url.origin,r.bytes.toString('utf8'));}
@@ -26,10 +27,10 @@ async function run(items,{fetcher=download,rule=robotsRule,save,sleep=ms=>new Pr
    await sleep(delay);first=false;
    const response=await fetcher(url.href,0,Date.now()+25000,undefined,undefined,true);
    const returned=new URL(response.url);
-   if(/;jsessionid=/i.test(returned.pathname)||[...returned.searchParams.keys()].some(k=>/^(?:jsessionid|sessionid|session_id|token|access_token)$/i.test(k)))throw Error('temporary_redirect');
+   if(temporaryUrl(returned))throw Error('temporary_redirect');
    if(returned.hostname!==url.hostname||!/text\/html/i.test(response.type)||response.bytes.length<500)throw Error('unexpected_page');
    const file=await save(response.bytes,url.href);manifest.push({source:response.url,file,parser:item.parser,...(item.parser==='detail'?{title:item.title}:{})});results.push({source:url.href,status:'downloaded',bytes:response.bytes.length});
-  }catch(e){results.push({source:typeof item?.source==='string'?item.source:null,status:'failed',reason:String(e.code||e.message||'unknown').slice(0,100)});}
+  }catch(e){results.push({source:e.message==='temporary_source'?null:typeof item?.source==='string'?item.source:null,status:'failed',reason:String(e.code||e.message||'unknown').slice(0,100)});}
  }
  const nextOffset=offset+selected.length<items.length?offset+selected.length:null;
  return {attempted:selected.length,nextOffset,remaining:Math.max(0,items.length-offset-selected.length),manifest,results};
@@ -45,5 +46,5 @@ async function main(){
  await fs.writeFile(path.join(dest,'report-'+id+'.json'),JSON.stringify({attempted:result.attempted,nextOffset:result.nextOffset,remaining:result.remaining,results:result.results},null,2),{flag:'wx'});
  console.log(JSON.stringify({attempted:result.attempted,downloaded:result.manifest.length,nextOffset:result.nextOffset,remaining:result.remaining,report:'report-'+id+'.json',manifest:'manifest-'+id+'.json'}));
 }
-module.exports={run,robotsRule};
+module.exports={run,robotsRule,temporaryUrl};
 if(require.main===module)main().catch(e=>{console.error(e.message);process.exitCode=1;});

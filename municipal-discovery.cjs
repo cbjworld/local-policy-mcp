@@ -5,7 +5,7 @@ function candidates(base,links){
  for(const link of links){
   if(!link||typeof link.url!=='string'||typeof link.title!=='string'||!/(정책|지원사업|사업안내|일자리|1인가구|복지|청년|임신|출산|장애인)/.test(link.title))continue;
   let u;try{u=new URL(link.url);}catch{continue;}
-  if(u.protocol!=='https:'||u.hostname!==host||u.username||u.password||(u.port&&u.port!=='443')||/\.(?:pdf|hwp|hwpx|zip|xls|xlsx)$/i.test(u.pathname))continue;
+  if(u.protocol!=='https:'||u.hostname!==host||u.username||u.password||(u.port&&u.port!=='443')||staging.temporaryUrl(u)||/\.(?:pdf|hwp|hwpx|zip|xls|xlsx)$/i.test(u.pathname))continue;
   u.hash='';if(seen.has(u.href)||u.href===base)continue;seen.add(u.href);
   found.push({title:link.title.slice(0,200),url:u.href,status:'unverified_menu_link'});
  }
