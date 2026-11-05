@@ -80,6 +80,8 @@
 
 [달성군 신혼부부 목표달성적금](https://www.dalseong.daegu.kr/index.do?menu_id=00005777)과 [남동구 청년자격증 응시료](https://www.namdong.go.kr/main/area/youth/business/certificate.jsp)는 각 지역 검색에서 원문과 본문 위치를 확인했다. 임시 세션 정보가 붙은 이동 주소는 출처로 저장하지 않고 재확인 대상으로 남긴다.
 
+[경기도 여성청소년 생리용품 지원](https://www.gg.go.kr/contents/contents.do?ciIdx=987253&menuId=1534092)과 [경기도 빈집정비 지원](https://www.gg.go.kr/contents/contents.do?ciIdx=987027&menuId=265934)은 원문 본문과 추출 결과를 대조하고 경기도 검색으로 확인했다.
+
 ## 의왕시·사상구·해운대구 추가 페이지
 
 - [의왕시 생애주기별 인구정책](https://www.uiwang.go.kr/UWKORWEL1901): 150행의 각 열을 원문과 대조했다. 같은 사업명이 반복되는 행이 있으므로 독립 사업 수로 세지 않는다.
