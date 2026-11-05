@@ -22,6 +22,8 @@ const search=require('./municipal-homepage-search.cjs').search;
  const detail=search({q:'반려동물 의료비'});assert.equal(detail.total,1);assert.equal(detail.items[0].status,'source_detail_candidate');assert.equal(detail.items[0].location.elementId,'contents');
  for(const id of ['conts','content','body_content']){second.items[2].location.elementId=id;fs.writeFileSync(file,JSON.stringify({sources:[first,second]}));assert.equal(search({q:'반려동물 의료비'}).items[0].location.elementId,id);}
  assert.equal(search({q:'동행',institution:'노원구'}).total,0);
+ const many=Array.from({length:25},(_,i)=>({...first,source:`https://www.nowon.kr/example-${i}`,items:[]}));fs.writeFileSync(file,JSON.stringify({sources:many}));
+ const coverage1=search({q:'청년'}),coverage2=search({q:'청년',sourceOffset:coverage1.scope.nextSourceOffset});assert.equal(coverage1.scope.totalSources,25);assert.equal(coverage1.scope.sources.length,20);assert.equal(coverage1.scope.nextSourceOffset,20);assert.equal(coverage2.scope.sources.length,5);assert.equal(coverage2.scope.nextSourceOffset,null);assert.equal(new Set([...coverage1.scope.sources,...coverage2.scope.sources].map(x=>x.source)).size,25);assert.throws(()=>search({q:'청년',sourceLimit:101}));
  fs.writeFileSync(file,JSON.stringify({sources:[first,first]}));assert.throws(()=>search({q:'청년'}),/형식/);fs.writeFileSync(file,JSON.stringify(first));
  const handler=require('./mcp').createHandler();
  await handler({jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-11-25',clientInfo:{name:'test',version:'1'},capabilities:{}}});
@@ -29,5 +31,6 @@ const search=require('./municipal-homepage-search.cjs').search;
  const list=await handler({jsonrpc:'2.0',id:2,method:'tools/list'});assert(list.result.tools.some(x=>x.name==='search_municipal_homepage'));
  const response=await handler({jsonrpc:'2.0',id:3,method:'tools/call',params:{name:'search_municipal_homepage',arguments:{q:'청년',institution:'노원구'}}});
  assert.equal(response.result.isError,false);assert.equal(JSON.parse(response.result.content[0].text).total,1);
+ assert(list.result.tools.find(x=>x.name==='search_municipal_homepage').inputSchema.properties.sourceOffset);fs.writeFileSync(file,JSON.stringify({sources:many}));const page=await handler({jsonrpc:'2.0',id:4,method:'tools/call',params:{name:'search_municipal_homepage',arguments:{q:'청년',sourceOffset:20}}});assert.equal(JSON.parse(page.result.content[0].text).scope.sources.length,5);
  console.log('PASS: local municipal source search, location, bounded coverage and MCP call');
 }finally{fs.unlinkSync(file);fs.rmdirSync(dir);}})().catch(e=>{console.error(e);process.exitCode=1});
