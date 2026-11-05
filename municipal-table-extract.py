@@ -83,8 +83,15 @@ def extract(data, source):
         if not rows:
             continue
         headers = [re.sub(r'\s+', '', x['text']) for x in rows[0]]
-        if '사업명' not in headers or '사업내용' not in headers:
+        if '사업명' not in headers:
             continue
+        content_headers = [h for h in headers if h == '사업내용' or h.startswith('사업내용(')]
+        if not content_headers and '지원내용' in headers:
+            content_headers = ['지원내용']
+        if len(content_headers) != 1:
+            skipped.append({'table': table_no, 'reason': 'unrecognized_content_header'})
+            continue
+        content_header = content_headers[0]
         if table['merged'] or len(set(headers)) != len(headers):
             skipped.append({'table': table_no, 'reason': 'merged_or_duplicate_headers'})
             continue
@@ -93,9 +100,9 @@ def extract(data, source):
                 skipped.append({'table': table_no, 'row': row_no, 'reason': 'irregular_row'})
                 continue
             fields = dict(zip(headers, (c['text'] for c in row)))
-            if not fields['사업명'] or not fields['사업내용']:
+            if not fields['사업명'] or not fields[content_header]:
                 continue
-            results.append({'name': fields['사업명'], 'content': fields['사업내용'],
+            results.append({'name': fields['사업명'], 'content': fields[content_header], 'contentColumn': content_header,
                             'department': fields.get('담당부서'), 'fields': fields,
                             'links': list(dict.fromkeys(link for cell in row for link in cell['links'])), 'source': source,
                             'location': {'table': table_no, 'row': row_no},

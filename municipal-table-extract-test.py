@@ -33,6 +33,13 @@ class TestMunicipalTable(unittest.TestCase):
         self.assertEqual(result['items'][0]['fields']['지원내용'], '5,000원')
         self.assertEqual(result['items'][0]['links'], ['https://www.gccity.go.kr/apply'])
 
+    def test_alternate_content_column_and_unrecognized_tables(self):
+        data = '<table><tr><th>사업명</th><th>지원내용</th></tr><tr><td>A</td><td>B</td></tr></table><table><tr><th>사업명</th><th>기타</th></tr><tr><td>X</td><td>Y</td></tr></table>'.encode()
+        result = module.extract(data, 'https://www.yw.go.kr/program')
+        self.assertEqual(result['items'][0]['contentColumn'], '지원내용')
+        self.assertEqual(result['items'][0]['content'], 'B')
+        self.assertEqual(result['skipped'], [{'table': 2, 'reason': 'unrecognized_content_header'}])
+
 
 if __name__ == '__main__':
     unittest.main()
