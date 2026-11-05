@@ -14,4 +14,13 @@ function matchesRegion(terms,entry){
    ?local.includes(term)||localFull===term||parents.includes(term)||key===term
    :/^[가-힣]{2,}$/.test(term)?normalize(entry.parent).includes(term)||local.some(part=>part.startsWith(term)):key.includes(term));
 }
-module.exports={aliases,regionTerms,matchesRegion};
+function queryWithoutRegion(query,institution){
+ if(typeof query!=='string'||typeof institution!=='string'||!institution.trim())return query;
+ const names=institution.trim().split(/\s+/).map(x=>x.normalize('NFKC'));
+ const tokens=query.trim().split(/\s+/), kept=tokens.filter(token=>{
+  const word=token.normalize('NFKC').replace(/[?？!！,.，。]+$/u,'');
+  return !names.some(name=>[name,name+'의',name+'에서',name+'은',name+'는'].includes(word));
+ });
+ return kept.length&&kept.length<tokens.length?kept.join(' '):query;
+}
+module.exports={aliases,regionTerms,matchesRegion,queryWithoutRegion};

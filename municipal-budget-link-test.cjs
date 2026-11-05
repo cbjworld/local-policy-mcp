@@ -1,5 +1,7 @@
 const assert=require('node:assert/strict');
 const {link,linkAuto}=require('./municipal-budget-link.cjs');
+const {queryWithoutRegion}=require('./region-aliases');
+assert.equal(queryWithoutRegion('파주시의 노인 난방비','파주시'),'노인 난방비');assert.equal(queryWithoutRegion('경기도 파주시 난방비','경기도 파주시'),'난방비');assert.equal(queryWithoutRegion('다른시 지원','파주시'),'다른시 지원');assert.equal(queryWithoutRegion('파주시','파주시'),'파주시');assert.equal(queryWithoutRegion('서울시립 지원','서울시'),'서울시립 지원');
 const website={name:'청년월세 지원사업',institution:'칠곡군',parent:'경상북도',source:'https://www.chilgok.go.kr/web',location:{section:1}};
 const rows=[{name:'청년월세지원사업',institution:'칠곡군',parent:'경상북도',year:2026,unit:'천원',budget:123,source:'https://www.chilgok.go.kr/budget',page:1},{name:'청년신혼부부 월세지원사업',institution:'칠곡군',parent:'경상북도'},{name:'청년월세지원사업',institution:'다른군',parent:'경상북도'}];
 const deps={homepage:{search:()=>({items:[website],total:1,nextOffset:null})},budget:{search:()=>({items:rows,totalCandidateRows:3,nextOffset:null,scope:{}})}};
