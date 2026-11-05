@@ -94,6 +94,8 @@
 
 [대구 남구 신혼부부 대출이자](https://www.nam.daegu.kr/index.do?menu_id=00205113), [대구 수성구 긴급복지](https://www.suseong.kr/index.do?menu_id=00000650), [하동군 육아수당](https://www.hadong.go.kr/specialty/00401/05203.web) 안내의 본문과 지역 검색을 대조했다.
 
+[대구 서구 출산 지원](https://www.dgs.go.kr/portal/contents.do?mid=0303100100), [남동구 청년어촌정착](https://www.namdong.go.kr/main/area/youth/business/fishing.jsp), [순창군 3세대 효도수당](https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac948736749e0) 안내도 원문과 지역 검색을 대조했다. 하동군 페이지 재조회에서는 원문 HTML 해시는 달라졌지만 추출한 안내 본문은 같았다.
+
 ## 의왕시·사상구·해운대구 추가 페이지
 
 - [의왕시 생애주기별 인구정책](https://www.uiwang.go.kr/UWKORWEL1901): 150행의 각 열을 원문과 대조했다. 같은 사업명이 반복되는 행이 있으므로 독립 사업 수로 세지 않는다.
