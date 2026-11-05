@@ -24,6 +24,9 @@ function plan({question,queries,startDate,endDate}={},now=new Date()){
  if(/전세\s*보증료|전세\s*보증금.*보증료/.test(searchTopic)){
   derived.splice(0,derived.length,searchTopic,'전세보증금 반환보증 보증료',...( /청년/.test(searchTopic)?['청년 보증료 지원']:['전세 보증료 지원']));
  }
+ if(/어르신|노인|고령자|고령운전자/.test(searchTopic)&&/운전\s*면허.*반납/.test(searchTopic)&&!/청년|아동/.test(searchTopic)){
+  derived.splice(0,derived.length,searchTopic,'고령자 운전면허 자진반납','운전면허 자진반납 지원');
+ }
  const terms=queries===undefined?[...new Set(derived)]:queries;
  if(!Array.isArray(terms)||terms.length<1||terms.length>3||terms.some(q=>typeof q!=='string'||!q.trim()||q.length>150))throw Error('검색 표현은 1~3개의 150자 이하 문자열이어야 합니다.');
  if((startDate===undefined)!==(endDate===undefined))throw Error('기간을 지정하려면 시작일과 종료일을 함께 입력하세요.');
@@ -160,7 +163,10 @@ async function runResearch(args={},io=portal){
   const institutions=new Set();
   const savedKeys=new Set(catalogEvidence.seedDocuments.map(d=>documentKey(d.url)));
   const plansFirst=!/교부|예탁|집행|결산/.test(request.question);
-  const ordered=candidates.filter(d=>!d.readingDecision).sort((a,b)=>Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||(plansFirst?Number(b.documentRole==='plan')-Number(a.documentRole==='plan'):0)||Number(savedKeys.has(documentKey(b.url)))-Number(savedKeys.has(documentKey(a.url)))||b.relevance.score-a.relevance.score||Number(b.disclosure==='공개')-Number(a.disclosure==='공개'));
+  const prioritizeOriginal=/어르신|노인|고령자|고령운전자/.test(request.topic)&&/운전\s*면허.*반납/.test(request.topic);
+  const originalAnchors=anchorSets[0].map(w=>w.toLowerCase());
+  const matchesOriginal=d=>{const text=String((d.title||'')+(d.institution||'')).replace(/\s+/g,'').toLowerCase();return originalAnchors.length>0&&originalAnchors.every(w=>text.includes(w));};
+  const ordered=candidates.filter(d=>!d.readingDecision).sort((a,b)=>Number(b.targetFit?.status==='match')-Number(a.targetFit?.status==='match')||(prioritizeOriginal?Number(matchesOriginal(b))-Number(matchesOriginal(a)):0)||(plansFirst?Number(b.documentRole==='plan')-Number(a.documentRole==='plan'):0)||Number(savedKeys.has(documentKey(b.url)))-Number(savedKeys.has(documentKey(a.url)))||b.relevance.score-a.relevance.score||Number(b.disclosure==='공개')-Number(a.disclosure==='공개'));
   const preload=queue=>{
    const seen=new Set(),first=[],rest=[];
    for(const d of queue){

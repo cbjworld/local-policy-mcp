@@ -143,3 +143,10 @@ privateListingTest().catch(e=>{console.error(e);process.exitCode=1;});
  assert.equal(calls.get('original:2'),2);assert.equal(calls.get('all:2'),2);assert.equal(r.coverage.continuationSucceeded,4);assert.equal(r.coverage.hasMore,false);assert.equal(r.failures.length,0);assert.equal(r.coverage.uniqueDocuments,3);assert(r.coverage.progress.every(x=>x.status==='exhausted'));
  console.log('PASS: automatic retry and continuation recover failed pages, merge duplicates and finish both scopes');
 })().catch(e=>{console.error(e);process.exitCode=1});
+
+(async()=>{
+ const docs=[{title:'2026년 고령자 운전면허 자진반납 지원계획',institution:'나시',url:'alternate',disclosure:'공개'},{title:'2026년 어르신 운전면허 자진반납 지원계획',institution:'가시',url:'original',disclosure:'공개'}],read=[];
+ const result=await w.research({question:'어르신 운전면허 반납 지원 찾아줘'},{search:async()=>({total:2,hasMore:false,items:docs,reviewItems:[],relatedDocuments:[]}),research:async a=>{read.push(a.url);return {status:'read',evidence:{fields:Object.fromEntries(['target','activity','budget','period'].map(k=>[k,{excerpts:[{status:'evidence_candidate',quote:k}]}]))}};}});
+ assert.equal(read[0],'original');assert(read.includes('alternate'));assert(result.candidates.some(x=>x.url==='alternate'));
+ console.log('PASS: original wording is read first while expanded older-driver candidates remain available');
+})().catch(e=>{console.error(e);process.exitCode=1});

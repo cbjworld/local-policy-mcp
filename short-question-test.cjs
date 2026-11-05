@@ -8,6 +8,9 @@ assert.deepEqual(plan({question:'대구 북구 청년 이사비용 찾아줘'}).
 assert.deepEqual(plan({question:'청년 전세보증료 지원 찾아줘'}).queries,['청년 전세보증료 지원','전세보증금 반환보증 보증료','청년 보증료 지원']);
 assert.equal(require('./relevance').targetFit('전세보증금 반환보증 보증료 지원사업 추진계획','청년 전세보증료 지원 찾아줘').status,'unspecified');
 assert.deepEqual(plan({question:'청년 전세보증료 지원 찾아줘',queries:['청년 보증료']}).queries,['청년 보증료']);
+assert.deepEqual(plan({question:'어르신 운전면허 반납 지원 찾아줘'}).queries,['어르신 운전면허 반납 지원','고령자 운전면허 자진반납','운전면허 자진반납 지원']);
+assert(!plan({question:'청년 운전면허 반납 지원 찾아줘'}).queries.some(q=>q.includes('고령자')));
+assert.equal(require('./relevance').targetFit('운전면허 자진반납 지원사업','어르신 운전면허 반납 지원').status,'unspecified');
 assert.equal(plan({question:'산후조리비'}).broad,false);assert.equal(plan({question:'반려동물'}).broad,true);
 (async()=>{
  let reads=0;const doc={title:'2026년 산후조리비 지원 사업 추진계획',institution:'시험시',url:'https://www.open.go.kr/test'};

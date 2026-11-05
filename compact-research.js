@@ -68,11 +68,11 @@ module.exports=function compactResearch(value){
  while(oversized()&&output.budgetCandidates.length){output.budgetCandidates.pop();output.responseSize.omittedBudgetCandidates++;}
  while(oversized()&&output.catalogEvidence?.items.length>1){output.catalogEvidence.items.pop();output.responseSize.omittedCatalogItems++;refreshComparison();}
  for(let i=documents.length-1;i>=0&&oversized();i--)if(documents[i].reading&&documents[i].readingStatus!=='read'){delete documents[i].reading;documents[i].readingDetailsOmitted=true;output.responseSize.omittedReadingDetails++;}
- while(oversized()){const i=documents.findLastIndex(d=>d.readingStatus!=='read');if(i<0)break;documents.splice(i,1);output.responseSize.omittedDocuments++;pruneReferences();}
  output.responseSize.omittedInstitutionSources=0;
  for(let i=output.institutionDirectory.rows.length-1;i>=0&&oversized();i--){output.institutionDirectory.rows[i].splice(3);output.responseSize.omittedInstitutionSources++;}
- // Preserve whole quotations rather than cutting evidence mid-sentence.
+ // The brief retains whole quotations; remove duplicated detail before an examined title-only case.
  for(let i=documents.length-1;i>=0&&oversized();i--)if(documents[i].reading){delete documents[i].reading;documents[i].readingDetailsOmitted=true;output.responseSize.omittedReadingDetails++;}
+ while(oversized()){const i=documents.findLastIndex(d=>d.readingStatus!=='read');if(i<0)break;documents.splice(i,1);output.responseSize.omittedDocuments++;pruneReferences();}
  while(oversized()&&output.possibleProjectLinks.length){output.possibleProjectLinks.pop();output.responseSize.omittedLinks++;}
  while(oversized()&&output.evidenceMap.length){output.evidenceMap.pop();output.responseSize.omittedEvidenceGroups++;}
  while(oversized()&&output.budgetEvidenceLinks.length){output.budgetEvidenceLinks.pop();output.responseSize.omittedBudgetLinks++;}

@@ -35,3 +35,7 @@ assert(JSON.stringify(preserved).length<=24000);
 const manyOther=Array.from({length:180},(_,i)=>({title:'청년 지원 계획 '+('가'.repeat(140)),institution:'기관'+i,url:'https://www.open.go.kr/item/'+i+'x'.repeat(80),relevance:{kind:'project_candidate'}}));
 const twoCases=crowdedReads.slice(0,2),large=require('./presentation').present('research_policy',{candidates:[...twoCases.map(x=>x.candidate),...manyOther],investigations:twoCases,projects:[]});
 assert(large.responseSize.omittedInstitutionSources>0);assert.equal(large.caseComparison.length,2,'retain two read cases before adding optional directory links');assert(JSON.stringify(large).length<=24000);
+
+const titleOnly={candidate:{title:'2027년 운전면허 반납 지원계획',institution:'인천광역시',url:'title-only-plan',relevance:{kind:'project_candidate'}},result:{status:'no_available_attachment'}};
+const sourcePressure=require('./presentation').present('research_policy',{candidates:[twoCases[0].candidate,titleOnly.candidate,...manyOther],investigations:[twoCases[0],titleOnly],projects:[]});
+assert(sourcePressure.documents.some(d=>d.url==='title-only-plan'&&d.readingStatus==='no_available_attachment'),'preserve the inspected title-only case before optional directory links');assert(JSON.stringify(sourcePressure).length<=24000);
