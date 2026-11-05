@@ -145,6 +145,16 @@ privateListingTest().catch(e=>{console.error(e);process.exitCode=1;});
 })().catch(e=>{console.error(e);process.exitCode=1});
 
 (async()=>{
+ const calls=[];
+ const r=await w.research({question:'반려동물 의료비 지원',queries:['반려동물 의료비'],autoOcr:false},{search:async a=>{calls.push([a.scope||'original',a.page]);if(!a.scope&&a.page===2)throw Error('포털 검색 실패: 응답 코드 429');return {total:30,hasMore:!a.scope,items:[],reviewItems:[],relatedDocuments:[]};}});
+ assert.equal(calls.filter(([scope,page])=>scope==='original'&&page===2).length,1);
+ assert.equal(r.coverage.portalRateLimited,true);assert.equal(r.coverage.continuationAttempts,0);
+ assert(r.coverage.nextSearches.some(x=>x.arguments.scope==='original'&&x.arguments.page===2));
+ assert.equal(r.coverage.hasMore,true);
+ console.log('PASS: portal rate limit stops immediate retries and retains the failed page');
+})().catch(e=>{console.error(e);process.exitCode=1});
+
+(async()=>{
  const docs=[{title:'2026년 고령자 운전면허 자진반납 지원계획',institution:'나시',url:'alternate',disclosure:'공개'},{title:'2026년 어르신 운전면허 자진반납 지원계획',institution:'가시',url:'original',disclosure:'공개'}],read=[];
  const result=await w.research({question:'어르신 운전면허 반납 지원 찾아줘'},{search:async()=>({total:2,hasMore:false,items:docs,reviewItems:[],relatedDocuments:[]}),research:async a=>{read.push(a.url);return {status:'read',evidence:{fields:Object.fromEntries(['target','activity','budget','period'].map(k=>[k,{excerpts:[{status:'evidence_candidate',quote:k}]}]))}};}});
  assert.equal(read[0],'original');assert(read.includes('alternate'));assert(result.candidates.some(x=>x.url==='alternate'));

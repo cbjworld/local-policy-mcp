@@ -43,14 +43,16 @@ async function runResearch(args={},io=portal){
  if(args.autoOcr!==undefined&&typeof args.autoOcr!=='boolean')throw Error('autoOcr은 boolean이어야 합니다.');
  const ocrBudget={remaining:args.autoOcr===false?0:2,supplementRemaining:args.autoOcr===false?0:1};
  // Start independent portal requests before synchronous index work; preserve result merge order.
- let firstSearch;
+ let firstSearch,portalRateLimited=false;
+ const recordRateLimit=e=>{if(/(?:응답 코드\s*|HTTP\s*|status\s*[:=]?\s*)429\b/i.test(e?.message||''))portalRateLimited=true;};
  const firstSearchPending=new Promise(resolve=>{firstSearch=resolve;});
  const batchesPending=Promise.all(request.queries.map(async q=>{
   const pages=[],errors=[];
   for(let page=1;page<=40;page++){
+   if(portalRateLimited)break;
    if(page>1&&Date.now()-started>=12000)break;
    try{const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page,deadline:started+12000});pages.push({q,page,r});firstSearch(true);if(!r.hasMore)break;}
-   catch(e){errors.push({q,page,scope:'original',message:e.message});break;}
+   catch(e){recordRateLimit(e);errors.push({q,page,scope:'original',message:e.message});break;}
   }
   return {pages,errors};
  })).then(batches=>{firstSearch(false);return batches;});
@@ -58,9 +60,10 @@ async function runResearch(args={},io=portal){
  const metadataPending=firstSearchPending.then(success=>success?Promise.all(request.queries.map(async q=>{
    const pages=[],errors=[];
    for(let page=1;page<=40;page++){
+    if(portalRateLimited)break;
     if(page>1&&Date.now()-started>=12000)break;
     try{const r=await io.search({q,startDate:request.startDate,endDate:request.endDate,page,scope:'all',deadline:started+12000});pages.push({q,page,r});if(!r.hasMore)break;}
-    catch(e){errors.push({q,page,scope:'all',message:e.message});break;}
+    catch(e){recordRateLimit(e);errors.push({q,page,scope:'all',message:e.message});break;}
    }
    return {pages,errors};
   })):[]);
@@ -118,7 +121,7 @@ async function runResearch(args={},io=portal){
   else if(last?.hasMore&&last.page<10000)continuation.push({q,scope,page:last.page+1});
  }
  let continuationAttempts=0,continuationSucceeded=0;
- while(continuation.length&&continuationAttempts<12&&Date.now()<continuationDeadline){
+ while(!portalRateLimited&&continuation.length&&continuationAttempts<12&&Date.now()<continuationDeadline){
   const cursor=continuation.shift();continuationAttempts++;
   try{
    const r=await io.search({q:cursor.q,startDate:request.startDate,endDate:request.endDate,page:cursor.page,deadline:continuationDeadline,...(cursor.scope==='all'?{scope:'all'}:{})});
@@ -130,6 +133,7 @@ async function runResearch(args={},io=portal){
    if(cursor.scope==='original'&&!searches.some(x=>x.q===cursor.q&&x.scope==='all')&&!continuation.some(x=>x.q===cursor.q&&x.scope==='all'))continuation.push({q:cursor.q,scope:'all',page:1});
    if(r.hasMore&&cursor.page<10000)continuation.push({...cursor,page:cursor.page+1});
   }catch(e){
+   recordRateLimit(e);
    const failure=failures.find(f=>f.q===cursor.q&&f.scope===cursor.scope);
    if(!failure)failures.push({...cursor,message:e.message});else failure.message=e.message;
   }
@@ -236,6 +240,7 @@ async function runResearch(args={},io=portal){
   return {q,scope,pagesRead:pages.length,lastPage:last?.page||0,reportedDocuments:last?.total??null,status:failure?'failed':!last?'not_started':last.hasMore?(last.page>=10000?'page_limit':'partial'):'exhausted',...(failure?{failedPage:failure.page}:{})};
  }));
  const coverage={continuationAttempts,continuationSucceeded,queriedPages:searches.length,uniqueDocuments:byUrl.size,hasMore:nextSearches.length>0||pageLimitReached,pageLimitReached,progress,nextSearches,note:'전국 지자체를 검색 대상으로 하지만 일부 페이지의 결과입니다. 검색어별 총건수는 중복될 수 있어 합산하지 마세요. 후속 검색은 순서대로 실행하고 URL 중복을 제거하세요. 전국 전체 사업 수나 검색 완전성을 뜻하지 않습니다.'};
+ if(portalRateLimited){coverage.portalRateLimited=true;coverage.rateLimitNote='정보공개포털의 요청 제한으로 추가 요청을 중단했습니다. 실패·미조회 쪽은 제한이 해제된 뒤 이어서 검색하세요.';}
  coverage.liveSearchDocuments=liveSearchDocuments;
  coverage.savedSeedDocuments=byUrl.size-liveSearchDocuments;
  timings.readingMs=Date.now()-readStart;timings.totalMs=Date.now()-started;
