@@ -13,7 +13,22 @@ function bundle(documents,investigations=[]){
  const titleCounts=new Map();
  for(const doc of [...new Map(documents.map(d=>[documentKey(d.url),d])).values()]){const k=identity(doc).key+'|'+String(doc.title).replace(/\s+/g,'');titleCounts.set(k,(titleCounts.get(k)||0)+1);}
  for(const doc of new Map(documents.map(d=>[documentKey(d.url),d])).values()){const id=identity(doc);const ambiguous=titleCounts.get(id.key+'|'+String(doc.title).replace(/\s+/g,''))>1;const key=ambiguous?doc.url:id.key;if(!groups.has(key))groups.set(key,{institution:doc.institution,name:id.name,titleYear:id.year,grouping:ambiguous?'identical-title-different-documents-kept-separate':'same-institution-department-explicit-title-year-normalized-name-only',documents:[]});const g=groups.get(key);if(!g.documents.some(x=>documentKey(x.url)===documentKey(doc.url)))g.documents.push({...doc,role:require('./relevance').documentRole(doc.title)});}
- return [...groups.values()].map(g=>{
+ const unambiguous=[];
+ for(const g of groups.values()){
+  const values=new Map();
+  for(const d of g.documents){
+   const result=investigations.find(x=>documentKey(x.candidate.url)===documentKey(d.url))?.result;
+   if(result?.status!=='read')continue;
+   for(const o of result.evidence?.organizations||[]){
+    if(!['도서관명','지자체(교육청)명'].includes(o.label)||!o.value)continue;
+    if(!values.has(o.label))values.set(o.label,new Set());values.get(o.label).add(o.value.replace(/\s+/g,''));
+   }
+  }
+  // Different implementing entities make title-only grouping unsafe; retain each source separately.
+  if([...values.values()].some(v=>v.size>1))unambiguous.push(...g.documents.map(d=>({...g,grouping:'different_implementing_entities_kept_separate',documents:[d]})));
+  else unambiguous.push(g);
+ }
+ return unambiguous.map(g=>{
   g.documents.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
   const read=g.documents.map(d=>investigations.find(x=>documentKey(x.candidate.url)===documentKey(d.url))).filter(Boolean);
   const titleSources=g.documents.filter(d=>(d.relevance||require('./relevance').classify(d.title)).kind==='project_candidate');

@@ -10,6 +10,10 @@ assert.notEqual(documentKey(original),documentKey(metadata.replace('www.open.go.
 const sameDoc=[{title:'2026년 산후조리비 지원사업 추진계획',institution:'A',url:original},{title:'2026년 산후조리비 지원사업 추진계획',institution:'A',url:metadata}];
 const bundled=require('./project-bundles').bundle(sameDoc,[{candidate:sameDoc[0],result:{status:'read',evidence:{fields:{budget:{excerpts:[{status:'evidence_candidate',quote:'사업비 100만원'}]}}}}}]);
 assert.equal(bundled.length,1);assert.equal(bundled[0].documents.length,1);assert.equal(bundled[0].fields.budget.excerpts.length,1);
+const distinctDocs=[{title:'2026년 독서 사업 추진계획',institution:'A시',department:'도서관과',url:'library-a'},{title:'2026년 독서 사업 시행계획',institution:'A시',department:'도서관과',url:'library-b'}];
+const different=distinctDocs.map((candidate,i)=>({candidate,result:{status:'read',evidence:{organizations:[{label:'도서관명',value:i?'나 도서관':'가 도서관'}],fields:{budget:{excerpts:[{status:'evidence_candidate',quote:i?'사업비 20만원':'사업비 10만원'}]}}}}}));
+const split=require('./project-bundles').bundle(distinctDocs,different);assert.equal(split.length,2);assert(split.every(x=>x.grouping==='different_implementing_entities_kept_separate'));assert.deepEqual(split.map(x=>x.fields.budget.excerpts[0].quote),['사업비 10만원','사업비 20만원']);
+const same=different.map(x=>({...x,result:{...x.result,evidence:{...x.result.evidence,organizations:[{label:'도서관명',value:'가 도서관'}]}}}));assert.equal(require('./project-bundles').bundle(distinctDocs,same).length,1);
 const dual=evidenceMap([{title:'2026년 산후조리비 지원계획',institution:'A',url:original},{title:'2026년 산후조리비 지원계획',institution:'A',url:metadata}],[{candidate:{url:metadata},result:{status:'read'}}]);
 assert.equal(dual[0].stages[0].documents.length,1);
 assert.equal(dual[0].stages[0].documents[0].readingStatus,'read');
