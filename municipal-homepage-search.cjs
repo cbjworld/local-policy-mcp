@@ -31,8 +31,8 @@ function search({q,institution,offset=0,limit=10,sourceOffset=0,sourceLimit=20,c
    (exact?rows:partial).push(item);
   }
  }
- const chosen=rows.length?rows:partial;
+ const chosen=[...rows,...partial];
  const totalInstitutions=new Set(coverage.map(x=>JSON.stringify([x.parent,x.institution]))).size,skippedEntries=coverage.reduce((sum,x)=>sum+x.skippedEntries,0);
- return {scope:{sources:coverage.slice(sourceOffset,sourceOffset+sourceLimit),totalSources:coverage.length,totalInstitutions,skippedEntries,sourceOffset,nextSourceOffset:sourceOffset+sourceLimit<coverage.length?sourceOffset+sourceLimit:null,coverage:'수록된 홈페이지의 추출된 표 행과 사업별 안내·개별 페이지 본문만 검색합니다. 미처리 항목은 사업 수가 아닙니다. 전국 전체나 현재 시행 여부를 뜻하지 않습니다.'},...(effectiveQuery!==q?{effectiveQuery}:{}),matchMode:rows.length?'all_terms':partial.length?'target_unconfirmed':'no_match',total:chosen.length,offset,nextOffset:offset+limit<chosen.length?offset+limit:null,items:chosen.slice(offset,offset+limit)};
+ return {scope:{sources:coverage.slice(sourceOffset,sourceOffset+sourceLimit),totalSources:coverage.length,totalInstitutions,skippedEntries,sourceOffset,nextSourceOffset:sourceOffset+sourceLimit<coverage.length?sourceOffset+sourceLimit:null,coverage:'수록된 홈페이지의 추출된 표 행과 사업별 안내·개별 페이지 본문만 검색합니다. 미처리 항목은 사업 수가 아닙니다. 전국 전체나 현재 시행 여부를 뜻하지 않습니다.'},...(effectiveQuery!==q?{effectiveQuery}:{}),matchMode:rows.length?(partial.length?'all_terms_and_target_unconfirmed':'all_terms'):partial.length?'target_unconfirmed':'no_match',matchCounts:{allTerms:rows.length,targetUnconfirmed:partial.length},total:chosen.length,offset,nextOffset:offset+limit<chosen.length?offset+limit:null,items:chosen.slice(offset,offset+limit)};
 }
 module.exports={search};

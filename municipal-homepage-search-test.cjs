@@ -13,7 +13,7 @@ const search=require('./municipal-homepage-search.cjs').search;
  fs.writeFileSync(file,JSON.stringify(first));
  const fallback=search({q:'청년 일자리'});assert.equal(fallback.matchMode,'target_unconfirmed');assert.equal(fallback.total,1);assert.equal(fallback.items[0].name,'일자리 지원센터');assert.deepEqual(fallback.items[0].missingTerms,['청년']);
  first.items.push({name:'청년 일자리',content:'청년 지원',source,location:{table:1,row:7}});fs.writeFileSync(file,JSON.stringify(first));
- const exact=search({q:'청년 일자리'});assert.equal(exact.matchMode,'all_terms');assert.deepEqual(exact.items.map(x=>x.name),['청년 일자리']);
+ const exact=search({q:'청년 일자리'});assert.equal(exact.matchMode,'all_terms_and_target_unconfirmed');assert.deepEqual(exact.matchCounts,{allTerms:1,targetUnconfirmed:1});assert.deepEqual(exact.items.map(x=>x.name),['청년 일자리','일자리 지원센터']);assert.equal(exact.items[1].queryMatch,'target_unconfirmed');const next=search({q:'청년 일자리',limit:1,offset:1});assert.equal(next.items[0].name,'일자리 지원센터');assert.equal(next.nextOffset,null);
  first.items=first.items.slice(0,3);
  const second={source:secondSource,sha256:'b'.repeat(64),items:[{name:'병원동행',content:'의료 동행',fields:{지원내용:'이용료 5,000원'},links:['https://www.gccity.go.kr/apply'],source:secondSource,location:{table:1,row:2}},{name:'청년 월세',content:'지원대상 청년 지원내용 월세',source:secondSource,location:{section:2}},{name:'반려동물 의료비',content:'취약계층 지원',source:secondSource,location:{elementId:'contents'}}]};
  fs.writeFileSync(file,JSON.stringify({sources:[first,second]}));
