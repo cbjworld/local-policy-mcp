@@ -1,4 +1,5 @@
 const fs=require('node:fs');
+const crypto=require('node:crypto');
 const {validateUrl}=require('./official-fetch');
 const {temporaryUrl}=require('./municipal-stage-download.cjs');
 const records=require('./catalog-institutions.json').records;
@@ -6,10 +7,11 @@ const municipalitiesByHost=new Map();
 for(const record of records){try{if(record.institution.includes('(편성 당시)'))continue;const host=new URL(record.url).hostname;const current=municipalitiesByHost.get(host)||[];current.push(record);municipalitiesByHost.set(host,current)}catch{}}
 const normalize=x=>String(x||'').normalize('NFKC').replace(/\s+/g,'').toLowerCase();
 function safeLink(value){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password&&!temporaryUrl(u)}catch{return false}}
-function search({q,institution,offset=0,limit=10,sourceOffset=0,sourceLimit=20,contentOffset=0,contentLimit=2000}={},file=process.env.POLICY_MUNICIPAL_CATALOG){
+function search({q,institution,offset=0,limit=10,sourceOffset=0,sourceLimit=20,contentOffset=0,contentLimit=2000,snapshot}={},file=process.env.POLICY_MUNICIPAL_CATALOG){
  if(typeof q!=='string'||!q.trim()||q.length>100||institution!==undefined&&(typeof institution!=='string'||!institution.trim()||institution.length>80)||!Number.isInteger(offset)||offset<0||!Number.isInteger(limit)||limit<1||limit>20||!Number.isInteger(sourceOffset)||sourceOffset<0||!Number.isInteger(sourceLimit)||sourceLimit<1||sourceLimit>100||!Number.isInteger(contentOffset)||contentOffset<0||!Number.isInteger(contentLimit)||contentLimit<1||contentLimit>2000)throw Error('검색어, 지자체 또는 결과 범위를 확인하세요.');
  if(!file)throw Error('홈페이지 사업자료가 설정되지 않았습니다.');
- let data;try{if(fs.statSync(file).size>20*1024*1024)throw Error('too_large');data=JSON.parse(fs.readFileSync(file,'utf8'));}catch{throw Error('홈페이지 자료를 읽을 수 없습니다. 파일과 크기 제한을 확인하세요.');}
+ let data,version;try{if(fs.statSync(file).size>20*1024*1024)throw Error('too_large');const bytes=fs.readFileSync(file);if(bytes.length>20*1024*1024)throw Error('too_large');version=crypto.createHash('sha256').update(bytes).digest('hex');data=JSON.parse(bytes.toString('utf8'));}catch{throw Error('홈페이지 자료를 읽을 수 없습니다. 파일과 크기 제한을 확인하세요.');}
+ if(snapshot!==undefined&&(typeof snapshot!=='string'||snapshot!==version))throw Error('홈페이지 자료가 변경되어 이어볼 수 없습니다. 처음부터 다시 검색하세요.');
  const sources=Array.isArray(data.sources)?data.sources:[data];if(!sources.length||sources.length>5000)throw Error('홈페이지 자료 형식이 올바르지 않습니다.');
  const effectiveQuery=require('./region-aliases').queryWithoutRegion(q,institution);
  const terms=effectiveQuery.trim().split(/\s+/).map(normalize),rows=[],equivalent=[],partial=[],coverage=[],seen=new Set();
@@ -39,6 +41,6 @@ function search({q,institution,offset=0,limit=10,sourceOffset=0,sourceLimit=20,c
  }
  const chosen=[...rows,...equivalent,...partial];
  const totalInstitutions=new Set(coverage.map(x=>JSON.stringify([x.parent,x.institution]))).size,skippedEntries=coverage.reduce((sum,x)=>sum+x.skippedEntries,0);
- return {scope:{sources:coverage.slice(sourceOffset,sourceOffset+sourceLimit),totalSources:coverage.length,totalInstitutions,skippedEntries,sourceOffset,nextSourceOffset:sourceOffset+sourceLimit<coverage.length?sourceOffset+sourceLimit:null,coverage:'수록된 홈페이지의 추출된 표 행과 사업별 안내·개별 페이지 본문만 검색합니다. 미처리 항목은 사업 수가 아닙니다. 전국 전체나 현재 시행 여부를 뜻하지 않습니다.'},...(effectiveQuery!==q?{effectiveQuery}:{}),matchMode:equivalent.length?'includes_target_equivalent':rows.length?(partial.length?'all_terms_and_target_unconfirmed':'all_terms'):partial.length?'target_unconfirmed':'no_match',matchCounts:{allTerms:rows.length,targetEquivalent:equivalent.length,targetUnconfirmed:partial.length},total:chosen.length,offset,nextOffset:offset+limit<chosen.length?offset+limit:null,items:chosen.slice(offset,offset+limit)};
+ return {snapshot:version,scope:{sources:coverage.slice(sourceOffset,sourceOffset+sourceLimit),totalSources:coverage.length,totalInstitutions,skippedEntries,sourceOffset,nextSourceOffset:sourceOffset+sourceLimit<coverage.length?sourceOffset+sourceLimit:null,coverage:'수록된 홈페이지의 추출된 표 행과 사업별 안내·개별 페이지 본문만 검색합니다. 미처리 항목은 사업 수가 아닙니다. 전국 전체나 현재 시행 여부를 뜻하지 않습니다.'},...(effectiveQuery!==q?{effectiveQuery}:{}),matchMode:equivalent.length?'includes_target_equivalent':rows.length?(partial.length?'all_terms_and_target_unconfirmed':'all_terms'):partial.length?'target_unconfirmed':'no_match',matchCounts:{allTerms:rows.length,targetEquivalent:equivalent.length,targetUnconfirmed:partial.length},total:chosen.length,offset,nextOffset:offset+limit<chosen.length?offset+limit:null,items:chosen.slice(offset,offset+limit)};
 }
 module.exports={search};
