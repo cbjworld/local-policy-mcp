@@ -5,7 +5,7 @@ import json
 import re
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 
 
 def clean(s):
@@ -13,8 +13,9 @@ def clean(s):
 
 
 class Tables(HTMLParser):
-    def __init__(self):
+    def __init__(self, source):
         super().__init__(convert_charrefs=True)
+        self.source = source
         self.tables, self.table, self.row, self.cell = [], None, None, None
         self.depth = 0
         self.skip = 0
@@ -34,11 +35,16 @@ class Tables(HTMLParser):
         elif self.depth == 1 and tag == 'tr':
             self.row = []
         elif self.depth == 1 and tag in ('th', 'td') and self.row is not None:
-            self.cell = {'kind': tag, 'text': []}
+            self.cell = {'kind': tag, 'scope': attrs.get('scope'), 'text': [], 'links': []}
             if attrs.get('rowspan', '1') != '1' or attrs.get('colspan', '1') != '1':
                 self.table['merged'] = True
         elif self.cell is not None and tag in ('br', 'p', 'div', 'li'):
             self.cell['text'].append(' ')
+        elif self.cell is not None and tag == 'a' and attrs.get('href'):
+            url = urljoin(self.source, attrs['href'])
+            parsed = urlparse(url)
+            if parsed.scheme == 'https' and parsed.hostname and not parsed.username and not parsed.password:
+                self.cell['links'].append(url)
 
     def handle_endtag(self, tag):
         if tag in ('script', 'style', 'noscript'):
@@ -68,7 +74,7 @@ def extract(data, source):
     u = urlparse(source)
     if u.scheme != 'https' or not u.hostname or u.username:
         raise ValueError('HTTPS 원문 주소가 필요합니다')
-    parser = Tables()
+    parser = Tables(source)
     parser.feed(data.decode('utf-8-sig'))
     results, skipped = [], []
     for table_no, table in enumerate(parser.tables, 1):
@@ -82,14 +88,15 @@ def extract(data, source):
             skipped.append({'table': table_no, 'reason': 'merged_or_duplicate_headers'})
             continue
         for row_no, row in enumerate(rows[1:], 2):
-            if len(row) != len(headers) or not all(c['kind'] == 'td' for c in row):
+            if len(row) != len(headers) or not all(c['kind'] == 'td' or (c['kind'] == 'th' and c['scope'] == 'row') for c in row):
                 skipped.append({'table': table_no, 'row': row_no, 'reason': 'irregular_row'})
                 continue
             fields = dict(zip(headers, (c['text'] for c in row)))
             if not fields['사업명'] or not fields['사업내용']:
                 continue
             results.append({'name': fields['사업명'], 'content': fields['사업내용'],
-                            'department': fields.get('담당부서'), 'source': source,
+                            'department': fields.get('담당부서'), 'fields': fields,
+                            'links': list(dict.fromkeys(link for cell in row for link in cell['links'])), 'source': source,
                             'location': {'table': table_no, 'row': row_no},
                             'status': 'source_row_candidate'})
     return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(),

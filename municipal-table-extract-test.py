@@ -27,6 +27,12 @@ class TestMunicipalTable(unittest.TestCase):
         with self.assertRaises(ValueError):
             module.extract(data, 'http://example.go.kr/')
 
+    def test_row_headers_extra_columns_and_application_links(self):
+        data = '<table><tr><th>사업명</th><th>사업내용</th><th>지원내용</th><th>바로가기</th></tr><tr><th scope="row">병원동행</th><td>동행</td><td>5,000원</td><td><a href="/apply">신청</a></td></tr></table>'.encode()
+        result = module.extract(data, 'https://www.gccity.go.kr/program')
+        self.assertEqual(result['items'][0]['fields']['지원내용'], '5,000원')
+        self.assertEqual(result['items'][0]['links'], ['https://www.gccity.go.kr/apply'])
+
 
 if __name__ == '__main__':
     unittest.main()

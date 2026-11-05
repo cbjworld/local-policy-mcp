@@ -7,6 +7,12 @@ const search=require('./municipal-homepage-search.cjs').search;
 (async()=>{try{
  const result=search({q:'청년 39세',institution:'서울 노원구'});assert.equal(result.total,1);assert.equal(result.items[0].source,source);assert.equal(result.items[0].location.row,2);assert.match(result.scope.coverage,/전국 전체/);
  assert.equal(search({q:'청년',institution:'부산'}).total,0);assert.throws(()=>search({q:'청년',limit:21}));
+ const first=JSON.parse(fs.readFileSync(file,'utf8')),secondSource='https://www.gccity.go.kr/notice';
+ const second={source:secondSource,sha256:'b'.repeat(64),items:[{name:'병원동행',content:'의료 동행',fields:{지원내용:'이용료 5,000원'},links:['https://www.gccity.go.kr/apply'],source:secondSource,location:{table:1,row:2}}]};
+ fs.writeFileSync(file,JSON.stringify({sources:[first,second]}));
+ const combined=search({q:'동행 5,000원'});assert.equal(combined.total,1);assert.equal(combined.items[0].institution,'과천시');assert.equal(combined.items[0].links[0],'https://www.gccity.go.kr/apply');assert.equal(combined.scope.sources.length,2);
+ assert.equal(search({q:'동행',institution:'노원구'}).total,0);
+ fs.writeFileSync(file,JSON.stringify({sources:[first,first]}));assert.throws(()=>search({q:'청년'}),/형식/);fs.writeFileSync(file,JSON.stringify(first));
  const handler=require('./mcp').createHandler();
  await handler({jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-11-25',clientInfo:{name:'test',version:'1'},capabilities:{}}});
  await handler({jsonrpc:'2.0',method:'notifications/initialized'});
