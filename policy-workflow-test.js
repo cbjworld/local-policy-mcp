@@ -155,6 +155,14 @@ privateListingTest().catch(e=>{console.error(e);process.exitCode=1;});
 })().catch(e=>{console.error(e);process.exitCode=1});
 
 (async()=>{
+ const docs=[{title:'2026년 사회적 약자 반려동물 의료비 지원사업 추진계획',institution:'대구광역시',url:'plan'}, {title:'2026년 사회적약자 반려동물 의료비 지원사업 추진계획 안내 및 협조 요청',institution:'대구광역시 동구',url:'notice'}, {title:'2026년 사회적약자 반려동물 의료비 지원사업 추진계획 알림 및 홍보 요청',institution:'대구광역시 달성군',url:'promotion'}];
+ const x=await w.research({question:'반려동물 의료비 지원 찾아줘',queries:['반려동물 의료비'],autoOcr:false},{search:async()=>({total:3,hasMore:false,items:docs,reviewItems:[],relatedDocuments:[]}),research:async()=>({status:'unreadable'})});
+ assert.deepEqual(x.candidates.map(d=>d.url),['plan']);assert.deepEqual(x.relatedDocuments.map(d=>d.url).sort(),['notice','promotion']);
+ assert.equal(require('./relevance').classify(docs[1].title,'반려동물 의료비 협조 요청').kind,'project_candidate');
+ console.log('PASS: actual plan distribution titles remain source records rather than independent program candidates');
+})().catch(e=>{console.error(e);process.exitCode=1});
+
+(async()=>{
  const docs=[{title:'2026년 고령자 운전면허 자진반납 지원계획',institution:'나시',url:'alternate',disclosure:'공개'},{title:'2026년 어르신 운전면허 자진반납 지원계획',institution:'가시',url:'original',disclosure:'공개'}],read=[];
  const result=await w.research({question:'어르신 운전면허 반납 지원 찾아줘'},{search:async()=>({total:2,hasMore:false,items:docs,reviewItems:[],relatedDocuments:[]}),research:async a=>{read.push(a.url);return {status:'read',evidence:{fields:Object.fromEntries(['target','activity','budget','period'].map(k=>[k,{excerpts:[{status:'evidence_candidate',quote:k}]}]))}};}});
  assert.equal(read[0],'original');assert(read.includes('alternate'));assert(result.candidates.some(x=>x.url==='alternate'));
