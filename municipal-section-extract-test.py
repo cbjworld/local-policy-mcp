@@ -22,6 +22,13 @@ class SectionTest(unittest.TestCase):
         self.assertEqual(x['items'][1]['location'], {'section': 2})
         self.assertEqual(x['skipped'], [{'section': 3, 'reason': 'missing_policy_labels'}])
 
+    def test_condition_label_is_preserved_without_renaming_it(self):
+        html = '<div class="spotWrap"><h4>취업 지원</h4><div class="div"><p>지원대상: 청년</p><p>지원조건: 실비 최대 100만원</p></div></div>'.encode()
+        x = m.extract(html, 'https://www.uiwang.go.kr/test')
+        self.assertEqual(len(x['items']), 1)
+        self.assertIn('지원조건: 실비 최대 100만원', x['items'][0]['content'])
+        self.assertNotIn('지원내용:', x['items'][0]['content'])
+
 
 if __name__ == '__main__':
     unittest.main()
