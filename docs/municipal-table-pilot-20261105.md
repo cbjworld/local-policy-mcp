@@ -106,6 +106,8 @@ Codex에서 별도 로컬 MCP로 사용하려면 MCP 서버의 실행 명령을 
 
 [제물포구 교육경비 보조](https://www.jemulpo.go.kr/main/area/education/support_expenses.jsp), [옹진군 여객운임](https://www.ongjin.go.kr/open_content/main/environment/ship/ship_support.jsp), [동두천시 자활근로](https://www.ddc.go.kr/ddc/contents.do?key=429)의 원문 본문과 지역 검색 결과를 확인했다. 순천시 청소년 안내는 한 페이지에 여러 사업이 있어 단일 사업으로 추가하지 않고 분리 검토한다.
 
+[순창군 청년 후계농 영농 정착](https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac945cddc4994) 안내를 원문과 대조하고, 기존 자료를 보존한 통합 파일을 로컬 MCP에서 읽도록 교체했다. 해당 사업과 기존 양주시 주거급여 검색을 설정된 서버 프로세스로 확인했다.
+
 이후 [순천시 청소년 안내](https://www.suncheon.go.kr/kr/welfare/0007/0006/)의 제목별 경계를 확인해 청소년 특별지원과 보건위생물품 지원을 분리했다. 두 사업의 원문 본문과 검색 결과를 각각 대조했으며, 청소년증 발급은 사업 후보에서 제외했다.
 
 [장흥군 일자리 지원 안내](https://www.jangheung.go.kr/www/civil_complaint/job_info/job_support)의 세로 표 5개를 제목별로 분리했다. 표 뒤의 홈페이지 만족도 문구가 마지막 사업에 섞이지 않도록 경계를 보완하고, 각 제목·표 내용 및 지역 검색을 대조했다.
