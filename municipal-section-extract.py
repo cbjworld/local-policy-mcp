@@ -157,23 +157,27 @@ class Accordion(HTMLParser):
 
 
 class HeadingSections(HTMLParser):
-    def __init__(self, source):
+    def __init__(self, source, table_mode=False):
         super().__init__(convert_charrefs=True)
         self.source, self.depth, self.container, self.heading_depth = source, 0, None, None
         self.heading, self.text, self.links, self.items, self.skipped = None, [], [], [], []
         self.serial, self.skip = 0, 0
+        self.table_mode, self.has_table, self.containers = table_mode, False, 0
+        self.table_depth, self.table_done = None, False
 
     def finish(self):
         if self.heading is None:
             return
         name, content = clean(''.join(self.heading)), clean(''.join(self.text))
-        if name and re.search(r'대상', content) and re.search(r'(?:지원|사업|주요)내용|지원조건', content):
+        content_label = r'(?:지원|사업|주요)내용|지원조건|(?:^|\s)내용(?:\s|:)' if self.table_mode else r'(?:지원|사업|주요)내용|지원조건'
+        if name and (not self.table_mode or self.has_table) and re.search(r'대상', content) and re.search(content_label, content):
             self.items.append({'name': name, 'content': content, 'contentColumn': '사업별 안내', 'department': None,
                                'fields': {}, 'links': list(dict.fromkeys(self.links)), 'source': self.source,
                                'location': {'section': self.serial}, 'status': 'source_section_candidate'})
         else:
             self.skipped.append({'section': self.serial, 'reason': 'missing_policy_labels'})
-        self.heading, self.text, self.links = None, [], []
+        self.heading, self.text, self.links, self.has_table = None, [], [], False
+        self.table_depth, self.table_done = None, False
 
     def handle_starttag(self, tag, attrs):
         if tag in ('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'):
@@ -186,13 +190,18 @@ class HeadingSections(HTMLParser):
         if self.skip:
             return
         attrs = dict(attrs)
-        if tag == 'div' and self.container is None and 'contentStyle' in (attrs.get('class') or '').split():
+        is_container = attrs.get('id') == 'content' if self.table_mode else 'contentStyle' in (attrs.get('class') or '').split()
+        if tag == 'div' and self.container is None and is_container:
             self.container = self.depth
-        elif self.container is not None and self.depth == self.container + 1 and tag == 'h4':
+            self.containers += 1
+        elif self.container is not None and self.depth == self.container + 1 and tag == ('h3' if self.table_mode else 'h4'):
             self.finish()
             self.serial += 1
             self.heading, self.heading_depth = [], self.depth
-        elif self.heading is not None and self.heading_depth is None:
+        elif self.heading is not None and self.heading_depth is None and not self.table_done:
+            if tag == 'table' and self.table_depth is None:
+                self.has_table = True
+                self.table_depth = self.depth
             if tag in ('div', 'li', 'p', 'h5', 'tr', 'td', 'th'):
                 self.text.append(' ')
             if tag == 'a' and attrs.get('href'):
@@ -207,7 +216,10 @@ class HeadingSections(HTMLParser):
         if tag in ('script', 'style', 'noscript'):
             self.skip = max(0, self.skip - 1)
         elif not self.skip:
-            if tag == 'h4' and self.depth == self.heading_depth:
+            if self.table_mode and tag == 'table' and self.depth == self.table_depth:
+                self.table_done = True
+                self.table_depth = None
+            elif tag == ('h3' if self.table_mode else 'h4') and self.depth == self.heading_depth:
                 self.heading_depth = None
             elif tag == 'div' and self.depth == self.container:
                 self.finish()
@@ -222,7 +234,7 @@ class HeadingSections(HTMLParser):
     def handle_data(self, data):
         if not self.skip and self.heading_depth is not None:
             self.heading.append(data)
-        elif not self.skip and self.heading is not None:
+        elif not self.skip and self.heading is not None and not self.table_done:
             self.text.append(data)
 
 
@@ -239,6 +251,12 @@ def extract(data, source):
     if not parser.items and not parser.skipped:
         parser = HeadingSections(source)
         parser.feed(html)
+    if not parser.items and not parser.skipped:
+        parser = HeadingSections(source, table_mode=True)
+        parser.feed(html)
+        if parser.containers != 1:
+            parser.items = []
+            parser.skipped = [{'reason': 'ambiguous_content_container'}]
     return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'extractedAt': datetime.now(timezone.utc).isoformat(),
             'items': parser.items, 'skipped': parser.skipped}
 

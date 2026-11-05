@@ -62,6 +62,18 @@ class SectionTest(unittest.TestCase):
         self.assertEqual(x['items'][1]['location'], {'section': 2})
         self.assertEqual(x['skipped'], [{'section': 3, 'reason': 'missing_policy_labels'}])
 
+    def test_headings_with_vertical_tables_need_unique_container(self):
+        html = '''<div id="content"><h3>청년 일자리</h3><table><tr><th>대상</th><td>청년</td></tr>
+        <tr><th>내용</th><td>인건비 지원</td></tr></table><h3>다른 사업</h3>
+        <table><tr><th>대상</th><td>중장년</td></tr><tr><th>내용</th><td>교육</td></tr></table><div>만족도 조사</div></div>'''
+        x = m.extract(html.encode(), 'https://www.jangheung.go.kr/test')
+        self.assertEqual([i['name'] for i in x['items']], ['청년 일자리', '다른 사업'])
+        self.assertNotIn('중장년', x['items'][0]['content'])
+        self.assertEqual(x['items'][1]['location'], {'section': 2})
+        self.assertNotIn('만족도 조사', x['items'][1]['content'])
+        ambiguous = m.extract((html + html).encode(), 'https://www.jangheung.go.kr/test')
+        self.assertEqual(ambiguous['items'], [])
+
 
 if __name__ == '__main__':
     unittest.main()
