@@ -10,6 +10,8 @@
 
 서버 시작 전 `POLICY_MUNICIPAL_CATALOG`에 추출 JSON의 절대경로를 지정하면 `search_municipal_homepage` 도구가 나타난다. 지정하지 않은 서버는 기존 도구 구성을 유지한다. 검색은 지정된 통합 파일 안에서 이루어지며, 자료는 서버에 함께 배포되지 않는다. UTF-8 JSON 파일에 포함된 원문 주소는 기관 주소록과 대조한다. 사업명과 내용의 모든 검색어가 들어간 행을 반환하며 문서 URL, 원본 해시, 표·행 위치와 자료 범위를 제공한다.
 
+Codex에서 별도 로컬 MCP로 사용하려면 MCP 서버의 실행 명령을 `node --use-system-ca`와 이 저장소의 `mcp.js` 경로로 지정하고, 서버 환경변수 `POLICY_MUNICIPAL_CATALOG`에 통합 자료의 절대경로를 넣는다. 설정을 바꾼 뒤에는 새 세션에서 도구 목록을 확인한다. 통합 파일 경로와 자료는 사용하는 PC에 있어야 한다.
+
 출처 범위는 기본 20개씩 반환하며 `scope.totalSources`가 전체 출처 수다. `scope.nextSourceOffset`이 있으면 다음 호출의 `sourceOffset`에 넣어 나머지 출처를 볼 수 있다. `sourceLimit`은 최대 100이다. 사업 결과의 `offset`과는 별개이며 각 사업에도 원문 링크가 있다.
 
 본문은 기본 2,000자씩 반환한다. 긴 항목은 같은 검색어와 결과 위치를 유지하고 `limit`을 1로 지정한 뒤, 항목의 `nextContentOffset`을 다음 호출의 `contentOffset`에 넣으면 이어 읽을 수 있다. 영등포구 주차장 개방 안내 4,769자를 세 부분으로 재구성해 원문 추출본과 대조했다.
