@@ -17,7 +17,8 @@ def load_module(name, filename):
 
 merger = load_module('catalog_merger', 'municipal-catalog-merge.py')
 extractors = {'table': load_module('tables', 'municipal-table-extract.py'),
-              'section': load_module('sections', 'municipal-section-extract.py')}
+              'section': load_module('sections', 'municipal-section-extract.py'),
+              'detail': load_module('detail', 'municipal-detail-extract.py')}
 
 
 def run(manifest, base, hosts, max_bytes=15 * 1024 * 1024):
@@ -25,7 +26,8 @@ def run(manifest, base, hosts, max_bytes=15 * 1024 * 1024):
         raise ValueError('수집 목록은 1~500개여야 합니다.')
     sources = set()
     for item in manifest:
-        if not isinstance(item, dict) or set(item) != {'source', 'file', 'parser'} or not all(isinstance(item[k], str) for k in item):
+        if (not isinstance(item, dict) or set(item) != ({'source', 'file', 'parser', 'title'} if item.get('parser') == 'detail' else {'source', 'file', 'parser'})
+                or not all(isinstance(item[k], str) for k in item) or (item.get('parser') == 'detail' and (not item['title'].strip() or len(item['title']) > 200))):
             raise ValueError('수집 목록 형식을 확인하세요.')
         if item['source'] in sources or item['parser'] not in extractors:
             raise ValueError('원문 주소 중복 또는 지원하지 않는 형식입니다.')
@@ -39,7 +41,8 @@ def run(manifest, base, hosts, max_bytes=15 * 1024 * 1024):
             file = Path(item['file'])
             if file.stat().st_size > max_bytes:
                 raise ValueError('원문 크기 제한 초과')
-            snapshot = extractors[item['parser']].extract(file.read_bytes(), item['source'])
+            extractor = extractors[item['parser']]
+            snapshot = extractor.extract(file.read_bytes(), item['source'], item['title']) if item['parser'] == 'detail' else extractor.extract(file.read_bytes(), item['source'])
             candidates.append((file.name, snapshot))
         except (OSError, ValueError, UnicodeError) as error:
             errors.append({'source': item['source'], 'status': 'failed', 'reason': type(error).__name__})

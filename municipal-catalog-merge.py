@@ -30,13 +30,15 @@ def validate(snapshot, registered):
         loc = item.get('location', {}) if isinstance(item, dict) else {}
         table, row = loc.get('table'), loc.get('row')
         section = loc.get('section')
-        table_loc = type(table) is int and type(row) is int and table >= 1 and row >= 1 and section is None
-        section_loc = type(section) is int and section >= 1 and table is None and row is None
-        key = ('table', table, row) if table_loc else ('section', section)
+        element = loc.get('elementId')
+        table_loc = type(table) is int and type(row) is int and table >= 1 and row >= 1 and section is None and element is None
+        section_loc = type(section) is int and section >= 1 and table is None and row is None and element is None
+        element_loc = element == 'contents' and section is None and table is None and row is None
+        key = ('table', table, row) if table_loc else ('section', section) if section_loc else ('element', element)
         if (not isinstance(item, dict) or item.get('source') != snapshot['source']
                 or not isinstance(item.get('name'), str) or not item['name'].strip()
                 or not isinstance(item.get('content'), str) or not item['content'].strip()
-                or not (table_loc or section_loc) or key in locations):
+                or not (table_loc or section_loc or element_loc) or key in locations):
             raise ValueError('사업 행 또는 원문 위치 오류')
         locations.add(key)
 

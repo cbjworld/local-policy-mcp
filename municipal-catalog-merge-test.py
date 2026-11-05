@@ -55,6 +55,12 @@ class CatalogMergeTest(unittest.TestCase):
         _, report = m.merge(result, [('mixed', mixed)], {'www.nowon.kr'})
         self.assertEqual(report[0]['status'], 'invalid')
 
+    def test_explicit_detail_element(self):
+        source = snapshot(1)
+        source['items'][0]['location'] = {'elementId': 'contents'}
+        _, report = m.merge({'sources': []}, [('detail', source)], {'www.nowon.kr'})
+        self.assertEqual(report[0]['status'], 'added')
+
 
 if __name__ == '__main__':
     unittest.main()

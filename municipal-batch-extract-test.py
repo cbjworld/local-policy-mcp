@@ -24,6 +24,11 @@ class BatchTest(unittest.TestCase):
             self.assertEqual(result['sources'][1]['items'][0]['name'], '새 사업')
             self.assertEqual(report['errors'][0]['source'], old_url)
             self.assertEqual(report['results'][0]['status'], 'added')
+            f.write_text('<title>청년 지원</title><div id="contents">지원대상 청년 지원내용 십만원과 다양한 취업 활동을 지원하는 사업입니다. 신청 안내 포함</div>', encoding='utf-8')
+            detail = [{'source': 'https://www.gccity.go.kr/detail', 'file': str(f), 'parser': 'detail', 'title': '청년 지원'}]
+            detailed, detail_report = m.run(detail, result, {'www.nowon.kr', 'www.gccity.go.kr'})
+            self.assertEqual(detail_report['results'][0]['status'], 'added')
+            self.assertEqual(detailed['sources'][-1]['items'][0]['location'], {'elementId': 'contents'})
         finally:
             f.unlink(missing_ok=True)
             Path(directory).rmdir()

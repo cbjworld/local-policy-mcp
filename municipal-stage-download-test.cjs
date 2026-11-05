@@ -11,5 +11,6 @@ const {run,robotsRule}=require('./municipal-stage-download.cjs');
  const fail=await run([{source:'https://www.nowon.kr/public',parser:'table'}],{fetcher:async()=>{throw Error('offline')},save:async()=>{throw Error('unexpected')},sleep:async()=>{},limit:1});
  assert.equal(fail.results[0].reason,'robots_unavailable');assert.equal(fail.manifest.length,0);
  const next=await run(input,{fetcher,rule:()=>({allowed:true,delay:0}),save:async()=> 'staged.html',sleep:async()=>{},limit:1,offset:3});assert.equal(next.results[0].source,input[3].source);assert.equal(next.nextOffset,null);
+ const detail=await run([{source:'https://www.nowon.kr/public',parser:'detail',title:'청년 지원'}],{fetcher,rule:()=>({allowed:true,delay:0}),save:async()=> 'staged.html',sleep:async()=>{},limit:1});assert.equal(detail.manifest[0].title,'청년 지원');
  console.log('PASS: registered hosts, robots restrictions, pacing, safe redirects and failure preservation');
 })().catch(e=>{console.error(e);process.exitCode=1});

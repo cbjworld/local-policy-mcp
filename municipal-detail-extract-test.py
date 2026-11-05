@@ -1,0 +1,27 @@
+import importlib.util
+import unittest
+from pathlib import Path
+
+spec = importlib.util.spec_from_file_location('detail', Path(__file__).with_name('municipal-detail-extract.py'))
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+
+
+class DetailTest(unittest.TestCase):
+    def test_bounded_content_with_unclosed_list_item(self):
+        html = '''<html><head><title>청년 지원사업 : 구청</title></head><body>
+        <div id="contents"><h3>지원대상</h3><ul><li>관내 청년</li></ul><h3>지원내용</h3>
+        <ul><li>최대 십만원 지원 및 관내 청년의 경제적 부담을 줄이기 위한 지원 사업입니다. <li>기타 조건 확인</li></ul></div><div>본문 밖 내용</div></body></html>'''.encode()
+        x = m.extract(html, 'https://www.nowon.kr/test', '청년 지원사업')
+        self.assertEqual(len(x['items']), 1)
+        self.assertNotIn('본문 밖 내용', x['items'][0]['content'])
+        self.assertEqual(x['items'][0]['location'], {'elementId': 'contents'})
+        self.assertEqual(m.extract(html, 'https://www.nowon.kr/test', '다른 사업')['items'], [])
+
+    def test_duplicate_content_id_is_rejected(self):
+        html = '<title>지원사업</title><div id="contents">지원대상 청년 지원내용 십만원 지원 추가 안내 추가 안내 추가 안내 추가 안내</div><div id="contents">다른 내용</div>'.encode()
+        self.assertEqual(m.extract(html, 'https://www.nowon.kr/test', '지원사업')['items'], [])
+
+
+if __name__ == '__main__':
+    unittest.main()

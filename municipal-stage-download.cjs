@@ -14,7 +14,7 @@ async function run(items,{fetcher=download,rule=robotsRule,save,sleep=ms=>new Pr
  const selected=items.slice(offset,offset+limit),results=[],manifest=[],cache=new Map();let first=true;
  for(const item of selected){
   try{
-   if(!item||typeof item.source!=='string'||!['table','section'].includes(item.parser))throw Error('invalid_entry');
+   if(!item||typeof item.source!=='string'||!['table','section','detail'].includes(item.parser)||(item.parser==='detail'&&(typeof item.title!=='string'||!item.title.trim()||item.title.length>200)))throw Error('invalid_entry');
    const url=validateUrl(item.source);if(!hosts.has(url.hostname))throw Error('unregistered_host');
    if(!cache.has(url.origin)){
     if(!first)await sleep(3000);first=false;
@@ -26,7 +26,7 @@ async function run(items,{fetcher=download,rule=robotsRule,save,sleep=ms=>new Pr
    await sleep(delay);first=false;
    const response=await fetcher(url.href,0,Date.now()+25000,undefined,undefined,true);
    if(new URL(response.url).hostname!==url.hostname||!/text\/html/i.test(response.type)||response.bytes.length<500)throw Error('unexpected_page');
-   const file=await save(response.bytes,url.href);manifest.push({source:response.url,file,parser:item.parser});results.push({source:url.href,status:'downloaded',bytes:response.bytes.length});
+   const file=await save(response.bytes,url.href);manifest.push({source:response.url,file,parser:item.parser,...(item.parser==='detail'?{title:item.title}:{})});results.push({source:url.href,status:'downloaded',bytes:response.bytes.length});
   }catch(e){results.push({source:typeof item?.source==='string'?item.source:null,status:'failed',reason:String(e.code||e.message||'unknown').slice(0,100)});}
  }
  const nextOffset=offset+selected.length<items.length?offset+selected.length:null;
