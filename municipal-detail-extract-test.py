@@ -22,6 +22,15 @@ class DetailTest(unittest.TestCase):
         html = '<title>지원사업</title><div id="contents">지원대상 청년 지원내용 십만원 지원 추가 안내 추가 안내 추가 안내 추가 안내</div><div id="contents">다른 내용</div>'.encode()
         self.assertEqual(m.extract(html, 'https://www.nowon.kr/test', '지원사업')['items'], [])
 
+    def test_other_content_ids_and_nested_specific_body(self):
+        for element in ('content', 'conts'):
+            html = f'<title>지원사업</title><div id="{element}">지원대상 청년 지원내용 십만원 지원 추가 안내 추가 안내 추가 안내 추가 안내</div>'.encode()
+            self.assertEqual(m.extract(html, 'https://www.nowon.kr/test', '지원사업')['items'][0]['location'], {'elementId': element})
+        nested = '<title>지원사업</title><div id="content">메뉴<div id="conts">지원대상 청년 지원내용 십만원 지원 추가 안내 추가 안내 추가 안내 추가 안내</div>바깥</div>'.encode()
+        result = m.extract(nested, 'https://www.nowon.kr/test', '지원사업')['items'][0]
+        self.assertEqual(result['location'], {'elementId': 'conts'})
+        self.assertNotIn('바깥', result['content'])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -33,7 +33,7 @@ def validate(snapshot, registered):
         element = loc.get('elementId')
         table_loc = type(table) is int and type(row) is int and table >= 1 and row >= 1 and section is None and element is None
         section_loc = type(section) is int and section >= 1 and table is None and row is None and element is None
-        element_loc = element == 'contents' and section is None and table is None and row is None
+        element_loc = element in ('contents', 'conts', 'content') and section is None and table is None and row is None
         key = ('table', table, row) if table_loc else ('section', section) if section_loc else ('element', element)
         if (not isinstance(item, dict) or item.get('source') != snapshot['source']
                 or not isinstance(item.get('name'), str) or not item['name'].strip()

@@ -12,9 +12,9 @@ VOID = frozenset(('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'l
 
 
 class Page(HTMLParser):
-    def __init__(self, source):
+    def __init__(self, source, element_id='contents'):
         super().__init__(convert_charrefs=True)
-        self.source, self.content_depth = source, 0
+        self.source, self.content_depth, self.element_id = source, 0, element_id
         self.title_active, self.skip, self.blocks = False, 0, 0
         self.title, self.parts, self.links = [], [], []
 
@@ -30,7 +30,7 @@ class Page(HTMLParser):
             return
         if tag == 'title':
             self.title_active = True
-        if tag == 'div' and attrs.get('id') == 'contents':
+        if tag == 'div' and attrs.get('id') == self.element_id:
             self.blocks += 1
             if self.blocks == 1:
                 self.content_depth = 1
@@ -78,8 +78,17 @@ def extract(data, source, expected_title):
     u = urlparse(source)
     if u.scheme != 'https' or not u.hostname or u.username or not expected_title or len(expected_title) > 200:
         raise ValueError('원문 주소 또는 사업 제목 오류')
-    page = Page(source)
-    page.feed(data.decode('utf-8-sig'))
+    html = data.decode('utf-8-sig')
+    page = None
+    for element_id in ('contents', 'conts', 'content'):
+        candidate = Page(source, element_id)
+        candidate.feed(html)
+        if candidate.blocks:
+            page = candidate
+            break
+    if page is None:
+        return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'items': [],
+                'skipped': [{'reason': 'detail_page_unverified'}]}
     title, content = clean(''.join(page.title)), clean(''.join(page.parts))
     normalize = lambda x: re.sub(r'\s+', '', x)
     if (page.blocks != 1 or normalize(expected_title) not in normalize(title)
@@ -87,11 +96,11 @@ def extract(data, source, expected_title):
             or not re.search(r'(?:지원|신청)대상|대상', content)
             or not re.search(r'(?:지원|사업)내용', content)):
         return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'items': [],
-                'skipped': [{'elementId': 'contents', 'reason': 'detail_page_unverified'}]}
+                'skipped': [{'elementId': page.element_id, 'reason': 'detail_page_unverified'}]}
     return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'extractedAt': datetime.now(timezone.utc).isoformat(),
             'items': [{'name': expected_title, 'content': content, 'contentColumn': '사업 안내 본문', 'department': None,
                        'fields': {}, 'links': list(dict.fromkeys(page.links)), 'source': source,
-                       'location': {'elementId': 'contents'}, 'status': 'source_detail_candidate'}], 'skipped': []}
+                       'location': {'elementId': page.element_id}, 'status': 'source_detail_candidate'}], 'skipped': []}
 
 
 if __name__ == '__main__':
