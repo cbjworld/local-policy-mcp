@@ -54,6 +54,13 @@ class TestMunicipalTable(unittest.TestCase):
         self.assertEqual(result['items'][1]['fields']['사업위치'], 'north')
         self.assertEqual(result['items'][1]['contentColumn'], '사업내용')
 
+    def test_slash_separated_name_and_content_headers(self):
+        data = '<table><tr><th>사업명 / 서비스명</th><th>사업내용 / 지원내용</th></tr><tr><th>청년 사업</th><td>주거 지원</td></tr></table>'.encode()
+        result = module.extract(data, 'https://www.sasang.go.kr/test')
+        self.assertEqual(result['items'][0]['name'], '청년 사업')
+        self.assertEqual(result['items'][0]['nameColumn'], '사업명/서비스명')
+        self.assertEqual(result['items'][0]['content'], '주거 지원')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -84,9 +84,14 @@ def extract(data, source):
         if not rows:
             continue
         headers = [re.sub(r'\s+', '', x['text']) for x in rows[0]]
-        if '사업명' not in headers:
+        name_headers = [h for h in headers if h in ('사업명', '사업명/서비스명')]
+        if not name_headers:
             continue
-        content_headers = [h for h in headers if h == '사업내용' or h.startswith('사업내용(')]
+        if len(name_headers) != 1:
+            skipped.append({'table': table_no, 'reason': 'unrecognized_name_header'})
+            continue
+        name_header = name_headers[0]
+        content_headers = [h for h in headers if h in ('사업내용', '사업내용/지원내용') or h.startswith('사업내용(')]
         if not content_headers and '지원내용' in headers:
             content_headers = ['지원내용']
         if len(content_headers) != 1:
@@ -101,12 +106,13 @@ def extract(data, source):
         for row_no, row in enumerate(rows[1:], 2):
             if len(row) > 1 and all(c['kind'] == 'th' for c in row) and not remaining:
                 replacement = [re.sub(r'\s+', '', c['text']) for c in row]
-                candidates = [h for h in replacement if h == '사업내용' or h.startswith('사업내용(')]
+                name_candidates = [h for h in replacement if h in ('사업명', '사업명/서비스명')]
+                candidates = [h for h in replacement if h in ('사업내용', '사업내용/지원내용') or h.startswith('사업내용(')]
                 if not candidates and '지원내용' in replacement:
                     candidates = ['지원내용']
-                if ('사업명' in replacement and len(candidates) == 1 and len(set(replacement)) == len(replacement)
+                if (len(name_candidates) == 1 and len(candidates) == 1 and len(set(replacement)) == len(replacement)
                         and all(c['rowspan'] == 1 and c['colspan'] > 0 for c in row)):
-                    headers, widths, content_header = replacement, [c['colspan'] for c in row], candidates[0]
+                    headers, widths, name_header, content_header = replacement, [c['colspan'] for c in row], name_candidates[0], candidates[0]
                 else:
                     headers, widths, content_header = [], [], None
                     skipped.append({'table': table_no, 'row': row_no, 'reason': 'unrecognized_repeated_header'})
@@ -118,13 +124,13 @@ def extract(data, source):
                 remaining = max(remaining - 1, max((c['rowspan'] - 1 for c in row), default=0))
                 skipped.append({'table': table_no, 'row': row_no, 'reason': 'rowspan'})
                 continue
-            if len(row) != len(headers) or [c['colspan'] for c in row] != widths or not all(c['kind'] == 'td' or (c['kind'] == 'th' and (c['scope'] == 'row' or (c['scope'] is None and headers[index] == '사업명'))) for index, c in enumerate(row)):
+            if len(row) != len(headers) or [c['colspan'] for c in row] != widths or not all(c['kind'] == 'td' or (c['kind'] == 'th' and (c['scope'] == 'row' or (c['scope'] is None and headers[index] == name_header))) for index, c in enumerate(row)):
                 skipped.append({'table': table_no, 'row': row_no, 'reason': 'irregular_row'})
                 continue
             fields = dict(zip(headers, (c['text'] for c in row)))
-            if not fields['사업명'] or not fields[content_header]:
+            if not fields[name_header] or not fields[content_header]:
                 continue
-            results.append({'name': fields['사업명'], 'content': fields[content_header], 'contentColumn': content_header,
+            results.append({'name': fields[name_header], 'nameColumn': name_header, 'content': fields[content_header], 'contentColumn': content_header,
                             'department': fields.get('담당부서'), 'fields': fields,
                             'links': list(dict.fromkeys(link for cell in row for link in cell['links'])), 'source': source,
                             'location': {'table': table_no, 'row': row_no},
