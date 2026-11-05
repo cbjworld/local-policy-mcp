@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {link}=require('./municipal-budget-link.cjs');
+const {link,linkAuto}=require('./municipal-budget-link.cjs');
 const website={name:'청년월세 지원사업',institution:'칠곡군',parent:'경상북도',source:'https://www.chilgok.go.kr/web',location:{section:1}};
 const rows=[{name:'청년월세지원사업',institution:'칠곡군',parent:'경상북도',year:2026,unit:'천원',budget:123,source:'https://www.chilgok.go.kr/budget',page:1},{name:'청년신혼부부 월세지원사업',institution:'칠곡군',parent:'경상북도'},{name:'청년월세지원사업',institution:'다른군',parent:'경상북도'}];
 const deps={homepage:{search:()=>({items:[website],total:1,nextOffset:null})},budget:{search:()=>({items:rows,totalCandidateRows:3,nextOffset:null,scope:{}})}};
@@ -10,4 +10,7 @@ const page=(items,offset)=>({items:items.slice(offset,offset+20),nextOffset:offs
 const paged={homepage:{search:({offset})=>({...page(webRows,offset),total:webRows.length})},budget:{search:({offset})=>({...page(budgetRows,offset),totalCandidateRows:budgetRows.length,scope:{}})}};
 const found=[];for(const websiteOffset of [0,20])for(const budgetOffset of [0,20])found.push(...link({q:'월세',institution:'칠곡군',websiteOffset,budgetOffset},paged).pairs);assert.equal(found.length,21);assert.equal(new Set(found.map(x=>x.homepage.name)).size,21);
 const repeat={homepage:{search:()=>({items:[website],total:1,nextOffset:null})},budget:{search:()=>({items:Array.from({length:25},()=>rows[0]),totalCandidateRows:25,nextOffset:null,scope:{}})}};const p1=link({q:'월세',institution:'칠곡군'},repeat),p2=link({q:'월세',institution:'칠곡군',pairOffset:p1.nextPairOffset},repeat);assert.equal(p1.pairs.length,20);assert.equal(p1.nextPairOffset,20);assert.equal(p2.pairs.length,5);assert.equal(p2.nextPairOffset,null);assert.throws(()=>link({q:'월세',institution:'칠곡군',pairOffset:-1},repeat));
+let cursor=null,autoFound=[],turns=0;do{const part=linkAuto({q:'월세',institution:'칠곡군',cursor,maxComparisons:1},paged,()=> 'fixed');autoFound.push(...part.pairs);cursor=part.cursor&&JSON.parse(JSON.stringify(part.cursor));turns++;assert(turns<10);}while(cursor);assert.equal(autoFound.length,21);assert.equal(new Set(autoFound.map(x=>x.homepage.name)).size,21);assert.equal(turns,4);
+const auto1=linkAuto({q:'월세',institution:'칠곡군',maxComparisons:1},repeat,()=> 'fixed');const auto2=linkAuto({q:'월세',institution:'칠곡군',cursor:auto1.cursor},repeat,()=> 'fixed');assert.equal(auto1.pairs.length,20);assert.equal(auto2.pairs.length,5);assert.equal(auto2.complete,true);assert.throws(()=>linkAuto({q:'월세',institution:'칠곡군',cursor:auto1.cursor},repeat,()=> 'changed'));assert.throws(()=>linkAuto({q:'다른 질문',institution:'칠곡군',cursor:auto1.cursor},repeat,()=> 'fixed'));
+let snapshots=0;assert.throws(()=>linkAuto({q:'월세',institution:'칠곡군'},repeat,()=>++snapshots===1?'before':'after'),/자료가 변경/);
 console.log('PASS: same-region same-name candidates retain separate evidence, amount and year');
