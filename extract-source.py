@@ -85,7 +85,7 @@ def main():
             if link['url'] not in seen:
                 seen.add(link['url']);links.append(link)
         links.sort(key=lambda x:not bool(re.search(r'pdf|hwp|다운로드|첨부|download',x['url']+' '+x['title'],re.I)))
-        result={'format':'html','pages':[{'page':None,'text':excerpt[:20000],'truncated':excerpt!=text}],'links':links[:60],'warning':'HTML 본문에 메뉴가 포함될 수 있습니다. 검색어 주변 발췌는 전체 문서가 아닙니다.'}
+        result={'format':'html','pages':[{'page':None,'text':excerpt[:20000],'truncated':excerpt!=text}],'links':links[:1000 if opts.get('discovery') is True else 60],'warning':'HTML 본문에 메뉴가 포함될 수 있습니다. 검색어 주변 발췌는 전체 문서가 아닙니다.'}
     sys.stdout.write(json.dumps(result,ensure_ascii=True))
 
 try: main()
