@@ -86,12 +86,86 @@ class Sections(HTMLParser):
             self.text.append(data)
 
 
+class Accordion(HTMLParser):
+    def __init__(self, source):
+        super().__init__(convert_charrefs=True)
+        self.source, self.depth, self.board, self.item = source, 0, None, None
+        self.title_depth, self.body_depth, self.skip = None, None, 0
+        self.title, self.body, self.links, self.items, self.skipped, self.serial = [], [], [], [], [], 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'):
+            if tag == 'br' and self.body_depth is not None:
+                self.body.append(' ')
+            return
+        self.depth += 1
+        if tag in ('script', 'style', 'noscript'):
+            self.skip += 1
+        if self.skip:
+            return
+        classes = (dict(attrs).get('class') or '').split()
+        if tag == 'div' and self.board is None and 'temp_board' in classes:
+            self.board = self.depth
+        elif self.board is not None and self.item is None and tag == 'li' and self.depth == self.board + 2:
+            self.item, self.title, self.body, self.links = self.depth, [], [], []
+            self.serial += 1
+        elif self.item is not None and tag == 'div' and 'tit_text' in classes and self.title_depth is None:
+            self.title_depth = self.depth
+        elif self.item is not None and tag == 'div' and 'cont_text' in classes and self.body_depth is None:
+            self.body_depth = self.depth
+        elif self.body_depth is not None and tag in ('li', 'p', 'div'):
+            self.body.append(' ')
+        if self.body_depth is not None and tag == 'a' and dict(attrs).get('href'):
+            url = urljoin(self.source, dict(attrs)['href'])
+            parsed = urlparse(url)
+            if parsed.scheme == 'https' and parsed.hostname and not parsed.username and not parsed.password:
+                self.links.append(url)
+
+    def handle_endtag(self, tag):
+        if tag in ('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'):
+            return
+        if tag in ('script', 'style', 'noscript'):
+            self.skip = max(0, self.skip - 1)
+        elif not self.skip:
+            if tag == 'div' and self.depth == self.title_depth:
+                self.title_depth = None
+            elif tag == 'div' and self.depth == self.body_depth:
+                self.body_depth = None
+            elif tag == 'li' and self.depth == self.item:
+                name, content = clean(''.join(self.title)), clean(''.join(self.body))
+                if name and re.search(r'(?:지원|사업)대상', content) and re.search(r'(?:지원|사업)내용|지원조건', content):
+                    self.items.append({'name': name, 'content': content, 'contentColumn': '사업별 안내', 'department': None,
+                                       'fields': {}, 'links': list(dict.fromkeys(self.links)), 'source': self.source,
+                                       'location': {'section': self.serial}, 'status': 'source_section_candidate'})
+                else:
+                    self.skipped.append({'section': self.serial, 'reason': 'missing_policy_labels'})
+                self.item = None
+            elif tag == 'div' and self.depth == self.board:
+                self.board = None
+        self.depth -= 1
+
+    def handle_startendtag(self, tag, attrs):
+        self.handle_starttag(tag, attrs)
+        if tag not in ('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'):
+            self.handle_endtag(tag)
+
+    def handle_data(self, data):
+        if not self.skip and self.title_depth is not None:
+            self.title.append(data)
+        elif not self.skip and self.body_depth is not None:
+            self.body.append(data)
+
+
 def extract(data, source):
     u = urlparse(source)
     if u.scheme != 'https' or not u.hostname or u.username:
         raise ValueError('HTTPS 원문 주소가 필요합니다')
     parser = Sections(source)
-    parser.feed(data.decode('utf-8-sig'))
+    html = data.decode('utf-8-sig')
+    parser.feed(html)
+    if not parser.items and not parser.skipped:
+        parser = Accordion(source)
+        parser.feed(html)
     return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'extractedAt': datetime.now(timezone.utc).isoformat(),
             'items': parser.items, 'skipped': parser.skipped}
 

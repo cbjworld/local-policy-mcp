@@ -29,6 +29,21 @@ class SectionTest(unittest.TestCase):
         self.assertIn('지원조건: 실비 최대 100만원', x['items'][0]['content'])
         self.assertNotIn('지원내용:', x['items'][0]['content'])
 
+    def test_accordion_sections_keep_each_body_and_link(self):
+        html = '''<div class="temp_board"><ul>
+        <li><div class="title"><div class="tit_text">청년 지원</div></div><div class="cont_text"><ul>
+        <li>사업대상: 청년</li><li>사업내용: 지원금 <a href="/apply">신청</a></li></ul></div></li>
+        <li><div class="title"><div class="tit_text">노인 지원</div></div><div class="cont_text">
+        <ul><li>사업대상: 노인</li><li>사업내용: 돌봄</li></ul></div></li>
+        <li><div class="title"><div class="tit_text">계획</div></div><div class="cont_text">자료 없음</div></li>
+        </ul></div>'''.encode()
+        x = m.extract(html, 'https://www.yangju.go.kr/test')
+        self.assertEqual([i['name'] for i in x['items']], ['청년 지원', '노인 지원'])
+        self.assertEqual(x['items'][0]['links'], ['https://www.yangju.go.kr/apply'])
+        self.assertNotIn('노인', x['items'][0]['content'])
+        self.assertEqual(x['items'][1]['location'], {'section': 2})
+        self.assertEqual(x['skipped'], [{'section': 3, 'reason': 'missing_policy_labels'}])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -86,6 +86,8 @@
 
 칠곡군 [청년월세](https://www.chilgok.go.kr/portal/contents.do?mId=0912030000), [운전면허 반납](https://www.chilgok.go.kr/portal/contents.do?mId=1101070000), [생애최초 주택구입](https://www.chilgok.go.kr/portal/contents.do?mId=1210000000), [신혼부부 임차보증금 이자](https://www.chilgok.go.kr/portal/contents.do?mId=1208000000) 안내도 본문과 검색을 대조했다. `지원자격`, `이자지원금리` 표현을 인식하도록 보완하고, 이전 33개 출처가 변경되지 않았는지 확인했다.
 
+[양주시 1인가구 안내](https://www.yangju.go.kr/www/contents.do?key=4371)의 접힌 사업별 항목 27개 중 대상과 사업내용이 확인되는 25개를 분리했다. 제목과 본문을 각 원문 항목과 대조했으며 나머지 2개는 검토 대상으로 남겼다. 양주시 청년 프로그램, 독거 AI스피커, 무연고 장례 검색을 확인했다.
+
 ## 의왕시·사상구·해운대구 추가 페이지
 
 - [의왕시 생애주기별 인구정책](https://www.uiwang.go.kr/UWKORWEL1901): 150행의 각 열을 원문과 대조했다. 같은 사업명이 반복되는 행이 있으므로 독립 사업 수로 세지 않는다.
