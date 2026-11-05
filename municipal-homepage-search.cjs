@@ -2,19 +2,21 @@ const fs=require('node:fs');
 const {validateUrl}=require('./official-fetch');
 const {temporaryUrl}=require('./municipal-stage-download.cjs');
 const records=require('./catalog-institutions.json').records;
+const municipalitiesByHost=new Map();
+for(const record of records){try{if(record.institution.includes('(편성 당시)'))continue;const host=new URL(record.url).hostname;const current=municipalitiesByHost.get(host)||[];current.push(record);municipalitiesByHost.set(host,current)}catch{}}
 const normalize=x=>String(x||'').normalize('NFKC').replace(/\s+/g,'').toLowerCase();
 function safeLink(value){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password&&!temporaryUrl(u)}catch{return false}}
 function search({q,institution,offset=0,limit=10,sourceOffset=0,sourceLimit=20}={},file=process.env.POLICY_MUNICIPAL_CATALOG){
  if(typeof q!=='string'||!q.trim()||q.length>100||institution!==undefined&&(typeof institution!=='string'||!institution.trim()||institution.length>80)||!Number.isInteger(offset)||offset<0||!Number.isInteger(limit)||limit<1||limit>20||!Number.isInteger(sourceOffset)||sourceOffset<0||!Number.isInteger(sourceLimit)||sourceLimit<1||sourceLimit>100)throw Error('검색어, 지자체 또는 결과 범위를 확인하세요.');
  if(!file)throw Error('홈페이지 사업자료가 설정되지 않았습니다.');
  let data;try{if(fs.statSync(file).size>20*1024*1024)throw Error('too_large');data=JSON.parse(fs.readFileSync(file,'utf8'));}catch{throw Error('홈페이지 자료를 읽을 수 없습니다. 파일과 크기 제한을 확인하세요.');}
- const sources=Array.isArray(data.sources)?data.sources:[data];if(!sources.length||sources.length>500)throw Error('홈페이지 자료 형식이 올바르지 않습니다.');
+ const sources=Array.isArray(data.sources)?data.sources:[data];if(!sources.length||sources.length>5000)throw Error('홈페이지 자료 형식이 올바르지 않습니다.');
  const terms=q.trim().split(/\s+/).map(normalize),rows=[],partial=[],coverage=[],seen=new Set();
  const targetTerms=terms.filter(t=>/^(청년|어르신|노인|고령자)$/.test(t)),subjectTerms=terms.filter(t=>!targetTerms.includes(t));
  for(const source of sources){
   if(!Array.isArray(source.items)||typeof source.source!=='string'||!/^[a-f0-9]{64}$/.test(source.sha256||'')||seen.has(source.source))throw Error('홈페이지 자료 형식이 올바르지 않습니다.');seen.add(source.source);
   const sourceUrl=validateUrl(source.source);if(temporaryUrl(sourceUrl))throw Error('임시 접속 정보가 포함된 출처는 사용할 수 없습니다.');
-  const host=sourceUrl.hostname,municipalities=records.filter(x=>{try{return new URL(x.url).hostname===host&&!x.institution.includes('(편성 당시)')}catch{return false}}),identity=municipalities.length===1?municipalities[0]:null;
+  const municipalities=municipalitiesByHost.get(sourceUrl.hostname)||[],identity=municipalities.length===1?municipalities[0]:null;
   if(!identity)throw Error('홈페이지의 지자체를 주소록에서 유일하게 확인할 수 없습니다.');
   const region=normalize(identity.parent+' '+identity.institution);coverage.push({institution:identity.institution,parent:identity.parent,source:source.source,sourceSha256:source.sha256,extractedAt:typeof source.extractedAt==='string'?source.extractedAt:null,skippedEntries:source.skipped?.length||0});
   for(const row of source.items){

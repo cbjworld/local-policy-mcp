@@ -24,6 +24,7 @@ const search=require('./municipal-homepage-search.cjs').search;
  assert.equal(search({q:'동행',institution:'노원구'}).total,0);
  const many=Array.from({length:25},(_,i)=>({...first,source:`https://www.nowon.kr/example-${i}`,items:[]}));fs.writeFileSync(file,JSON.stringify({sources:many}));
  const coverage1=search({q:'청년'}),coverage2=search({q:'청년',sourceOffset:coverage1.scope.nextSourceOffset});assert.equal(coverage1.scope.totalSources,25);assert.equal(coverage1.scope.sources.length,20);assert.equal(coverage1.scope.nextSourceOffset,20);assert.equal(coverage2.scope.sources.length,5);assert.equal(coverage2.scope.nextSourceOffset,null);assert.equal(new Set([...coverage1.scope.sources,...coverage2.scope.sources].map(x=>x.source)).size,25);assert.throws(()=>search({q:'청년',sourceLimit:101}));
+ const large=Array.from({length:601},(_,i)=>({...first,source:`https://www.nowon.kr/large-${i}`,items:[]}));fs.writeFileSync(file,JSON.stringify({sources:large}));const largePage=search({q:'청년',sourceOffset:600});assert.equal(largePage.scope.totalSources,601);assert.equal(largePage.scope.sources.length,1);assert.equal(largePage.scope.nextSourceOffset,null);
  fs.writeFileSync(file,JSON.stringify({sources:[first,first]}));assert.throws(()=>search({q:'청년'}),/형식/);fs.writeFileSync(file,JSON.stringify(first));
  const handler=require('./mcp').createHandler();
  await handler({jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-11-25',clientInfo:{name:'test',version:'1'},capabilities:{}}});
