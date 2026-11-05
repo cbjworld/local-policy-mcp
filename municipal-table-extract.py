@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import re
+from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlparse, urljoin
@@ -99,7 +100,7 @@ def extract(data, source):
                             'links': list(dict.fromkeys(link for cell in row for link in cell['links'])), 'source': source,
                             'location': {'table': table_no, 'row': row_no},
                             'status': 'source_row_candidate'})
-    return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(),
+    return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'extractedAt': datetime.now(timezone.utc).isoformat(),
             'tables': len(parser.tables), 'items': results, 'skipped': skipped}
 
 
