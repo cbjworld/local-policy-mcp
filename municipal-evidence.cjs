@@ -1,12 +1,22 @@
 const keyForRegion=item=>JSON.stringify([item.parent,item.institution]);
 function assessTarget(item,question){
  if(!question)return item;
- const text=[item.name,item.content,...Object.values(item.fields||{})].filter(x=>typeof x==='string').join(' ');
+ const fields=Object.entries(item.fields||{}).filter(([k,v])=>/^(?:지원|신청|사업|수혜)?대상(?:자)?$/.test(k.replace(/\s/g,''))&&typeof v==='string'&&v.trim()).map(([,v])=>v);
+ const sections=[...String(item.content||'').matchAll(/(?:지원\s*대상(?:자)?|신청\s*대상|사업\s*대상)\s*[:：]\s*(.{1,500}?)(?=\s*(?:사업\s*내용|지원\s*내용|신청\s*방법|사업\s*기간|선정\s*기준|사업\s*목적|구비\s*서류|문의)\s*[:：]|$)/gs)].map(x=>x[1]);
+ const target=fields.length===1?fields[0]:fields.length===0&&sections.length===1?sections[0]:null;
+ const text=target||[item.name,item.content,...Object.values(item.fields||{})].filter(x=>typeof x==='string').join(' ');
  const fit=require('./relevance').targetFit(text,question);
- if(!fit.requested.length)return item;
- if(fit.status==='mismatch')return {...item,queryMatch:'target_mismatch',targetAssessment:fit,note:'원래 질문의 연령 대상과 이 발췌문의 명시 대상이 다릅니다. 요청한 대상의 확정 사례로 세지 마세요.'};
- if(fit.status==='unspecified')return {...item,queryMatch:'target_unconfirmed',targetAssessment:fit,note:'원래 질문의 연령 대상이 이 발췌문에서 확인되지 않습니다. 확정 사례로 세지 마세요.'};
- return {...item,targetAssessment:fit};
+ const topicWarning=/월세/.test(question)&&/(?:전.?월세|월세).{0,25}(?:안심계약|계약\s*(?:상담|도움))/.test(item.name||'')?'전월세 계약 상담·동행 안내입니다. 월세 지급 사업으로 단정하지 마세요.':undefined;
+ const disabilityRequested=/장애인|장애아동/.test(question);
+ const disabilityMentioned=Boolean(target&&/장애인|장애아동/.test(target));
+ const conditionAssessment=disabilityRequested?{requested:'장애인',status:disabilityMentioned?'mentioned_in_target':'unconfirmed',scope:target?'explicit_target':'excerpt',...(target?{excerpt:target.slice(0,250)}:{})}:undefined;
+ const result={...item,...(topicWarning?{topicWarning}:{}),...(conditionAssessment?{conditionAssessment}:{})};
+ if(disabilityRequested&&!disabilityMentioned){result.queryMatch='target_unconfirmed';result.note='장애인 지원 여부가 명시된 지원대상에서 확인되지 않습니다. 확정 사례로 세지 마세요.';}
+ if(!fit.requested.length)return result;
+ const targetAssessment={...fit,scope:target?'explicit_target':'excerpt',...(target?{excerpt:target.slice(0,250)}:{})};
+ if(fit.status==='mismatch')return {...result,queryMatch:'target_mismatch',targetAssessment,note:'원래 질문의 연령 대상과 이 발췌문의 명시 대상이 다릅니다. 요청한 대상의 확정 사례로 세지 마세요.'};
+ if(fit.status==='unspecified')return {...result,queryMatch:'target_unconfirmed',targetAssessment,note:'원래 질문의 연령 대상이 이 발췌문에서 확인되지 않습니다. 확정 사례로 세지 마세요.'};
+ return {...result,targetAssessment};
 }
 function diversify(values,regionOf){
  const first=[],rest=[],seen=new Set();
@@ -32,7 +42,7 @@ function collect(catalog,search,link,question){
     const regionKey=keyForRegion(item);if(item.parent&&item.institution&&!regions.has(regionKey))regions.set(regionKey,item.parent+' '+item.institution);
     const key=JSON.stringify([item.source,item.location,item.name]);if(found.has(key))continue;
     const entries=Object.entries(item.fields||{}),fields=Object.fromEntries(entries.slice(0,4).map(([k,v])=>[k,String(v).slice(0,180)]));
-    found.set(key,{name:item.name,institution:item.institution,parent:item.parent,publisherInstitution:item.publisherInstitution,programAuthority:item.programAuthority,institutionRole:item.institutionRole,source:item.source,sourceSha256:item.sourceSha256,location:item.location,status:item.status,queryMatch:item.queryMatch,targetAssessment:item.targetAssessment,matchScope:item.matchScope,missingTerms:item.missingTerms,targetNote:item.note,beneficiaryWarning:item.beneficiaryWarning,content:item.content,contentTruncated:item.contentTruncated,contentLength:item.contentLength,nextContentOffset:item.nextContentOffset,fields,fieldsTruncated:Boolean(item.fieldsTruncated||entries.length>4||entries.some(([,v])=>String(v).length>180)),followup:{tool:'search_municipal_homepage',arguments:{...base,offset:offset+index,limit:1,snapshot}}});
+    found.set(key,{name:item.name,institution:item.institution,parent:item.parent,publisherInstitution:item.publisherInstitution,programAuthority:item.programAuthority,institutionRole:item.institutionRole,source:item.source,sourceSha256:item.sourceSha256,location:item.location,status:item.status,queryMatch:item.queryMatch,targetAssessment:item.targetAssessment,conditionAssessment:item.conditionAssessment,matchScope:item.matchScope,missingTerms:item.missingTerms,targetNote:item.note,beneficiaryWarning:item.beneficiaryWarning,topicWarning:item.topicWarning,content:item.content,contentTruncated:item.contentTruncated,contentLength:item.contentLength,nextContentOffset:item.nextContentOffset,fields,fieldsTruncated:Boolean(item.fieldsTruncated||entries.length>4||entries.some(([,v])=>String(v).length>180)),followup:{tool:'search_municipal_homepage',arguments:{...base,offset:offset+index,limit:1,snapshot}}});
    }
    if(page.nextOffset===null||page.nextOffset===undefined||regions.size>=5)break;
    if(!Number.isInteger(page.nextOffset)||page.nextOffset<=offset){failure=offset;break;}
@@ -47,10 +57,11 @@ function collect(catalog,search,link,question){
   const comparison=link({q,institution,maxComparisons:2});
   linkSearches.push({q,institution,comparisons:comparison.comparisons,complete:comparison.complete,returnedPairs:comparison.pairs.length,cursor:comparison.cursor,followup:{tool:'link_municipal_budget_auto',arguments:{q,institution}}});
   for(const pair of comparison.pairs){const h=assessTarget(pair.homepage,question),b=pair.budget,key=JSON.stringify([h.source,h.location,b.source,b.page,b.table,b.tableRow,b.name]);if(linked.has(key))continue;
-   linked.set(key,{query:q,relationship:pair.relationship,nameMatch:pair.nameMatch,note:pair.note,homepage:{name:h.name,institution:h.institution,parent:h.parent,publisherInstitution:h.publisherInstitution,programAuthority:h.programAuthority,institutionRole:h.institutionRole,source:h.source,sourceSha256:h.sourceSha256,location:h.location,queryMatch:h.queryMatch,targetAssessment:h.targetAssessment,missingTerms:h.missingTerms,targetNote:h.note,matchScope:h.matchScope,beneficiaryWarning:h.beneficiaryWarning},budget:{name:b.name,institution:b.institution,parent:b.parent,year:b.year,amount:b.budget,unit:b.unit,source:b.source,page:b.page,table:b.table,tableRow:b.tableRow,archiveMember:b.archiveMember,archiveSha256:b.archiveSha256,sourceFileSha256:b.sourceFileSha256,officialDocumentList:b.officialDocumentList,limitation:b.limitation}});
+   linked.set(key,{query:q,relationship:pair.relationship,nameMatch:pair.nameMatch,note:pair.note,homepage:{name:h.name,institution:h.institution,parent:h.parent,publisherInstitution:h.publisherInstitution,programAuthority:h.programAuthority,institutionRole:h.institutionRole,source:h.source,sourceSha256:h.sourceSha256,location:h.location,queryMatch:h.queryMatch,targetAssessment:h.targetAssessment,conditionAssessment:h.conditionAssessment,missingTerms:h.missingTerms,targetNote:h.note,matchScope:h.matchScope,beneficiaryWarning:h.beneficiaryWarning,topicWarning:h.topicWarning},budget:{name:b.name,institution:b.institution,parent:b.parent,year:b.year,amount:b.budget,unit:b.unit,source:b.source,page:b.page,table:b.table,tableRow:b.tableRow,archiveMember:b.archiveMember,archiveSha256:b.archiveSha256,sourceFileSha256:b.sourceFileSha256,officialDocumentList:b.officialDocumentList,limitation:b.limitation}});
   }
  }catch{linkSearches.push({q,institution,status:'failed',note:'홈페이지와 예산 후보를 대조하지 못했습니다.'});}
- const all=[...found.values()],items=diversify(all,keyForRegion).slice(0,5),allLinks=[...linked.values()],links=diversify(allLinks,x=>keyForRegion(x.homepage)).slice(0,5);
+ const rank=x=>x.queryMatch==='target_mismatch'?2:x.queryMatch==='target_unconfirmed'||x.topicWarning?1:0;
+ const all=[...found.values()].sort((a,b)=>rank(a)-rank(b)),items=diversify(all,keyForRegion).slice(0,5),allLinks=[...linked.values()].sort((a,b)=>rank(a.homepage)-rank(b.homepage)),links=diversify(allLinks,x=>keyForRegion(x.homepage)).slice(0,5);
  for(const item of items){
   if(item.matchScope!=='notice_body')continue;
   item.noticeWarning='한 공지에 여러 사업이 있을 수 있습니다. 각 사업의 대상·지원액과 연도를 따로 확인하세요.';
