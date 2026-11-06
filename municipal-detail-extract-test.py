@@ -55,6 +55,19 @@ class DetailTest(unittest.TestCase):
         self.assertEqual(m.extract(html + '<div class="con_wrap">다른 본문</div>'.encode(), source, '경기도 산후조리비 지원')['items'], [])
         self.assertEqual(m.extract(html, source.replace('www.ansan.go.kr', 'www.nowon.kr'), '경기도 산후조리비 지원')['items'], [])
 
+    def test_yongin_notice_uses_unique_bounded_scope_and_keeps_copayment(self):
+        source = 'https://www.yongin.go.kr/user/bbs/BD_selectBbs.do?q_bbsCode=1001'
+        html = ('<div class="title">다른 제목</div><div class="t_view"><td class="title">반려동물 지원사업</td>'
+                '<tr id="activeTr"><td>등록일 2026-02-04</td></tr><td class="tview_desc">지원대상 취약가구 '
+                '지원내용 의료비 최대 20만원 자부담 20% 포함, 검진비 최대 40만원 지원.</td></div>'
+                '<img alt="공공누리 제1유형: 출처표시">').encode()
+        item = m.extract(html, source, '반려동물 지원사업')['items'][0]
+        self.assertEqual(item['location'], {'elementClass': 'tview_desc'})
+        self.assertIn('자부담 20%', item['content'])
+        self.assertNotIn('다른 제목', item['content'])
+        self.assertEqual(m.extract(html + '<div class="t_view"></div>'.encode(), source, '반려동물 지원사업')['items'], [])
+        self.assertEqual(m.extract(html.replace('제1유형'.encode(), '제4유형'.encode()), source, '반려동물 지원사업')['items'], [])
+
     def test_bounded_content_with_unclosed_list_item(self):
         html = '''<html><head><title>청년 지원사업 : 구청</title></head><body>
         <div id="contents"><h3>지원대상</h3><ul><li>관내 청년</li></ul><h3>지원내용</h3>
