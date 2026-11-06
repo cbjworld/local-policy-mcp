@@ -60,7 +60,7 @@ async function read({url,fileId,q='',page=1,scanEmptyPdf=false,ocr=false}={},io=
  let stage='download',phase='request',retryCount=0;
  const timings=[];
  const transfer=async(step,params)=>{
-  phase=step;const deadline=Date.now()+25000;
+  phase=step;const deadline=Date.now()+(step==='wonmunFileRequest.ajax'&&Number.isInteger(io.requestTimeoutMs)?io.requestTimeoutMs:25000);
   for(;;){const start=Date.now();try{const response=await io.post(step,params,deadline);timings.push({phase:step,ms:Date.now()-start});return response;}
    catch(e){timings.push({phase:step,ms:Date.now()-start,status:'failed',code:e.code||'PORTAL_ERROR'});if(!e.retryable||retryCount||Date.now()>=deadline)throw e;retryCount++;}}
  };
@@ -169,6 +169,10 @@ async function research({url,requestedQuery='',autoOcr=true}={},reader=read,exte
    continue;
   }
   attempts.push({...result,fileId:file.fileId,fileName:file.name,evidenceScope:scope(file),assessment:form?'form_or_cover':plan?'plan_candidate':'text_needs_review'});
+  if(options.deferAfterProviderTimeout&&result.status==='download_failed'&&result.phase==='wonmunFileRequest.ajax'&&result.errorCode==='ETIMEDOUT'){
+   for(const later of candidates.slice(candidates.indexOf(file)+1))selectionNotes.push({...later,status:'deferred_provider_timeout',reason:'제공기관 응답 지연으로 자동 조회를 미뤘습니다. 문서 원문 조회에서 다시 확인할 수 있습니다.'});
+   break;
+  }
   const missing=()=>require('./automatic-ocr').gaps(attempts,requestedQuery).length>0;
   const missingText=()=>missing()||require('./evidence').evidence(attempts.filter(a=>a.assessment!=='target_mismatch')).fields.period.status==='unconfirmed';
   // shortcut: at most two more six-page ranges per PDF; expose remaining pages rather than claiming full reading.

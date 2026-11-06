@@ -18,7 +18,7 @@ function createSession(portal,{get=download,extract=readResponse,warm=require('.
    if(prepared.has(item.url)){prepareFile(item.url);continue;}
    if(prepared.size>=4)continue;
    let downloading=false,lastRequest,failedRequest;
-   const reader=portal.createReader({extract:(response,args)=>downloading?Promise.resolve({format:'deferred',pages:[]}):extract(response,args),post:async(step,params,deadline)=>{
+   const reader=portal.createReader({requestTimeoutMs:10000,extract:(response,args)=>downloading?Promise.resolve({format:'deferred',pages:[]}):extract(response,args),post:async(step,params,deadline)=>{
     const body=new URLSearchParams(Object.entries(params).filter(([,v])=>v!==undefined&&v!==null)).toString();
     if(step==='wonmunFileRequest.ajax'&&failedRequest?.body===body)return failedRequest.response;
     const response=await get('https://www.open.go.kr/util/wonmunUtils/'+step,0,deadline,body,controller.signal);
@@ -73,7 +73,7 @@ function createSession(portal,{get=download,extract=readResponse,warm=require('.
   try{
    const result=entry?await entry:{};
    if(result.error&&result.error.code!=='PREFETCH_METADATA_LIMIT'&&!result.error.retryable)throw result.error;
-   const investigation=await portal.research(args,result.reader||portal.createReader({get}),externalReader,options);
+   const investigation=await portal.research(args,result.reader||portal.createReader({get,requestTimeoutMs:10000}),externalReader,{...options,deferAfterProviderTimeout:true});
    if(result.error)investigation.metadataPrefetchFailure={code:result.error.code,message:result.error.message};
    return investigation;
   }finally{prepared.delete(args.url);reserved.delete(args.url);releaseFile(args.url);}

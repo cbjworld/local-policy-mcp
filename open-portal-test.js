@@ -94,6 +94,13 @@ async function main(){
  posts=0;const bounded=p.createReader({...cachedIO,get:async()=>html({openCateSearchVO:twoFiles})});
  for(const fileId of ['f','g','f'])assert.equal((await bounded({url,fileId})).status,'read');
  assert.equal(posts,9); // Only the latest validated file is retained.
+ const timedAttachments=[{fileId:'f1',name:'추진계획.pdf',available:true},{fileId:'f2',name:'예산계획.pdf',available:true}];
+ const timedCalls=[];const timedReader=async a=>{if(!a.fileId)return {title:'지원사업 추진계획',attachments:timedAttachments};timedCalls.push(a.fileId);return {status:'download_failed',phase:'wonmunFileRequest.ajax',errorCode:'ETIMEDOUT'};};
+ const timeoutDeferred=await p.research({url,autoOcr:false},timedReader,undefined,{deferAfterProviderTimeout:true});
+ assert.equal(timedCalls.length,1);assert.equal(timeoutDeferred.remaining.length,1);assert.equal(timeoutDeferred.selectionNotes[0].status,'deferred_provider_timeout');
+ timedCalls.length=0;await p.research({url,autoOcr:false},timedReader);assert.equal(timedCalls.length,2,'explicit document reads retain the full attachment retry');
+ let fastDeadline;const fastReader=p.createReader({...cachedIO,requestTimeoutMs:10000,post:async(step,params,deadline)=>{fastDeadline=deadline-Date.now();throw Error('offline');}});
+ await fastReader({url,fileId:'f'});assert(fastDeadline>9000&&fastDeadline<=10000);
  const external={...io,get:async()=>html({openCateSearchVO:{...v,oppUrl:'https://opengov.seoul.go.kr/section/test'}})};
  const selected=[];
  const attachments=[{fileId:'child',name:'아동 보청기 계획.hwp',available:true},{fileId:'sheet',name:'예산.xlsx',available:true},{fileId:'adult',name:'어르신 보청기 계획.hwp',available:true}];
