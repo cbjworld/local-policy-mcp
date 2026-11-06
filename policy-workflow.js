@@ -3,7 +3,7 @@ const {documentKey}=require('./project-bundles');
 const {missingFields,sameProject}=require('./policy-followup');
 function plan({question,queries,startDate,endDate}={},now=new Date()){
  if(typeof question!=='string'||!question.trim()||question.length>300)throw Error('질문은 1~300자여야 합니다.');
- const topic=question.trim().replace(/^우리\s*(?:지자체|지역|시|군|구)(?:도|에서|에)?\s*/, '').replace(/^(?:다른\s*(?:지자체|지역|지방자치단체)|전국(?:의)?\s*(?:지자체|지방자치단체))(?:에서|의)?\s+/, '').replace(/[?？!.。]+$/,'').replace(/\s*(?:을|를)?\s*(?:새로\s*)?(?:도입\s*검토해\s*줘|도입하고\s*싶어|도입하려는데|추진하려는데|시작하려는데|하려는데)\s*$/,'').replace(/\s*(?:찾아\s*주세요|찾아\s*줘|알려\s*주세요|알려\s*줘|검색해\s*줘|검색해줘|비교해\s*줘|비교해\s*주세요)\s*$/,'').replace(/\s+(?:계획과\s*예산|예산과\s*계획|예산|계획)(?:을|를)?\s*$/,'').replace(/\s*(?:정책|사례)(?:를|을)?\s*$/,'').replace(/\s+(?:지자체|지방자치단체)(?:별|의)?\s*$/,'').trim().replace(/\s지원사업$/,' 지원 사업');
+ const topic=question.trim().replace(/^우리\s*(?:지자체|지역|시|군|구)(?:도|에서|에)?\s*/, '').replace(/^(?:다른\s*(?:지자체|지역|지방자치단체)|전국(?:의)?\s*(?:지자체|지방자치단체))(?:에서|의)?\s+/, '').replace(/[?？!.。]+$/,'').replace(/\s*(?:을|를)?\s*(?:새로\s*)?(?:도입\s*검토해\s*줘|도입하고\s*싶어|도입하려는데|추진하려는데|시작하려는데|하려는데)\s*$/,'').replace(/\s*(?:찾아\s*주세요|찾아\s*줘|알려\s*주세요|알려\s*줘|검색해\s*줘|검색해줘|비교해\s*줘|비교해\s*주세요)\s*$/,'').replace(/\s+(?:계획과\s*예산|예산과\s*계획|예산|계획)(?:을|를)?\s*$/,'').replace(/(지원|사업)(?:은|는)?\s*(?:어디서|어디에서)\s*(?:하나요|하나|해요)\s*$/,'$1').replace(/(?:을|를)?\s*(?:시행|운영)(?:한|하는)\s*(?:곳|지자체|지역)\s*$/,'').replace(/지원하는\s+(?:다른\s*)?(?:지자체|지방자치단체|지역)(?:별|의)?\s*$/,'지원').replace(/\s*(?:정책|사례)(?:를|을)?\s*$/,'').replace(/\s+(?:다른\s*)?(?:지자체|지방자치단체|지역)(?:별|의)?\s*$/,'').trim().replace(/\s지원사업$/,' 지원 사업');
  if(!topic)throw Error('찾을 주제가 필요합니다.');
  const region=require('./catalog-context').regionScope(topic);
  const searchTopic=topic.split(/\s+/).slice(region.regionTokens.length).join(' ')||topic;
@@ -20,6 +20,9 @@ function plan({question,queries,startDate,endDate}={},now=new Date()){
  if(/음식물\s*처리기/.test(searchTopic)){
   const subject=words.filter(w=>!['지원','사업','정책'].includes(w)).join(' ');
   derived.splice(1,derived.length,subject.replace(/음식물\s*처리기/,'음식물쓰레기 처리기'),subject.replace(/음식물\s*처리기/,'음식물 감량기'));
+ }
+ if(/반려동물/.test(searchTopic)&&/의료\s*비/.test(searchTopic)){
+  derived.splice(0,derived.length,searchTopic,searchTopic.replace(/의료\s*비/,'의료서비스'),searchTopic.replace(/의료\s*비/,'의료'));
  }
  if(/전세\s*보증료|전세\s*보증금.*보증료/.test(searchTopic)){
   derived.splice(0,derived.length,searchTopic,'전세보증금 반환보증 보증료',...( /청년/.test(searchTopic)?['청년 보증료 지원']:['전세 보증료 지원']));
