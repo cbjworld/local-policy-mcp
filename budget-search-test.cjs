@@ -1,6 +1,8 @@
 const assert=require('node:assert/strict');
 const {search}=require('./budget-search');
 const inferred=search({q:'해운대구 부모급여'}),explicit=search({q:'부모급여',institution:'부산광역시 해운대구'});assert.equal(inferred.inferredInstitution,'부산광역시 해운대구');assert.deepEqual(inferred.items,explicit.items);assert(inferred.totalCandidateRows>0);assert.equal(search({q:'중구 지원'}).inferredInstitution,undefined);
+for(const [q,parent] of [['부산 중구 청년','부산광역시 중구'],['서울 중구 청년','서울특별시 중구']]){const actual=search({q}),expected=search({q:'청년',institution:parent});assert.equal(actual.inferredInstitution,parent);assert.deepEqual(actual.items,expected.items);assert.equal(actual.totalCandidateRows,expected.totalCandidateRows);}assert.equal(search({q:'서울 해운대구 부모급여'}).inferredInstitution,undefined);
+assert.equal(search({q:'중구 청년'}).ambiguousInstitution.name,'중구');assert.equal(search({q:'부산 중구 청년'}).ambiguousInstitution,undefined);
 const all=search({q:'청년',limit:2});assert.equal(all.items.length,2);assert.equal(all.nextOffset,2);
 const next=search({q:'청년',limit:2,offset:2});assert.notDeepEqual(all.items,next.items);
 for(const [shorthand,expanded] of [['음식물처리기','음식물 처리기'],['전세보증료','전세 보증료']]){
