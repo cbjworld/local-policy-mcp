@@ -83,13 +83,14 @@ def clean(value):
 
 
 class GumiNotice(HTMLParser):
-    def __init__(self):
+    def __init__(self, classes=('subject', 'view_date', 'view_cont')):
         super().__init__(convert_charrefs=True)
+        self.classes = classes
         self.depth = 0
         self.skip = 0
         self.active = None
         self.container_tag = None
-        self.counts = {'subject': 0, 'view_date': 0, 'view_cont': 0}
+        self.counts = dict.fromkeys(classes, 0)
         self.values = {key: [] for key in self.counts}
 
     def handle_starttag(self, tag, attrs):
@@ -133,27 +134,29 @@ class GumiNotice(HTMLParser):
 
 def gumi_notice(data, source, expected_title):
     html = data.decode('utf-8-sig')
-    page = GumiNotice()
+    classes = ('board-view-head', 'board-view-table', 'board-view-content') if urlparse(source).hostname == 'www.seongnam.go.kr' else ('subject', 'view_date', 'view_cont')
+    page = GumiNotice(classes)
     page.feed(html)
-    subject, date, content = (clean(''.join(page.values[x])) for x in ('subject', 'view_date', 'view_cont'))
-    norm = lambda x: re.sub(r'\s+', '', x)
-    date_match = re.search(r'20\d{2}-\d{2}-\d{2}', date)
+    subject, date, content = (clean(''.join(page.values[x])) for x in classes)
+    norm = lambda x: re.sub(r'[\s「」『』]', '', x)
+    dates = re.findall(r'20\d{2}-\d{2}-\d{2}', date)
+    date_match = dates[0] if len(dates) == 1 and '등록일' in date else None
     marked = re.search(r'공공누리.{0,30}제\s*1\s*유형', html, re.I | re.S)
     policy = re.search(r'(?:지원|신청)대상|지원자격', content) and re.search(r'(?:지원|사업)(?:내용|금액|규모|한도)', content)
     notice = re.search(r'마감|종료', subject) and re.search(r'마감|종료', content) and re.search(r'20\d{2}', content)
-    if any(page.counts[x] != 1 for x in page.counts) or norm(expected_title) not in norm(subject) or not date_match or not marked or not (40 <= len(content) <= 30000) or not (policy or notice):
+    if page.counts[classes[0]] != 1 or page.counts[classes[2]] != 1 or page.counts[classes[1]] < 1 or norm(expected_title) not in norm(subject) or not date_match or not marked or not (40 <= len(content) <= 30000) or not (policy or notice):
         return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'items': [], 'skipped': [{'reason': 'notice_page_unverified'}]}
     return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'extractedAt': datetime.now(timezone.utc).isoformat(),
-            'items': [{'name': subject, 'content': '등록일: ' + date_match.group() + ' ' + content, 'contentColumn': '게시글 본문',
-                       'department': None, 'fields': {'등록일': date_match.group()}, 'links': [], 'source': source,
-                       'location': {'elementClass': 'view_cont'}, 'status': 'source_notice_candidate'}], 'skipped': []}
+            'items': [{'name': subject, 'content': '등록일: ' + date_match + ' ' + content, 'contentColumn': '게시글 본문',
+                       'department': None, 'fields': {'등록일': date_match}, 'links': [], 'source': source,
+                       'location': {'elementClass': classes[2]}, 'status': 'source_notice_candidate'}], 'skipped': []}
 
 
 def extract(data, source, expected_title):
     u = urlparse(source)
     if u.scheme != 'https' or not u.hostname or u.username or not expected_title or len(expected_title) > 200:
         raise ValueError('원문 주소 또는 사업 제목 오류')
-    if u.hostname == 'www.gumi.go.kr' and '/board/post/view.do' in u.path:
+    if (u.hostname == 'www.gumi.go.kr' and '/board/post/view.do' in u.path) or (u.hostname == 'www.seongnam.go.kr' and re.fullmatch(r'/bbs[0-9]+/[0-9]+', u.path)):
         return gumi_notice(data, source, expected_title)
     html = data.decode('utf-8-sig')
     page = None

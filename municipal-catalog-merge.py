@@ -35,7 +35,7 @@ def validate(snapshot, registered):
         table_loc = type(table) is int and type(row) is int and table >= 1 and row >= 1 and section is None and element is None and element_class is None
         section_loc = type(section) is int and section >= 1 and table is None and row is None and element is None and element_class is None
         element_loc = element in ('contents', 'conts', 'content', 'body_content') and section is None and table is None and row is None and element_class is None
-        class_loc = element_class == 'view_cont' and parsed.hostname == 'www.gumi.go.kr' and '/board/post/view.do' in parsed.path and all(x is None for x in (section, table, row, element))
+        class_loc = ((element_class == 'view_cont' and parsed.hostname == 'www.gumi.go.kr' and '/board/post/view.do' in parsed.path) or (element_class == 'board-view-content' and parsed.hostname == 'www.seongnam.go.kr' and re.fullmatch(r'/bbs[0-9]+/[0-9]+', parsed.path))) and all(x is None for x in (section, table, row, element))
         key = ('table', table, row) if table_loc else ('section', section) if section_loc else ('element', element) if element_loc else ('class', element_class)
         if (not isinstance(item, dict) or item.get('source') != snapshot['source']
                 or not isinstance(item.get('name'), str) or not item['name'].strip()

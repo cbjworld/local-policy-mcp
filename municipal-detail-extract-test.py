@@ -32,6 +32,18 @@ class DetailTest(unittest.TestCase):
         source = 'https://www.gumi.go.kr/portal/board/post/view.do?idx=123'
         self.assertIn('4. 17. 마감', m.extract(html, source, '청년월세 조기마감 안내')['items'][0]['content'])
 
+    def test_seongnam_notice_keeps_extension_and_rejects_ambiguous_dates(self):
+        source = 'https://www.seongnam.go.kr/bbs010101/405225'
+        html = ('<div class="board-view-head">「산후조리 지원사업」 종료 안내</div>'
+                '<div class="board-view-table">등록일 2026-09-10</div>'
+                '<div class="board-view-content">2026년 10월 1일 사업 종료 예정. 2026년 9월 30일 지침에 따라 접수 연장 중입니다.</div>'
+                '<div class="board-view-table">첨부</div><img alt="공공누리 제1유형: 출처표시">').encode()
+        item = m.extract(html, source, '산후조리 지원사업 종료 안내')['items'][0]
+        self.assertEqual(item['location'], {'elementClass': 'board-view-content'})
+        self.assertIn('접수 연장 중', item['content'])
+        self.assertEqual(m.extract(html.replace('첨부'.encode(), '2026-10-01'.encode()), source, '산후조리 지원사업 종료 안내')['items'], [])
+        self.assertEqual(m.extract(html.replace('제1유형'.encode(), '제4유형'.encode()), source, '산후조리 지원사업 종료 안내')['items'], [])
+
     def test_bounded_content_with_unclosed_list_item(self):
         html = '''<html><head><title>청년 지원사업 : 구청</title></head><body>
         <div id="contents"><h3>지원대상</h3><ul><li>관내 청년</li></ul><h3>지원내용</h3>
