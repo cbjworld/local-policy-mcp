@@ -6,12 +6,16 @@ function assessTarget(item,question){
  const target=fields.length===1?fields[0]:fields.length===0&&sections.length===1?sections[0]:null;
  const text=target||[item.name,item.content,...Object.values(item.fields||{})].filter(x=>typeof x==='string').join(' ');
  const fit=require('./relevance').targetFit(text,question);
- const topicWarning=/월세/.test(question)&&/(?:전.?월세|월세).{0,25}(?:안심계약|계약\s*(?:상담|도움))/.test(item.name||'')?'전월세 계약 상담·동행 안내입니다. 월세 지급 사업으로 단정하지 마세요.':undefined;
+ const consultation=/월세/.test(question)&&/(?:전.?월세|월세).{0,25}(?:안심계약|계약\s*(?:상담|도움))/.test(item.name||'');
+ const careExclusion=/(?:아동|아이|영유아).*돌봄|아이\s*돌봄/.test(question)&&/^가정\s*양육\s*수당(?:\s*지원)?$/.test(item.name||'')&&/아이\s*돌봄\s*(?:서비스)?[^.]{0,20}(?:미이용|이용하지\s*않)/.test(text);
+ const topicWarning=consultation?'전월세 계약 상담·동행 안내입니다. 월세 지급 사업으로 단정하지 마세요.':careExclusion?'아이돌봄서비스를 이용하지 않는 가정의 양육수당입니다. 돌봄서비스 제공 사업으로 세지 마세요.':undefined;
  const disabilityRequested=/장애인|장애아동/.test(question);
  const disabilityMentioned=Boolean(target&&/장애인|장애아동/.test(target));
  const conditionAssessment=disabilityRequested?{requested:'장애인',status:disabilityMentioned?'mentioned_in_target':'unconfirmed',scope:target?'explicit_target':'excerpt',...(target?{excerpt:target.slice(0,250)}:{})}:undefined;
  const result={...item,...(topicWarning?{topicWarning}:{}),...(conditionAssessment?{conditionAssessment}:{})};
  if(disabilityRequested&&!disabilityMentioned){result.queryMatch='target_unconfirmed';result.note='장애인 지원 여부가 명시된 지원대상에서 확인되지 않습니다. 확정 사례로 세지 마세요.';}
+ const titleFit=require('./relevance').targetFit(item.name||'',question);
+ if(titleFit.status==='mismatch')return {...result,queryMatch:'target_mismatch',targetAssessment:{...titleFit,scope:'title',excerpt:item.name},note:'사업 제목의 연령 대상이 원래 질문과 다릅니다. 본문에 다른 연령이 언급돼도 요청 대상의 확정 사례로 세지 마세요.'};
  if(!fit.requested.length)return result;
  const targetAssessment={...fit,scope:target?'explicit_target':'excerpt',...(target?{excerpt:target.slice(0,250)}:{})};
  if(fit.status==='mismatch')return {...result,queryMatch:'target_mismatch',targetAssessment,note:'원래 질문의 연령 대상과 이 발췌문의 명시 대상이 다릅니다. 요청한 대상의 확정 사례로 세지 마세요.'};
@@ -61,7 +65,9 @@ function collect(catalog,search,link,question){
   }
  }catch{linkSearches.push({q,institution,status:'failed',note:'홈페이지와 예산 후보를 대조하지 못했습니다.'});}
  const rank=x=>x.queryMatch==='target_mismatch'?2:x.queryMatch==='target_unconfirmed'||x.topicWarning?1:0;
- const all=[...found.values()].sort((a,b)=>rank(a)-rank(b)),items=diversify(all,keyForRegion).slice(0,5),allLinks=[...linked.values()].sort((a,b)=>rank(a.homepage)-rank(b.homepage)),links=diversify(allLinks,x=>keyForRegion(x.homepage)).slice(0,5);
+ const all=[...found.values()].sort((a,b)=>rank(a)-rank(b)),allLinks=[...linked.values()].sort((a,b)=>rank(a.homepage)-rank(b));
+ const items=[0,1,2].flatMap(level=>diversify(all.filter(x=>rank(x)===level),keyForRegion)).slice(0,5);
+ const links=[0,1,2].flatMap(level=>diversify(allLinks.filter(x=>rank(x.homepage)===level),x=>keyForRegion(x.homepage))).slice(0,5);
  for(const item of items){
   if(item.matchScope!=='notice_body')continue;
   item.noticeWarning='한 공지에 여러 사업이 있을 수 있습니다. 각 사업의 대상·지원액과 연도를 따로 확인하세요.';
