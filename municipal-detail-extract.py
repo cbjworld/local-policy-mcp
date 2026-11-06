@@ -102,7 +102,7 @@ def extract(data, source, expected_title):
     matched_heading = sum(normalize(h) == normalize(expected_title) for h in page.headings) == 1
     if (page.blocks != 1 or (normalize(expected_title) not in normalize(title) and not matched_heading)
             or len(content) < 40 or len(content) > 30000
-            or not re.search(r'(?:지원|신청)대상|지원자격|대상', content)
+            or not re.search(r'(?:지원|신청)대상|지원자격|대상|이용아동|이용자격', content)
             or not re.search(r'(?:지원|사업)(?:내용|금액|규모|한도|분야|범위)|이자지원금리', content)):
         return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'items': [],
                 'skipped': [{'elementId': page.element_id, 'reason': 'detail_page_unverified'}]}

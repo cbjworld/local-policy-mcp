@@ -37,6 +37,13 @@ class DetailTest(unittest.TestCase):
         html = '<title>귀농 지원</title><div id="body_content">사업대상자 요건 귀농인 지원분야 농업 창업 및 주택 구입을 위한 상세한 안내가 포함되어 있습니다.</div>'.encode()
         self.assertEqual(len(m.extract(html, 'https://www.nowon.kr/test', '귀농 지원')['items']), 1)
 
+    def test_child_service_population_label(self):
+        html = '<title>지역아동센터 지원사업</title><div id="contents">지역아동센터의 사업내용 아동 보호와 학습 지도 등 서비스를 제공합니다. 이용아동 지역사회 내 보호가 필요한 만 18세 미만 아동입니다.</div>'.encode()
+        result = m.extract(html, 'https://www.ddc.go.kr/test', '지역아동센터 지원사업')
+        self.assertEqual(len(result['items']), 1)
+        self.assertIn('18세 미만', result['items'][0]['content'])
+        self.assertEqual(m.extract(html, 'https://www.ddc.go.kr/test', '다른 사업')['items'], [])
+
     def test_generic_title_requires_unique_matching_main_heading(self):
         html = '<title>시청</title><h1>청년 지원</h1><div id="body_content">지원대상 청년 지원범위 의료비를 지원하고 신청에 필요한 상세 조건을 안내합니다.</div>'.encode()
         self.assertEqual(len(m.extract(html, 'https://www.nowon.kr/test', '청년 지원')['items']), 1)
