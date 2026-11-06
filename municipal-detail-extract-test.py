@@ -68,6 +68,18 @@ class DetailTest(unittest.TestCase):
         self.assertEqual(m.extract(html + '<div class="t_view"></div>'.encode(), source, '반려동물 지원사업')['items'], [])
         self.assertEqual(m.extract(html.replace('제1유형'.encode(), '제4유형'.encode()), source, '반려동물 지원사업')['items'], [])
 
+    def test_yongin_prose_requires_target_amount_and_licence(self):
+        source = 'https://www.yongin.go.kr/user/bbs/BD_selectBbs.do?q_bbsCode=1020'
+        html = ('<div class="t_view"><td class="title">청년 이사비 지원</td>'
+                '<tr id="activeTr"><td>등록일 2026-07-07</td></tr><td class="tview_desc">'
+                '지원 대상은 무주택 청년이다. 선정되면 이사비를 최대 40만원 한도로 지원한다.</td></div>'
+                '<img alt="공공누리 제1유형: 출처표시">').encode()
+        item = m.extract(html, source, '청년 이사비 지원')['items'][0]
+        self.assertIn('최대 40만원', item['content'])
+        self.assertEqual(m.extract(html.replace('지원 대상은'.encode(), '대상은'.encode()), source, '청년 이사비 지원')['items'], [])
+        self.assertEqual(m.extract(html.replace('최대 40만원'.encode(), '40만원'.encode()), source, '청년 이사비 지원')['items'], [])
+        self.assertEqual(m.extract(html.replace('제1유형'.encode(), '제4유형'.encode()), source, '청년 이사비 지원')['items'], [])
+
     def test_bounded_content_with_unclosed_list_item(self):
         html = '''<html><head><title>청년 지원사업 : 구청</title></head><body>
         <div id="contents"><h3>지원대상</h3><ul><li>관내 청년</li></ul><h3>지원내용</h3>

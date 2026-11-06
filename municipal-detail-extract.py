@@ -168,6 +168,8 @@ def gumi_notice(data, source, expected_title):
     date_match = dates[0] if len(dates) == 1 and '등록일' in date else None
     marked = re.search(r'공공누리.{0,30}제\s*1\s*유형', html, re.I | re.S)
     policy = re.search(r'(?:지원|신청)대상|지원자격', content) and re.search(r'(?:지원|사업)(?:내용|금액|규모|한도)', content)
+    if host == 'www.yongin.go.kr' and re.search(r'지원\s*대상(?:은|이|자|:|\s)', content) and re.search(r'(?:최대|한도).{0,30}\d[\d,]*(?:만원|원)', content):
+        policy = True
     notice = re.search(r'마감|종료', subject) and re.search(r'마감|종료', content) and re.search(r'20\d{2}', content)
     if (host == 'www.yongin.go.kr' and page.scope_count != 1) or page.counts[classes[0]] != 1 or page.counts[classes[2]] != 1 or page.counts[classes[1]] < 1 or norm(expected_title) not in norm(subject) or not date_match or not marked or not (40 <= len(content) <= 30000) or not (policy or notice):
         return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'items': [], 'skipped': [{'reason': 'notice_page_unverified'}]}
