@@ -12,9 +12,9 @@ VOID = frozenset(('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'l
 
 
 class Page(HTMLParser):
-    def __init__(self, source, element_id='contents'):
+    def __init__(self, source, element_id='contents', element_class=None):
         super().__init__(convert_charrefs=True)
-        self.source, self.content_depth, self.element_id = source, 0, element_id
+        self.source, self.content_depth, self.element_id, self.element_class = source, 0, element_id, element_class
         self.title_active, self.skip, self.blocks = False, 0, 0
         self.title, self.parts, self.links = [], [], []
         self.headings, self.heading = [], None
@@ -33,7 +33,7 @@ class Page(HTMLParser):
             self.title_active = True
         if tag == 'h1':
             self.heading = []
-        if tag == 'div' and attrs.get('id') == self.element_id:
+        if tag == 'div' and ((self.element_id and attrs.get('id') == self.element_id) or (self.element_class and self.element_class in attrs.get('class', '').split())):
             self.blocks += 1
             if self.blocks == 1:
                 self.content_depth = 1
@@ -160,7 +160,13 @@ def extract(data, source, expected_title):
         return gumi_notice(data, source, expected_title)
     html = data.decode('utf-8-sig')
     page = None
-    for element_id in ('contents', 'conts', 'content', 'body_content'):
+    ansan = u.hostname == 'www.ansan.go.kr' and u.path == '/iloveyou/sub/contents.do'
+    if ansan:
+        candidate = Page(source, element_id=None, element_class='con_wrap')
+        candidate.feed(html)
+        if candidate.blocks and re.search(r'공공누리.{0,30}제\s*1\s*유형', html, re.I | re.S):
+            page = candidate
+    for element_id in (() if ansan else ('contents', 'conts', 'content', 'body_content')):
         candidate = Page(source, element_id)
         candidate.feed(html)
         if candidate.blocks:
@@ -181,7 +187,7 @@ def extract(data, source, expected_title):
     return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'extractedAt': datetime.now(timezone.utc).isoformat(),
             'items': [{'name': expected_title, 'content': content, 'contentColumn': '사업 안내 본문', 'department': None,
                        'fields': {}, 'links': list(dict.fromkeys(page.links)), 'source': source,
-                       'location': {'elementId': page.element_id}, 'status': 'source_detail_candidate'}], 'skipped': []}
+                       'location': {'elementClass': page.element_class} if page.element_class else {'elementId': page.element_id}, 'status': 'source_detail_candidate'}], 'skipped': []}
 
 
 if __name__ == '__main__':

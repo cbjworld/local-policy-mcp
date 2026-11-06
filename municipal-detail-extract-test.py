@@ -44,6 +44,17 @@ class DetailTest(unittest.TestCase):
         self.assertEqual(m.extract(html.replace('첨부'.encode(), '2026-10-01'.encode()), source, '산후조리 지원사업 종료 안내')['items'], [])
         self.assertEqual(m.extract(html.replace('제1유형'.encode(), '제4유형'.encode()), source, '산후조리 지원사업 종료 안내')['items'], [])
 
+    def test_ansan_explicit_content_requires_license_and_unique_body(self):
+        source = 'https://www.ansan.go.kr/iloveyou/sub/contents.do?c1=3&c3=22'
+        html = ('<title>경기도 산후조리비 지원</title><div class="con_wrap">지원대상자 경기도 거주 출산가정 '
+                '지원금액 출생아 1인당 50만원 신청기간 출생 후 12개월 이내. 공공누리 제1유형: 출처표시</div>').encode()
+        item = m.extract(html, source, '경기도 산후조리비 지원')['items'][0]
+        self.assertEqual(item['location'], {'elementClass': 'con_wrap'})
+        self.assertIn('50만원', item['content'])
+        self.assertEqual(m.extract(html.replace('제1유형'.encode(), '제4유형'.encode()), source, '경기도 산후조리비 지원')['items'], [])
+        self.assertEqual(m.extract(html + '<div class="con_wrap">다른 본문</div>'.encode(), source, '경기도 산후조리비 지원')['items'], [])
+        self.assertEqual(m.extract(html, source.replace('www.ansan.go.kr', 'www.nowon.kr'), '경기도 산후조리비 지원')['items'], [])
+
     def test_bounded_content_with_unclosed_list_item(self):
         html = '''<html><head><title>청년 지원사업 : 구청</title></head><body>
         <div id="contents"><h3>지원대상</h3><ul><li>관내 청년</li></ul><h3>지원내용</h3>
