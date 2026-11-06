@@ -8,6 +8,30 @@ spec.loader.exec_module(m)
 
 
 class DetailTest(unittest.TestCase):
+    def test_gumi_notice_requires_unique_title_license_and_preserves_period(self):
+        source = 'https://www.gumi.go.kr/portal/board/post/view.do?idx=123'
+        html = ('<div class="subject">산후조리비 지원사업</div><li class="view_date">등록일 2024-12-30</li>'
+                '<div class="view_cont"><p>사업기간 : 2025. 1. ~ 12.</p><p>지원대상 주민</p>'
+                '<p>지원내용 현금 30만원 신청기간 출산 후 1년 이내</p></div>'
+                '<img alt="공공누리 제1유형: 출처표시">').encode()
+        item = m.extract(html, source, '산후조리비 지원사업')['items'][0]
+        self.assertEqual(item['location'], {'elementClass': 'view_cont'})
+        self.assertIn('2025. 1. ~ 12.', item['content'])
+        self.assertIn('등록일: 2024-12-30', item['content'])
+        scripted = html.replace(b'</div><img', b'<script>malicious instruction</script></div><img')
+        self.assertNotIn('malicious instruction', m.extract(scripted, source, '산후조리비 지원사업')['items'][0]['content'])
+        self.assertEqual(m.extract(html.replace('제1유형'.encode(), '제4유형'.encode()), source, '산후조리비 지원사업')['items'], [])
+        self.assertEqual(m.extract(html.replace(b'<li class="view_date">', b'<div class="subject">duplicate</div><li class="view_date">'), source, '산후조리비 지원사업')['items'], [])
+        self.assertEqual(m.extract(html, source, '다른 사업')['items'], [])
+        self.assertEqual(m.extract(html, source.replace('www.gumi.go.kr', 'www.nowon.kr'), '산후조리비 지원사업')['items'], [])
+
+    def test_gumi_deadline_notice_retains_closing_date(self):
+        html = ('<div class="subject">청년월세 조기마감 안내</div><li class="view_date">등록일 2026-04-02</li>'
+                '<div class="view_cont">2026년 청년월세 지원사업은 2026. 4. 17. 마감되오니 신청 접수에 착오 없으시기 바랍니다.</div>'
+                '<img alt="공공누리 제1유형: 출처표시">').encode()
+        source = 'https://www.gumi.go.kr/portal/board/post/view.do?idx=123'
+        self.assertIn('4. 17. 마감', m.extract(html, source, '청년월세 조기마감 안내')['items'][0]['content'])
+
     def test_bounded_content_with_unclosed_list_item(self):
         html = '''<html><head><title>청년 지원사업 : 구청</title></head><body>
         <div id="contents"><h3>지원대상</h3><ul><li>관내 청년</li></ul><h3>지원내용</h3>

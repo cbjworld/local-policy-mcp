@@ -55,6 +55,20 @@ class CatalogMergeTest(unittest.TestCase):
         _, report = m.merge(result, [('mixed', mixed)], {'www.nowon.kr'})
         self.assertEqual(report[0]['status'], 'invalid')
 
+    def test_gumi_notice_location_requires_official_board_and_no_mixed_location(self):
+        url = 'https://www.gumi.go.kr/portal/board/post/view.do?idx=1'
+        source = snapshot(1, source=url)
+        source['items'][0]['location'] = {'elementClass': 'view_cont'}
+        _, report = m.merge({'sources': []}, [('notice', source)], {'www.gumi.go.kr'})
+        self.assertEqual(report[0]['status'], 'added')
+        source['items'][0]['location']['row'] = 2
+        _, report = m.merge({'sources': []}, [('mixed', source)], {'www.gumi.go.kr'})
+        self.assertEqual(report[0]['status'], 'invalid')
+        other = snapshot(1)
+        other['items'][0]['location'] = {'elementClass': 'view_cont'}
+        _, report = m.merge({'sources': []}, [('other', other)], {'www.nowon.kr'})
+        self.assertEqual(report[0]['status'], 'invalid')
+
     def test_explicit_detail_element(self):
         for element in ('contents', 'conts', 'content', 'body_content'):
             source = snapshot(1)

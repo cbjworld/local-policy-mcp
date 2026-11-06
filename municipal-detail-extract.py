@@ -82,10 +82,79 @@ def clean(value):
     return re.sub(r'\s+', ' ', value).strip()
 
 
+class GumiNotice(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.depth = 0
+        self.skip = 0
+        self.active = None
+        self.container_tag = None
+        self.counts = {'subject': 0, 'view_date': 0, 'view_cont': 0}
+        self.values = {key: [] for key in self.counts}
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ('script', 'style', 'noscript'):
+            self.skip += 1
+            return
+        if self.skip:
+            return
+        if tag in VOID:
+            if tag == 'br' and self.active:
+                self.values[self.active].append(' ')
+            return
+        attrs = dict(attrs)
+        classes = attrs.get('class', '').split()
+        key = next((x for x in self.counts if x in classes), None)
+        if self.active:
+            if tag == self.container_tag:
+                self.depth += 1
+            if tag in ('p', 'li', 'div', 'tr'):
+                self.values[self.active].append(' ')
+        elif key:
+            self.counts[key] += 1
+            self.active, self.depth, self.container_tag = key, 1, tag
+
+    def handle_endtag(self, tag):
+        if tag in ('script', 'style', 'noscript'):
+            self.skip = max(0, self.skip - 1)
+            return
+        if self.skip:
+            return
+        if tag in VOID or not self.active or tag != self.container_tag:
+            return
+        self.depth -= 1
+        if self.depth == 0:
+            self.active = None
+
+    def handle_data(self, data):
+        if self.active and not self.skip:
+            self.values[self.active].append(data)
+
+
+def gumi_notice(data, source, expected_title):
+    html = data.decode('utf-8-sig')
+    page = GumiNotice()
+    page.feed(html)
+    subject, date, content = (clean(''.join(page.values[x])) for x in ('subject', 'view_date', 'view_cont'))
+    norm = lambda x: re.sub(r'\s+', '', x)
+    date_match = re.search(r'20\d{2}-\d{2}-\d{2}', date)
+    marked = re.search(r'공공누리.{0,30}제\s*1\s*유형', html, re.I | re.S)
+    policy = re.search(r'(?:지원|신청)대상|지원자격', content) and re.search(r'(?:지원|사업)(?:내용|금액|규모|한도)', content)
+    notice = re.search(r'마감|종료', subject) and re.search(r'마감|종료', content) and re.search(r'20\d{2}', content)
+    if any(page.counts[x] != 1 for x in page.counts) or norm(expected_title) not in norm(subject) or not date_match or not marked or not (40 <= len(content) <= 30000) or not (policy or notice):
+        return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'items': [], 'skipped': [{'reason': 'notice_page_unverified'}]}
+    return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'extractedAt': datetime.now(timezone.utc).isoformat(),
+            'items': [{'name': subject, 'content': '등록일: ' + date_match.group() + ' ' + content, 'contentColumn': '게시글 본문',
+                       'department': None, 'fields': {'등록일': date_match.group()}, 'links': [], 'source': source,
+                       'location': {'elementClass': 'view_cont'}, 'status': 'source_notice_candidate'}], 'skipped': []}
+
+
 def extract(data, source, expected_title):
     u = urlparse(source)
     if u.scheme != 'https' or not u.hostname or u.username or not expected_title or len(expected_title) > 200:
         raise ValueError('원문 주소 또는 사업 제목 오류')
+    if u.hostname == 'www.gumi.go.kr' and '/board/post/view.do' in u.path:
+        return gumi_notice(data, source, expected_title)
     html = data.decode('utf-8-sig')
     page = None
     for element_id in ('contents', 'conts', 'content', 'body_content'):

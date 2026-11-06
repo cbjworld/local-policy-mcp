@@ -18,7 +18,7 @@ function link({q,institution,websiteOffset=0,budgetOffset=0,pairOffset=0}={},dep
   const qualifierEquivalent=a.length>=6&&c.length>=6&&a!==c&&a.replace(/장애인가정/g,'장애인')===c.replace(/장애인가정/g,'장애인');
   const partial=a.length>=6&&c.length>=6&&(a.includes(c)||c.includes(a));
   const anchored=anchor.length>=4&&a===anchor&&startsTerm(row.name,anchor);
-  const pageTopic=anchor.length>=4&&Boolean(web.location?.elementId)&&normalize(web.content).includes(anchor)&&startsTerm(row.name,anchor);
+  const pageTopic=anchor.length>=4&&Boolean(web.location?.elementId||web.location?.elementClass)&&normalize(web.content).includes(anchor)&&startsTerm(row.name,anchor);
   if(!exact&&!sameBase&&!qualifierEquivalent&&!partial&&!anchored&&!pageTopic)continue;
   const nameMatch=normalize(web.name)===normalize(row.name)?'normalized_exact':sameBase?'suffix_equivalent':qualifierEquivalent?'qualifier_equivalent':partial?'partial_name':anchored?'query_anchor':'page_topic';
   const note=nameMatch==='page_topic'?'홈페이지 전체 본문과 예산행에 검색 주제가 나타나는 참고 후보입니다. 한 페이지에 여러 사업이 있을 수 있어 같은 사업이나 한 사업의 예산으로 판단하거나 합산하지 마세요.':nameMatch==='query_anchor'?'같은 지역에서 질문의 주제가 이름에 공통으로 나타나는 관련 후보입니다. 대상·재원·기간과 원문을 대조하기 전에는 동일 사업으로 판단하거나 예산을 합산하지 마세요.':nameMatch==='partial_name'?'이름의 일부만 일치하는 연결 후보입니다. 한쪽에만 있는 대상·사업 내용과 회계연도를 원문에서 대조한 뒤 동일 여부를 판단하세요. 예산액은 지원 단가나 집행액이 아닙니다.':nameMatch==='qualifier_equivalent'?'장애인과 장애인가정의 명칭 차이를 가진 연결 후보입니다. 지원 대상·사업 범위와 회계연도를 원문에서 대조하세요. 예산액은 지원 단가나 집행액이 아닙니다.':'이름과 지자체가 일치하는 연결 후보입니다. 회계연도·사업 범위와 동일 여부를 원문에서 확인하세요. 예산액은 지원 단가나 집행액이 아닙니다.';
