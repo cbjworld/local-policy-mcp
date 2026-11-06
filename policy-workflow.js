@@ -24,6 +24,9 @@ function plan({question,queries,startDate,endDate}={},now=new Date()){
  if(/반려동물/.test(searchTopic)&&/의료\s*비/.test(searchTopic)){
   derived.splice(0,derived.length,searchTopic,searchTopic.replace(/의료\s*비/,'의료서비스'),searchTopic.replace(/의료\s*비/,'의료'));
  }
+ if(/어린이|아동|영유아|신생아/.test(searchTopic)&&/난청\s*(?:검사|선별검사|확진검사)/.test(searchTopic)){
+  derived.splice(0,derived.length,...new Set([searchTopic,searchTopic.replace(/어린이|아동|영유아/,'신생아'),searchTopic.replace(/(?:어린이|아동|영유아|신생아)\s*/,'')]));
+ }
  if(/전세\s*보증료|전세\s*보증금.*보증료/.test(searchTopic)){
   derived.splice(0,derived.length,searchTopic,'전세보증금 반환보증 보증료',...( /청년/.test(searchTopic)?['청년 보증료 지원']:['전세 보증료 지원']));
  }

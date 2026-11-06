@@ -8,7 +8,8 @@ function assessTarget(item,question){
  const fit=require('./relevance').targetFit(text,question);
  const consultation=/월세/.test(question)&&/(?:전.?월세|월세).{0,25}(?:안심계약|계약\s*(?:상담|도움))/.test(item.name||'');
  const careExclusion=/(?:아동|아이|영유아).*돌봄|아이\s*돌봄/.test(question)&&/^가정\s*양육\s*수당(?:\s*지원)?$/.test(item.name||'')&&/아이\s*돌봄\s*(?:서비스)?[^.]{0,20}(?:미이용|이용하지\s*않)/.test(text);
- const topicWarning=consultation?'전월세 계약 상담·동행 안내입니다. 월세 지급 사업으로 단정하지 마세요.':careExclusion?'아이돌봄서비스를 이용하지 않는 가정의 양육수당입니다. 돌봄서비스 제공 사업으로 세지 마세요.':undefined;
+ const hearingAndAid=/난청\s*(?:검사|선별검사|확진검사)/.test(question)&&/(?:검사\s*비|검사\s*지원)/.test(item.content||'')&&/보청기/.test(item.content||'');
+ const topicWarning=consultation?'전월세 계약 상담·동행 안내입니다. 월세 지급 사업으로 단정하지 마세요.':careExclusion?'아이돌봄서비스를 이용하지 않는 가정의 양육수당입니다. 돌봄서비스 제공 사업으로 세지 마세요.':hearingAndAid?'청각검사와 보청기 지원은 대상·한도가 다를 수 있으므로 각각의 조건과 금액을 구분하세요.':undefined;
  const disabilityRequested=/장애인|장애아동/.test(question);
  const disabilityMentioned=Boolean(target&&/장애인|장애아동/.test(target));
  const conditionAssessment=disabilityRequested?{requested:'장애인',status:disabilityMentioned?'mentioned_in_target':'unconfirmed',scope:target?'explicit_target':'excerpt',...(target?{excerpt:target.slice(0,250)}:{})}:undefined;
