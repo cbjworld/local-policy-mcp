@@ -1,0 +1,23 @@
+[
+  {
+    "name": "경기도 산후조리비 지원사업",
+    "relationship": "same_scheme_different_documents",
+    "note": "같은 경기도 사업에 관한 지자체 안내와 종료·접수연장 공지입니다. 각 문서의 작성·적용 시점은 다를 수 있으며 지원 조건이나 현재 운영 상태를 합쳐 단정하지 않습니다.",
+    "sources": [
+      {
+        "url": "https://www.ansan.go.kr/iloveyou/sub/contents.do?c1=3&c3=22",
+        "sha256": "5b3d511e3a8085f0918b7e0e9622dda496d7cbd84b081fa550ce3fe6df267c60",
+        "title": "경기도 산후조리비 지원",
+        "quote": "출생일 및 신청일 현재 경기도 거주 출산가정",
+        "role": "사업 안내, 게시일 미확인"
+      },
+      {
+        "url": "https://www.seongnam.go.kr/bbs010101/405225",
+        "sha256": "2ac983b4ddd55655c353cd2c86588c97ee1607303b067403375620628e2a2716",
+        "title": "「경기도 산후조리 지원사업」 종료 안내(※접수연장 안내)",
+        "quote": "「경기도 산후조리비 지원사업」이 2026년 10월1일자로 종료될 예정",
+        "role": "2026년 종료·접수연장 안내"
+      }
+    ]
+  }
+]
