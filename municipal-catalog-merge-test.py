@@ -16,6 +16,16 @@ def snapshot(count, digest='a', source=SOURCE):
 
 
 class CatalogMergeTest(unittest.TestCase):
+    def test_gyeyang_notice_location_is_restricted_to_detail_path(self):
+        url = 'https://www.gyeyang.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=16'
+        source = snapshot(1, source=url)
+        source['items'][0]['location'] = {'elementClass': 'con'}
+        _, report = m.merge({'sources': []}, [('notice', source)], {'www.gyeyang.go.kr'})
+        self.assertEqual(report[0]['status'], 'added')
+        source['source'] = source['items'][0]['source'] = url.replace('bbsMsgDetail.do', 'elsewhere.do')
+        _, report = m.merge({'sources': []}, [('wrong-path', source)], {'www.gyeyang.go.kr'})
+        self.assertEqual(report[0]['status'], 'invalid')
+
     def test_preserves_previous_on_bad_or_sparse_update(self):
         old = snapshot(4)
         low = snapshot(1, 'b')

@@ -156,6 +156,38 @@ class YonginNotice(GumiNotice):
                 self.scope_depth -= 1
 
 
+class GyeyangNotice(GumiNotice):
+    def __init__(self):
+        super().__init__(('notice-title', 'data', 'con'))
+        self.scope_depth = 0
+        self.scope_count = 0
+        self.header = False
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        classes = attributes.get('class', '').split()
+        if tag == 'div':
+            if self.scope_depth:
+                self.scope_depth += 1
+            elif 'general_board' in classes and 'board_view' in classes:
+                self.scope_count += 1
+                self.scope_depth = 1
+            if self.scope_depth == 2 and 'tit' in classes and not self.counts['notice-title']:
+                self.header = True
+        if self.scope_depth:
+            if tag == 'p' and self.header and not self.counts['notice-title']:
+                attrs = list(attrs) + [('class', 'notice-title')]
+            super().handle_starttag(tag, attrs)
+
+    def handle_endtag(self, tag):
+        if self.scope_depth:
+            super().handle_endtag(tag)
+            if tag == 'div':
+                if self.scope_depth == 2:
+                    self.header = False
+                self.scope_depth -= 1
+
+
 class BusanSeoguNotice(GumiNotice):
     def __init__(self):
         super().__init__(('notice-title', 'info', 'con'))
@@ -185,19 +217,30 @@ class BusanSeoguNotice(GumiNotice):
 def gumi_notice(data, source, expected_title):
     html = data.decode('utf-8-sig')
     host = urlparse(source).hostname
-    classes = ('board-view-head', 'board-view-table', 'board-view-content') if host == 'www.seongnam.go.kr' else ('title', 'activeTr', 'tview_desc') if host == 'www.yongin.go.kr' else ('notice-title', 'info', 'con') if host == 'www.bsseogu.go.kr' else ('subject', 'view_date', 'view_cont')
-    page = YonginNotice() if host == 'www.yongin.go.kr' else BusanSeoguNotice() if host == 'www.bsseogu.go.kr' else GumiNotice(classes)
+    classes = ('board-view-head', 'board-view-table', 'board-view-content') if host == 'www.seongnam.go.kr' else ('title', 'activeTr', 'tview_desc') if host == 'www.yongin.go.kr' else ('notice-title', 'info', 'con') if host == 'www.bsseogu.go.kr' else ('notice-title', 'data', 'con') if host == 'www.gyeyang.go.kr' else ('subject', 'view_date', 'view_cont')
+    page = YonginNotice() if host == 'www.yongin.go.kr' else BusanSeoguNotice() if host == 'www.bsseogu.go.kr' else GyeyangNotice() if host == 'www.gyeyang.go.kr' else GumiNotice(classes)
     page.feed(html)
     subject, date, content = (clean(''.join(page.values[x])) for x in classes)
     norm = lambda x: re.sub(r'[\s「」『』]', '', x)
     dates = re.findall(r'20\d{2}-\d{2}-\d{2}', date)
     date_match = dates[0] if len(dates) == 1 and ('등록일' in date or host == 'www.bsseogu.go.kr') else None
     marked = re.search(r'공공누리.{0,30}제\s*1\s*유형', html, re.I | re.S)
+    if host == 'www.gyeyang.go.kr':
+        korean_dates = re.findall(r'작성일\s*(20\d{2})년\s*(\d{1,2})월\s*(\d{1,2})일', date)
+        date_match = '%s-%02d-%02d' % (korean_dates[0][0], int(korean_dates[0][1]), int(korean_dates[0][2])) if len(korean_dates) == 1 else None
+        if date_match:
+            try:
+                datetime.strptime(date_match, '%Y-%m-%d')
+            except ValueError:
+                date_match = None
+        marked = re.search(r'<p\s+class="openNuri"[^>]*>\s*<img[^>]*alt="공공누리[^\"]*제\s*1\s*유형', html, re.I | re.S)
     policy = re.search(r'(?:지원|신청)대상|지원자격', content) and re.search(r'(?:지원|사업)(?:내용|금액|규모|한도)', content)
     if host in ('www.yongin.go.kr', 'www.bsseogu.go.kr') and re.search(r'지원\s*대상(?:은|이|자|:|\s)', content) and re.search(r'(?:최대|한도).{0,30}\d[\d,]*(?:만\s*원|원)', content):
         policy = True
+    if host == 'www.gyeyang.go.kr' and re.search(r'대\s*상\s*:', content) and re.search(r'내\s*용\s*:', content) and re.search(r'최대\s*\d[\d,]*\s*만\s*원', content):
+        policy = True
     notice = re.search(r'마감|종료', subject) and re.search(r'마감|종료', content) and re.search(r'20\d{2}', content)
-    if (host in ('www.yongin.go.kr', 'www.bsseogu.go.kr') and page.scope_count != 1) or page.counts[classes[0]] != 1 or page.counts[classes[2]] != 1 or page.counts[classes[1]] < 1 or norm(expected_title) not in norm(subject) or not date_match or not marked or not (40 <= len(content) <= 30000) or not (policy or notice):
+    if (host in ('www.yongin.go.kr', 'www.bsseogu.go.kr', 'www.gyeyang.go.kr') and page.scope_count != 1) or page.counts[classes[0]] != 1 or page.counts[classes[2]] != 1 or page.counts[classes[1]] < 1 or norm(expected_title) not in norm(subject) or not date_match or not marked or not (40 <= len(content) <= 30000) or not (policy or notice):
         return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'items': [], 'skipped': [{'reason': 'notice_page_unverified'}]}
     return {'source': source, 'sha256': hashlib.sha256(data).hexdigest(), 'extractedAt': datetime.now(timezone.utc).isoformat(),
             'items': [{'name': subject, 'content': '등록일: ' + date_match + ' ' + content, 'contentColumn': '게시글 본문',
@@ -209,7 +252,7 @@ def extract(data, source, expected_title):
     u = urlparse(source)
     if u.scheme != 'https' or not u.hostname or u.username or not expected_title or len(expected_title) > 200:
         raise ValueError('원문 주소 또는 사업 제목 오류')
-    if (u.hostname == 'www.gumi.go.kr' and '/board/post/view.do' in u.path) or (u.hostname == 'www.seongnam.go.kr' and re.fullmatch(r'/bbs[0-9]+/[0-9]+', u.path)) or (u.hostname == 'www.yongin.go.kr' and u.path == '/user/bbs/BD_selectBbs.do') or (u.hostname == 'www.bsseogu.go.kr' and u.path == '/news/board/view.do'):
+    if (u.hostname == 'www.gumi.go.kr' and '/board/post/view.do' in u.path) or (u.hostname == 'www.seongnam.go.kr' and re.fullmatch(r'/bbs[0-9]+/[0-9]+', u.path)) or (u.hostname == 'www.yongin.go.kr' and u.path == '/user/bbs/BD_selectBbs.do') or (u.hostname == 'www.bsseogu.go.kr' and u.path == '/news/board/view.do') or (u.hostname == 'www.gyeyang.go.kr' and u.path == '/open_content/main/bbs/bbsMsgDetail.do'):
         return gumi_notice(data, source, expected_title)
     html = data.decode('utf-8-sig')
     page = None

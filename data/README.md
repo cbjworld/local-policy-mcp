@@ -1,6 +1,6 @@
 # 공공누리 홈페이지 자료
 
-`municipal-kogl1-20261106.json`은 아래 지자체의 공공누리 제1유형 자료 12건을 2026년 11월 6일 수집해 추출한 검색용 자료입니다. 이용 시 각 원문 출처를 표시합니다. 사업의 현재 시행·접수 여부는 원문과 별도 최신 공지에서 확인합니다.
+`municipal-kogl1-20261106.json`은 아래 지자체의 공공누리 제1유형 자료 13건을 2026년 11월 6일 수집해 추출한 검색용 자료입니다. 이용 시 각 원문 출처를 표시합니다. 사업의 현재 시행·접수 여부는 원문과 별도 최신 공지에서 확인합니다.
 
 - 구미시 형곡2동, 2024년 게시 [산후조리비 지원사업](https://www.gumi.go.kr/hyeonggok2/board/post/view.do?bcIdx=1&idx=815868&mid=0201000000), 2025년 사업 안내.
 - 구미시 가족정책과, 2026년 게시 [다자녀 이사비·가족진료비 지원 안내](https://www.gumi.go.kr/portal/board/post/view.do?bcIdx=1&idx=840383&mid=0401020000). 두 사업의 대상과 지원액은 각각 다릅니다.
@@ -16,6 +16,8 @@
 - 인천광역시 남동구, 작성연도 미표시 [청년어촌정착 지원사업](https://www.namdong.go.kr/main/area/youth/business/fishing.jsp).
 - 인천광역시 남동구, 작성연도 미표시 [청년월세 지원사업](https://www.namdong.go.kr/main/area/youth/welfare/monthly.jsp).
 
+- 인천광역시 계양구, 윤상현, 2025년 게시 [인천광역시 공예산업 상품화 지원사업 참여 기업 모집](https://www.gyeyang.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=16&bcd=businessinfo). 인천 지역 기업 대상 2025년 모집 공지입니다.
+
 제1유형은 출처 표시 조건으로 이용할 수 있습니다. 각 항목에는 출처 URL과 원문 SHA-256, 수집 시각이 포함됩니다. 원본 HTML과 첨부파일은 포함하지 않습니다. 이 파일은 전체 보유 자료가 아닌 기본 예시 자료입니다.
 
-별도 자료 경로를 지정하지 않으면 MCP가 이 12건을 자동으로 사용합니다. `POLICY_MUNICIPAL_CATALOG`를 지정하면 해당 파일이 우선합니다. 기존 69개 출처가 든 로컬 자료를 사용 중이라면 설정을 바꿀 필요가 없습니다.
+별도 자료 경로를 지정하지 않으면 MCP가 이 13건을 자동으로 사용합니다. `POLICY_MUNICIPAL_CATALOG`를 지정하면 해당 파일이 우선합니다. 기존 70개 출처가 든 로컬 자료를 사용 중이라면 설정을 바꿀 필요가 없습니다.

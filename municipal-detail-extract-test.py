@@ -8,6 +8,22 @@ spec.loader.exec_module(m)
 
 
 class DetailTest(unittest.TestCase):
+    def test_gyeyang_uses_unique_notice_body_and_own_licence(self):
+        source = 'https://www.gyeyang.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=16&bcd=businessinfo'
+        html = ('<div class="general_board board_view"><div class="tit"><p>공예 지원 모집</p>'
+                '<div class="data">작성일 2025년 4월 24일(목)</div></div>'
+                '<div class="con"><p>○기 간: 2025. 4. 22. ~ 5. 7.</p>'
+                '<p>○대 상: 인천 공예기업</p><p>○내 용: 기업당 최대 500만원 지원</p></div>'
+                '<p class="openNuri"><img alt="공공누리 제1유형: 출처표시"></p></div>').encode()
+        item = m.extract(html, source, '공예 지원 모집')['items'][0]
+        self.assertIn('등록일: 2025-04-24', item['content'])
+        self.assertIn('기업당 최대 500만원', item['content'])
+        self.assertEqual(m.extract(html.replace('제1유형'.encode(), '제4유형'.encode()), source, '공예 지원 모집')['items'], [])
+        self.assertEqual(m.extract(html + b'<div class="general_board board_view"></div>', source, '공예 지원 모집')['items'], [])
+        self.assertEqual(m.extract(html, source, '다른 제목')['items'], [])
+        self.assertEqual(m.extract(html.replace('인천 공예기업'.encode(), b'' ).replace('대 상'.encode(), '내용'.encode()), source, '공예 지원 모집')['items'], [])
+        self.assertEqual(m.extract(html, source.replace('www.gyeyang.go.kr', 'www.nowon.kr'), '공예 지원 모집')['items'], [])
+
     def test_gumi_notice_requires_unique_title_license_and_preserves_period(self):
         source = 'https://www.gumi.go.kr/portal/board/post/view.do?idx=123'
         html = ('<div class="subject">산후조리비 지원사업</div><li class="view_date">등록일 2024-12-30</li>'

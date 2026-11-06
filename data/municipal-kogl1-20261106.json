@@ -282,6 +282,29 @@
         }
       ],
       "skipped": []
+    },
+    {
+      "source": "https://www.gyeyang.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=16&bcd=businessinfo",
+      "sha256": "7b589338328a9669ec557d1f443f3a75cf023561896ad6d0dd8b367dd1ce5a4a",
+      "extractedAt": "2026-11-06T03:03:13.286523+00:00",
+      "items": [
+        {
+          "name": "2025년 인천광역시 공예산업 상품화 지원사업 참여 기업 모집",
+          "content": "등록일: 2025-04-24 인천광역시에서 지역 공예기업의 공예상품 지원 및 공예문화 산업 육성을 위한 \"공예산업 상품화 지원사업\" 참여 기업을 모집하오니 많은 관심과 참여 부탁드립니다. ○사업명: 2025년 인천광역시 중소기업 디자인개발지원사업(마케팅 연계지원) ○분 야: 공예산업 상품화 지원 ○기 간: 2025. 4. 22.(화) ~ 5. 7.(수) [18시까지] ○대 상: 상품화 아이디어를 보유한 인천 지역 공예기업 ○내 용: 공예상품화 개발비 실비(공급가액) 지원 ※기업당 최대 500만원 ○신 청: 인천디자인지원센터 홈페이지 바로가기 ○문 의: 인천테크노파크 디자인N콘텐츠사업단 디자인지원센터(☎032-260-0235)",
+          "contentColumn": "게시글 본문",
+          "department": null,
+          "fields": {
+            "등록일": "2025-04-24"
+          },
+          "links": [],
+          "source": "https://www.gyeyang.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=16&bcd=businessinfo",
+          "location": {
+            "elementClass": "con"
+          },
+          "status": "source_notice_candidate"
+        }
+      ],
+      "skipped": []
     }
   ]
 }
