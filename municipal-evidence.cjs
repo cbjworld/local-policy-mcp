@@ -17,7 +17,7 @@ function collect(catalog,search,link){
    catch{failure=offset;break;}
    if(snapshot&&page.snapshot!==snapshot){failure=offset;break;}
    result=page;snapshot=page.snapshot;pages++;scanned+=page.items.length;
-   scope={totalSources:page.scope?.totalSources??null,totalInstitutions:page.scope?.totalInstitutions??null,skippedEntries:page.scope?.skippedEntries??null,description:page.scope?.coverage??null};
+   scope={totalSources:page.scope?.totalSources??null,totalInstitutions:page.scope?.totalInstitutions??null,skippedEntries:page.scope?.skippedEntries??null,selectedRegion:page.scope?.selectedRegion??null,description:page.scope?.coverage??null};
    for(const [index,item] of page.items.entries()){
     const regionKey=keyForRegion(item);if(item.parent&&item.institution&&!regions.has(regionKey))regions.set(regionKey,item.parent+' '+item.institution);
     const key=JSON.stringify([item.source,item.location,item.name]);if(found.has(key))continue;
