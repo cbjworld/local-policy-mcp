@@ -13,6 +13,10 @@ function plan({question,queries,startDate,endDate}={},now=new Date()){
  if(/청년/.test(searchTopic)&&/면접\s*(?:수당|비|활동비)/.test(searchTopic)){
   derived.splice(0,derived.length,'청년 면접수당','청년 면접비','청년 면접활동비');
  }
+ if(/청년/.test(searchTopic)&&/면접\s*사진비/.test(searchTopic)){
+  const variant=searchTopic.replace(/면접\s*사진비/,'면접사진 촬영비');
+  derived.splice(0,derived.length,searchTopic,variant,variant.replace(/청년\s*/,''));
+ }
  if(/이사\s*(?:비용|비)/.test(searchTopic)){
   const subject=words.filter(w=>!['지원','사업','정책'].includes(w)).join(' ');
   derived.splice(0,derived.length,...[...new Set([searchTopic,subject.replace(/이사\s*(?:비용|비)/,'이사비'),subject.replace(/이사\s*(?:비용|비)/,'이사비용'),subject.replace(/이사\s*(?:비용|비)/,'이사 지원')])].slice(0,3));
@@ -29,6 +33,9 @@ function plan({question,queries,startDate,endDate}={},now=new Date()){
  }
  if(/전세\s*보증료|전세\s*보증금.*보증료/.test(searchTopic)){
   derived.splice(0,derived.length,searchTopic,'전세보증금 반환보증 보증료',...( /청년/.test(searchTopic)?['청년 보증료 지원']:['전세 보증료 지원']));
+ }
+ if(/신혼부부/.test(searchTopic)&&/전세\s*자금/.test(searchTopic)&&/이자/.test(searchTopic)){
+  derived.splice(0,derived.length,searchTopic,searchTopic.replace(/전세\s*자금/,'임차보증금'),searchTopic.replace(/전세\s*자금/,'주택자금').replace(/(?<!대출)이자/,'대출이자'));
  }
  if(/어르신|노인|고령자|고령운전자/.test(searchTopic)&&/운전\s*면허.*반납/.test(searchTopic)&&!/청년|아동/.test(searchTopic)){
   derived.splice(0,derived.length,searchTopic,'고령자 운전면허 자진반납','운전면허 자진반납 지원');

@@ -12,6 +12,9 @@ assert.deepEqual(plan({question:'반려동물 의료비 지원 사업을 시행�
 assert.deepEqual(plan({question:'어린이 난청 검사 지원 사업 찾아줘'}).queries,['어린이 난청 검사 지원 사업','신생아 난청 검사 지원 사업','난청 검사 지원 사업']);
 assert.deepEqual(plan({question:'어린이 난청 검사 지원 사업 찾아줘',queries:['어린이 난청 검사']}).queries,['어린이 난청 검사']);
 assert(!plan({question:'노인 난청 검사 지원 찾아줘'}).queries.some(q=>q.includes('신생아')));
+assert.deepEqual(plan({question:'청년 면접 사진비 지원 사업 찾아줘'}).queries,['청년 면접 사진비 지원 사업','청년 면접사진 촬영비 지원 사업','면접사진 촬영비 지원 사업']);
+assert.deepEqual(plan({question:'신혼부부 전세자금 이자 지원 사업 찾아줘'}).queries,['신혼부부 전세자금 이자 지원 사업','신혼부부 임차보증금 이자 지원 사업','신혼부부 주택자금 대출이자 지원 사업']);
+assert.deepEqual(plan({question:'신혼부부 전세자금 이자 지원 사업 찾아줘',queries:['전세자금']} ).queries,['전세자금']);
 assert.deepEqual(plan({question:'대구 북구 청년 이사비용 찾아줘'}).queries,['청년 이사비용','청년 이사비','청년 이사 지원']);
 assert.deepEqual(plan({question:'청년 전세보증료 지원 찾아줘'}).queries,['청년 전세보증료 지원','전세보증금 반환보증 보증료','청년 보증료 지원']);
 assert.equal(require('./relevance').targetFit('전세보증금 반환보증 보증료 지원사업 추진계획','청년 전세보증료 지원 찾아줘').status,'unspecified');
