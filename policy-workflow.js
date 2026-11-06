@@ -73,7 +73,7 @@ async function runResearch(args={},io=portal){
  const catalogEvidence=require('./catalog-context').lookup(request,io.searchCatalog);
  const homepageSearch=io.searchHomepage||(((io.search===portal.search||process.env.POLICY_MUNICIPAL_CATALOG)&&require('./municipal-catalog-path.cjs')())?require('./municipal-homepage-search.cjs').search:null);
  const homepageBudgetLink=io.linkMunicipalBudget||(((io.search===portal.search||process.env.POLICY_MUNICIPAL_CATALOG)&&require('./municipal-catalog-path.cjs')())?require('./municipal-budget-link.cjs').linkAuto:null);
- const municipalEvidence=require('./municipal-evidence.cjs').collect(catalogEvidence,homepageSearch,homepageBudgetLink);
+ const municipalEvidence=require('./municipal-evidence.cjs').collect(catalogEvidence,homepageSearch,homepageBudgetLink,request.question);
  timings.catalogMs=Date.now()-started;
  const budgetSearches=[],budgetRows=new Map();
  let budgetScope=null;

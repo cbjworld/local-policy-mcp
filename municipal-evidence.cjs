@@ -1,10 +1,19 @@
 const keyForRegion=item=>JSON.stringify([item.parent,item.institution]);
+function assessTarget(item,question){
+ if(!question)return item;
+ const text=[item.name,item.content,...Object.values(item.fields||{})].filter(x=>typeof x==='string').join(' ');
+ const fit=require('./relevance').targetFit(text,question);
+ if(!fit.requested.length)return item;
+ if(fit.status==='mismatch')return {...item,queryMatch:'target_mismatch',targetAssessment:fit,note:'원래 질문의 연령 대상과 이 발췌문의 명시 대상이 다릅니다. 요청한 대상의 확정 사례로 세지 마세요.'};
+ if(fit.status==='unspecified')return {...item,queryMatch:'target_unconfirmed',targetAssessment:fit,note:'원래 질문의 연령 대상이 이 발췌문에서 확인되지 않습니다. 확정 사례로 세지 마세요.'};
+ return {...item,targetAssessment:fit};
+}
 function diversify(values,regionOf){
  const first=[],rest=[],seen=new Set();
  for(const value of values){const key=regionOf(value);if(seen.has(key))rest.push(value);else{seen.add(key);first.push(value);}}
  return [...first,...rest];
 }
-function collect(catalog,search,link){
+function collect(catalog,search,link,question){
  if(typeof search!=='function')return null;
  const queries=[...new Set((catalog?.searches||[]).map(s=>s.q).filter(q=>typeof q==='string'&&q.trim()))].slice(0,3);
  const searches=[],linkSearches=[],found=new Map(),linked=new Map(),linkTargets=new Map();let scope=null;
@@ -18,11 +27,12 @@ function collect(catalog,search,link){
    if(snapshot&&page.snapshot!==snapshot){failure=offset;break;}
    result=page;snapshot=page.snapshot;pages++;scanned+=page.items.length;
    scope={dataset:page.scope?.dataset??null,totalSources:page.scope?.totalSources??null,totalInstitutions:page.scope?.totalInstitutions??null,skippedEntries:page.scope?.skippedEntries??null,selectedRegion:page.scope?.selectedRegion??null,description:page.scope?.coverage??null};
-   for(const [index,item] of page.items.entries()){
+   for(const [index,rawItem] of page.items.entries()){
+    const item=assessTarget(rawItem,question);
     const regionKey=keyForRegion(item);if(item.parent&&item.institution&&!regions.has(regionKey))regions.set(regionKey,item.parent+' '+item.institution);
     const key=JSON.stringify([item.source,item.location,item.name]);if(found.has(key))continue;
     const entries=Object.entries(item.fields||{}),fields=Object.fromEntries(entries.slice(0,4).map(([k,v])=>[k,String(v).slice(0,180)]));
-    found.set(key,{name:item.name,institution:item.institution,parent:item.parent,publisherInstitution:item.publisherInstitution,programAuthority:item.programAuthority,institutionRole:item.institutionRole,source:item.source,sourceSha256:item.sourceSha256,location:item.location,status:item.status,queryMatch:item.queryMatch,matchScope:item.matchScope,missingTerms:item.missingTerms,targetNote:item.note,beneficiaryWarning:item.beneficiaryWarning,content:item.content,contentTruncated:item.contentTruncated,contentLength:item.contentLength,nextContentOffset:item.nextContentOffset,fields,fieldsTruncated:Boolean(item.fieldsTruncated||entries.length>4||entries.some(([,v])=>String(v).length>180)),followup:{tool:'search_municipal_homepage',arguments:{...base,offset:offset+index,limit:1,snapshot}}});
+    found.set(key,{name:item.name,institution:item.institution,parent:item.parent,publisherInstitution:item.publisherInstitution,programAuthority:item.programAuthority,institutionRole:item.institutionRole,source:item.source,sourceSha256:item.sourceSha256,location:item.location,status:item.status,queryMatch:item.queryMatch,targetAssessment:item.targetAssessment,matchScope:item.matchScope,missingTerms:item.missingTerms,targetNote:item.note,beneficiaryWarning:item.beneficiaryWarning,content:item.content,contentTruncated:item.contentTruncated,contentLength:item.contentLength,nextContentOffset:item.nextContentOffset,fields,fieldsTruncated:Boolean(item.fieldsTruncated||entries.length>4||entries.some(([,v])=>String(v).length>180)),followup:{tool:'search_municipal_homepage',arguments:{...base,offset:offset+index,limit:1,snapshot}}});
    }
    if(page.nextOffset===null||page.nextOffset===undefined||regions.size>=5)break;
    if(!Number.isInteger(page.nextOffset)||page.nextOffset<=offset){failure=offset;break;}
@@ -36,8 +46,8 @@ function collect(catalog,search,link){
  if(typeof link==='function')for(const {q,institution} of targets.slice(0,5))try{
   const comparison=link({q,institution,maxComparisons:2});
   linkSearches.push({q,institution,comparisons:comparison.comparisons,complete:comparison.complete,returnedPairs:comparison.pairs.length,cursor:comparison.cursor,followup:{tool:'link_municipal_budget_auto',arguments:{q,institution}}});
-  for(const pair of comparison.pairs){const h=pair.homepage,b=pair.budget,key=JSON.stringify([h.source,h.location,b.source,b.page,b.table,b.tableRow,b.name]);if(linked.has(key))continue;
-   linked.set(key,{query:q,relationship:pair.relationship,nameMatch:pair.nameMatch,note:pair.note,homepage:{name:h.name,institution:h.institution,parent:h.parent,publisherInstitution:h.publisherInstitution,programAuthority:h.programAuthority,institutionRole:h.institutionRole,source:h.source,sourceSha256:h.sourceSha256,location:h.location,queryMatch:h.queryMatch,missingTerms:h.missingTerms,targetNote:h.note,matchScope:h.matchScope,beneficiaryWarning:h.beneficiaryWarning},budget:{name:b.name,institution:b.institution,parent:b.parent,year:b.year,amount:b.budget,unit:b.unit,source:b.source,page:b.page,table:b.table,tableRow:b.tableRow,archiveMember:b.archiveMember,archiveSha256:b.archiveSha256,sourceFileSha256:b.sourceFileSha256,officialDocumentList:b.officialDocumentList,limitation:b.limitation}});
+  for(const pair of comparison.pairs){const h=assessTarget(pair.homepage,question),b=pair.budget,key=JSON.stringify([h.source,h.location,b.source,b.page,b.table,b.tableRow,b.name]);if(linked.has(key))continue;
+   linked.set(key,{query:q,relationship:pair.relationship,nameMatch:pair.nameMatch,note:pair.note,homepage:{name:h.name,institution:h.institution,parent:h.parent,publisherInstitution:h.publisherInstitution,programAuthority:h.programAuthority,institutionRole:h.institutionRole,source:h.source,sourceSha256:h.sourceSha256,location:h.location,queryMatch:h.queryMatch,targetAssessment:h.targetAssessment,missingTerms:h.missingTerms,targetNote:h.note,matchScope:h.matchScope,beneficiaryWarning:h.beneficiaryWarning},budget:{name:b.name,institution:b.institution,parent:b.parent,year:b.year,amount:b.budget,unit:b.unit,source:b.source,page:b.page,table:b.table,tableRow:b.tableRow,archiveMember:b.archiveMember,archiveSha256:b.archiveSha256,sourceFileSha256:b.sourceFileSha256,officialDocumentList:b.officialDocumentList,limitation:b.limitation}});
   }
  }catch{linkSearches.push({q,institution,status:'failed',note:'홈페이지와 예산 후보를 대조하지 못했습니다.'});}
  const all=[...found.values()],items=diversify(all,keyForRegion).slice(0,5),allLinks=[...linked.values()],links=diversify(allLinks,x=>keyForRegion(x.homepage)).slice(0,5);
