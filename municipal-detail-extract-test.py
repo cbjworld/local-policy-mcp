@@ -80,6 +80,19 @@ class DetailTest(unittest.TestCase):
         self.assertEqual(m.extract(html.replace('최대 40만원'.encode(), '40만원'.encode()), source, '청년 이사비 지원')['items'], [])
         self.assertEqual(m.extract(html.replace('제1유형'.encode(), '제4유형'.encode()), source, '청년 이사비 지원')['items'], [])
 
+    def test_busan_seogu_notice_keeps_target_and_annual_limit(self):
+        source = 'https://www.bsseogu.go.kr/news/board/view.do?dataSid=1'
+        html = ('<h4>바깥 제목</h4><div class="board-view-wrap"><h4>수급자 이사비 지원</h4>'
+                '<ul class="info"><li>2026-08-26 11:52</li></ul><div class="con">'
+                '지원 대상은 생계 또는 의료급여 수급가구이며 이사비를 최대 30만 원 한도에서 연 1회 지원합니다.</div></div>'
+                '<img alt="공공누리 제1유형: 출처표시">').encode()
+        item = m.extract(html, source, '수급자 이사비 지원')['items'][0]
+        self.assertEqual(item['location'], {'elementClass': 'con'})
+        self.assertIn('연 1회', item['content'])
+        self.assertIn('생계 또는 의료급여', item['content'])
+        self.assertEqual(m.extract(html.replace('제1유형'.encode(), '제4유형'.encode()), source, '수급자 이사비 지원')['items'], [])
+        self.assertEqual(m.extract(html + '<div class="board-view-wrap"></div>'.encode(), source, '수급자 이사비 지원')['items'], [])
+
     def test_bounded_content_with_unclosed_list_item(self):
         html = '''<html><head><title>청년 지원사업 : 구청</title></head><body>
         <div id="contents"><h3>지원대상</h3><ul><li>관내 청년</li></ul><h3>지원내용</h3>
