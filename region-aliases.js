@@ -23,4 +23,13 @@ function queryWithoutRegion(query,institution){
  });
  return kept.length&&kept.length<tokens.length?kept.join(' '):query;
 }
-module.exports={aliases,regionTerms,matchesRegion,queryWithoutRegion};
+function inferInstitution(query,records){
+ if(typeof query!=='string'||!Array.isArray(records))return null;
+ const tokens=query.trim().normalize('NFKC').split(/\s+/).map(t=>t.replace(/[?？!！,.，。]+$/u,'').replace(/(?:에서|으로|의|은|는)$/u,''));
+ const found=records.filter(r=>r.parent&&r.institution&&r.institution!==r.parent&&!r.institution.includes('(')&&tokens.includes(r.institution));
+ const unique=new Map(found.map(r=>[JSON.stringify([r.parent,r.institution]),r]));
+ if(unique.size!==1)return null;
+ const r=unique.values().next().value;
+ return `${r.parent} ${r.institution}`;
+}
+module.exports={aliases,regionTerms,matchesRegion,queryWithoutRegion,inferInstitution};

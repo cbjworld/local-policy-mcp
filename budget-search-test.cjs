@@ -1,5 +1,6 @@
 const assert=require('node:assert/strict');
 const {search}=require('./budget-search');
+const inferred=search({q:'해운대구 부모급여'}),explicit=search({q:'부모급여',institution:'부산광역시 해운대구'});assert.equal(inferred.inferredInstitution,'부산광역시 해운대구');assert.deepEqual(inferred.items,explicit.items);assert(inferred.totalCandidateRows>0);assert.equal(search({q:'중구 지원'}).inferredInstitution,undefined);
 const all=search({q:'청년',limit:2});assert.equal(all.items.length,2);assert.equal(all.nextOffset,2);
 const next=search({q:'청년',limit:2,offset:2});assert.notDeepEqual(all.items,next.items);
 for(const [shorthand,expanded] of [['음식물처리기','음식물 처리기'],['전세보증료','전세 보증료']]){
