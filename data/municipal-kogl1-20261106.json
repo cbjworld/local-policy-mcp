@@ -301,7 +301,11 @@
           "location": {
             "elementClass": "con"
           },
-          "status": "source_notice_candidate"
+          "status": "source_notice_candidate",
+          "programAuthority": {
+            "name": "인천광역시",
+            "quote": "인천광역시에서 지역 공예기업의 공예상품 지원 및 공예문화 산업 육성을 위한"
+          }
         }
       ],
       "skipped": []
