@@ -41,6 +41,14 @@ function collect(catalog,search,link){
   }
  }catch{linkSearches.push({q,institution,status:'failed',note:'홈페이지와 예산 후보를 대조하지 못했습니다.'});}
  const all=[...found.values()],items=diversify(all,keyForRegion).slice(0,5),allLinks=[...linked.values()],links=diversify(allLinks,x=>keyForRegion(x.homepage)).slice(0,5);
+ for(const item of items){
+  if(item.matchScope!=='notice_body')continue;
+  item.noticeWarning='한 공지에 여러 사업이 있을 수 있습니다. 각 사업의 대상·지원액과 연도를 따로 확인하세요.';
+  if(!item.contentTruncated||item.contentLength>2000)continue;
+  try{const page=search({...item.followup.arguments,contentLimit:2000}),full=page.items?.[0];
+   if(page.snapshot===item.followup.arguments.snapshot&&full?.source===item.source&&full.sourceSha256===item.sourceSha256&&JSON.stringify(full.location)===JSON.stringify(item.location))Object.assign(item,{content:full.content,contentTruncated:full.contentTruncated,contentLength:full.contentLength,nextContentOffset:full.nextContentOffset});
+  }catch{}
+ }
  const attempted=typeof link==='function'?Math.min(targets.length,5):0,remaining=targets.slice(attempted);
  const unattempted=remaining.slice(0,20).map(({q,institution})=>({q,institution,followup:{tool:'link_municipal_budget_auto',arguments:{q,institution}}}));
  return {scope,searches,items,omittedItems:Math.max(0,all.length-items.length),linkSearches,linkCoverage:{scannedRegionQueries:targets.length,attemptedRegionQueries:attempted,unattemptedRegionQueries:remaining.length,unattempted,omittedUnattempted:Math.max(0,remaining.length-unattempted.length)},links,omittedLinks:Math.max(0,allLinks.length-links.length),note:'저장된 홈페이지 발췌이며 실시간·전국 전체 검색이 아닙니다. 검색어당 최대 세 쪽과 최대 다섯 지역·검색어 조합을 대조합니다. 미대조 지역은 linkCoverage.unattempted로 이어서 확인하세요. 연결은 후보 또는 페이지 참고자료이며 예산행을 합산하거나 같은 사업으로 확정하지 마세요. 생략된 연결은 linkSearches.followup에서 처음부터 확인하고, 이후 cursor로 이어가세요. 지원 조건·시점과 예산 연결은 각 원문에서 확인하고 포털 원문과 구분하세요.'};
