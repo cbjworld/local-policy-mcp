@@ -6,10 +6,15 @@ function createStore({archive=null,background=null}={}){
   const read=new Map((value.investigations||[]).map(x=>[documentKey(x.candidate.url),x.result])),unique=new Map();
   for(const d of [...(value.candidates||[]),...(value.reviewItems||[]),...(value.relatedDocuments||[]),...(value.financialDocuments||[])]){
    if(!d.url)continue;const key=documentKey(d.url);if(unique.has(key))continue;
-   const result=read.get(key),timeout=(result?.attempts||[]).some(a=>a.status==='download_failed'&&a.phase==='wonmunFileRequest.ajax'&&a.errorCode==='ETIMEDOUT');
+   const result=read.get(key),attempts=result?.attempts||[];
+   const timeout=attempts.some(a=>a.status==='download_failed'&&a.errorCode==='ETIMEDOUT');
    const deferred=(result?.selectionNotes||[]).filter(n=>n.status==='deferred_provider_timeout').length;
+   const transient=attempts.some(a=>a.status==='download_failed'&&['ECONNRESET','EPIPE','EAI_AGAIN','ECONNREFUSED','HTTP_502','HTTP_503','HTTP_504','PROVIDER_MAINTENANCE'].includes(a.errorCode));
    let retry;
-   try{const u=new URL(d.url);if((timeout||deferred)&&u.origin==='https://www.open.go.kr'&&['/othicInfo/infoList/infoListDetl.do','/othicInfo/infoList/infoListDetl2.do'].includes(u.pathname))retry={reason:'provider_timeout',deferredAttachments:deferred,tool:'research_open_document',arguments:{url:d.url,...(typeof value.request?.question==='string'&&value.request.question.length<=300?{requestedQuery:value.request.question}:{})}};}catch{}
+   try{
+    const u=new URL(d.url),reason=timeout||deferred?'provider_timeout':transient?'temporary_provider_failure':null;
+    if(reason&&u.origin==='https://www.open.go.kr'&&['/othicInfo/infoList/infoListDetl.do','/othicInfo/infoList/infoListDetl2.do'].includes(u.pathname))retry={reason,deferredAttachments:deferred,tool:'research_open_document',arguments:{url:d.url,...(typeof value.request?.question==='string'&&value.request.question.length<=300?{requestedQuery:value.request.question}:{}),...(typeof value.automaticOcr?.enabled==='boolean'?{autoOcr:value.automaticOcr.enabled}:{})}};
+   }catch{}
    unique.set(key,{institution:d.institution||null,title:d.title||'',url:d.url,disclosure:d.disclosure||null,classification:d.relevance?.kind||'unclassified',role:d.documentRole||'other',readingStatus:result?.status||'not_attempted',...(retry?{readingFollowup:retry}:{})});
   }
   const researchId=archive?randomBytes(32).toString('hex'):randomUUID(),items=[...unique.values()],snapshot={items,createdAt:Date.now(),question:value.request?.question||null};
