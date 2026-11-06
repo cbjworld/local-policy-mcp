@@ -18,6 +18,7 @@ function search({q,institution,offset=0,limit=10,sourceOffset=0,sourceLimit=20,c
  if(snapshot!==undefined&&(typeof snapshot!=='string'||snapshot!==version))throw Error('질문·지자체 또는 홈페이지 자료가 변경되어 이어볼 수 없습니다. 처음부터 다시 검색하세요.');
  const sources=Array.isArray(data.sources)?data.sources:[data];if(!sources.length||sources.length>5000)throw Error('홈페이지 자료 형식이 올바르지 않습니다.');
  const effectiveQuery=require('./region-aliases').queryWithoutRegion(q,institution);
+ const regionTerms=institution?require('./region-aliases').regionTerms(institution).map(normalize):null;
  const terms=effectiveQuery.trim().split(/\s+/).map(normalize),rows=[],equivalent=[],partial=[],coverage=[],seen=new Set();
  const targetTerms=terms.filter(t=>/^(청년|어르신|노인|고령자)$/.test(t)),subjectTerms=terms.filter(t=>!targetTerms.includes(t));
  for(const source of sources){
@@ -25,10 +26,10 @@ function search({q,institution,offset=0,limit=10,sourceOffset=0,sourceLimit=20,c
   const sourceUrl=validateUrl(source.source);if(temporaryUrl(sourceUrl))throw Error('임시 접속 정보가 포함된 출처는 사용할 수 없습니다.');
   const municipalities=municipalitiesByHost.get(sourceUrl.hostname)||[],identity=municipalities.length===1?municipalities[0]:null;
   if(!identity)throw Error('홈페이지의 지자체를 주소록에서 유일하게 확인할 수 없습니다.');
-  const region=normalize(identity.parent+' '+identity.institution);coverage.push({institution:identity.institution,parent:identity.parent,source:source.source,sourceSha256:source.sha256,extractedAt:typeof source.extractedAt==='string'?source.extractedAt:null,skippedEntries:Array.isArray(source.skipped)?source.skipped.length:0});
+  const regionMatches=!regionTerms||require('./region-aliases').matchesRegion(regionTerms,identity);coverage.push({institution:identity.institution,parent:identity.parent,source:source.source,sourceSha256:source.sha256,extractedAt:typeof source.extractedAt==='string'?source.extractedAt:null,skippedEntries:Array.isArray(source.skipped)?source.skipped.length:0});
   for(const row of source.items){
    const rawFields=row?.fields&&typeof row.fields==='object'&&!Array.isArray(row.fields)?Object.entries(row.fields).filter(([k,v])=>typeof v==='string'):[],fields=Object.fromEntries(rawFields.slice(0,20).map(([k,v])=>[k.slice(0,100),v.slice(0,2000)]));
-   if(!row||row.source!==source.source||typeof row.name!=='string'||typeof row.content!=='string'||!((Number.isInteger(row.location?.table)&&row.location.table>0&&Number.isInteger(row.location?.row)&&row.location.row>0&&row.location.section===undefined&&row.location.elementId===undefined)||(Number.isInteger(row.location?.section)&&row.location.section>0&&row.location.table===undefined&&row.location.row===undefined&&row.location.elementId===undefined)||(['contents','conts','content','body_content'].includes(row.location?.elementId)&&row.location.table===undefined&&row.location.row===undefined&&row.location.section===undefined))||institution&&!institution.trim().split(/\s+/).every(t=>region.includes(normalize(t))))continue;
+   if(!row||row.source!==source.source||typeof row.name!=='string'||typeof row.content!=='string'||!((Number.isInteger(row.location?.table)&&row.location.table>0&&Number.isInteger(row.location?.row)&&row.location.row>0&&row.location.section===undefined&&row.location.elementId===undefined)||(Number.isInteger(row.location?.section)&&row.location.section>0&&row.location.table===undefined&&row.location.row===undefined&&row.location.elementId===undefined)||(['contents','conts','content','body_content'].includes(row.location?.elementId)&&row.location.table===undefined&&row.location.row===undefined&&row.location.section===undefined))||!regionMatches)continue;
    const text=row.name+' '+row.content+' '+rawFields.map(([,v])=>v).join(' '),normalized=normalize(text),exact=terms.every(t=>normalized.includes(t));
    const fit=require('./relevance').targetFit(text,effectiveQuery).status;
    const synonym=!exact&&targetTerms.length===1&&/^(어르신|노인|고령자)$/.test(targetTerms[0])&&subjectTerms.length>0&&subjectTerms.every(t=>normalized.includes(t))&&fit==='match';
