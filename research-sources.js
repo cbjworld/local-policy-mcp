@@ -3,10 +3,14 @@ const {documentKey}=require('./project-bundles');
 function createStore({archive=null,background=null}={}){
  const snapshots=new Map();
  async function save(value){
-  const read=new Map((value.investigations||[]).map(x=>[documentKey(x.candidate.url),x.result.status])),unique=new Map();
+  const read=new Map((value.investigations||[]).map(x=>[documentKey(x.candidate.url),x.result])),unique=new Map();
   for(const d of [...(value.candidates||[]),...(value.reviewItems||[]),...(value.relatedDocuments||[]),...(value.financialDocuments||[])]){
    if(!d.url)continue;const key=documentKey(d.url);if(unique.has(key))continue;
-   unique.set(key,{institution:d.institution||null,title:d.title||'',url:d.url,disclosure:d.disclosure||null,classification:d.relevance?.kind||'unclassified',role:d.documentRole||'other',readingStatus:read.get(key)||'not_attempted'});
+   const result=read.get(key),timeout=(result?.attempts||[]).some(a=>a.status==='download_failed'&&a.phase==='wonmunFileRequest.ajax'&&a.errorCode==='ETIMEDOUT');
+   const deferred=(result?.selectionNotes||[]).filter(n=>n.status==='deferred_provider_timeout').length;
+   let retry;
+   try{const u=new URL(d.url);if((timeout||deferred)&&u.origin==='https://www.open.go.kr'&&['/othicInfo/infoList/infoListDetl.do','/othicInfo/infoList/infoListDetl2.do'].includes(u.pathname))retry={reason:'provider_timeout',deferredAttachments:deferred,tool:'research_open_document',arguments:{url:d.url,...(typeof value.request?.question==='string'&&value.request.question.length<=300?{requestedQuery:value.request.question}:{})}};}catch{}
+   unique.set(key,{institution:d.institution||null,title:d.title||'',url:d.url,disclosure:d.disclosure||null,classification:d.relevance?.kind||'unclassified',role:d.documentRole||'other',readingStatus:result?.status||'not_attempted',...(retry?{readingFollowup:retry}:{})});
   }
   const researchId=archive?randomBytes(32).toString('hex'):randomUUID(),items=[...unique.values()],snapshot={items,createdAt:Date.now(),question:value.request?.question||null};
   const cursors=(value.coverage?.nextSearches||[]).map(x=>x.arguments);
