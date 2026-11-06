@@ -42,6 +42,6 @@ function ambiguousInstitution(query,records){
  if(tokens.some(t=>records.some(r=>r.parent===(parentAliases[t]||t))))return null;
  const found=records.filter(r=>r.parent&&r.institution&&r.institution!==r.parent&&!r.institution.includes('(')&&tokens.includes(r.institution));
  const names=[...new Set(found.map(r=>r.institution))],parents=[...new Set(found.map(r=>r.parent))];
- return names.length===1&&parents.length>1?{name:names[0],parents,note:'같은 이름의 지자체가 여러 곳입니다. 광역 지역을 함께 지정해 주세요.'}:null;
+ return names.length===1&&parents.length>1?{name:names[0],parents,note:'같은 이름의 지자체를 수록 자료 범위에서 검색합니다. 결과의 광역 지역을 구분하고, 특정 지역만 원하면 광역 지역을 함께 지정하세요.'}:null;
 }
 module.exports={aliases,regionTerms,matchesRegion,queryWithoutRegion,inferInstitution,ambiguousInstitution};

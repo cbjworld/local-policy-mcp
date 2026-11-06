@@ -13,6 +13,7 @@ function search({q,institution,offset=0,limit=10,sourceOffset=0,sourceLimit=20,c
  const inferredInstitution=institution===undefined?require('./region-aliases').inferInstitution(q,records):null;
  const ambiguousInstitution=institution===undefined?require('./region-aliases').ambiguousInstitution(q,records):null;
  if(inferredInstitution)institution=inferredInstitution;
+ else if(ambiguousInstitution)institution=ambiguousInstitution.name;
  let data,version;try{if(fs.statSync(file).size>20*1024*1024)throw Error('too_large');const bytes=fs.readFileSync(file);if(bytes.length>20*1024*1024)throw Error('too_large');version=crypto.createHash('sha256').update(JSON.stringify([q,institution??null])).update('\0').update(bytes).digest('hex');data=JSON.parse(bytes.toString('utf8'));}catch{throw Error('홈페이지 자료를 읽을 수 없습니다. 파일과 크기 제한을 확인하세요.');}
  if(snapshot!==undefined&&(typeof snapshot!=='string'||snapshot!==version))throw Error('질문·지자체 또는 홈페이지 자료가 변경되어 이어볼 수 없습니다. 처음부터 다시 검색하세요.');
  const sources=Array.isArray(data.sources)?data.sources:[data];if(!sources.length||sources.length>5000)throw Error('홈페이지 자료 형식이 올바르지 않습니다.');

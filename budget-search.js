@@ -19,6 +19,7 @@ function search({q,institution,offset=0,limit=10}={}){
  const inferredInstitution=institution===undefined?require('./region-aliases').inferInstitution(q,require('./catalog-institutions.json').records):null;
  const ambiguousInstitution=institution===undefined?require('./region-aliases').ambiguousInstitution(q,require('./catalog-institutions.json').records):null;
  if(inferredInstitution)institution=inferredInstitution;
+ else if(ambiguousInstitution)institution=ambiguousInstitution.name;
  const effectiveQuery=require('./region-aliases').queryWithoutRegion(q,institution);
  const terms=effectiveQuery.trim().split(/\s+/).map(normalize);
  const region=institution?require('./region-aliases').regionTerms(institution).map(normalize):null;
