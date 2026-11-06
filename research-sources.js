@@ -3,10 +3,11 @@ const {documentKey}=require('./project-bundles');
 function createStore({archive=null,background=null}={}){
  const snapshots=new Map();
  async function save(value){
-  const read=new Map((value.investigations||[]).map(x=>[documentKey(x.candidate.url),x.result])),unique=new Map();
+  const read=new Map(),unique=new Map();
+  for(const x of value.investigations||[]){const key=documentKey(x.candidate.url);if(!read.has(key))read.set(key,[]);read.get(key).push(x.result);}
   for(const d of [...(value.candidates||[]),...(value.reviewItems||[]),...(value.relatedDocuments||[]),...(value.financialDocuments||[])]){
    if(!d.url)continue;const key=documentKey(d.url);if(unique.has(key))continue;
-   const result=read.get(key),attempts=result?.attempts||[];
+   const history=read.get(key)||[],result=history.at(-1),attempts=result?.attempts||[];
    const timeout=attempts.some(a=>a.status==='download_failed'&&a.errorCode==='ETIMEDOUT');
    const deferred=(result?.selectionNotes||[]).filter(n=>n.status==='deferred_provider_timeout').length;
    const transient=attempts.some(a=>a.status==='download_failed'&&['ECONNRESET','EPIPE','EAI_AGAIN','ECONNREFUSED','HTTP_502','HTTP_503','HTTP_504','PROVIDER_MAINTENANCE'].includes(a.errorCode));
@@ -15,7 +16,7 @@ function createStore({archive=null,background=null}={}){
     const u=new URL(d.url),reason=timeout||deferred?'provider_timeout':transient?'temporary_provider_failure':null;
     if(reason&&u.origin==='https://www.open.go.kr'&&['/othicInfo/infoList/infoListDetl.do','/othicInfo/infoList/infoListDetl2.do'].includes(u.pathname))retry={reason,deferredAttachments:deferred,tool:'research_open_document',arguments:{url:d.url,...(typeof value.request?.question==='string'&&value.request.question.length<=300?{requestedQuery:value.request.question}:{}),...(typeof value.automaticOcr?.enabled==='boolean'?{autoOcr:value.automaticOcr.enabled}:{})}};
    }catch{}
-   unique.set(key,{institution:d.institution||null,title:d.title||'',url:d.url,disclosure:d.disclosure||null,classification:d.relevance?.kind||'unclassified',role:d.documentRole||'other',readingStatus:result?.status||'not_attempted',...(retry?{readingFollowup:retry}:{})});
+   unique.set(key,{institution:d.institution||null,title:d.title||'',url:d.url,disclosure:d.disclosure||null,classification:d.relevance?.kind||'unclassified',role:d.documentRole||'other',readingStatus:result?.status||'not_attempted',...(history.length>1?{readingHistory:{investigations:history.length,earlierTextRead:history.slice(0,-1).some(x=>x?.status==='read'),note:'readingStatus는 마지막 조사 결과이며 이전 텍스트 추출은 현재 공개 상태나 최신 내용을 보증하지 않습니다.'}}:{}),...(retry?{readingFollowup:retry}:{})});
   }
   const researchId=archive?randomBytes(32).toString('hex'):randomUUID(),items=[...unique.values()],snapshot={items,createdAt:Date.now(),question:value.request?.question||null};
   const cursors=(value.coverage?.nextSearches||[]).map(x=>x.arguments);
