@@ -28,6 +28,15 @@ function plan({question,queries,startDate,endDate}={},now=new Date()){
  if(/반려동물/.test(searchTopic)&&/의료\s*비/.test(searchTopic)){
   derived.splice(0,derived.length,searchTopic,searchTopic.replace(/의료\s*비/,'의료서비스'),searchTopic.replace(/의료\s*비/,'의료'));
  }
+ if(/반려동물/.test(searchTopic)&&/병원\s*비/.test(searchTopic)){
+  derived.splice(0,derived.length,searchTopic,searchTopic.replace(/병원\s*비/,'의료'),searchTopic.replace(/취약계층|저소득층/,'').replace(/병원\s*비/,'의료서비스').replace(/\s+/g,' ').trim());
+ }
+ if(/겨울철/.test(searchTopic)&&/난방비/.test(searchTopic)){
+  derived.splice(0,derived.length,searchTopic,searchTopic.replace(/겨울철\s*/,'월동'),searchTopic.replace(/겨울철\s*/,''));
+ }
+ if(/치매\s*(?:환자\s*)?치료비/.test(searchTopic)){
+  derived.splice(0,derived.length,searchTopic,searchTopic.replace(/치매\s*(?:환자\s*)?치료비/,'치매 치료관리비'),searchTopic.replace(/환자\s*/,''));
+ }
  if(/어린이|아동|영유아|신생아/.test(searchTopic)&&/난청\s*(?:검사|선별검사|확진검사)/.test(searchTopic)){
   derived.splice(0,derived.length,...new Set([searchTopic,searchTopic.replace(/어린이|아동|영유아/,'신생아'),searchTopic.replace(/(?:어린이|아동|영유아|신생아)\s*/,'')]));
  }

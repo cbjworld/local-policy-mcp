@@ -3,7 +3,8 @@ function assessTarget(item,question){
  if(!question)return item;
  const fields=Object.entries(item.fields||{}).filter(([k,v])=>/^(?:지원|신청|사업|수혜)?대상(?:자)?$/.test(k.replace(/\s/g,''))&&typeof v==='string'&&v.trim()).map(([,v])=>v);
  const sections=[...String(item.content||'').matchAll(/(?:지원\s*대상(?:자)?|신청\s*대상|사업\s*대상)\s*[:：]\s*(.{1,500}?)(?=\s*(?:사업\s*내용|지원\s*내용|신청\s*방법|사업\s*기간|선정\s*기준|사업\s*목적|구비\s*서류|문의)\s*[:：]|$)/gs)].map(x=>x[1]);
- const target=fields.length===1?fields[0]:fields.length===0&&sections.length===1?sections[0]:null;
+ const plainSections=sections.length===0?[...String(item.content||'').matchAll(/(?:^|\s)대상\s+(.{1,500}?)(?=\s*지원\s*내용(?:\s|[:：]|$))/gs)].map(x=>x[1]):[];
+ const target=fields.length===1?fields[0]:fields.length===0&&sections.length===1?sections[0]:fields.length===0&&sections.length===0&&plainSections.length===1?plainSections[0]:null;
  const text=target||[item.name,item.content,...Object.values(item.fields||{})].filter(x=>typeof x==='string').join(' ');
  const fit=require('./relevance').targetFit(text,question);
  const consultation=/월세/.test(question)&&/(?:전.?월세|월세).{0,25}(?:안심계약|계약\s*(?:상담|도움))/.test(item.name||'');
@@ -11,12 +12,15 @@ function assessTarget(item,question){
  const hearingAndAid=/난청\s*(?:검사|선별검사|확진검사)/.test(question)&&/(?:검사\s*비|검사\s*지원)/.test(item.content||'')&&/보청기/.test(item.content||'');
  const leaseReview=/전세\s*자금/.test(question)&&/임차\s*보증금/.test(item.name||'')&&!/전세/.test(item.content||'');
  const mixedMortgage=/전세\s*자금/.test(question)&&/주택\s*자금/.test(item.name||'')&&/구입/.test(item.content||'')&&/전세/.test(item.content||'');
- const topicWarning=consultation?'전월세 계약 상담·동행 안내입니다. 월세 지급 사업으로 단정하지 마세요.':careExclusion?'아이돌봄서비스를 이용하지 않는 가정의 양육수당입니다. 돌봄서비스 제공 사업으로 세지 마세요.':hearingAndAid?'청각검사와 보청기 지원은 대상·한도가 다를 수 있으므로 각각의 조건과 금액을 구분하세요.':leaseReview?'임차보증금 이자 안내입니다. 전세 적용 여부는 이 발췌문에서 확인되지 않았으므로 원문을 확인하세요.':mixedMortgage?'주택 구입과 전세가 함께 안내됩니다. 전세 조건과 구입 조건을 나누어 확인하세요.':undefined;
+ const dementiaCost=/치매\s*(?:환자\s*)?치료비/.test(question)&&/치매\s*치료\s*관리비/.test(item.name||'');
+ const topicWarning=consultation?'전월세 계약 상담·동행 안내입니다. 월세 지급 사업으로 단정하지 마세요.':careExclusion?'아이돌봄서비스를 이용하지 않는 가정의 양육수당입니다. 돌봄서비스 제공 사업으로 세지 마세요.':hearingAndAid?'청각검사와 보청기 지원은 대상·한도가 다를 수 있으므로 각각의 조건과 금액을 구분하세요.':leaseReview?'임차보증금 이자 안내입니다. 전세 적용 여부는 이 발췌문에서 확인되지 않았으므로 원문을 확인하세요.':mixedMortgage?'주택 구입과 전세가 함께 안내됩니다. 전세 조건과 구입 조건을 나누어 확인하세요.':dementiaCost?'치매치료관리비의 지원 범위와 한도를 확인하세요. 모든 치매 치료비를 지원한다는 뜻은 아닙니다.':undefined;
  const disabilityRequested=/장애인|장애아동/.test(question);
  const disabilityMentioned=Boolean(target&&/장애인|장애아동/.test(target));
- const conditionAssessment=disabilityRequested?{requested:'장애인',status:disabilityMentioned?'mentioned_in_target':'unconfirmed',scope:target?'explicit_target':'excerpt',...(target?{excerpt:target.slice(0,250)}:{})}:undefined;
+ const vulnerabilityRequested=!disabilityRequested&&/취약계층|저소득층/.test(question);
+ const vulnerabilityMentioned=Boolean(target&&/취약계층|취약가구|저소득|수급|차상위|중위소득/.test(target));
+ const conditionAssessment=disabilityRequested||vulnerabilityRequested?{requested:disabilityRequested?'장애인':'취약계층',status:(disabilityRequested?disabilityMentioned:vulnerabilityMentioned)?'mentioned_in_target':'unconfirmed',scope:target?'explicit_target':'excerpt',...(target?{excerpt:target.slice(0,250)}:{})}:undefined;
  const result={...item,...(topicWarning?{topicWarning}:{}),...(conditionAssessment?{conditionAssessment}:{})};
- if(disabilityRequested&&!disabilityMentioned){result.queryMatch='target_unconfirmed';result.note='장애인 지원 여부가 명시된 지원대상에서 확인되지 않습니다. 확정 사례로 세지 마세요.';}
+ if(conditionAssessment?.status==='unconfirmed'){result.queryMatch='target_unconfirmed';result.note=conditionAssessment.requested+' 지원 여부가 명시된 지원대상에서 확인되지 않습니다. 확정 사례로 세지 마세요.';}
  const titleFit=require('./relevance').targetFit(item.name||'',question);
  if(titleFit.status==='mismatch')return {...result,queryMatch:'target_mismatch',targetAssessment:{...titleFit,scope:'title',excerpt:item.name},note:'사업 제목의 연령 대상이 원래 질문과 다릅니다. 본문에 다른 연령이 언급돼도 요청 대상의 확정 사례로 세지 마세요.'};
  if(!fit.requested.length)return result;
