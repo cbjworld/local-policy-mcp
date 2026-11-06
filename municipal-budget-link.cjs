@@ -2,11 +2,13 @@ const budget=require('./budget-search');
 const homepage=require('./municipal-homepage-search.cjs');
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const normalize=value=>String(value||'').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
+const startsTerm=(value,anchor)=>String(value||'').normalize('NFKC').split(/[^\p{L}\p{N}]+/u).some(term=>{const t=normalize(term);return t.startsWith(anchor)||t.startsWith('전문'+anchor)});
 function baseName(value){return normalize(value).replace(/(?:지원사업|지원|사업)$/,'')}
 function link({q,institution,websiteOffset=0,budgetOffset=0,pairOffset=0}={},deps={budget,homepage}){
  if(institution!==undefined&&(typeof institution!=='string'||!institution.trim()))throw Error('지자체를 확인하세요.');
  if(![websiteOffset,budgetOffset,pairOffset].every(x=>Number.isInteger(x)&&x>=0))throw Error('결과 범위를 확인하세요.');
  const b=deps.budget.search({q,institution,limit:20,offset:budgetOffset}),h=deps.homepage.search({q,institution,limit:20,offset:websiteOffset});
+ const anchor=normalize(h.effectiveQuery||q);
  const pairs=[];
  for(const web of h.items)for(const row of b.items){
   if(!normalize(web.parent)||!normalize(row.parent)||!normalize(web.institution)||!normalize(row.institution)||normalize(web.parent)!==normalize(row.parent)||normalize(web.institution)!==normalize(row.institution))continue;
@@ -14,10 +16,13 @@ function link({q,institution,websiteOffset=0,budgetOffset=0,pairOffset=0}={},dep
   const exact=normalize(web.name).length>=6&&normalize(web.name)===normalize(row.name);
   const sameBase=a.length>=4&&a===c;
   const qualifierEquivalent=a.length>=6&&c.length>=6&&a!==c&&a.replace(/장애인가정/g,'장애인')===c.replace(/장애인가정/g,'장애인');
-  if(!exact&&!sameBase&&!qualifierEquivalent&&(a.length<6||c.length<6||(!a.includes(c)&&!c.includes(a))))continue;
-  const nameMatch=normalize(web.name)===normalize(row.name)?'normalized_exact':sameBase?'suffix_equivalent':qualifierEquivalent?'qualifier_equivalent':'partial_name';
-  const note=nameMatch==='partial_name'?'이름의 일부만 일치하는 연결 후보입니다. 한쪽에만 있는 대상·사업 내용과 회계연도를 원문에서 대조한 뒤 동일 여부를 판단하세요. 예산액은 지원 단가나 집행액이 아닙니다.':nameMatch==='qualifier_equivalent'?'장애인과 장애인가정의 명칭 차이를 가진 연결 후보입니다. 지원 대상·사업 범위와 회계연도를 원문에서 대조하세요. 예산액은 지원 단가나 집행액이 아닙니다.':'이름과 지자체가 일치하는 연결 후보입니다. 회계연도·사업 범위와 동일 여부를 원문에서 확인하세요. 예산액은 지원 단가나 집행액이 아닙니다.';
-  pairs.push({relationship:'same_name_region_candidate',nameMatch,homepage:web,budget:row,note});
+  const partial=a.length>=6&&c.length>=6&&(a.includes(c)||c.includes(a));
+  const anchored=anchor.length>=4&&a===anchor&&startsTerm(row.name,anchor);
+  const pageTopic=anchor.length>=4&&Boolean(web.location?.elementId)&&normalize(web.content).includes(anchor)&&startsTerm(row.name,anchor);
+  if(!exact&&!sameBase&&!qualifierEquivalent&&!partial&&!anchored&&!pageTopic)continue;
+  const nameMatch=normalize(web.name)===normalize(row.name)?'normalized_exact':sameBase?'suffix_equivalent':qualifierEquivalent?'qualifier_equivalent':partial?'partial_name':anchored?'query_anchor':'page_topic';
+  const note=nameMatch==='page_topic'?'홈페이지 전체 본문과 예산행에 검색 주제가 나타나는 참고 후보입니다. 한 페이지에 여러 사업이 있을 수 있어 같은 사업이나 한 사업의 예산으로 판단하거나 합산하지 마세요.':nameMatch==='query_anchor'?'같은 지역에서 질문의 주제가 이름에 공통으로 나타나는 관련 후보입니다. 대상·재원·기간과 원문을 대조하기 전에는 동일 사업으로 판단하거나 예산을 합산하지 마세요.':nameMatch==='partial_name'?'이름의 일부만 일치하는 연결 후보입니다. 한쪽에만 있는 대상·사업 내용과 회계연도를 원문에서 대조한 뒤 동일 여부를 판단하세요. 예산액은 지원 단가나 집행액이 아닙니다.':nameMatch==='qualifier_equivalent'?'장애인과 장애인가정의 명칭 차이를 가진 연결 후보입니다. 지원 대상·사업 범위와 회계연도를 원문에서 대조하세요. 예산액은 지원 단가나 집행액이 아닙니다.':'이름과 지자체가 일치하는 연결 후보입니다. 회계연도·사업 범위와 동일 여부를 원문에서 확인하세요. 예산액은 지원 단가나 집행액이 아닙니다.';
+  pairs.push({relationship:nameMatch==='page_topic'?'page_topic_reference':nameMatch==='query_anchor'?'related_name_region_candidate':'same_name_region_candidate',nameMatch,homepage:web,budget:row,note});
  }
  return {query:q,institution:institution??null,regionResolution:{inferredInstitution:h.inferredInstitution??b.inferredInstitution??null,ambiguousInstitution:h.ambiguousInstitution??b.ambiguousInstitution??null},pairs:pairs.slice(pairOffset,pairOffset+20),candidatePairCount:pairs.length,pairOffset,nextPairOffset:pairOffset+20<pairs.length?pairOffset+20:null,pairsTruncated:pairs.length>20,website:{total:h.total,offset:websiteOffset,nextOffset:h.nextOffset,coverage:{totalSources:h.scope?.totalSources??null,totalInstitutions:h.scope?.totalInstitutions??null,skippedEntries:h.scope?.skippedEntries??null,description:h.scope?.coverage??null}},budget:{totalCandidateRows:b.totalCandidateRows,offset:budgetOffset,nextOffset:b.nextOffset,scope:b.scope},note:'지정한 홈페이지·예산 각 20건의 조합을 대조한 후보입니다. 같은 두 쪽에 남은 후보는 nextPairOffset으로, 다른 자료 쪽은 websiteOffset과 budgetOffset의 모든 조합을 바꿔 확인하세요. 여러 예산행을 별도 사업으로 세거나 합산하지 마세요. 누락된 자료나 현행 시행 여부는 이 결과만으로 판단할 수 없습니다.'};
 }
