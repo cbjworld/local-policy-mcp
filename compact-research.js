@@ -34,6 +34,7 @@ module.exports=function compactResearch(value){
  output.budgetScope=value.budgetScope||null;
  output.catalogEvidence=require('./catalog-context').compact(value.catalogEvidence);
  if(value.municipalEvidence)output.municipalEvidence={...value.municipalEvidence,items:value.municipalEvidence.items.map(item=>({...item})),links:(value.municipalEvidence.links||[]).map(link=>({...link}))};
+ if(value.gov24References)output.gov24References={...value.gov24References,items:[...value.gov24References.items],omittedItems:value.gov24References.omittedItems||0};
  output.responseSize.omittedCatalogItems=0;
  output.budgetCandidateNote='2026년 본예산 일반회계 세출의 사업명 검색 초기 후보 최대 5행입니다. budgetSearches의 q·nextOffset으로 search_budget_projects를 이어 조회하세요. 문서의 사업과 같은지, 시비인지 총사업비인지 확인한 뒤 사용하세요. 교부·집행액과 합산하지 마세요.';
  output.confirmedProgramLinks=require('./program-links').retainedLinks(value.confirmedProgramLinks||[],documents);
@@ -98,13 +99,15 @@ module.exports=function compactResearch(value){
  }
  while(oversized()&&output.municipalEvidence?.items.length>1){output.municipalEvidence.items.pop();output.municipalEvidence.omittedItems++;}
  while(oversized()&&output.municipalEvidence?.links.length>1){output.municipalEvidence.links.pop();output.municipalEvidence.omittedLinks++;}
+ while(oversized()&&output.gov24References?.items.length>1){output.gov24References.items.pop();output.gov24References.omittedItems++;}
  if(oversized()){
-  const fallback={responseMode:'compact',confirmedProgramSummaries:linkSummaries,researchSources:value.researchSources,request:value.request,status:value.status,summary:value.summary,coverage:value.coverage,...(output.municipalEvidence?{municipalEvidence:{...output.municipalEvidence,items:output.municipalEvidence.items,links:output.municipalEvidence.links}}:{}),quickBrief:output.quickBrief.slice(0,2),institutionDirectory:output.institutionDirectory,responseSize:{maxCharacters:24000,metadataOmitted:true,omittedDocuments:rows.size},detailHint:'전체 문서 링크는 같은 연결에서 list_research_sources로 조회하세요.',note:'자료를 나눠 확인하세요.'};
+  const fallback={responseMode:'compact',confirmedProgramSummaries:linkSummaries,researchSources:value.researchSources,request:value.request,status:value.status,summary:value.summary,coverage:value.coverage,...(output.gov24References?{gov24References:output.gov24References}:{}),...(output.municipalEvidence?{municipalEvidence:{...output.municipalEvidence,items:output.municipalEvidence.items,links:output.municipalEvidence.links}}:{}),quickBrief:output.quickBrief.slice(0,2),institutionDirectory:output.institutionDirectory,responseSize:{maxCharacters:24000,metadataOmitted:true,omittedDocuments:rows.size},detailHint:'전체 문서 링크는 같은 연결에서 list_research_sources로 조회하세요.',note:'자료를 나눠 확인하세요.'};
   while(JSON.stringify(fallback).length>24000&&fallback.quickBrief.length)fallback.quickBrief.pop();
   while(JSON.stringify(fallback).length>24000&&fallback.institutionDirectory.rows.length)fallback.institutionDirectory.rows.pop();
   while(JSON.stringify(fallback).length>24000&&fallback.confirmedProgramSummaries.length){fallback.confirmedProgramSummaries.pop();fallback.responseSize.omittedConfirmedPrograms=(fallback.responseSize.omittedConfirmedPrograms||0)+1;}
   while(JSON.stringify(fallback).length>24000&&fallback.municipalEvidence?.items.length){fallback.municipalEvidence.items.pop();fallback.municipalEvidence.omittedItems++;}
   while(JSON.stringify(fallback).length>24000&&fallback.municipalEvidence?.links.length){fallback.municipalEvidence.links.pop();fallback.municipalEvidence.omittedLinks++;}
+  while(JSON.stringify(fallback).length>24000&&fallback.gov24References?.items.length){fallback.gov24References.items.pop();fallback.gov24References.omittedItems++;}
   return fallback;
  }
  return {answerGuide:output.answerGuide,quickBrief:output.quickBrief,...output};

@@ -1,0 +1,1477 @@
+{
+  "apiSource": "https://www.data.go.kr/data/15113968/openapi.do",
+  "fetchedAt": "2026-10-13T03:12:43.772Z",
+  "coverage": "성동구·남양주시·의왕시·영월군·순천시 직접 소관 목록; 저장 시점 기준",
+  "records": [
+    {
+      "serviceId": "303000000102",
+      "title": "한방진료 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000102",
+      "modifiedAt": "20260808143717"
+    },
+    {
+      "serviceId": "303000000103",
+      "title": "장애인 활동지원(추가2)",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000103",
+      "modifiedAt": "20260812175633"
+    },
+    {
+      "serviceId": "303000000104",
+      "title": "어린이 예방접종 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000104",
+      "modifiedAt": "20260807134832"
+    },
+    {
+      "serviceId": "303000000105",
+      "title": "100세 어르신 장수축하금(품) 지급",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000105",
+      "modifiedAt": "20260809122327"
+    },
+    {
+      "serviceId": "303000000106",
+      "title": "저소득 주민 국민건강보험료 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000106",
+      "modifiedAt": "20260810110314"
+    },
+    {
+      "serviceId": "303000000107",
+      "title": "저소득장애인 명절위문금 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000107",
+      "modifiedAt": "20260809161113"
+    },
+    {
+      "serviceId": "303000000108",
+      "title": "저소득 중증 재가장애인 밑반찬 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000108",
+      "modifiedAt": "20260921093327"
+    },
+    {
+      "serviceId": "303000000109",
+      "title": "장애인 활동지원(추가1)",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000109",
+      "modifiedAt": "20260812175735"
+    },
+    {
+      "serviceId": "303000000110",
+      "title": "저소득 한부모가족 명절격려금 및 학습참고서비 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000110",
+      "modifiedAt": "20260807094154"
+    },
+    {
+      "serviceId": "303000000111",
+      "title": "출생축하금 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000111",
+      "modifiedAt": "20260812094341"
+    },
+    {
+      "serviceId": "303000000112",
+      "title": "저소득주민 명절 위문금",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000112",
+      "modifiedAt": "20260810110454"
+    },
+    {
+      "serviceId": "303000000113",
+      "title": "지역화폐(성동사랑상품권)",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000113",
+      "modifiedAt": "20260804091732"
+    },
+    {
+      "serviceId": "303000000114",
+      "title": "산후조리비용 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000114",
+      "modifiedAt": "20260810095007"
+    },
+    {
+      "serviceId": "303000000307",
+      "title": "미혼모.미혼부 냉난방비 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000307",
+      "modifiedAt": "20260812163645"
+    },
+    {
+      "serviceId": "303000000309",
+      "title": "저소득 주민 월동대책비 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000309",
+      "modifiedAt": "20260917163730"
+    },
+    {
+      "serviceId": "303000000311",
+      "title": "(성동구) 난임부부 시술비 약제비 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000311",
+      "modifiedAt": "20260910171831"
+    },
+    {
+      "serviceId": "303000000314",
+      "title": "65세 이상 대상포진 예방접종 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000314",
+      "modifiedAt": "20260804175859"
+    },
+    {
+      "serviceId": "303000000315",
+      "title": "성동구민 생활안전보험",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000315",
+      "modifiedAt": "20260812163354"
+    },
+    {
+      "serviceId": "303000000320",
+      "title": "성동구청 무료법률상담 서비스",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000320",
+      "modifiedAt": "20260810095039"
+    },
+    {
+      "serviceId": "303000000321",
+      "title": "범죄피해자 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000321",
+      "modifiedAt": "20260803202436"
+    },
+    {
+      "serviceId": "303000000323",
+      "title": "실내공기질 측정기 대여",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000323",
+      "modifiedAt": "20260804152906"
+    },
+    {
+      "serviceId": "303000000325",
+      "title": "청년 행정체험단 운영",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000325",
+      "modifiedAt": "20260810153927"
+    },
+    {
+      "serviceId": "303000000326",
+      "title": "소상공인 손실보상금 지원(현장신청 지원)",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000326",
+      "modifiedAt": "20260804091712"
+    },
+    {
+      "serviceId": "303000000327",
+      "title": "장난감세상",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000327",
+      "modifiedAt": "20260805172023"
+    },
+    {
+      "serviceId": "303000000328",
+      "title": "성동구 국가보훈대상자 보훈예우수당 지급",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000328",
+      "modifiedAt": "20260812100034"
+    },
+    {
+      "serviceId": "303000000330",
+      "title": "성동구 국가보훈대상자 사망위로금 지급",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000330",
+      "modifiedAt": "20260812095217"
+    },
+    {
+      "serviceId": "303000000331",
+      "title": "성동구 국가보훈대상자 위문금 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000331",
+      "modifiedAt": "20260811111505"
+    },
+    {
+      "serviceId": "303000000333",
+      "title": "성동구 장애인 스마트IoT 배회감지기 보급",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000333",
+      "modifiedAt": "20260804165604"
+    },
+    {
+      "serviceId": "303000000335",
+      "title": "무인민원발급기 수수료 일부 면제",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000335",
+      "modifiedAt": "20260812175844"
+    },
+    {
+      "serviceId": "303000000336",
+      "title": "어르신 국가예방접종 지원사업",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000336",
+      "modifiedAt": "20260804173859"
+    },
+    {
+      "serviceId": "303000000338",
+      "title": "주민들의 세금 고민을 해결해주기 위한 무료 세무상담 서비스",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000338",
+      "modifiedAt": "20260810153629"
+    },
+    {
+      "serviceId": "303000000339",
+      "title": "장애인 이동보조기기 수리비 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000339",
+      "modifiedAt": "20260804172538"
+    },
+    {
+      "serviceId": "303000000340",
+      "title": "거리노숙인 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000340",
+      "modifiedAt": "20260810101401"
+    },
+    {
+      "serviceId": "303000000341",
+      "title": "구민 정보화교육",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000341",
+      "modifiedAt": "20260813092838"
+    },
+    {
+      "serviceId": "303000000343",
+      "title": "디지털 저장매체 파기서비스 운영",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000343",
+      "modifiedAt": "20260811100839"
+    },
+    {
+      "serviceId": "303000000344",
+      "title": "성동구 통합돌봄 낙상방지 홈케어 서비스",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000344",
+      "modifiedAt": "20260810103546"
+    },
+    {
+      "serviceId": "303000000346",
+      "title": "저소득 한부모가족 유급 자녀돌봄휴가비 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000346",
+      "modifiedAt": "20260807093214"
+    },
+    {
+      "serviceId": "303000000347",
+      "title": "임신부 및 배우자 백일해 예방접종 지원",
+      "institution": "서울특별시 성동구",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/303000000347",
+      "modifiedAt": "20260804173559"
+    },
+    {
+      "serviceId": "399000000101",
+      "title": "남양주시 장학금",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000101",
+      "modifiedAt": "20260813092520"
+    },
+    {
+      "serviceId": "399000000102",
+      "title": "장애인가정 출산지원금 지원",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000102",
+      "modifiedAt": "20260813095648"
+    },
+    {
+      "serviceId": "399000000105",
+      "title": "출산축하금 지원",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000105",
+      "modifiedAt": "20260812142845"
+    },
+    {
+      "serviceId": "399000000106",
+      "title": "남양주시 청소년 인터넷 수능방송 수강권 지원",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000106",
+      "modifiedAt": "20260813091234"
+    },
+    {
+      "serviceId": "399000000107",
+      "title": "중풍 ‧ 와상 노인 생활용품 지원(기저귀)",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000107",
+      "modifiedAt": "20260812193028"
+    },
+    {
+      "serviceId": "399000000108",
+      "title": "지역사랑상품권(남양주시)",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000108",
+      "modifiedAt": "20260812141835"
+    },
+    {
+      "serviceId": "399000000109",
+      "title": "참전명예수당 및 배우자 복지수당",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000109",
+      "modifiedAt": "20260812171929"
+    },
+    {
+      "serviceId": "399000000111",
+      "title": "가정위탁 아동 능력개발비 지원",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000111",
+      "modifiedAt": "20260812162055"
+    },
+    {
+      "serviceId": "399000000112",
+      "title": "산모·신생아 건강관리 지원(추가형)",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000112",
+      "modifiedAt": "20260812142928"
+    },
+    {
+      "serviceId": "399000000113",
+      "title": "중증장애인 부모세대자녀의 학원교육비 지원",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000113",
+      "modifiedAt": "20260813095545"
+    },
+    {
+      "serviceId": "399000000115",
+      "title": "보훈명예수당",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000115",
+      "modifiedAt": "20260812171850"
+    },
+    {
+      "serviceId": "399000000116",
+      "title": "국가보훈대상자 명절위문 수당 지급",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000116",
+      "modifiedAt": "20260812171912"
+    },
+    {
+      "serviceId": "399000000117",
+      "title": "남양주시 초등학생 입학축하금 지원",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000117",
+      "modifiedAt": "20260813092554"
+    },
+    {
+      "serviceId": "399000000118",
+      "title": "남양주시 입영지원금 지급",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000118",
+      "modifiedAt": "20260812143455"
+    },
+    {
+      "serviceId": "399000000122",
+      "title": "다자녀가정 종량제봉투 지원",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000122",
+      "modifiedAt": "20260813112425"
+    },
+    {
+      "serviceId": "399000000393",
+      "title": "남양주시 시민안전보험",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000393",
+      "modifiedAt": "20260813125959"
+    },
+    {
+      "serviceId": "399000000396",
+      "title": "북한이탈주민 정착지원",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000396",
+      "modifiedAt": "20260928100510"
+    },
+    {
+      "serviceId": "399000000398",
+      "title": "남양주시 청년 이사비 지원",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/399000000398",
+      "modifiedAt": "20260901172515"
+    },
+    {
+      "serviceId": "403000000102",
+      "title": "광견병 예방접종 시술비 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000102",
+      "modifiedAt": "20260813085848"
+    },
+    {
+      "serviceId": "403000000103",
+      "title": "명절 위문비 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000103",
+      "modifiedAt": "20260813143539"
+    },
+    {
+      "serviceId": "403000000104",
+      "title": "모자 건강증진 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000104",
+      "modifiedAt": "20260812152034"
+    },
+    {
+      "serviceId": "403000000105",
+      "title": "출산장려금 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000105",
+      "modifiedAt": "20260814090234"
+    },
+    {
+      "serviceId": "403000000107",
+      "title": "국가유공자 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000107",
+      "modifiedAt": "20260813132620"
+    },
+    {
+      "serviceId": "403000000108",
+      "title": "안과 정밀 검진 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000108",
+      "modifiedAt": "20260812143915"
+    },
+    {
+      "serviceId": "403000000110",
+      "title": "저소득 한부모가족 학습장려수당 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000110",
+      "modifiedAt": "20260813093245"
+    },
+    {
+      "serviceId": "403000000112",
+      "title": "효행장려금 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000112",
+      "modifiedAt": "20260813132537"
+    },
+    {
+      "serviceId": "403000000113",
+      "title": "혼인신고자 기념품 증정",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000113",
+      "modifiedAt": "20260812162748"
+    },
+    {
+      "serviceId": "403000000114",
+      "title": "영유아 북스타트 도서 배포",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000114",
+      "modifiedAt": "20260813082036"
+    },
+    {
+      "serviceId": "403000000116",
+      "title": "저소득층 국민건강보험료 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000116",
+      "modifiedAt": "20260813143028"
+    },
+    {
+      "serviceId": "403000000117",
+      "title": "농업기계 수리비 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000117",
+      "modifiedAt": "20260813085709"
+    },
+    {
+      "serviceId": "403000000119",
+      "title": "신재생에너지 보급 주택 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000119",
+      "modifiedAt": "20260813141935"
+    },
+    {
+      "serviceId": "403000000120",
+      "title": "대상포진 예방접종 사업",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000120",
+      "modifiedAt": "20260812180409"
+    },
+    {
+      "serviceId": "403000000121",
+      "title": "지역화폐(의왕사랑상품권)",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000121",
+      "modifiedAt": "20260813101537"
+    },
+    {
+      "serviceId": "403000000122",
+      "title": "중·고등학교 신입생 교복 및 체육복 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000122",
+      "modifiedAt": "20260812145110"
+    },
+    {
+      "serviceId": "403000000123",
+      "title": "장애인가정 출산지원금 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000123",
+      "modifiedAt": "20260813131152"
+    },
+    {
+      "serviceId": "403000000124",
+      "title": "재활물리치료 서비스",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000124",
+      "modifiedAt": "20260812150449"
+    },
+    {
+      "serviceId": "403000000128",
+      "title": "청년 취업(면접) 지원 패키지[면접정장 무료대여]",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000128",
+      "modifiedAt": "20260813143143"
+    },
+    {
+      "serviceId": "403000000129",
+      "title": "대학생 행정체험 아르바이트 운영",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000129",
+      "modifiedAt": "20260813091430"
+    },
+    {
+      "serviceId": "403000000130",
+      "title": "임신축하금 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000130",
+      "modifiedAt": "20260812151943"
+    },
+    {
+      "serviceId": "403000000131",
+      "title": "공동체팜 도시농부 활동지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000131",
+      "modifiedAt": "20260813085742"
+    },
+    {
+      "serviceId": "403000000132",
+      "title": "신혼부부 주택임차보증금 대출이자 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000132",
+      "modifiedAt": "20260914130931"
+    },
+    {
+      "serviceId": "403000000133",
+      "title": "중소기업 특례보증 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000133",
+      "modifiedAt": "20260812172930"
+    },
+    {
+      "serviceId": "403000000134",
+      "title": "소상공인 특례보증 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000134",
+      "modifiedAt": "20260812150149"
+    },
+    {
+      "serviceId": "403000000135",
+      "title": "벼 못자리 상토 지원사업",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000135",
+      "modifiedAt": "20260812165715"
+    },
+    {
+      "serviceId": "403000000136",
+      "title": "농산물 포장재 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000136",
+      "modifiedAt": "20260812150626"
+    },
+    {
+      "serviceId": "403000000140",
+      "title": "의왕시 상하수도 요금 감면(수급자)",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000140",
+      "modifiedAt": "20260812160744"
+    },
+    {
+      "serviceId": "403000000142",
+      "title": "의왕시 초등학교 입학축하금 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000142",
+      "modifiedAt": "20260812145132"
+    },
+    {
+      "serviceId": "403000000144",
+      "title": "의왕시 산모건강관리사 본인부담금 환급 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000144",
+      "modifiedAt": "20260812151912"
+    },
+    {
+      "serviceId": "403000000145",
+      "title": "아픈아이 홈케어",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000145",
+      "modifiedAt": "20260813133436"
+    },
+    {
+      "serviceId": "403000000146",
+      "title": "아이돌봄 신규 및 120시간 이용자 확대지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000146",
+      "modifiedAt": "20260813133819"
+    },
+    {
+      "serviceId": "403000000147",
+      "title": "노인 버스 무료승차 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000147",
+      "modifiedAt": "20260813134609"
+    },
+    {
+      "serviceId": "403000000148",
+      "title": "의왕시 노인 건강생활 더하기",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000148",
+      "modifiedAt": "20260813131222"
+    },
+    {
+      "serviceId": "403000000150",
+      "title": "소상공인 이차보전금 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000150",
+      "modifiedAt": "20260812150242"
+    },
+    {
+      "serviceId": "403000000151",
+      "title": "의왕시 산후조리비 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000151",
+      "modifiedAt": "20260814090257"
+    },
+    {
+      "serviceId": "403000000153",
+      "title": "골목상권 및 소상공인 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000153",
+      "modifiedAt": "20260812150138"
+    },
+    {
+      "serviceId": "403000000154",
+      "title": "청년 이사비 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000154",
+      "modifiedAt": "20260812145728"
+    },
+    {
+      "serviceId": "403000000155",
+      "title": "청년 취업(면접)지원 패키지[취업사진 촬영 및 헤어 메이크업 비용 지원]",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000155",
+      "modifiedAt": "20260813143101"
+    },
+    {
+      "serviceId": "403000000156",
+      "title": "청년 구직활동지원금 지급",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000156",
+      "modifiedAt": "20260812145805"
+    },
+    {
+      "serviceId": "403000000157",
+      "title": "출생·입양 신고세대 종량제봉투 무상지급",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000157",
+      "modifiedAt": "20260813143953"
+    },
+    {
+      "serviceId": "403000000158",
+      "title": "기초생활수급자 종량제봉투 무상지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000158",
+      "modifiedAt": "20260812144040"
+    },
+    {
+      "serviceId": "403000000165",
+      "title": "화장장려금 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000165",
+      "modifiedAt": "20260812163718"
+    },
+    {
+      "serviceId": "403000000166",
+      "title": "무료 법률·세무상담 서비스",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000166",
+      "modifiedAt": "20260812144310"
+    },
+    {
+      "serviceId": "403000000167",
+      "title": "어린이집 공기청정기 지원사업",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000167",
+      "modifiedAt": "20260813085653"
+    },
+    {
+      "serviceId": "403000000168",
+      "title": "어린이집 기자재 렌탈비 지원사업",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000168",
+      "modifiedAt": "20260813085815"
+    },
+    {
+      "serviceId": "403000000172",
+      "title": "임신성 당뇨 및 빈혈검사 지원",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000172",
+      "modifiedAt": "20260812152016"
+    },
+    {
+      "serviceId": "403000000173",
+      "title": "임산부 자동차표지 제공",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000173",
+      "modifiedAt": "20260812152004"
+    },
+    {
+      "serviceId": "403000000174",
+      "title": "의왕시 마을세무사 운영",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000174",
+      "modifiedAt": "20260812173836"
+    },
+    {
+      "serviceId": "403000000175",
+      "title": "공공심야약국 운영",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000175",
+      "modifiedAt": "20260812145542"
+    },
+    {
+      "serviceId": "403000000184",
+      "title": "의왕시 상하수도 요금 감면(다자녀)",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000184",
+      "modifiedAt": "20260812163636"
+    },
+    {
+      "serviceId": "403000000185",
+      "title": "의왕시 상하수도 요금 감면(장애인)",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000185",
+      "modifiedAt": "20260812163210"
+    },
+    {
+      "serviceId": "403000000186",
+      "title": "의왕시 상하수도 요금 감면(한부모, 조손가정)",
+      "institution": "경기도 의왕시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/403000000186",
+      "modifiedAt": "20260812163037"
+    },
+    {
+      "serviceId": "427000000181",
+      "title": "농업용 관리기 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000181",
+      "modifiedAt": "20260814143100"
+    },
+    {
+      "serviceId": "427000000183",
+      "title": "귀농인 영농 정착 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000183",
+      "modifiedAt": "20260831100621"
+    },
+    {
+      "serviceId": "427000000184",
+      "title": "농산물저온저장고설치지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000184",
+      "modifiedAt": "20260903173224"
+    },
+    {
+      "serviceId": "427000000185",
+      "title": "비닐하우스 농자재 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000185",
+      "modifiedAt": "20260911113137"
+    },
+    {
+      "serviceId": "427000000187",
+      "title": "노지고추 건조기 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000187",
+      "modifiedAt": "20260911113022"
+    },
+    {
+      "serviceId": "427000000189",
+      "title": "시설재배 생산성 향상 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000189",
+      "modifiedAt": "20260911112852"
+    },
+    {
+      "serviceId": "427000000190",
+      "title": "연동 비닐하우스 설치 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000190",
+      "modifiedAt": "20260814142610"
+    },
+    {
+      "serviceId": "427000000191",
+      "title": "친환경 쌀 생산단지 육성 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000191",
+      "modifiedAt": "20260814142959"
+    },
+    {
+      "serviceId": "427000000193",
+      "title": "양봉산업 육성(소초광) 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000193",
+      "modifiedAt": "20260914110951"
+    },
+    {
+      "serviceId": "427000000194",
+      "title": "축분 건조용 환풍기 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000194",
+      "modifiedAt": "20260814143702"
+    },
+    {
+      "serviceId": "427000000195",
+      "title": "임신 및 출산 축하기념품 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000195",
+      "modifiedAt": "20260728142913"
+    },
+    {
+      "serviceId": "427000000197",
+      "title": "다자녀가정 교육비 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000197",
+      "modifiedAt": "20260814105839"
+    },
+    {
+      "serviceId": "427000000198",
+      "title": "토종돼지 출하장려금 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000198",
+      "modifiedAt": "20260814143644"
+    },
+    {
+      "serviceId": "427000000199",
+      "title": "표고버섯생산성향상지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000199",
+      "modifiedAt": "20260908090255"
+    },
+    {
+      "serviceId": "427000000200",
+      "title": "원예작물 품질향상 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000200",
+      "modifiedAt": "20260911100257"
+    },
+    {
+      "serviceId": "427000000202",
+      "title": "축산 환경개선제 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000202",
+      "modifiedAt": "20260814143731"
+    },
+    {
+      "serviceId": "427000000204",
+      "title": "시설하우스 ICT 보급",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000204",
+      "modifiedAt": "20260911112938"
+    },
+    {
+      "serviceId": "427000000206",
+      "title": "양봉산업 육성(기자재) 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000206",
+      "modifiedAt": "20260914112141"
+    },
+    {
+      "serviceId": "427000000207",
+      "title": "출산·입양장려금 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000207",
+      "modifiedAt": "20260728102914"
+    },
+    {
+      "serviceId": "427000000208",
+      "title": "누리과정 아동 특별활동비 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000208",
+      "modifiedAt": "20260814105909"
+    },
+    {
+      "serviceId": "427000000209",
+      "title": "지역화폐(영월군)",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000209",
+      "modifiedAt": "20260814141321"
+    },
+    {
+      "serviceId": "427000000210",
+      "title": "생분해성 멀칭필름 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000210",
+      "modifiedAt": "20260814142427"
+    },
+    {
+      "serviceId": "427000000211",
+      "title": "국가보훈대상자수당",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000211",
+      "modifiedAt": "20260808171902"
+    },
+    {
+      "serviceId": "427000000212",
+      "title": "산채류 생산기반 조성사업",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000212",
+      "modifiedAt": "20260814142322"
+    },
+    {
+      "serviceId": "427000000213",
+      "title": "생강 재배기반 조성 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000213",
+      "modifiedAt": "20260911113224"
+    },
+    {
+      "serviceId": "427000000214",
+      "title": "시설하우스 연작장해 개선 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000214",
+      "modifiedAt": "20260911112807"
+    },
+    {
+      "serviceId": "427000000215",
+      "title": "착한가격업소 인센티브 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000215",
+      "modifiedAt": "20260814141344"
+    },
+    {
+      "serviceId": "427000000217",
+      "title": "친환경 원예작물 천적활용 방제 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000217",
+      "modifiedAt": "20260814143205"
+    },
+    {
+      "serviceId": "427000000218",
+      "title": "기미아 보호 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000218",
+      "modifiedAt": "20260814105501"
+    },
+    {
+      "serviceId": "427000000219",
+      "title": "풍진검사 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000219",
+      "modifiedAt": "20260813094007"
+    },
+    {
+      "serviceId": "427000000220",
+      "title": "대형농기계 급유탱크 지원사업",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000220",
+      "modifiedAt": "20260814141932"
+    },
+    {
+      "serviceId": "427000000225",
+      "title": "반려동물 등록제 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000225",
+      "modifiedAt": "20260814143429"
+    },
+    {
+      "serviceId": "427000000227",
+      "title": "가업승계농 영농기반조성 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000227",
+      "modifiedAt": "20260805092151"
+    },
+    {
+      "serviceId": "427000000228",
+      "title": "주요 농산물 생산원가보장 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000228",
+      "modifiedAt": "20260728110321"
+    },
+    {
+      "serviceId": "427000000229",
+      "title": "저소득 재가노인 급식",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000229",
+      "modifiedAt": "20260814153012"
+    },
+    {
+      "serviceId": "427000000230",
+      "title": "여성농업인 농작업 편이장비 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000230",
+      "modifiedAt": "20260805104425"
+    },
+    {
+      "serviceId": "427000000235",
+      "title": "모범음식점 인센티브 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000235",
+      "modifiedAt": "20260729155522"
+    },
+    {
+      "serviceId": "427000000236",
+      "title": "어려운 가구 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000236",
+      "modifiedAt": "20260811135126"
+    },
+    {
+      "serviceId": "427000000237",
+      "title": "영월군 LPG소형저장탱크 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000237",
+      "modifiedAt": "20260814141859"
+    },
+    {
+      "serviceId": "427000000238",
+      "title": "쌀전업농 농기계 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000238",
+      "modifiedAt": "20260814142010"
+    },
+    {
+      "serviceId": "427000000239",
+      "title": "소상공인 경영환경 개선지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000239",
+      "modifiedAt": "20260731111633"
+    },
+    {
+      "serviceId": "427000000242",
+      "title": "산후(산모·신생아)건강관리비 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000242",
+      "modifiedAt": "20260728100933"
+    },
+    {
+      "serviceId": "427000000243",
+      "title": "소규모 다목적 비닐하우스 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000243",
+      "modifiedAt": "20260911112721"
+    },
+    {
+      "serviceId": "427000000245",
+      "title": "화장장 사용료 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000245",
+      "modifiedAt": "20260911101943"
+    },
+    {
+      "serviceId": "427000000246",
+      "title": "장기 등 기증 사망자 사망위로금 지급",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000246",
+      "modifiedAt": "20260903140503"
+    },
+    {
+      "serviceId": "427000000247",
+      "title": "참전유공자 배우자수당",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000247",
+      "modifiedAt": "20260808171804"
+    },
+    {
+      "serviceId": "427000000248",
+      "title": "양봉산업 육성(화분) 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000248",
+      "modifiedAt": "20260914110443"
+    },
+    {
+      "serviceId": "427000000249",
+      "title": "친환경 퇴비조성 수피 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000249",
+      "modifiedAt": "20260814141947"
+    },
+    {
+      "serviceId": "427000000250",
+      "title": "저소득 주민 국민건강보험료 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000250",
+      "modifiedAt": "20260814153322"
+    },
+    {
+      "serviceId": "427000000251",
+      "title": "인력절감형 방제호스릴 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000251",
+      "modifiedAt": "20260814142200"
+    },
+    {
+      "serviceId": "427000000252",
+      "title": "가정위탁아동 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000252",
+      "modifiedAt": "20260814105950"
+    },
+    {
+      "serviceId": "427000000257",
+      "title": "찰옥수수 명품화",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000257",
+      "modifiedAt": "20260814142850"
+    },
+    {
+      "serviceId": "427000000258",
+      "title": "버섯 생산성 향상 지원사업",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000258",
+      "modifiedAt": "20260911113416"
+    },
+    {
+      "serviceId": "427000000259",
+      "title": "명품과원 기반조성 사업",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000259",
+      "modifiedAt": "20260911104729"
+    },
+    {
+      "serviceId": "427000000260",
+      "title": "과수 품질향상 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000260",
+      "modifiedAt": "20260911104606"
+    },
+    {
+      "serviceId": "427000000262",
+      "title": "과수 전용 방제기 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000262",
+      "modifiedAt": "20260911104902"
+    },
+    {
+      "serviceId": "427000000266",
+      "title": "전입장려금",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000266",
+      "modifiedAt": "20260814140750"
+    },
+    {
+      "serviceId": "427000000269",
+      "title": "출산 육아용품 대여 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427000000269",
+      "modifiedAt": "20260814105927"
+    },
+    {
+      "serviceId": "427100000002",
+      "title": "청년농업인 맞춤형 지원",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427100000002",
+      "modifiedAt": "20260805104403"
+    },
+    {
+      "serviceId": "427100000003",
+      "title": "상하수도요금 감면",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427100000003",
+      "modifiedAt": "20260814141317"
+    },
+    {
+      "serviceId": "427100000005",
+      "title": "영월군민안전보험",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427100000005",
+      "modifiedAt": "20260814143954"
+    },
+    {
+      "serviceId": "427100000007",
+      "title": "유축기 대여",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/427100000007",
+      "modifiedAt": "20260728142851"
+    },
+    {
+      "serviceId": "482000000101",
+      "title": "축산농가 유효 미생물제 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000101",
+      "modifiedAt": "20251127192144"
+    },
+    {
+      "serviceId": "482000000102",
+      "title": "가축분뇨 환경개선 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000102",
+      "modifiedAt": "20251127191630"
+    },
+    {
+      "serviceId": "482000000103",
+      "title": "시민안전보험 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000103",
+      "modifiedAt": "20251127191638"
+    },
+    {
+      "serviceId": "482000000104",
+      "title": "한센양로자 의료비 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000104",
+      "modifiedAt": "20251127192144"
+    },
+    {
+      "serviceId": "482000000105",
+      "title": "축산농가 헬퍼(도우미) 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000105",
+      "modifiedAt": "20251127191709"
+    },
+    {
+      "serviceId": "482000000106",
+      "title": "영구임대주택 공동전기요금 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000106",
+      "modifiedAt": "20251127192144"
+    },
+    {
+      "serviceId": "482000000108",
+      "title": "출산장려금 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000108",
+      "modifiedAt": "20260831150116"
+    },
+    {
+      "serviceId": "482000000109",
+      "title": "임산부 영유아 영양제 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000109",
+      "modifiedAt": "20251127191709"
+    },
+    {
+      "serviceId": "482000000110",
+      "title": "친환경 인증 농가 인센티브 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000110",
+      "modifiedAt": "20260812164219"
+    },
+    {
+      "serviceId": "482000000114",
+      "title": "가정위탁세대 어린이날 위문 격려금 지급",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000114",
+      "modifiedAt": "20251127191900"
+    },
+    {
+      "serviceId": "482000000115",
+      "title": "순천시 신혼부부 주택전세자금 대출이자 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000115",
+      "modifiedAt": "20251127191714"
+    },
+    {
+      "serviceId": "482000000116",
+      "title": "저소득 국민건강보험료 및 장기요양보험료 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000116",
+      "modifiedAt": "20251127192144"
+    },
+    {
+      "serviceId": "482000000117",
+      "title": "사회복지시설 생계급여 지급",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000117",
+      "modifiedAt": "20260915163528"
+    },
+    {
+      "serviceId": "482000000119",
+      "title": "장애인 보장구 수리 및 대여사업",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000119",
+      "modifiedAt": "20251127191750"
+    },
+    {
+      "serviceId": "482000000120",
+      "title": "순천형 생활안정비 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000120",
+      "modifiedAt": "20251127192144"
+    },
+    {
+      "serviceId": "482000000121",
+      "title": "국가보훈대상자 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000121",
+      "modifiedAt": "20251127191750"
+    },
+    {
+      "serviceId": "482000000122",
+      "title": "석면피해 구제급여 지급",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000122",
+      "modifiedAt": "20251127192145"
+    },
+    {
+      "serviceId": "482000000124",
+      "title": "농업인 가공품 생산 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000124",
+      "modifiedAt": "20251127191759"
+    },
+    {
+      "serviceId": "482000000125",
+      "title": "지역사랑상품권(순천사랑상품권)",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000125",
+      "modifiedAt": "20260915175328"
+    },
+    {
+      "serviceId": "482000000131",
+      "title": "과수 생력화 장비 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000131",
+      "modifiedAt": "20251127192145"
+    },
+    {
+      "serviceId": "482000000133",
+      "title": "시설원예 생산시설 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000133",
+      "modifiedAt": "20251127192144"
+    },
+    {
+      "serviceId": "482000000134",
+      "title": "복숭아 세균구멍병 방제 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000134",
+      "modifiedAt": "20251127192144"
+    },
+    {
+      "serviceId": "482000000135",
+      "title": "원예작물 친환경자재 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000135",
+      "modifiedAt": "20251127191825"
+    },
+    {
+      "serviceId": "482000000137",
+      "title": "과수농가 인공수분기 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000137",
+      "modifiedAt": "20251127191824"
+    },
+    {
+      "serviceId": "482000000138",
+      "title": "자녀학습서비스 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000138",
+      "modifiedAt": "20251127191825"
+    },
+    {
+      "serviceId": "482000000139",
+      "title": "생분해 멀칭비닐 공급 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000139",
+      "modifiedAt": "20251127191824"
+    },
+    {
+      "serviceId": "482000000140",
+      "title": "순천형 다목적 소형농기계 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000140",
+      "modifiedAt": "20251127191824"
+    },
+    {
+      "serviceId": "482000000141",
+      "title": "정원수 생산유통 개선을 위한 자재지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000141",
+      "modifiedAt": "20251127191825"
+    },
+    {
+      "serviceId": "482000000142",
+      "title": "귀농인 소형농기계 구입 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000142",
+      "modifiedAt": "20251127191825"
+    },
+    {
+      "serviceId": "482000000147",
+      "title": "귀농인 이웃주민 초청행사",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000147",
+      "modifiedAt": "20251127191920"
+    },
+    {
+      "serviceId": "482000000148",
+      "title": "야생동물 피해예방시설 지원",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000148",
+      "modifiedAt": "20251127191824"
+    },
+    {
+      "serviceId": "482000000149",
+      "title": "2025년 임업기술전문교육",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000149",
+      "modifiedAt": "20251127191824"
+    },
+    {
+      "serviceId": "482000000151",
+      "title": "산림특화작물 육성사업",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000151",
+      "modifiedAt": "20251127192144"
+    },
+    {
+      "serviceId": "482000000586",
+      "title": "전입세대 축하금",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000586",
+      "modifiedAt": "20260723202307"
+    },
+    {
+      "serviceId": "482000000587",
+      "title": "대학(원)생 전입장려금",
+      "institution": "전남광주통합특별시 순천시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/482000000587",
+      "modifiedAt": "20260723202048"
+    },
+    {
+      "serviceId": "O00005900001",
+      "title": "수도요금 감면(다자녀)",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/O00005900001",
+      "modifiedAt": "20260813095339"
+    },
+    {
+      "serviceId": "O00005900002",
+      "title": "수도요금 감면(기초생활수급자)",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/O00005900002",
+      "modifiedAt": "20260831142807"
+    },
+    {
+      "serviceId": "O00005900003",
+      "title": "수도요금 감면(중증장애인)",
+      "institution": "경기도 남양주시",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/O00005900003",
+      "modifiedAt": "20260821155031"
+    },
+    {
+      "serviceId": "O00039900001",
+      "title": "(재)영월장학회 장학금",
+      "institution": "강원특별자치도 영월군",
+      "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/O00039900001",
+      "modifiedAt": "20260901101508"
+    }
+  ]
+}
