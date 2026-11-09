@@ -64,7 +64,7 @@ def merge(base, candidates, registered):
             comparable = lambda value: {k: v for k, v in value.items() if k != 'extractedAt'}
             if old and comparable(old) == comparable(source):
                 status = 'unchanged'
-            elif not source['items'] or (old and len(source['items']) * 2 < len(old['items'])):
+            elif not source['items'] or (old and (len(source['items']) < len(old['items']) or len(source['skipped']) > len(old['skipped']))):
                 status = 'review_required'
             else:
                 current[key] = source

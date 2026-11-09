@@ -16,6 +16,14 @@ def snapshot(count, digest='a', source=SOURCE):
 
 
 class CatalogMergeTest(unittest.TestCase):
+    def test_newly_skipped_rows_do_not_replace_previous_snapshot(self):
+        old = snapshot(4)
+        candidate = snapshot(3, 'b')
+        candidate['skipped'] = [{'table': 1, 'row': 5, 'reason': 'rowspan'}]
+        result, report = m.merge({'sources': [old]}, [('incomplete', candidate)], {'www.nowon.kr'})
+        self.assertEqual(report[0]['status'], 'review_required')
+        self.assertEqual(result['sources'][0], old)
+
     def test_gyeyang_notice_location_is_restricted_to_detail_path(self):
         url = 'https://www.gyeyang.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=16'
         source = snapshot(1, source=url)
