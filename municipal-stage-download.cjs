@@ -19,13 +19,13 @@ async function run(items,{fetcher=download,rule=robotsRule,save,sleep=ms=>new Pr
    const url=validateUrl(item.source);if(temporaryUrl(url))throw Error('temporary_source');if(!hosts.has(url.hostname))throw Error('unregistered_host');
    if(!cache.has(url.origin)){
     if(!first)await sleep(3000);first=false;
-    try{const r=await fetcher(url.origin+'/robots.txt',0,Date.now()+25000,undefined,undefined,true);if(r.bytes.length>1000000||/text\/html/i.test(r.type))throw Error('robots_invalid');cache.set(url.origin,r.bytes.toString('utf8'));}
+    try{const r=await fetcher(url.origin+'/robots.txt',0,Date.now()+25000,undefined,undefined,true,true,true);if(r.bytes.length>1000000||/text\/html/i.test(r.type))throw Error('robots_invalid');cache.set(url.origin,r.bytes.toString('utf8'));}
     catch(e){if(e.code==='HTTP_404')cache.set(url.origin,'');else throw Error('robots_unavailable');}
    }
    const permission=rule(cache.get(url.origin),url.href);if(!permission.allowed)throw Error('robots_disallowed');
    const delay=Math.max(3000,Math.ceil(permission.delay*1000));if(delay>60000)throw Error('crawl_delay_exceeds_batch_limit');
    await sleep(delay);first=false;
-   const response=await fetcher(url.href,0,Date.now()+25000,undefined,undefined,true);
+   const response=await fetcher(url.href,0,Date.now()+25000,undefined,undefined,true,true,true);
    const returned=new URL(response.url);
    if(temporaryUrl(returned))throw Error('temporary_redirect');
    if(returned.hostname!==url.hostname||!/text\/html/i.test(response.type)||response.bytes.length<500)throw Error('unexpected_page');

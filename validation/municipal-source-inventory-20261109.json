@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-11-09T02:32:23.889Z",
-  "catalogSha256": "d228fe38a4489343d62f5328e89aaf0ea3602910fd9dac0ca6350a540dbfd98c",
-  "sourceCount": 70,
-  "itemCount": 487,
+  "generatedAt": "2026-11-09T03:30:27.767Z",
+  "catalogSha256": "46a44cde172f8345371f9031fad8863828ba43d631c910e935184e7eee4036b5",
+  "sourceCount": 71,
+  "itemCount": 488,
   "note": "홈페이지 출처와 로컬 검색 범위의 메타데이터입니다. 원문 및 사업별 내용은 포함하지 않습니다.",
   "sources": [
     {
@@ -469,15 +469,15 @@
     },
     {
       "source": "https://www.yongin.go.kr/user/bbs/BD_selectBbs.do?q_bbsCode=1001&q_bbscttSn=20260204142833457&q_clCode=1",
-      "sha256": "afe9e2e027e391b2d67ef88073d920b3c9abf965c833b07578604ea3e7293750",
-      "checkedAt": "2026-11-06T02:27:36.918324+00:00",
+      "sha256": "f863ef6acac36f37134d1cef4c8bb27ab2907f27b11a5279cfe2b464204782e0",
+      "checkedAt": "2026-11-09T03:26:22.504856+00:00",
       "itemCount": 1,
       "skippedCount": 0
     },
     {
       "source": "https://www.yongin.go.kr/user/bbs/BD_selectBbs.do?q_bbsCode=1020&q_bbscttSn=20260707075005612",
-      "sha256": "47caf704791b11f2ce4b494e4d0882d2b65c5f0288eec1bfa219efeebb6c9129",
-      "checkedAt": "2026-11-06T02:39:10.038813+00:00",
+      "sha256": "f3c6fea05e74b32382dd233b5af4a6dfd11252fee76853bc4b2a367434d3ff9e",
+      "checkedAt": "2026-11-09T03:26:22.521382+00:00",
       "itemCount": 1,
       "skippedCount": 0
     },
@@ -492,6 +492,13 @@
       "source": "https://www.gyeyang.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=16&bcd=businessinfo",
       "sha256": "c1dd20258efb12ffd8131633339545d367ae9393c99e7d43024fcd3c3de8bad3",
       "checkedAt": "2026-11-09T02:29:37.365158+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.yongin.go.kr/user/bbs/BD_selectBbs.do?q_bbsCode=1020&q_bbscttSn=20260219140518113",
+      "sha256": "74cec4c94beeb18848d5c404672e1676c8f8b2c4a60e5f2be3186002135eb920",
+      "checkedAt": "2026-11-09T03:29:12.309930+00:00",
       "itemCount": 1,
       "skippedCount": 0
     }
