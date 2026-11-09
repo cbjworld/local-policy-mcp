@@ -19,6 +19,8 @@ assert.deepEqual(plan({question:'노인 겨울철 난방비 지원 사업 찾아
 assert.deepEqual(plan({question:'치매 환자 치료비 지원 사업 찾아줘'}).queries,['치매 환자 치료비 지원 사업','치매 치료관리비 지원 사업','치매 치료비 지원 사업']);
 assert.deepEqual(plan({question:'취약계층 반려동물 병원비 지원 사례 찾아줘'}).queries,['취약계층 반려동물 병원비 지원','취약계층 반려동물 의료 지원','반려동물 의료서비스 지원']);
 assert.deepEqual(plan({question:'취약계층 반려동물 병원비 지원 찾아줘',queries:['원래 표현']}).queries,['원래 표현']);
+assert.deepEqual(plan({question:'아동 무료 예방접종 지원 사례 찾아줘'}).queries,['아동 무료 예방접종 지원','어린이 무료 예방접종 지원','어린이 예방접종 지원']);
+assert.deepEqual(plan({question:'아동 무료 예방접종 지원 찾아줘',queries:['아동 접종']}).queries,['아동 접종']);
 assert.deepEqual(plan({question:'대구 북구 청년 이사비용 찾아줘'}).queries,['청년 이사비용','청년 이사비','청년 이사 지원']);
 assert.deepEqual(plan({question:'청년 전세보증료 지원 찾아줘'}).queries,['청년 전세보증료 지원','전세보증금 반환보증 보증료','청년 보증료 지원']);
 assert.equal(require('./relevance').targetFit('전세보증금 반환보증 보증료 지원사업 추진계획','청년 전세보증료 지원 찾아줘').status,'unspecified');

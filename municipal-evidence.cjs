@@ -13,7 +13,8 @@ function assessTarget(item,question){
  const leaseReview=/전세\s*자금/.test(question)&&/임차\s*보증금/.test(item.name||'')&&!/전세/.test(item.content||'');
  const mixedMortgage=/전세\s*자금/.test(question)&&/주택\s*자금/.test(item.name||'')&&/구입/.test(item.content||'')&&/전세/.test(item.content||'');
  const dementiaCost=/치매\s*(?:환자\s*)?치료비/.test(question)&&/치매\s*치료\s*관리비/.test(item.name||'');
- const topicWarning=consultation?'전월세 계약 상담·동행 안내입니다. 월세 지급 사업으로 단정하지 마세요.':careExclusion?'아이돌봄서비스를 이용하지 않는 가정의 양육수당입니다. 돌봄서비스 제공 사업으로 세지 마세요.':hearingAndAid?'청각검사와 보청기 지원은 대상·한도가 다를 수 있으므로 각각의 조건과 금액을 구분하세요.':leaseReview?'임차보증금 이자 안내입니다. 전세 적용 여부는 이 발췌문에서 확인되지 않았으므로 원문을 확인하세요.':mixedMortgage?'주택 구입과 전세가 함께 안내됩니다. 전세 조건과 구입 조건을 나누어 확인하세요.':dementiaCost?'치매치료관리비의 지원 범위와 한도를 확인하세요. 모든 치매 치료비를 지원한다는 뜻은 아닙니다.':undefined;
+ const freeVaccineUnknown=/무료/.test(question)&&/예방\s*접종/.test(question)&&!/(?:무료|전액\s*지원|본인\s*부담금?\s*(?:없음|면제))/.test([item.name,item.content,...Object.values(item.fields||{})].join(' '));
+ const topicWarning=consultation?'전월세 계약 상담·동행 안내입니다. 월세 지급 사업으로 단정하지 마세요.':careExclusion?'아이돌봄서비스를 이용하지 않는 가정의 양육수당입니다. 돌봄서비스 제공 사업으로 세지 마세요.':hearingAndAid?'청각검사와 보청기 지원은 대상·한도가 다를 수 있으므로 각각의 조건과 금액을 구분하세요.':leaseReview?'임차보증금 이자 안내입니다. 전세 적용 여부는 이 발췌문에서 확인되지 않았으므로 원문을 확인하세요.':mixedMortgage?'주택 구입과 전세가 함께 안내됩니다. 전세 조건과 구입 조건을 나누어 확인하세요.':dementiaCost?'치매치료관리비의 지원 범위와 한도를 확인하세요. 모든 치매 치료비를 지원한다는 뜻은 아닙니다.':freeVaccineUnknown?'이 발췌문에서는 무료 여부가 확인되지 않습니다. 대상과 본인부담금을 원문에서 확인하세요.':undefined;
  const disabilityRequested=/장애인|장애아동/.test(question);
  const disabilityMentioned=Boolean(target&&/장애인|장애아동/.test(target));
  const vulnerabilityRequested=!disabilityRequested&&/취약계층|저소득층/.test(question);
@@ -25,6 +26,7 @@ function assessTarget(item,question){
  if(titleFit.status==='mismatch')return {...result,queryMatch:'target_mismatch',targetAssessment:{...titleFit,scope:'title',excerpt:item.name},note:'사업 제목의 연령 대상이 원래 질문과 다릅니다. 본문에 다른 연령이 언급돼도 요청 대상의 확정 사례로 세지 마세요.'};
  if(!fit.requested.length)return result;
  const targetAssessment={...fit,scope:target?'explicit_target':'excerpt',...(target?{excerpt:target.slice(0,250)}:{})};
+ if(fit.status==='mismatch'&&!target)return {...result,queryMatch:'target_unconfirmed',targetAssessment:{...targetAssessment,status:'unspecified',reason:'다른 연령 표현은 대상이 아닌 페이지 본문이나 메뉴에 등장할 수 있습니다.'},note:'명시된 사업 대상을 구분하지 못했습니다. 본문의 다른 연령 언급만으로 대상 불일치로 판단하지 마세요.'};
  if(fit.status==='mismatch')return {...result,queryMatch:'target_mismatch',targetAssessment,note:'원래 질문의 연령 대상과 이 발췌문의 명시 대상이 다릅니다. 요청한 대상의 확정 사례로 세지 마세요.'};
  if(fit.status==='unspecified')return {...result,queryMatch:'target_unconfirmed',targetAssessment,note:'원래 질문의 연령 대상이 이 발췌문에서 확인되지 않습니다. 확정 사례로 세지 마세요.'};
  return {...result,targetAssessment};
