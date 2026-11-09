@@ -19,6 +19,21 @@ const {StdioClientTransport}=require('@modelcontextprotocol/sdk/client/stdio.js'
   const implicit=await search({q:'대구 중구 청년',limit:20});assert(implicit.items.some(x=>x.institution==='대구광역시 중구'));assert(implicit.items.every(x=>x.institution==='대구광역시 중구'));
   const ambiguous=await search({q:'지원',institution:'중구',limit:1});assert(ambiguous.ambiguousInstitution.parents.includes('부산광역시'));assert(ambiguous.ambiguousInstitution.parents.includes('서울특별시'));assert(ambiguous.nextOffset);
   const next=await search({q:'지원',institution:'중구',limit:1,offset:ambiguous.nextOffset,snapshot:ambiguous.snapshot});assert.notEqual(next.items[0].serviceId,ambiguous.items[0].serviceId);
+  for(const [q,institution,title,agency] of [
+   ['어린이집 전기','경기도','어린이집 전기레인지 지원','경기도 안양시'],
+   ['귀농인 이사','경상북도','귀농인 이사비용 지원','경상북도 안동시'],
+   ['노인 의료급여','대전광역시','노인장기요양 의료급여부담금 지원','대전광역시'],
+   ['임산부 교통비','충청북도','군 지역 임산부 교통비 지원','충청북도'],
+   ['장애인가정 출산','인천광역시','장애인가정 출산지원금 지원','인천광역시 제물포구'],
+   ['대학생 주거비','강원특별자치도','도내 대학생 장학금 지원(주거비)','강원특별자치도'],
+   ['소상공인 경영','울산광역시','소상공인 경영안정자금','울산광역시'],
+   ['치매 무료검진','전북특별자치도','치매 무료검진 지원','전북특별자치도 전주시'],
+   ['어린이집 보육료','세종특별자치시','민간어린이집 차액보육료 지원','세종특별자치시'],
+   ['반려동물 의료비','서울특별시','취약계층 반려동물 의료비 지원','서울특별시 동대문구']]){
+    const r=await search({q,institution,limit:20});assert(r.items.some(x=>x.title===title&&x.institution===agency),`${institution} ${q}`);
+    assert(r.items.every(x=>x.url.startsWith('https://www.gov.kr/portal/rcvfvrSvc/dtlEx/')));
+    console.log(`PASS: ${institution} ${q} — ${r.total} candidates`);
+  }
   console.log('PASS: 5 actual regional questions, region inference, ambiguous districts and pagination via MCP stdio');
  }finally{await client.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
