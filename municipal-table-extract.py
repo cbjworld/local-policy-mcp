@@ -176,8 +176,11 @@ def extract(data, source):
                     and row[1]['colspan'] == widths[1] and row[2]['rowspan'] == row[0]['rowspan']
                     and row[2]['colspan'] == widths[2] == 1):
                 count = row[0]['rowspan']
-                following = rows[row_no:row_no + count - 1]
-                content_rows = expanded_content_rows([[row[1]]] + following, widths[1]) if len(following) == count - 1 else None
+                available = len(rows) - row_no + 1
+                truncated = count == available + 1 and available >= 2
+                actual_count = available if truncated else count
+                following = rows[row_no:row_no + actual_count - 1]
+                content_rows = expanded_content_rows([[row[1]]] + following, widths[1]) if len(following) == actual_count - 1 else None
                 if content_rows is not None:
                     content = '\n'.join(content_rows)
                     fields = {headers[0]: row[0]['text'], headers[1]: content, headers[2]: row[2]['text']}
@@ -185,9 +188,10 @@ def extract(data, source):
                                     'content': content, 'contentColumn': content_header,
                                     'department': fields.get('담당부서'), 'fields': fields,
                                     'links': list(dict.fromkeys(link for cells in [row] + following for cell in cells for link in cell['links'])),
-                                    'source': source, 'location': {'table': table_no, 'row': row_no, 'rowEnd': row_no + count - 1},
-                                    'status': 'source_row_candidate'})
-                    processed_through = row_no + count - 1
+                                    'source': source, 'location': {'table': table_no, 'row': row_no, 'rowEnd': row_no + actual_count - 1},
+                                    'status': 'source_row_candidate',
+                                    **({'layoutWarnings': ['rowspan_exceeds_table_boundary']} if truncated else {})})
+                    processed_through = row_no + actual_count - 1
                     continue
             # A category in the first column may cover several independent rows;
             # the name and content cells must each be present in every row.

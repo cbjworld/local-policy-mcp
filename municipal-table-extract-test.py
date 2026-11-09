@@ -8,6 +8,23 @@ spec.loader.exec_module(module)
 
 
 class TestMunicipalTable(unittest.TestCase):
+    def test_one_excess_outer_span_at_table_end_is_marked_for_review(self):
+        data = ('<table><tr><th>사업명</th><th colspan="2">사업내용</th><th>문의처</th></tr>'
+                '<tr><th rowspan="4">A</th><td colspan="2">지원대상</td><td rowspan="4">복지과</td></tr>'
+                '<tr><td>구분</td><td>청년</td></tr><tr><td colspan="2">지원금</td></tr></table>').encode()
+        item = module.extract(data, 'https://www.haeundae.go.kr/test')['items'][0]
+        self.assertEqual(item['content'], '지원대상\n구분 | 청년\n지원금')
+        self.assertEqual(item['location'], {'table': 1, 'row': 2, 'rowEnd': 4})
+        self.assertEqual(item['layoutWarnings'], ['rowspan_exceeds_table_boundary'])
+
+    def test_more_than_one_excess_outer_span_is_not_inferred(self):
+        data = ('<table><tr><th>사업명</th><th>사업내용</th><th>문의처</th></tr>'
+                '<tr><th rowspan="5">A</th><td>대상</td><td rowspan="5">복지과</td></tr>'
+                '<tr><td>지원금</td></tr></table>').encode()
+        result = module.extract(data, 'https://www.haeundae.go.kr/test')
+        self.assertEqual(result['items'], [])
+        self.assertTrue(result['skipped'])
+
     def test_two_column_merged_details_keep_scope_without_guessing(self):
         data = ('<table><tr><th>사업명</th><th>신청시기</th><th>지원내용</th><th>지원조건</th><th>문의 및 신청기관</th></tr>'
                 '<tr><td rowspan="2">장학사업</td><td rowspan="2">연중</td><td>50만원</td><td>1년 거주</td><td rowspan="2">교육과</td></tr>'
