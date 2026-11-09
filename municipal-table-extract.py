@@ -72,6 +72,34 @@ class Tables(HTMLParser):
             self.cell['text'].append(data)
 
 
+def expanded_content_rows(rows, width):
+    if not 1 <= width <= 100:
+        return None
+    active = [None] * width
+    output = []
+    for index, cells in enumerate(rows):
+        grid = [entry if entry and entry[1] > index else None for entry in active]
+        for cell in cells:
+            span, height = cell['colspan'], cell['rowspan']
+            if span < 1 or height < 1 or index + height > len(rows):
+                return None
+            start = next((i for i, entry in enumerate(grid) if entry is None), width)
+            if start + span > width or any(grid[i] is not None for i in range(start, start + span)):
+                return None
+            entry = (cell, index + height)
+            for i in range(start, start + span):
+                grid[i] = entry
+        if any(entry is None for entry in grid):
+            return None
+        unique = []
+        for entry in grid:
+            if not unique or unique[-1] is not entry:
+                unique.append(entry)
+        output.append(' | '.join(entry[0]['text'] for entry in unique))
+        active = grid
+    return output
+
+
 def extract(data, source):
     u = urlparse(source)
     if u.scheme != 'https' or not u.hostname or u.username:
@@ -131,10 +159,9 @@ def extract(data, source):
                     and row[2]['colspan'] == widths[2] == 1):
                 count = row[0]['rowspan']
                 following = rows[row_no:row_no + count - 1]
-                if (len(following) == count - 1 and all(r and sum(c['colspan'] for c in r) == widths[1]
-                        and all(c['rowspan'] == 1 and c['colspan'] > 0 for c in r) for r in following)):
-                    content_rows = [[row[1]]] + following
-                    content = '\n'.join(' | '.join(c['text'] for c in cells) for cells in content_rows)
+                content_rows = expanded_content_rows([[row[1]]] + following, widths[1]) if len(following) == count - 1 else None
+                if content_rows is not None:
+                    content = '\n'.join(content_rows)
                     fields = {headers[0]: row[0]['text'], headers[1]: content, headers[2]: row[2]['text']}
                     results.append({'name': fields[name_header], 'nameColumn': name_header,
                                     'content': content, 'contentColumn': content_header,

@@ -8,6 +8,27 @@ spec.loader.exec_module(module)
 
 
 class TestMunicipalTable(unittest.TestCase):
+    def test_nested_rowspan_preserves_each_benefit_and_category(self):
+        data = ('<table><tr><th>사업명</th><th colspan="4">사업내용</th><th>문의처</th></tr>'
+                '<tr><th rowspan="4">부모급여</th><td colspan="4">대상: 영유아</td><td rowspan="4">복지과</td></tr>'
+                '<tr><th>구분</th><th>연령</th><th>금액</th><th>방식</th></tr>'
+                '<tr><td rowspan="2">미이용</td><td>0~11개월</td><td>100만원</td><td rowspan="2">현금</td></tr>'
+                '<tr><td>12~23개월</td><td>50만원</td></tr></table>').encode()
+        result = module.extract(data, 'https://www.haeundae.go.kr/test')
+        self.assertEqual(len(result['items']), 1)
+        self.assertEqual(result['items'][0]['content'], '대상: 영유아\n구분 | 연령 | 금액 | 방식\n미이용 | 0~11개월 | 100만원 | 현금\n미이용 | 12~23개월 | 50만원 | 현금')
+        self.assertEqual(result['items'][0]['location']['rowEnd'], 5)
+
+    def test_nested_span_with_hole_or_overrun_is_skipped(self):
+        for inner in ('<tr><td rowspan="3">미이용</td><td>10만원</td></tr><tr><td>20만원</td></tr>',
+                      '<tr><td>미이용</td></tr><tr><td>이용</td><td>20만원</td></tr>'):
+            data = ('<table><tr><th>사업명</th><th colspan="2">사업내용</th><th>문의처</th></tr>'
+                    '<tr><th rowspan="3">부모급여</th><td colspan="2">대상</td><td rowspan="3">복지과</td></tr>'
+                    + inner + '</table>').encode()
+            result = module.extract(data, 'https://www.haeundae.go.kr/test')
+            self.assertEqual(result['items'], [])
+            self.assertTrue(result['skipped'])
+
     def test_bounded_program_block_retains_table_rows_and_never_crosses_programs(self):
         data = ('<table><tr><th>사업명</th><th colspan="2">사업내용</th><th>담당부서</th></tr>'
                 '<tr><th rowspan="3">A</th><td colspan="2">대상: 청년</td><td rowspan="3">복지과</td></tr>'
