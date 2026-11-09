@@ -29,7 +29,7 @@ assert.equal(row(summarize(make('예산액:100만원')),'planBudget').status,'no
 assert.equal(row(summarize(make('예산액:100만원')),'documentBudget').valueKRW,1000000);
 assert.equal(row(summarize(make('지원금:50천원×100명(50%)')),'supportBudget').status,'not_stated');
 assert.equal(g.checks[0].status,'matched');assert.equal(summarize(make(gijang.replace('10,500,000','10,600,000'))).checks[0].status,'mismatch');
-assert.equal(row(summarize(make(yeongdo,{evidenceScope:'attachment_reference'})),'supportBudget').status,'not_stated');
+assert.equal(row(summarize(make(yeongdo,{evidenceScope:'attachment_reference'})),'supportBudget').status,'not_read');
 assert.equal(row(summarize(make('타 지자체 참고\n지원금:50천원×100회')),'supportBudget').status,'not_stated');
 const partial=make('본문');partial[0].source.scanComplete=false;assert.equal(row(summarize(partial),'promotionBudget').display,'읽은 범위 별도 표기 없음');
 const direct=require('./presentation').present('read_open_document',{status:'read',title:'2026년 계획',institution:'테스트시',url:'https://a.go.kr/plan',source:make(gijang)[0].source});assert.equal(row(direct.presentation.financialSummary,'planBudget').valueKRW,10500000);assert(direct.source.pages.length);
@@ -71,3 +71,7 @@ for(const quote of ['지원내용 : 1인 대출 원금 1억원','지원내용 : 
 const reference=conditional('지원내용: 1인 50만원');reference.evidence.fields.activity.excerpts[0].sourceScope='attachment_reference';assert(require('./financial-summary').requestedGaps(reference,'지원액').includes('benefit'));
 
 for(const q of ['청년 이사비 찾아줘','청년 면접비 찾아줘','전세보증료 알려줘']){const gaps=requestedGaps({status:'read',attempts:[]},q);assert(gaps.includes('planBudget'),q);assert(gaps.includes('benefit'),q);}
+
+// A failed source is not evidence that the original omitted a budget.
+for(const attempts of [[],[{status:'download_failed'}],make('',{}),make('참고자료',{evidenceScope:'attachment_reference'})]){const result=summarize(attempts);assert.equal(row(result,'planBudget').status,'not_read');assert.equal(row(result,'planBudget').display,'원문 미확인');assert.equal(result.rows.length,3);}
+const failedView=require('./presentation').present('research_open_document',{status:'unreadable',metadata:{title:'예방접종 지원 사업',url:'https://www.open.go.kr/'},attempts:[{status:'download_failed'}]});assert(failedView.presentation.answerSummary.text.includes('원문 미확인 | 원문 미확인'));

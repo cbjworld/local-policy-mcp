@@ -58,13 +58,14 @@ function summarize(attempts,existingAmounts){
    const valueKRW=money(m[1]);if(valueKRW!==null)add(key,{sourceId:a.source.sourceId,url:a.source.url,page:p.page,quote:m[0],basis:'stated',amountText:m[1],valueKRW});
   }
  }
- const complete=readable.length>0&&readable.every(a=>a.source?.scanComplete===true&&!a.source.pages.some(p=>p.truncated));
+ const hasText=readable.some(a=>(a.source?.pages||[]).some(p=>typeof p.text==='string'&&p.text.trim()));
+ const complete=hasText&&readable.every(a=>a.source?.scanComplete===true&&!a.source.pages.some(p=>p.truncated));
  for(const r of Object.values(rows)){
   const values=[...new Set(r.observations.filter(e=>e.valueKRW!==null).map(e=>e.valueKRW))];
   if(r.observations.length>4)r.omittedObservations=r.observations.length-4;
   r.observations=r.observations.slice(0,4);
-  r.status=values.length>1?'multiple_values':values.length?r.observations.some(e=>e.basis==='stated')?'stated':'calculated':r.observations.some(e=>e.basis==='redacted')?'redacted':'not_stated';
-  r.display=r.status==='redacted'?'가림 처리':r.status==='not_stated'?(complete?'별도 표기 없음':'읽은 범위 별도 표기 없음'):values.map(v=>(v/10000).toLocaleString('ko-KR',{maximumFractionDigits:4})+'만원').join(' / ')+(r.status==='calculated'?' (산식 계산값)':'');
+  r.status=values.length>1?'multiple_values':values.length?r.observations.some(e=>e.basis==='stated')?'stated':'calculated':r.observations.some(e=>e.basis==='redacted')?'redacted':hasText?'not_stated':'not_read';
+  r.display=r.status==='redacted'?'가림 처리':r.status==='not_read'?'원문 미확인':r.status==='not_stated'?(complete?'별도 표기 없음':'읽은 범위 별도 표기 없음'):values.map(v=>(v/10000).toLocaleString('ko-KR',{maximumFractionDigits:4})+'만원').join(' / ')+(r.status==='calculated'?' (산식 계산값)':'');
   if(values.length===1)r.valueKRW=values[0];
   if(r.key==='benefit'&&r.observations.length&&r.observations.every(e=>e.amountBasis==='ceiling_not_fixed_payment'))r.display='최대 '+r.display;
  }
@@ -79,7 +80,7 @@ function summarize(attempts,existingAmounts){
   if(r.status==='not_stated'&&attempts.some(a=>a.source?.ocr?.status==='read'))r.display='OCR 읽은 범위에서 추출되지 않음';
  }
  if(Object.values(rows).some(r=>r.ocrReviewRequired))for(const c of checks){c.verification='ocr_arithmetic_only';c.ocrReviewRequired=true;}
- return {checks,rows:Object.values(rows).filter(r=>['planBudget','supportBudget','promotionBudget'].includes(r.key)||r.status!=='not_stated'),scope:'one_document_only',completeTextRead:complete,instruction:'문서의 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_stated는 표기 범위이며 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요.'};
+ return {checks,rows:Object.values(rows).filter(r=>['planBudget','supportBudget','promotionBudget'].includes(r.key)||!['not_stated','not_read'].includes(r.status)),scope:'one_document_only',completeTextRead:complete,instruction:'문서의 사업비에는 사업비·소요예산·총사업비의 원문 금액을 함께 분류합니다. 원문 명칭은 observations.sourceLabel에 보존합니다. stated는 표기 금액, calculated는 산식 계산값입니다. OCR 판독값은 기계 전사 후보이며 금액 확정·자동 합산에 사용하지 마세요. 서로 다른 값은 문서 내 문맥을 대조하고 임의로 하나를 고르지 마세요. not_read는 원문을 읽지 못한 상태이며, not_stated는 읽은 범위의 표기 상태입니다. 둘 다 0원이 아닙니다. 항목·금액·근거를 짧게 제시하세요.'};
 }
 function requestedGaps(result,question=''){
  if(result?.status!=='read'||result.relevanceStatus==='supporting_document'||result.targetFit?.status==='mismatch')return [];
@@ -95,7 +96,7 @@ function requestedGaps(result,question=''){
   const payment=e.quote.match(/지원\s*(?:내용|금액|한도|범위|단가)([\s\S]*)/)?.[1]?.split(/예산|사업비|소요예산|교부액|교부금/)[0]||'';
   return !/대출|융자|원금/.test(payment)&&/\d[\d,.]*\s*(?:만\s*)?원/.test(payment)&&/(?:1\s*인|인당|가구당|세대당|1\s*가구|1\s*명|1\s*대|1\s*회|교통카드\s*[12]\s*매)/.test(payment);
  });
- return requested.filter(key=>(summary.rows.find(r=>r.key===key)?.status||'not_stated')==='not_stated'&&!(key==='benefit'&&quotedBenefit));
+ return requested.filter(key=>['not_stated','not_read'].includes(summary.rows.find(r=>r.key===key)?.status||'not_stated')&&!(key==='benefit'&&quotedBenefit));
 }
 function compact(s){return {rows:s.rows,checks:s.checks,completeTextRead:s.completeTextRead,scope:s.scope};}
 module.exports={summarize,money,requestedGaps,compact};
