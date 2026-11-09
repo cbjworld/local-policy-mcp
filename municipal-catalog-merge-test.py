@@ -16,6 +16,15 @@ def snapshot(count, digest='a', source=SOURCE):
 
 
 class CatalogMergeTest(unittest.TestCase):
+    def test_reviewed_metadata_is_not_lost_on_refresh(self):
+        for metadata in ({'extraction': 'manually_verified_from_saved_source'}, {'programAuthority': {'name': '경기도'}}):
+            old = snapshot(1)
+            old['items'][0].update(metadata)
+            candidate = snapshot(1, 'b')
+            result, report = m.merge({'sources': [old]}, [('automatic', candidate)], {'www.nowon.kr'})
+            self.assertEqual(report[0]['status'], 'review_required')
+            self.assertEqual(result['sources'][0], old)
+
     def test_newly_skipped_rows_do_not_replace_previous_snapshot(self):
         old = snapshot(4)
         candidate = snapshot(3, 'b')

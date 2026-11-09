@@ -69,10 +69,14 @@ def merge(base, candidates, registered):
                            type(item['location'].get('row')) is int and
                            item['location']['row'] <= skip['row'] <= item['location'].get('rowEnd', item['location']['row'])
                            for item in old['items'])
+            def loses_reviewed_metadata():
+                new_by_location = {json.dumps(item['location'], sort_keys=True): item for item in source['items']}
+                return any(any(field in item and new_by_location.get(json.dumps(item['location'], sort_keys=True), {}).get(field) != item[field]
+                               for field in ('programAuthority', 'extraction')) for item in old['items'])
             comparable = lambda value: {k: v for k, v in value.items() if k != 'extractedAt'}
             if old and comparable(old) == comparable(source):
                 status = 'unchanged'
-            elif not source['items'] or (old and (len(source['items']) < len(old['items']) or len(source['skipped']) > len(old['skipped']) or any(overlaps_previous_item(s) for s in source['skipped']))):
+            elif not source['items'] or (old and (len(source['items']) < len(old['items']) or len(source['skipped']) > len(old['skipped']) or any(overlaps_previous_item(s) for s in source['skipped']) or loses_reviewed_metadata())):
                 status = 'review_required'
             else:
                 current[key] = source

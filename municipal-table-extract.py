@@ -151,6 +151,24 @@ def extract(data, source):
             if content_header is None:
                 skipped.append({'table': table_no, 'row': row_no, 'reason': 'unrecognized_repeated_header'})
                 continue
+            # The second row spans both benefit and eligibility; preserve its scope explicitly.
+            if (not remaining and headers == ['사업명', '신청시기', '지원내용', '지원조건', '문의및신청기관']
+                    and widths == [1] * 5 and len(row) == 5 and row_no < len(rows)
+                    and [c['rowspan'] for c in row] == [2, 2, 1, 1, 2]
+                    and all(c['colspan'] == 1 for c in row) and row[0]['text'] and row[2]['text']):
+                following = rows[row_no]
+                if (len(following) == 1 and following[0]['kind'] == 'td' and following[0]['rowspan'] == 1
+                        and following[0]['colspan'] == 2 and following[0]['text']):
+                    fields = dict(zip(headers, (c['text'] for c in row)))
+                    fields['지원내용·지원조건 공통 추가내용'] = following[0]['text']
+                    results.append({'name': fields[name_header], 'nameColumn': name_header,
+                                    'content': fields[content_header], 'contentColumn': content_header,
+                                    'department': None, 'fields': fields,
+                                    'links': list(dict.fromkeys(link for cell in row + following for link in cell['links'])),
+                                    'source': source, 'location': {'table': table_no, 'row': row_no, 'rowEnd': row_no + 1},
+                                    'status': 'source_row_candidate'})
+                    processed_through = row_no + 1
+                    continue
             # Only combine a fully bounded program block with an explicit shared name and contact.
             if (not remaining and len(headers) == 3 and headers[0] == name_header and headers[1] == content_header
                     and len(row) == 3 and row[0]['text'] and row[1]['text'] and row[0]['rowspan'] > 1

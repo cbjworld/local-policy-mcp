@@ -8,6 +8,27 @@ spec.loader.exec_module(module)
 
 
 class TestMunicipalTable(unittest.TestCase):
+    def test_two_column_merged_details_keep_scope_without_guessing(self):
+        data = ('<table><tr><th>사업명</th><th>신청시기</th><th>지원내용</th><th>지원조건</th><th>문의 및 신청기관</th></tr>'
+                '<tr><td rowspan="2">장학사업</td><td rowspan="2">연중</td><td>50만원</td><td>1년 거주</td><td rowspan="2">교육과</td></tr>'
+                '<tr><td colspan="2">고등학생 또는 대학생</td></tr>'
+                '<tr><td>다른 사업</td><td>연중</td><td>20만원</td><td>청년</td><td>복지과</td></tr></table>').encode()
+        result = module.extract(data, 'https://www.inje.go.kr/test')
+        self.assertEqual([x['name'] for x in result['items']], ['장학사업', '다른 사업'])
+        first = result['items'][0]
+        self.assertEqual(first['fields']['지원조건'], '1년 거주')
+        self.assertEqual(first['fields']['지원내용·지원조건 공통 추가내용'], '고등학생 또는 대학생')
+        self.assertEqual(first['location'], {'table': 1, 'row': 2, 'rowEnd': 3})
+        self.assertNotIn('다른 사업', str(first))
+
+    def test_ambiguous_following_merged_cell_is_not_attached(self):
+        data = ('<table><tr><th>사업명</th><th>신청시기</th><th>지원내용</th><th>지원조건</th><th>문의 및 신청기관</th></tr>'
+                '<tr><td rowspan="2">장학사업</td><td rowspan="2">연중</td><td>50만원</td><td>1년 거주</td><td rowspan="2">교육과</td></tr>'
+                '<tr><td colspan="3">범위 불명</td></tr></table>').encode()
+        result = module.extract(data, 'https://www.inje.go.kr/test')
+        self.assertEqual(result['items'], [])
+        self.assertTrue(result['skipped'])
+
     def test_nested_rowspan_preserves_each_benefit_and_category(self):
         data = ('<table><tr><th>사업명</th><th colspan="4">사업내용</th><th>문의처</th></tr>'
                 '<tr><th rowspan="4">부모급여</th><td colspan="4">대상: 영유아</td><td rowspan="4">복지과</td></tr>'
