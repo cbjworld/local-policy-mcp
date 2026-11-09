@@ -1,0 +1,499 @@
+{
+  "generatedAt": "2026-11-09T02:32:23.889Z",
+  "catalogSha256": "d228fe38a4489343d62f5328e89aaf0ea3602910fd9dac0ca6350a540dbfd98c",
+  "sourceCount": 70,
+  "itemCount": 487,
+  "note": "홈페이지 출처와 로컬 검색 범위의 메타데이터입니다. 원문 및 사업별 내용은 포함하지 않습니다.",
+  "sources": [
+    {
+      "source": "https://www.nowon.kr/www/info/info2/info2_09/info2_09_01.jsp",
+      "sha256": "95746d8152dabffb2c5932903aab47b9f4715f890e8a357920710937267a4d9e",
+      "checkedAt": "2026-11-05T02:05:09.150130+00:00",
+      "itemCount": 31,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.gccity.go.kr/dept/contents.do?mId=0212020700",
+      "sha256": "d795916e1054adb073cde6b87aafb8cbf8a47e28da5bcccf9cfe0a8f7f177c5d",
+      "checkedAt": "2026-11-09T02:32:08.083486+00:00",
+      "itemCount": 12,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.sd.go.kr/main/contents.do?key=4778",
+      "sha256": "ea3ead57060af6b7cb6fbf62c5841529ffd4fa8ba892ccd4f19e956f2ccd1c5c",
+      "checkedAt": "2026-11-05T01:39:40.932677+00:00",
+      "itemCount": 36,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.saha.go.kr/portal/contents.do?mId=0509020300",
+      "sha256": "13d9baf7f2aaf835b1b3eb42f4ec581169b39ae861796aa7deb11ede5ff41a7f",
+      "checkedAt": "2026-11-09T02:32:08.173867+00:00",
+      "itemCount": 6,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.yw.go.kr/www/contents.do?key=1213",
+      "sha256": "d2c3f51297bea2b14ec0bda9718a238009901533d69a5d07104da86e28e43fa8",
+      "checkedAt": "2026-11-05T01:39:41.072414+00:00",
+      "itemCount": 10,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000103001005006",
+      "sha256": "a795bbc36394be05004062dd7991c7ad64d2b97e4a6b8bdb7284e32d4079f60e",
+      "checkedAt": "2026-11-09T02:31:44.332655+00:00",
+      "itemCount": 10,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.inje.go.kr/portal/field-info/youth",
+      "sha256": "35e71fc8a9da839b416020dacd02dceaa5799539c721600bc44444d1b5fb1092",
+      "checkedAt": "2026-11-09T02:31:44.340698+00:00",
+      "itemCount": 24,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.nyj.go.kr/www/contents.do?key=4938",
+      "sha256": "666b167da667880dc8a75b77a2ada31a2220dcdb31b3557dc6cb9b5e7e73e39a",
+      "checkedAt": "2026-11-05T01:39:41.267186+00:00",
+      "itemCount": 14,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.yw.go.kr/www/contents.do?key=1215",
+      "sha256": "b7898b5781410c242fe7d857fe7c858daa0daa119bf8e361ccb781b6c549f92a",
+      "checkedAt": "2026-11-05T01:39:41.368275+00:00",
+      "itemCount": 3,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.uiwang.go.kr/UWKORWEL1901",
+      "sha256": "307d72f05bc25d7edaf82846a15f4c2554d575e56dafbadea481e453243257cd",
+      "checkedAt": "2026-11-05T01:45:12.694453+00:00",
+      "itemCount": 150,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.sasang.go.kr/index.sasang?menuCd=DOM_000000103008003005",
+      "sha256": "4bf5b92eb764c30cdf7f6508bea36841cc643632da945b8fb413747c222956c0",
+      "checkedAt": "2026-11-09T02:32:08.191122+00:00",
+      "itemCount": 7,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000103001005003",
+      "sha256": "ba3f77385935a2858945507cfac6b4b7cc0cebba7d9339df4449674838772e29",
+      "checkedAt": "2026-11-09T02:30:33.855494+00:00",
+      "itemCount": 24,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.uiwang.go.kr/UWKORWEL1604",
+      "sha256": "626c86704709ba6156e96097053119aa48a89f1993b31ac670c422855b8f2510",
+      "checkedAt": "2026-11-05T01:56:54.438996+00:00",
+      "itemCount": 6,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.hongcheon.go.kr/www/contents.do?key=2702",
+      "sha256": "723a28f24b5be9b0c2d75621c5199ec2d4a1b5e777783c233597971ca408e0ff",
+      "checkedAt": "2026-11-09T02:20:09.398349+00:00",
+      "itemCount": 6,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000103001005000",
+      "sha256": "02636b7bd9d33463c211da119f9f98e5723f12e33672f06878825557f6c3c06e",
+      "checkedAt": "2026-11-09T02:20:09.424058+00:00",
+      "itemCount": 22,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000103001005005",
+      "sha256": "adf69a6e04bb5a275cf1314655ba6f94e237ab6999bf0e84804960632ed63f2c",
+      "checkedAt": "2026-11-09T02:20:09.453840+00:00",
+      "itemCount": 24,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.nowon.kr/www/info/info2/info2_05/info2_05_05/info2_05_05_01.jsp",
+      "sha256": "c26ef483750673cead828f540f0032c199ca79bc30f5bf105f53999e141ae0c1",
+      "checkedAt": "2026-11-05T02:14:22.597598+00:00",
+      "itemCount": 17,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.ydp.go.kr/www/contents.do?key=6231&",
+      "sha256": "aa20f23f17895f7d265dcf807b50ca93b7bc1507d424a3e9e17d909421e4a0a8",
+      "checkedAt": "2026-11-09T02:29:36.490046+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.gwanak.go.kr/site/gwanak/08/10810080000002020021209.jsp",
+      "sha256": "4ab146983474ee5ffdc6bcf7b3b6836c0c9d499e65c39a4b8adbfc31bfbf2fed",
+      "checkedAt": "2026-11-09T02:29:36.504973+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.gwanak.go.kr/site/gwanak/04/10404050600002016051205.jsp",
+      "sha256": "611720c622bbbeeae90b3b6668c8e870435a0445726fde00891b48082f7c264c",
+      "checkedAt": "2026-11-09T02:29:36.520653+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac948ebb749f0",
+      "sha256": "cdab5f03b2fa0454b7c6032d9a47ae42f2e30d4f64ad0c861ba39d0afc861b08",
+      "checkedAt": "2026-11-05T02:36:21.515668+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.chilgok.go.kr/portal/contents.do?mId=0912040000",
+      "sha256": "a847960f2591adc80e0d85404e76ffaea20ceb913b91fae9cafd62055f3b4f99",
+      "checkedAt": "2026-11-05T02:36:21.595941+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.ydp.go.kr/www/contents.do?key=6058&",
+      "sha256": "25554cd8c3f3aab0241ab71e8c39727ec1fb202b5a1eda41dedc1a08434100af",
+      "checkedAt": "2026-11-09T02:29:36.545546+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.saha.go.kr/portal/contents.do?mId=0509020000",
+      "sha256": "9b6587a18b2eddc69e797a2a47bb783c4e7a2fe2a5e0203decc58ea0d96a63bf",
+      "checkedAt": "2026-11-09T02:26:27.939508+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.yeonje.go.kr/portal/contents.do?mId=0608110000",
+      "sha256": "2d7dcbd1bdd97423c35c6e505d67bf24e98c278d0d439833ff008d7601fac5e0",
+      "checkedAt": "2026-11-09T02:26:27.985564+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.dalseong.daegu.kr/index.do?menu_id=00005777",
+      "sha256": "9bd88543bcc4b7b0ce0376bebddbaad33c1bef8f7fa7c762f81a89ca26b6642f",
+      "checkedAt": "2026-11-05T02:43:17.606578+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.namdong.go.kr/main/area/youth/business/certificate.jsp",
+      "sha256": "53c9c3bcb2b5652b2372e19db87b41f0e4bb7f1991ee263b5dd68c60cf09dd13",
+      "checkedAt": "2026-11-05T02:43:17.655331+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.gg.go.kr/contents/contents.do?ciIdx=987253&menuId=1534092",
+      "sha256": "226160da3d0f81032009422133992b23a12ec4ae874f729d52299c35a59c870c",
+      "checkedAt": "2026-11-09T02:26:28.082592+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.gg.go.kr/contents/contents.do?ciIdx=987027&menuId=265934",
+      "sha256": "ade4d7ab93b26d8a69e8b649be07e77b72414143d6043049cf05b53cf6fe42d3",
+      "checkedAt": "2026-11-09T02:26:28.184945+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.gimje.go.kr/index.gimje?menuCd=DOM_000000106003005000",
+      "sha256": "d8feebff4aac5d949fb3558b52ff9ed37661ac888620f5e1e9285976ce5c2687",
+      "checkedAt": "2026-11-09T02:26:28.217764+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac93f6a5448dc",
+      "sha256": "c4cac6376a9d09f5a326aaa73d7504289938dac567ca6c8458327a42d455f145",
+      "checkedAt": "2026-11-05T02:48:37.869460+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac946825649a8",
+      "sha256": "646329720ef272c3f7592b56c46f51002af4a3824b517945944f671386d13f7d",
+      "checkedAt": "2026-11-05T02:48:37.909142+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac948510449dc",
+      "sha256": "795a7db4bd53d64c8dc629df136fcdbaabf2e6bc729df04a4650870354ea82ef",
+      "checkedAt": "2026-11-05T02:48:37.952810+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.chilgok.go.kr/portal/contents.do?mId=0912030000",
+      "sha256": "e2f9ac2c73cebf847cf2842b2182d3c40aec1abd787b963d5dab6163ceafe9e2",
+      "checkedAt": "2026-11-05T02:52:12.525950+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.chilgok.go.kr/portal/contents.do?mId=1101070000",
+      "sha256": "fa188ebed9a58a380cda64d971f3c1c7c6ee99ea8e1944519e5eab3d59e42791",
+      "checkedAt": "2026-11-05T02:52:12.601109+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.chilgok.go.kr/portal/contents.do?mId=1210000000",
+      "sha256": "d1b4313e747247aadf8dc985e48a59c8ea703875644305ec6b5c999273551ea2",
+      "checkedAt": "2026-11-05T02:52:12.670523+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.chilgok.go.kr/portal/contents.do?mId=1208000000",
+      "sha256": "b9c3dfb7b2258dcca1af33586666fdcfe6acfb25d70e2817d17027d6c4a0f9ea",
+      "checkedAt": "2026-11-05T02:52:12.740652+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.yangju.go.kr/www/contents.do?key=4371",
+      "sha256": "6fa5d833b23269b722c53ffb324c20c2ccad3d3030c9a2e1273b18b609484882",
+      "checkedAt": "2026-11-09T02:27:56.583044+00:00",
+      "itemCount": 26,
+      "skippedCount": 1
+    },
+    {
+      "source": "https://www.jinju.go.kr/00134/04991/05055.web",
+      "sha256": "bbfd24ff22c8d497b83855afd5a6594851c6ce216ba09eb8fbe7c10e85321245",
+      "checkedAt": "2026-11-09T02:26:28.384395+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.namdong.go.kr/main/area/youth/business/farming.jsp",
+      "sha256": "d8ae9e3d2a7872eca9c4283ca0645532817c977a0e45aab3a1627d4c5d54ee62",
+      "checkedAt": "2026-11-05T02:59:39.209364+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.sacheon.go.kr/life/00327/03933.web",
+      "sha256": "10866cf31961ea11642e6d052813b0e6e1061fc0e8ae4718e96591e0fac43f10",
+      "checkedAt": "2026-11-09T02:26:28.492305+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.sacheon.go.kr/agriculture/04092/04094.web",
+      "sha256": "4b9f1c0b0615cf26e704b2ba0992fff3d25f08d4220cf0c210f49c6d85ef783f",
+      "checkedAt": "2026-11-09T02:26:28.598290+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.sacheon.go.kr/agriculture/04092/04097.web",
+      "sha256": "5af29b32d2eb40d0f0323db452e327b5119432247f55e9cb1c08840167d92b82",
+      "checkedAt": "2026-11-09T02:27:56.132593+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.nam.daegu.kr/index.do?menu_id=00205113",
+      "sha256": "55646973628546de91d2fc858d2c31efc9a3c0748b961858a595614748237e4a",
+      "checkedAt": "2026-11-09T02:27:56.179727+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.suseong.kr/index.do?menu_id=00000650",
+      "sha256": "b6dd61981c7bd6af0bda8e32a9c5f91c5c4f9b9262ecd6b153287c5d85150ffe",
+      "checkedAt": "2026-11-09T02:27:56.276562+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.hadong.go.kr/specialty/00401/05203.web",
+      "sha256": "c11d03d819d1c641bbb1c494331ecec75d8d8f8e723511d0b8f7955b1f8ea038",
+      "checkedAt": "2026-11-09T02:27:56.330092+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.dgs.go.kr/portal/contents.do?mid=0303100100",
+      "sha256": "455cd5cb732fef9f7f99bdb95066ec79f74c68e415436ca9d1817df1f431a3bf",
+      "checkedAt": "2026-11-09T02:27:56.387173+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.namdong.go.kr/main/area/youth/business/fishing.jsp",
+      "sha256": "77b544ae06c581dfa849fe3b6f71091da84b7f75dee14c7f6b6642900203d358",
+      "checkedAt": "2026-11-05T03:04:36.798893+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac948736749e0",
+      "sha256": "bff5711c21181828db263fdd5b9cceabc4e27c78c9439d6f50bc778394719909",
+      "checkedAt": "2026-11-05T03:04:36.868096+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.jemulpo.go.kr/main/area/education/support_expenses.jsp",
+      "sha256": "77785185944847ce3cbbfbaa984f6213153772073528fede4b658e8210bbeeb8",
+      "checkedAt": "2026-11-09T02:27:56.410162+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.ongjin.go.kr/open_content/main/environment/ship/ship_support.jsp",
+      "sha256": "037d450b776e626fdc2633d611dba8c8828f4dd23e15aca9053479a5e0eb0bdb",
+      "checkedAt": "2026-11-05T03:08:16.188812+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.ddc.go.kr/ddc/contents.do?key=429",
+      "sha256": "bfa5fb123c654552f824f25bf3a513c5c5a47d0ac868b465f21043074a6fe2c6",
+      "checkedAt": "2026-11-05T03:08:16.219912+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.suncheon.go.kr/kr/welfare/0007/0006/",
+      "sha256": "e77e4223d567a3f200aa8a07cec65ac40534778c305f7227357f5fbe21f19f0b",
+      "checkedAt": "2026-11-05T03:09:52.779699+00:00",
+      "itemCount": 2,
+      "skippedCount": 1
+    },
+    {
+      "source": "https://www.jangheung.go.kr/www/civil_complaint/job_info/job_support",
+      "sha256": "47b199bfac1f16e23ff8119cb2d3434f120a93c44a483b7f46423e6ada3e9d74",
+      "checkedAt": "2026-11-09T02:27:56.657877+00:00",
+      "itemCount": 5,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.paju.go.kr/www/www_02/www_02_01/www_02_01_02/www_02_01_02_02/www_02_01_02_02_01.jsp",
+      "sha256": "f1aa5551e14bd9916932234dfc2f32a4f3773a3c559e374d087aa14bd4067bab",
+      "checkedAt": "2026-11-05T03:22:15.631380+00:00",
+      "itemCount": 3,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.sunchang.go.kr/index.do?menuUid=ff8080819a2f0e3b019ac945cddc4994",
+      "sha256": "1aa09a32c6124414e598226bb85d99ef6725230aa3dee0984f374bfb7d761024",
+      "checkedAt": "2026-11-05T03:32:11.029437+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.ddc.go.kr/ddc/contents.do?key=445",
+      "sha256": "39a9772442bf4f34ef4628fc12a2d0a36019fe24e29996b4f329e0dea1adcb10",
+      "checkedAt": "2026-11-06T00:19:04.972284+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.donggu.ulsan.kr/donggu/contents/contents.do?mId=3030602",
+      "sha256": "e2a9b4e48de25b81d0c93d24abd4b292d79b9665efac3db0596e1b2120bd4a09",
+      "checkedAt": "2026-11-06T00:22:38.704665+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.saha.go.kr/portal/contents.do?mId=0501060000",
+      "sha256": "00998b65aa589f4d05a7c2137102ccaec90ce1ed87b94b7007f31950c409d4ea",
+      "checkedAt": "2026-11-09T02:27:56.426548+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.namdong.go.kr/main/area/youth/welfare/monthly.jsp",
+      "sha256": "179de4125340ab7c8f045ec7639beaa2b13f7d66a820aec388fb0643adaa965f",
+      "checkedAt": "2026-11-06T00:33:02.431240+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.tongyeong.go.kr/00973/00979/00989.web",
+      "sha256": "cb5de2d345783271c9c19abcefd6fdda3d07057911f722f7b8953b1d6f32e3d6",
+      "checkedAt": "2026-11-09T02:27:56.525408+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.gumi.go.kr/hyeonggok2/board/post/view.do?bcIdx=1&idx=815868&mid=0201000000",
+      "sha256": "580ac1968c3f84d377f6f2cb7c45a0d7a77d88053ce903afc0fd0c82dd722b37",
+      "checkedAt": "2026-11-09T02:28:48.596662+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.gumi.go.kr/portal/board/post/view.do?bcIdx=1&idx=834701&mid=0401020000",
+      "sha256": "d400198171fe4a1e33f511c6731b7c8e231b28bfcfb5b8cd7e718a3650a09f96",
+      "checkedAt": "2026-11-09T02:28:48.620499+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.seongnam.go.kr/bbs010101/405225",
+      "sha256": "985249395f4fea7dafb73129fbc174b3a711d8a6fb2468dba6a03a7886983166",
+      "checkedAt": "2026-11-09T02:28:48.631684+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.ansan.go.kr/iloveyou/sub/contents.do?c1=3&c3=22",
+      "sha256": "d059505d07a39b1a5301de78d0652ad3ef92669c1e55307aaf55917c2d33d3bc",
+      "checkedAt": "2026-11-09T02:28:48.640727+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.gumi.go.kr/portal/board/post/view.do?bcIdx=1&idx=840383&mid=0401020000",
+      "sha256": "a780f5abc222a8c06b429c28fda058c38249e5fe3749175994f29799c0c024e4",
+      "checkedAt": "2026-11-09T02:28:48.670995+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.yongin.go.kr/user/bbs/BD_selectBbs.do?q_bbsCode=1001&q_bbscttSn=20260204142833457&q_clCode=1",
+      "sha256": "afe9e2e027e391b2d67ef88073d920b3c9abf965c833b07578604ea3e7293750",
+      "checkedAt": "2026-11-06T02:27:36.918324+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.yongin.go.kr/user/bbs/BD_selectBbs.do?q_bbsCode=1020&q_bbscttSn=20260707075005612",
+      "sha256": "47caf704791b11f2ce4b494e4d0882d2b65c5f0288eec1bfa219efeebb6c9129",
+      "checkedAt": "2026-11-06T02:39:10.038813+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.bsseogu.go.kr/news/board/view.do?boardId=BBS_0000105&dataSid=275595&menuCd=DOM_000000501000000000&paging=ok&startPage=1",
+      "sha256": "24fb3f232285a58e9d243b1a11e7850786a8f4c752672c250ab120c1c27c868b",
+      "checkedAt": "2026-11-09T02:28:48.675660+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    },
+    {
+      "source": "https://www.gyeyang.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=16&bcd=businessinfo",
+      "sha256": "c1dd20258efb12ffd8131633339545d367ae9393c99e7d43024fcd3c3de8bad3",
+      "checkedAt": "2026-11-09T02:29:37.365158+00:00",
+      "itemCount": 1,
+      "skippedCount": 0
+    }
+  ]
+}
