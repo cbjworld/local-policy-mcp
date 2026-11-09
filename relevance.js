@@ -1,9 +1,11 @@
 function documentRole(title=''){
  const t=title.replace(/\s+/g,'');
+ if(/지급.*(?:건의|요청|의뢰|신청)|(?:건의|요청|의뢰|신청).*지급/.test(t))return 'payment_request';
  if(/정산|집행실적|지급내역|집행잔액/.test(t))return 'execution_or_settlement';
  if(/교부|예탁|예치금/.test(t))return 'allocation_or_deposit';
  if(/예산|추경/.test(t))return 'budget';
  if(/계획|방침/.test(t))return 'plan';
+ if(/지급|대금납부/.test(t))return 'payment_related';
  return 'other';
 }
 function targetFit(text='',question=''){
@@ -42,7 +44,7 @@ function screen(result,purpose='projects'){
   const matches=anchors.every(w=>context.includes(w.toLowerCase()));
   if(anchors.length&&relevance.kind==='project_candidate'&&!matches)relevance={kind:'unclassified',reason:'원래 검색 주제의 일부 핵심어가 제목에서 확인되지 않음: 본문 관련성 추가 확인 필요',score:0};
   if(anchors.length&&matches&&relevance.kind==='unclassified'&&/사업/.test(title))relevance={kind:'project_candidate',reason:'원래 검색 주제와 사업명이 일치하는 후보: 계획서 여부는 본문 확인 필요',score:2};
-  return {...x,relevance,documentRole:documentRole(x.title),stageNote:'제목에서 추정한 문서 역할이며 교부·예탁은 실제 집행이나 현재 시행 확정이 아닙니다.'};
+  return {...x,relevance,documentRole:documentRole(x.title),stageNote:'제목에서 추정한 문서 역할입니다. 지급·지급 요청·교부·예탁은 실제 집행이나 현재 시행을 확정하지 않습니다.'};
  });
  const candidates=all.filter(x=>x.relevance.kind==='project_candidate').sort((a,b)=>b.relevance.score-a.relevance.score);
  return {...result,purpose,totalMeaning:'포털 원시 문서 건수이며 관련 사업 수가 아님',items:purpose==='documents'?all:candidates,

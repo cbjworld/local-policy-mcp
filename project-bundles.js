@@ -63,7 +63,7 @@ function bundle(documents,investigations=[]){
 function evidenceMap(documents,investigations=[]){
  const reads=new Map(investigations.map(x=>[documentKey(x.candidate.url),x.result.status]));
  const groups=new Map(),seen=new Set();
- const labels={plan:'계획·방침',budget:'예산 편성·변경',allocation_or_deposit:'교부·예탁',execution_or_settlement:'집행·정산'};
+ const labels={plan:'계획·방침',budget:'예산 편성·변경',allocation_or_deposit:'교부·예탁',execution_or_settlement:'집행·정산',payment_related:'지급 관련 문서',payment_request:'지급 건의·요청'};
  for(const d of documents){
   const role=require('./relevance').documentRole(d.title);
   if(!labels[role]||!d.url||seen.has(documentKey(d.url)))continue;
@@ -76,6 +76,6 @@ function evidenceMap(documents,investigations=[]){
   if(!stage){stage={role,label:labels[role],documents:[]};group.stages.push(stage);}
   stage.documents.push({title:d.title,url:d.url,department:d.department||null,readingStatus:reads.get(documentKey(d.url))||'not_attempted'});
  }
- return [...groups.values()].map(g=>({...g,missingStages:Object.keys(labels).filter(k=>!g.stages.some(s=>s.role===k)),note:'문서 제목에 따른 조사 경로입니다. 단계별 자료가 같은 사업인지 본문 대조가 필요하며, 미발견은 자료 부존재가 아닙니다. 교부·예탁과 실제 집행을 구분하세요.'}));
+ return [...groups.values()].map(g=>({...g,missingStages:['plan','budget','allocation_or_deposit','execution_or_settlement'].filter(k=>!g.stages.some(s=>s.role===k)),note:'문서 제목에 따른 조사 경로입니다. 단계별 자료가 같은 사업인지 본문 대조가 필요하며, 미발견은 자료 부존재가 아닙니다. 지급 건의와 지급 관련 문서, 교부·예탁은 실제 집행을 확정하지 않습니다.'}));
 }
 module.exports={identity,bundle,evidenceMap,documentKey};

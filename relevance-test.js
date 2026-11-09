@@ -50,6 +50,11 @@ console.log('PASS: survey and internal notices remain supporting documents; unre
 assert.equal(require('./relevance').documentRole('사업비 예탁 건의'),'allocation_or_deposit');
 assert.equal(require('./relevance').documentRole('보조금 교부결정'),'allocation_or_deposit');
 assert.equal(require('./relevance').documentRole('사업 집행실적 및 정산'),'execution_or_settlement');
+assert.equal(require('./relevance').documentRole('2026년 6월 1차 어린이 국가 예방접종 지원사업 위탁의료기관 접종 비용 지급'),'payment_related');
+assert.equal(require('./relevance').documentRole('인플루엔자 국가예방접종 지원사업(어린이·임신부)백신 대금 지급 건의'),'payment_request');
+assert.equal(require('./relevance').documentRole('사업비 지급내역 제출 요청'),'payment_request');
+assert.equal(require('./relevance').documentRole('2026년 지원금 지급 계획'),'plan');
+assert.equal(require('./relevance').documentRole('2026년 보조금 교부 및 지급'),'allocation_or_deposit');
 assert.equal(require('./relevance').documentRole('추경 예산 편성'),'budget');
 const {targetFit}=require('./relevance');
 assert.equal(targetFit('선천성 난청 검사 및 보청기 지원','어르신 보청기').status,'mismatch');

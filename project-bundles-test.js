@@ -20,6 +20,8 @@ const annual=require('./project-bundles').bundle([annualDoc],[annualRead])[0];as
 const dated={...annualDoc,title:'2026년 청년 부동산 중개보수 및 이사비 지원사업 추진계획'};const datedResult=require('./project-bundles').bundle([dated],[{...annualRead,candidate:dated}])[0];assert.equal(datedResult.titleYear,'2026');assert.equal(datedResult.businessYear,'2027');assert(datedResult.reviewFlags.includes('title_year_differs_from_business_year'));
 const multi={...annualRead,result:{...annualRead.result,evidence:{fields:{period:{excerpts:[{status:'evidence_candidate',quote:'사업기간 : 2026년부터 2027년까지'}]}}}}};assert.equal(require('./project-bundles').bundle([annualDoc],[multi])[0].businessYear,null);
 const dual=evidenceMap([{title:'2026년 산후조리비 지원계획',institution:'A',url:original},{title:'2026년 산후조리비 지원계획',institution:'A',url:metadata}],[{candidate:{url:metadata},result:{status:'read'}}]);
+const payments=evidenceMap([{title:'2026년 어린이 예방접종 지원사업 접종 비용 지급',institution:'A',url:'payment'},{title:'2026년 어린이 예방접종 지원사업 백신 대금 지급 건의',institution:'A',url:'request'}]);
+assert.deepEqual(payments[0].stages.map(x=>x.role),['payment_related','payment_request']);assert.match(payments[0].note,/실제 집행을 확정하지/);
 assert.equal(dual[0].stages[0].documents.length,1);
 assert.equal(dual[0].stages[0].documents[0].readingStatus,'read');
 const docs=[

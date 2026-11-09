@@ -173,7 +173,7 @@ async function runResearch(args={},io=portal){
  if(catalogEvidence.seedDocuments.length)screened=screen();
  timings.searchMs=Date.now()-searchStart;const readStart=Date.now();
  const allDocuments=[...screened.items,...screened.reviewItems,...screened.relatedDocuments];
- const financialDocuments=allDocuments.filter(d=>['allocation_or_deposit','execution_or_settlement','budget'].includes(d.documentRole));
+ const financialDocuments=allDocuments.filter(d=>['allocation_or_deposit','execution_or_settlement','payment_related','payment_request','budget'].includes(d.documentRole));
  // shortcut: link only explicit regional business names with the same explicit year; never merge institutions.
  const named=new Map();
  for(const d of allDocuments){
@@ -188,7 +188,7 @@ async function runResearch(args={},io=portal){
  const candidates=screened.items;
  for(const d of allDocuments)if(d.discovery!=='saved_catalog'&&d.institution&&!/^서울/.test(d.institution)&&['비공개','열람제한'].includes(d.disclosure))d.readingDecision={status:'listed_nonpublic',reason:'목록상 비공개·열람제한: 자동 첨부 조회는 생략하고 제목과 출처를 보존합니다.'};
  const anchorSets=request.queries.map(q=>q.split(/\s+/).filter(w=>!['지원','사업','정책','사례'].includes(w)));
- const stageDocuments=allDocuments.filter(d=>d.targetFit?.status!=='mismatch'&&anchorSets.some(anchors=>anchors.length&&anchors.every(w=>String((d.title||'')+(d.institution||'')).replace(/\s+/g,'').toLowerCase().includes(w.toLowerCase())))&&(d.relevance.kind==='project_candidate'||['allocation_or_deposit','execution_or_settlement','budget'].includes(d.documentRole)));
+ const stageDocuments=allDocuments.filter(d=>d.targetFit?.status!=='mismatch'&&anchorSets.some(anchors=>anchors.length&&anchors.every(w=>String((d.title||'')+(d.institution||'')).replace(/\s+/g,'').toLowerCase().includes(w.toLowerCase())))&&(d.relevance.kind==='project_candidate'||['allocation_or_deposit','execution_or_settlement','payment_related','payment_request','budget'].includes(d.documentRole)));
  const investigations=[];
  const complete=x=>!missingFields(x.result,request.question).length;
  // Broad topics present real candidate titles first; choosing a single sub-topic would invent user intent.
