@@ -123,6 +123,27 @@ def extract(data, source):
             if content_header is None:
                 skipped.append({'table': table_no, 'row': row_no, 'reason': 'unrecognized_repeated_header'})
                 continue
+            # Only combine a fully bounded program block with an explicit shared name and contact.
+            if (not remaining and len(headers) == 3 and headers[0] == name_header and headers[1] == content_header
+                    and len(row) == 3 and row[0]['text'] and row[1]['text'] and row[0]['rowspan'] > 1
+                    and row[0]['colspan'] == widths[0] == 1 and row[1]['rowspan'] == 1
+                    and row[1]['colspan'] == widths[1] and row[2]['rowspan'] == row[0]['rowspan']
+                    and row[2]['colspan'] == widths[2] == 1):
+                count = row[0]['rowspan']
+                following = rows[row_no:row_no + count - 1]
+                if (len(following) == count - 1 and all(r and sum(c['colspan'] for c in r) == widths[1]
+                        and all(c['rowspan'] == 1 and c['colspan'] > 0 for c in r) for r in following)):
+                    content_rows = [[row[1]]] + following
+                    content = '\n'.join(' | '.join(c['text'] for c in cells) for cells in content_rows)
+                    fields = {headers[0]: row[0]['text'], headers[1]: content, headers[2]: row[2]['text']}
+                    results.append({'name': fields[name_header], 'nameColumn': name_header,
+                                    'content': content, 'contentColumn': content_header,
+                                    'department': fields.get('담당부서'), 'fields': fields,
+                                    'links': list(dict.fromkeys(link for cells in [row] + following for cell in cells for link in cell['links'])),
+                                    'source': source, 'location': {'table': table_no, 'row': row_no, 'rowEnd': row_no + count - 1},
+                                    'status': 'source_row_candidate'})
+                    processed_through = row_no + count - 1
+                    continue
             # A category in the first column may cover several independent rows;
             # the name and content cells must each be present in every row.
             if (not remaining and headers[0] in ('분야', '구분') and widths == [1] * len(headers)

@@ -24,6 +24,18 @@ class CatalogMergeTest(unittest.TestCase):
         self.assertEqual(report[0]['status'], 'review_required')
         self.assertEqual(result['sources'][0], old)
 
+    def test_skipped_previous_group_is_preserved_even_when_new_rows_offset_it(self):
+        old = snapshot(2)
+        old['items'][0]['location']['rowEnd'] = 3
+        candidate = snapshot(3, 'b')
+        candidate['items'] = candidate['items'][1:]
+        candidate['items'].append({'name': '새 사업', 'content': '새 내용', 'source': SOURCE, 'location': {'table': 2, 'row': 2}})
+        candidate['skipped'] = [{'table': 1, 'row': 3, 'reason': 'rowspan'}]
+        old['skipped'] = [{'table': 2, 'row': 9, 'reason': 'rowspan'}]
+        result, report = m.merge({'sources': [old]}, [('incomplete', candidate)], {'www.nowon.kr'})
+        self.assertEqual(report[0]['status'], 'review_required')
+        self.assertEqual(result['sources'][0], old)
+
     def test_gyeyang_notice_location_is_restricted_to_detail_path(self):
         url = 'https://www.gyeyang.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=16'
         source = snapshot(1, source=url)

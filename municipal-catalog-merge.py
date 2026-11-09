@@ -32,7 +32,8 @@ def validate(snapshot, registered):
         section = loc.get('section')
         element = loc.get('elementId')
         element_class = loc.get('elementClass')
-        table_loc = type(table) is int and type(row) is int and table >= 1 and row >= 1 and section is None and element is None and element_class is None
+        row_end = loc.get('rowEnd', row)
+        table_loc = type(table) is int and type(row) is int and type(row_end) is int and table >= 1 and row >= 1 and row_end >= row and section is None and element is None and element_class is None
         section_loc = type(section) is int and section >= 1 and table is None and row is None and element is None and element_class is None
         element_loc = element in ('contents', 'conts', 'content', 'body_content') and section is None and table is None and row is None and element_class is None
         class_loc = ((element_class == 'view_cont' and parsed.hostname == 'www.gumi.go.kr' and '/board/post/view.do' in parsed.path) or (element_class == 'board-view-content' and parsed.hostname == 'www.seongnam.go.kr' and re.fullmatch(r'/bbs[0-9]+/[0-9]+', parsed.path)) or (element_class == 'con_wrap' and parsed.hostname == 'www.ansan.go.kr' and parsed.path == '/iloveyou/sub/contents.do') or (element_class == 'tview_desc' and parsed.hostname == 'www.yongin.go.kr' and parsed.path == '/user/bbs/BD_selectBbs.do') or (element_class == 'con' and parsed.hostname == 'www.bsseogu.go.kr' and parsed.path == '/news/board/view.do') or (element_class == 'con' and parsed.hostname == 'www.gyeyang.go.kr' and parsed.path == '/open_content/main/bbs/bbsMsgDetail.do')) and all(x is None for x in (section, table, row, element))
@@ -61,10 +62,17 @@ def merge(base, candidates, registered):
             validate(source, registered)
             key = source['source']
             old = current.get(key)
+            def overlaps_previous_item(skip):
+                if not isinstance(skip, dict) or type(skip.get('table')) is not int or type(skip.get('row')) is not int:
+                    return False
+                return any(item['location'].get('table') == skip['table'] and
+                           type(item['location'].get('row')) is int and
+                           item['location']['row'] <= skip['row'] <= item['location'].get('rowEnd', item['location']['row'])
+                           for item in old['items'])
             comparable = lambda value: {k: v for k, v in value.items() if k != 'extractedAt'}
             if old and comparable(old) == comparable(source):
                 status = 'unchanged'
-            elif not source['items'] or (old and (len(source['items']) < len(old['items']) or len(source['skipped']) > len(old['skipped']))):
+            elif not source['items'] or (old and (len(source['items']) < len(old['items']) or len(source['skipped']) > len(old['skipped']) or any(overlaps_previous_item(s) for s in source['skipped']))):
                 status = 'review_required'
             else:
                 current[key] = source

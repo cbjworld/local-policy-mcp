@@ -8,6 +8,25 @@ spec.loader.exec_module(module)
 
 
 class TestMunicipalTable(unittest.TestCase):
+    def test_bounded_program_block_retains_table_rows_and_never_crosses_programs(self):
+        data = ('<table><tr><th>사업명</th><th colspan="2">사업내용</th><th>담당부서</th></tr>'
+                '<tr><th rowspan="3">A</th><td colspan="2">대상: 청년</td><td rowspan="3">복지과</td></tr>'
+                '<tr><th>구분</th><th>금액</th></tr><tr><td>가구</td><td>10만원</td></tr>'
+                '<tr><th>B</th><td colspan="2">다른 사업</td><td>기획과</td></tr></table>').encode()
+        result = module.extract(data, 'https://www.haeundae.go.kr/test')
+        self.assertEqual([x['name'] for x in result['items']], ['A', 'B'])
+        self.assertEqual(result['items'][0]['content'], '대상: 청년\n구분 | 금액\n가구 | 10만원')
+        self.assertEqual(result['items'][0]['location'], {'table': 1, 'row': 2, 'rowEnd': 4})
+        self.assertNotIn('다른 사업', result['items'][0]['content'])
+
+    def test_incomplete_or_nested_spans_are_not_combined(self):
+        data = ('<table><tr><th>사업명</th><th colspan="2">사업내용</th><th>담당부서</th></tr>'
+                '<tr><th rowspan="3">A</th><td colspan="2">내용</td><td rowspan="3">복지과</td></tr>'
+                '<tr><td rowspan="2">오류</td><td>내용</td></tr></table>').encode()
+        result = module.extract(data, 'https://www.haeundae.go.kr/test')
+        self.assertEqual(result['items'], [])
+        self.assertTrue(result['skipped'])
+
     def test_shared_category_preserves_independent_program_rows(self):
         data = '<table><tr><th>분야</th><th>사업명</th><th>지원내용</th><th>비고</th></tr><tr><td rowspan="2">근무환경</td><td>병가</td><td>60일</td><td>도 공통</td></tr><tr><td>휴가</td><td>5일</td><td>시</td></tr></table>'.encode()
         result = module.extract(data, 'https://www.nyj.go.kr/test')
