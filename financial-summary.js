@@ -59,7 +59,8 @@ function summarize(attempts,existingAmounts){
   }
  }
  const hasText=readable.some(a=>(a.source?.pages||[]).some(p=>typeof p.text==='string'&&p.text.trim()));
- const complete=hasText&&readable.every(a=>a.source?.scanComplete===true&&!a.source.pages.some(p=>p.truncated));
+ const unresolved=attempts.some(a=>a.evidenceScope!=='attachment_reference'&&!['form_or_cover','target_mismatch'].includes(a.assessment)&&a.status!=='read');
+ const complete=hasText&&!unresolved&&readable.every(a=>a.source?.scanComplete===true&&Array.isArray(a.source.pages)&&!a.source.pages.some(p=>p.truncated));
  for(const r of Object.values(rows)){
   const values=[...new Set(r.observations.filter(e=>e.valueKRW!==null).map(e=>e.valueKRW))];
   if(r.observations.length>4)r.omittedObservations=r.observations.length-4;
