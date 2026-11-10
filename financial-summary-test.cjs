@@ -74,7 +74,10 @@ for(const q of ['청년 이사비 찾아줘','청년 면접비 찾아줘','전�
 
 // A failed source is not evidence that the original omitted a budget.
 for(const attempts of [[],[{status:'download_failed'}],make('',{}),make('참고자료',{evidenceScope:'attachment_reference'})]){const result=summarize(attempts);assert.equal(row(result,'planBudget').status,'not_read');assert.equal(row(result,'planBudget').display,'원문 미확인');assert.equal(result.rows.length,3);}
-const failedView=require('./presentation').present('research_open_document',{status:'unreadable',metadata:{title:'예방접종 지원 사업',url:'https://www.open.go.kr/'},attempts:[{status:'download_failed'}]});assert(failedView.presentation.answerSummary.text.includes('원문 미확인 | 원문 미확인'));
+const failedView=require('./presentation').present('research_open_document',{status:'unreadable',metadata:{title:'예방접종 지원 사업',url:'https://www.open.go.kr/'},attempts:[{status:'download_failed'}]});assert.equal(failedView.presentation.answerSummary.text,'원문을 읽지 못했습니다.');
+assert(!direct.presentation.answerSummary.text.includes('별도 표기 없음'));
+assert(!direct.presentation.answerSummary.text.includes('원문 미확인'));
+const noAmountView=require('./presentation').documentView({attempts:make('계획 본문')});assert.equal(noAmountView.answerSummary.text,'읽은 원문에서 금액을 찾지 못했습니다.');
 
 const mixed=[...make('계획 본문'),{status:'download_failed',fileName:'예산계획.pdf'}];
 assert.equal(summarize(mixed).completeTextRead,false);assert.equal(row(summarize(mixed),'planBudget').display,'읽은 범위 별도 표기 없음');

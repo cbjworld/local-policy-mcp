@@ -13,8 +13,9 @@ function targetDifferences(attempts){
  return differences;
 }
 function answerSummary(financialSummary,differences){
- const text=['| 항목 | 금액 | 근거 쪽 |','| --- | --- | --- |',...financialSummary.rows.map(r=>'| '+r.label+' | '+r.display+' | '+([...new Set(r.observations.map(e=>e.page==null?'쪽 번호 없음':e.page+'쪽'))].join(', ')||(r.status==='not_read'?'원문 미확인':'별도 표기 없음'))+' |')].join('\n');
- return {text,instruction:'이 표를 우선 제시하세요. 사업비·소요예산·총사업비는 문서의 사업비 한 행으로 표시하고 원문 명칭의 차이만으로 미기재라고 하지 마세요. 산식 계산값은 금액 옆에 표시하세요. 별도 표기 없음은 0원이 아닙니다. 원문 표기 차이는 해당 항목 옆에 한 번만 설명하세요. 재원이 달라도 문서의 사업비는 비교할 수 있으며 합산만 하지 않습니다. 내부 추출 상태와 일반적인 주의 문구는 나열하지 마세요. 실제 불일치·읽기 실패·가림은 구체적으로 표시하세요.'};
+ const visibleRows=financialSummary.rows.filter(r=>!['not_read','not_stated'].includes(r.status));
+ const text=visibleRows.length?['| 항목 | 금액 | 근거 쪽 |','| --- | --- | --- |',...visibleRows.map(r=>'| '+r.label+' | '+r.display+' | '+([...new Set(r.observations.map(e=>e.page==null?'원문 내':e.page+'쪽'))].join(', ')||'원문 내')+' |')].join('\n'):(financialSummary.rows.some(r=>r.status==='not_read')?'원문을 읽지 못했습니다.':'읽은 원문에서 금액을 찾지 못했습니다.');
+ return {text,instruction:'확인된 내용과 출처를 중심으로 간결하게 답변하고, 값이 없는 항목이나 빈 열은 나열하지 마세요. 사용자가 직접 물은 내용을 확인하지 못했거나 원문을 읽지 못한 경우에는 그 사실을 한 번만 짧게 알리세요. 금액의 원문 명칭과 계산 여부를 유지하고 다른 대상이나 예산을 임의로 합산하지 마세요. 결과 해석에 영향을 주는 가림 처리, 대상 조건, 문서 간 차이와 OCR 숫자 검토 사항은 유지하세요.'};
 }
 function institutionGroups(value){
  const groups=new Map(),seen=new Set(),states=new Map((value.investigations||[]).map(x=>[x.candidate.url,x.result.status]));
