@@ -1,11 +1,12 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const norm=s=>String(s||'').normalize('NFKC').replace(/\s+/g,'').toLowerCase();
 const regions=require('./region-aliases.js'),registry=require('./catalog-institutions.json').records.filter(x=>!x.institution.includes('(편성 당시)'));
+const {validGov24Url}=require('./gov24-url.cjs');
 const agencies=new Map(registry.map(x=>[norm(x.parent===x.institution?x.parent:x.parent+' '+x.institution),x]));
 function configuredPath(){
  if(process.env.POLICY_GOV24_SNAPSHOT)return process.env.POLICY_GOV24_SNAPSHOT;
  if(process.env.POLICY_MUNICIPAL_CATALOG){const candidate=path.join(path.dirname(process.env.POLICY_MUNICIPAL_CATALOG),'gov24-municipal-snapshot.json');if(fs.existsSync(candidate))return candidate;}
- const bundled=path.join(__dirname,'data','gov24-national-20261013.json');return fs.existsSync(bundled)?bundled:null;
+ const bundled=path.join(__dirname,'data','gov24-national-20261110.json');return fs.existsSync(bundled)?bundled:null;
 }
 function search({q,institution,offset=0,limit=10,snapshot}={},file=configuredPath()){
  if(typeof q!=='string'||!q.trim()||q.length>100||institution!==undefined&&(typeof institution!=='string'||!institution.trim()||institution.length>80)||!Number.isInteger(offset)||offset<0||!Number.isInteger(limit)||limit<1||limit>20)throw Error('검색어 또는 결과 범위를 확인하세요.');
@@ -19,7 +20,7 @@ function search({q,institution,offset=0,limit=10,snapshot}={},file=configuredPat
  for(const r of data.records){
   if(!r||typeof r.serviceId!=='string'||!/^[A-Za-z0-9]{1,40}$/.test(r.serviceId)||typeof r.title!=='string'||!r.title.trim()||r.title.length>300||typeof r.institution!=='string'||r.institution.length>150||typeof r.url!=='string')throw Error('정부24 항목 형식이 올바르지 않습니다.');
   let u;try{u=new URL(r.url);}catch{throw Error('정부24 원문 주소가 올바르지 않습니다.');}
-  if(u.protocol!=='https:'||u.hostname!=='www.gov.kr'||u.username||u.password||u.port||u.search||u.hash||u.pathname!=='/portal/rcvfvrSvc/dtlEx/'+r.serviceId||seen.has(r.serviceId))throw Error('정부24 원문 주소가 올바르지 않습니다.');seen.add(r.serviceId);
+  if(!validGov24Url(r.url,r.serviceId)||seen.has(r.serviceId))throw Error('정부24 원문 주소가 올바르지 않습니다.');seen.add(r.serviceId);
   const agency=agencies.get(norm(r.institution));if(!agency)throw Error('정부24 소관기관을 확인할 수 없습니다.');
   if(region&&!regions.matchesRegion(region,agency)||!terms.every(t=>norm(r.title).includes(t)))continue;
   rows.push({serviceId:r.serviceId,title:r.title,institution:r.institution,url:u.href,modifiedAt:typeof r.modifiedAt==='string'&&/^\d{14}$/.test(r.modifiedAt)?r.modifiedAt:null});

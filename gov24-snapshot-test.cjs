@@ -5,6 +5,8 @@ try{
  const data={apiSource:source,fetchedAt:'2026-10-13T03:12:43.772Z',coverage:'시험 범위',records:rows};fs.writeFileSync(file,JSON.stringify(data));
  const a=search({q:'장학금',institution:'영월군'},file);assert.equal(a.total,1);assert.equal(a.items[0].serviceId,'A123');assert.equal(a.scope.fetchedAt,data.fetchedAt);assert.equal(search({q:'장학금',limit:1},file).nextOffset,1);assert.equal(search({q:'월세',institution:'영월군'},file).total,0);assert.throws(()=>search({q:'장학금',snapshot:a.snapshot},file),/변경/);
  const collected=require('./gov24-snapshot.cjs').collect({institution:'영월군',searches:[{q:'장학금'},{q:'장학금'}]},file);assert.equal(collected.items.length,1);assert.equal(collected.items[0].serviceId,'A123');assert.equal(collected.searches.length,1);
+ const valid=require('./gov24-url.cjs').validGov24Url,modern='https://plus.gov.kr/portal/benefitV2/benefitTotalSrvcList/benefitSrvcDtl?svcSeq=123&bnefType=all&svcId=A123';
+ assert(valid(modern,'A123'));assert(!valid(modern,'B456'));assert(!valid(modern+'&svcId=B456','A123'));assert(!valid(modern.replace('plus.gov.kr','plus.gov.kr.evil.example'),'A123'));assert(!valid(modern+'&next=https://evil.example','A123'));
  rows[0].url='https://evil.example/A123';fs.writeFileSync(file,JSON.stringify(data));assert.throws(()=>search({q:'장학금'},file),/주소/);
  console.log('PASS: official snapshot, institution filtering, pagination and strict source URLs');
 }finally{fs.rmSync(dir,{recursive:true,force:true});}
