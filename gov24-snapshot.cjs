@@ -30,7 +30,11 @@ function search({q,institution,offset=0,limit=10,snapshot}={},file=configuredPat
 function collect(catalog,file=configuredPath()){
  if(!file)return null;
  const queries=[...new Set((catalog?.searches||[]).map(x=>x.q).filter(q=>typeof q==='string'&&q.trim()))].slice(0,3),items=new Map(),searches=[];let scope=null;
- for(const q of queries){try{const args={q,...(catalog.institution?{institution:catalog.institution}:{})},result=search({...args,limit:5},file);scope=result.scope;searches.push({...args,total:result.total,nextOffset:result.nextOffset,snapshot:result.snapshot,followup:{tool:'search_gov24_services',arguments:{...args,limit:5,snapshot:result.snapshot}}});for(const item of result.items)items.set(item.serviceId,item);}catch{searches.push({q,status:'failed'});}}
- return {scope,searches,items:[...items.values()].slice(0,5),omittedItems:Math.max(0,items.size-5),note:'정부24 저장 목록의 제목 후보입니다. 지자체 문서·사업과 중복될 수 있으며 현재 시행·예산·지원 조건을 확정하지 않습니다. 생략 항목은 각 검색의 followup부터 이어서 확인하세요.'};
+ for(const q of queries){try{
+  const args={q,...(catalog.institution?{institution:catalog.institution}:{})};let result,offset=0,snapshot,pages=0;
+  do{result=search({...args,offset,limit:20,...(snapshot?{snapshot}:{})},file);scope=result.scope;snapshot=result.snapshot;pages++;for(const item of result.items)items.set(item.serviceId,item);offset=result.nextOffset;}while(offset!==null&&pages<3);
+  searches.push({...args,total:result.total,pagesRead:pages,nextOffset:offset,snapshot,followup:{tool:'search_gov24_services',arguments:{...args,limit:20,snapshot}},...(offset!==null?{continuation:{tool:'search_gov24_services',arguments:{...args,offset,limit:20,snapshot}}}:{})});
+ }catch{searches.push({q,status:'failed'});}}
+ return {scope,searches,items:[...items.values()].slice(0,60),omittedItems:Math.max(0,items.size-60),note:'정부24 저장 목록의 제목 후보입니다. 지자체 문서·사업과 중복될 수 있으며 현재 시행·예산·지원 조건을 확정하지 않습니다. 각 검색에서 최대 세 쪽을 모으며 남은 쪽은 continuation으로 이어가세요. 응답 크기로 생략된 항목은 followup부터 확인하세요.'};
 }
 module.exports={search,collect,configuredPath};

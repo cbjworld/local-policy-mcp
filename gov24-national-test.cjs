@@ -5,6 +5,8 @@ const {StdioClientTransport}=require('@modelcontextprotocol/sdk/client/stdio.js'
 (async()=>{
  const client=new Client({name:'national-gov24-check',version:'1'});
  const file=path.join(__dirname,'data','gov24-national-20261110.json');
+ const all=require('./gov24-snapshot.cjs').collect({searches:[{q:'산후조리비'}]},file);
+ assert.equal(all.searches[0].total,46);assert.equal(all.searches[0].pagesRead,3);assert.equal(all.items.length,46);assert.equal(new Set(all.items.map(x=>x.serviceId)).size,46);
  try{
   await client.connect(new StdioClientTransport({command:process.execPath,args:['mcp.js'],cwd:__dirname,env:{...process.env,POLICY_GOV24_SNAPSHOT:file}}));
   async function search(args){const r=await client.callTool({name:'search_gov24_services',arguments:args});assert.equal(r.isError,false);return JSON.parse(r.content[0].text);}

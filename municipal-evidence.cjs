@@ -57,7 +57,7 @@ function collect(catalog,search,link,question){
     const entries=Object.entries(item.fields||{}),fields=Object.fromEntries(entries.slice(0,4).map(([k,v])=>[k,String(v).slice(0,180)]));
     found.set(key,{name:item.name,institution:item.institution,parent:item.parent,publisherInstitution:item.publisherInstitution,programAuthority:item.programAuthority,institutionRole:item.institutionRole,source:item.source,sourceSha256:item.sourceSha256,location:item.location,status:item.status,queryMatch:item.queryMatch,targetAssessment:item.targetAssessment,conditionAssessment:item.conditionAssessment,matchScope:item.matchScope,missingTerms:item.missingTerms,targetNote:item.note,beneficiaryWarning:item.beneficiaryWarning,topicWarning:item.topicWarning,layoutWarning:item.layoutWarning,content:item.content,contentTruncated:item.contentTruncated,contentLength:item.contentLength,nextContentOffset:item.nextContentOffset,fields,fieldsTruncated:Boolean(item.fieldsTruncated||entries.length>4||entries.some(([,v])=>String(v).length>180)),followup:{tool:'search_municipal_homepage',arguments:{...base,offset:offset+index,limit:1,snapshot}}});
    }
-   if(page.nextOffset===null||page.nextOffset===undefined||regions.size>=5)break;
+   if(page.nextOffset===null||page.nextOffset===undefined)break;
    if(!Number.isInteger(page.nextOffset)||page.nextOffset<=offset){failure=offset;break;}
    offset=page.nextOffset;
   }
@@ -75,7 +75,7 @@ function collect(catalog,search,link,question){
  }catch{linkSearches.push({q,institution,status:'failed',note:'홈페이지와 예산 후보를 대조하지 못했습니다.'});}
  const rank=x=>x.queryMatch==='target_mismatch'?2:x.queryMatch==='target_unconfirmed'||x.topicWarning?1:0;
  const all=[...found.values()].sort((a,b)=>rank(a)-rank(b)),allLinks=[...linked.values()].sort((a,b)=>rank(a.homepage)-rank(b));
- const items=[0,1,2].flatMap(level=>diversify(all.filter(x=>rank(x)===level),keyForRegion)).slice(0,5);
+ const items=[0,1,2].flatMap(level=>diversify(all.filter(x=>rank(x)===level),keyForRegion)).slice(0,30);
  const links=[0,1,2].flatMap(level=>diversify(allLinks.filter(x=>rank(x.homepage)===level),x=>keyForRegion(x.homepage))).slice(0,5);
  for(const item of items){
   if(item.matchScope!=='notice_body')continue;

@@ -60,6 +60,7 @@ module.exports=function compactResearch(value){
   output.responseSize.omittedEvidenceGroups+=output.evidenceMap.length-groups.length;output.evidenceMap=groups;
  };
  // Keep retrieved evidence before spending the response budget on unread candidate titles.
+ while(oversized()&&output.gov24References?.items.length>5){output.gov24References.items.pop();output.gov24References.omittedItems++;}
  while(oversized()){
   const index=documents.findLastIndex(d=>d.readingStatus==='not_attempted');
   if(index<0)break;
